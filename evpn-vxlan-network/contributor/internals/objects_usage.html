@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Objects &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Open vSwitch Firewall Driver" href="openvswitch_firewall.html" />
+    <link rel="prev" title="Network IP Availability Extension" href="network_ip_availability.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/contributor/internals/objects_usage.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Objects</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="network_ip_availability.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Network IP Availability Extension"></i></a>
+    
+    
+    <a href="openvswitch_firewall.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Open vSwitch Firewall Driver"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="objects">
+<h1>Objects<a class="headerlink" href="#objects" title="Link to this heading">¶</a></h1>
+<p>Object versioning is a key concept in achieving rolling upgrades. Since its
+initial implementation by the nova community, a versioned object model has been
+pushed to an oslo library so that its benefits can be shared across projects.</p>
+<p><a class="reference external" href="https://docs.openstack.org/oslo.versionedobjects/latest/">Oslo VersionedObjects</a> (aka OVO) is a database facade, where you define the
+middle layer between software and the database schema. In this layer, a
+versioned object per database resource is created with a strict data definition
+and version number. With OVO, when you change the database schema, the version
+of the object also changes and a backward compatible translation is provided.
+This allows different versions of software to communicate with one another (via
+RPC).</p>
+<p>OVO is also commonly used for RPC payload versioning. OVO creates versioned
+dictionary messages by defining a strict structure and keeping strong typing.
+Because of it, you can be sure of what is sent and how to use the data on the
+receiving end.</p>
+<section id="usage-of-objects">
+<h2>Usage of objects<a class="headerlink" href="#usage-of-objects" title="Link to this heading">¶</a></h2>
+<section id="crud-operations">
+<h3>CRUD operations<a class="headerlink" href="#crud-operations" title="Link to this heading">¶</a></h3>
+<p>Objects support CRUD operations: <code class="code docutils literal notranslate"><span class="pre">create()</span></code>, <code class="code docutils literal notranslate"><span class="pre">get_object()</span></code> and
+<code class="code docutils literal notranslate"><span class="pre">get_objects()</span></code> (equivalent of <code class="code docutils literal notranslate"><span class="pre">read</span></code>), <code class="code docutils literal notranslate"><span class="pre">update()</span></code>,
+<code class="code docutils literal notranslate"><span class="pre">delete()</span></code>, <code class="code docutils literal notranslate"><span class="pre">update_objects()</span></code>, and <code class="code docutils literal notranslate"><span class="pre">delete_objects()</span></code>. The
+nature of OVO is, when any change is applied, OVO tracks it. After calling
+<code class="code docutils literal notranslate"><span class="pre">create()</span></code> or <code class="code docutils literal notranslate"><span class="pre">update()</span></code>, OVO detects this and changed fields are
+saved in the database. Please take a look at simple object usage scenarios
+using example of DNSNameServer:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># to create an object, you can pass the attributes in constructor:</span>
+<span class="n">dns</span> <span class="o">=</span> <span class="n">DNSNameServer</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">address</span><span class="o">=</span><span class="s1">&#39;asd&#39;</span><span class="p">,</span> <span class="n">subnet_id</span><span class="o">=</span><span class="s1">&#39;xxx&#39;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">dns</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+
+<span class="c1"># or you can create a dict and pass it as kwargs:</span>
+<span class="n">dns_data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;address&#39;</span><span class="p">:</span> <span class="s1">&#39;asd&#39;</span><span class="p">,</span> <span class="s1">&#39;subnet_id&#39;</span><span class="p">:</span> <span class="s1">&#39;xxx&#39;</span><span class="p">,</span> <span class="s1">&#39;order&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+<span class="n">dns</span> <span class="o">=</span> <span class="n">DNSNameServer</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">dns_data</span><span class="p">)</span>
+<span class="n">dns</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+
+<span class="c1"># for fetching multiple objects:</span>
+<span class="n">dnses</span> <span class="o">=</span> <span class="n">DNSNameServer</span><span class="o">.</span><span class="n">get_objects</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+<span class="c1"># will return list of all dns name servers from DB</span>
+
+<span class="c1"># for fetching objects with substrings in a string field:</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">neutron_lib.objects</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">obj_utils</span>
+<span class="n">dnses</span> <span class="o">=</span> <span class="n">DNSNameServer</span><span class="o">.</span><span class="n">get_objects</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">address</span><span class="o">=</span><span class="n">obj_utils</span><span class="o">.</span><span class="n">StringContains</span><span class="p">(</span><span class="s1">&#39;10.0.0&#39;</span><span class="p">))</span>
+<span class="c1"># will return list of all dns name servers from DB that has &#39;10.0.0&#39; in their addresses</span>
+
+<span class="c1"># to update fields:</span>
+<span class="n">dns</span> <span class="o">=</span> <span class="n">DNSNameServer</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">address</span><span class="o">=</span><span class="s1">&#39;asd&#39;</span><span class="p">,</span> <span class="n">subnet_id</span><span class="o">=</span><span class="s1">&#39;xxx&#39;</span><span class="p">)</span>
+<span class="n">dns</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">dns</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+<span class="c1"># if you don&#39;t care about keeping the object, you can execute the update</span>
+<span class="c1"># without fetch of the object state from the underlying persistent layer</span>
+<span class="n">count</span> <span class="o">=</span> <span class="n">DNSNameServer</span><span class="o">.</span><span class="n">update_objects</span><span class="p">(</span>
+    <span class="n">context</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;order&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span> <span class="n">address</span><span class="o">=</span><span class="s1">&#39;asd&#39;</span><span class="p">,</span> <span class="n">subnet_id</span><span class="o">=</span><span class="s1">&#39;xxx&#39;</span><span class="p">)</span>
+
+<span class="c1"># to remove object with filter arguments:</span>
+<span class="n">filters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;address&#39;</span><span class="p">:</span> <span class="s1">&#39;asd&#39;</span><span class="p">,</span> <span class="s1">&#39;subnet_id&#39;</span><span class="p">:</span> <span class="s1">&#39;xxx&#39;</span><span class="p">}</span>
+<span class="n">DNSNameServer</span><span class="o">.</span><span class="n">delete_objects</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">filters</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="filter-sort-and-paginate">
+<h3>Filter, sort and paginate<a class="headerlink" href="#filter-sort-and-paginate" title="Link to this heading">¶</a></h3>
+<p>The <code class="code docutils literal notranslate"><span class="pre">NeutronDbObject</span></code> class has strict validation on which field sorting
+and filtering can happen. When calling <code class="code docutils literal notranslate"><span class="pre">get_objects()</span></code>, <code class="code docutils literal notranslate"><span class="pre">count()</span></code>,
+<code class="code docutils literal notranslate"><span class="pre">update_objects()</span></code>, <code class="code docutils literal notranslate"><span class="pre">delete_objects()</span></code> and <code class="code docutils literal notranslate"><span class="pre">objects_exist()</span></code>,
+<code class="code docutils literal notranslate"><span class="pre">validate_filters()</span></code> is invoked, to see if it’s a supported filter
+criterion (which is by default non-synthetic fields only). Additional filters
+can be defined using <code class="code docutils literal notranslate"><span class="pre">register_filter_hook_on_model()</span></code>. This will add the
+requested string to valid filter names in object implementation. It is
+optional.</p>
+<p>In order to disable filter validation, <code class="code docutils literal notranslate"><span class="pre">validate_filters=False</span></code> needs to
+be passed as an argument in aforementioned methods. It was added because the
+default behaviour of the neutron API is to accept everything at API level
+and filter it out at DB layer. This can be used by out of tree extensions.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">register_filter_hook_on_model()</span></code> is a complementary implementation in
+the <code class="code docutils literal notranslate"><span class="pre">NeutronDbObject</span></code> layer to DB layer’s
+<code class="code docutils literal notranslate"><span class="pre">neutron_lib.db.model_query.register_hook()</span></code>, which adds support for
+extra filtering during construction of SQL query. When extension defines
+extra query hook, it needs to be registered using the objects
+<code class="code docutils literal notranslate"><span class="pre">register_filter_hook_on_model()</span></code>, if it is not already included in the
+objects <code class="code docutils literal notranslate"><span class="pre">fields</span></code>.</p>
+<p>To limit or paginate results, <code class="code docutils literal notranslate"><span class="pre">Pager</span></code> object can be used. It accepts
+<code class="code docutils literal notranslate"><span class="pre">sorts</span></code> (list of <code class="code docutils literal notranslate"><span class="pre">(key,</span> <span class="pre">direction)</span></code> tuples), <code class="code docutils literal notranslate"><span class="pre">limit</span></code>,
+<code class="code docutils literal notranslate"><span class="pre">page_reverse</span></code> and <code class="code docutils literal notranslate"><span class="pre">marker</span></code> keywords.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># filtering</span>
+
+<span class="c1"># to get an object based on primary key filter</span>
+<span class="n">dns</span> <span class="o">=</span> <span class="n">DNSNameServer</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">address</span><span class="o">=</span><span class="s1">&#39;asd&#39;</span><span class="p">,</span> <span class="n">subnet_id</span><span class="o">=</span><span class="s1">&#39;xxx&#39;</span><span class="p">)</span>
+
+<span class="c1"># to get multiple objects</span>
+<span class="n">dnses</span> <span class="o">=</span> <span class="n">DNSNameServer</span><span class="o">.</span><span class="n">get_objects</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">subnet_id</span><span class="o">=</span><span class="s1">&#39;xxx&#39;</span><span class="p">)</span>
+
+<span class="n">filters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;subnet_id&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;xxx&#39;</span><span class="p">,</span> <span class="s1">&#39;yyy&#39;</span><span class="p">]}</span>
+<span class="n">dnses</span> <span class="o">=</span> <span class="n">DNSNameServer</span><span class="o">.</span><span class="n">get_objects</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">filters</span><span class="p">)</span>
+
+<span class="c1"># do not validate filters</span>
+<span class="n">dnses</span> <span class="o">=</span> <span class="n">DNSNameServer</span><span class="o">.</span><span class="n">get_objects</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">validate_filters</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                  <span class="n">fake_filter</span><span class="o">=</span><span class="s1">&#39;xxx&#39;</span><span class="p">)</span>
+
+<span class="c1"># count the dns servers for given subnet</span>
+<span class="n">dns_count</span> <span class="o">=</span> <span class="n">DNSNameServer</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">subnet_id</span><span class="o">=</span><span class="s1">&#39;xxx&#39;</span><span class="p">)</span>
+
+<span class="c1"># sorting</span>
+<span class="c1"># direction True == ASC, False == DESC</span>
+<span class="n">direction</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">pager</span> <span class="o">=</span> <span class="n">Pager</span><span class="p">(</span><span class="n">sorts</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;order&#39;</span><span class="p">,</span> <span class="n">direction</span><span class="p">)])</span>
+<span class="n">dnses</span> <span class="o">=</span> <span class="n">DNSNameServer</span><span class="o">.</span><span class="n">get_objects</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">_pager</span><span class="o">=</span><span class="n">pager</span><span class="p">,</span> <span class="n">subnet_id</span><span class="o">=</span><span class="s1">&#39;xxx&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="defining-your-own-object">
+<h2>Defining your own object<a class="headerlink" href="#defining-your-own-object" title="Link to this heading">¶</a></h2>
+<p>In order to add a new object in neutron, you have to:</p>
+<ol class="arabic simple">
+<li><p>Create an object derived from <code class="code docutils literal notranslate"><span class="pre">NeutronDbObject</span></code> (aka base object)</p></li>
+<li><p>Add/reuse data model</p></li>
+<li><p>Define fields</p></li>
+</ol>
+<p>It is mandatory to define data model using <code class="code docutils literal notranslate"><span class="pre">db_model</span></code> attribute from
+<code class="code docutils literal notranslate"><span class="pre">NeutronDbObject</span></code>.</p>
+<p>Fields should be defined using <code class="code docutils literal notranslate"><span class="pre">oslo_versionobjects.fields</span></code> exposed
+types. If there is a special need to create a new type of field, you can use
+<code class="code docutils literal notranslate"><span class="pre">common_types.py</span></code> in the <code class="code docutils literal notranslate"><span class="pre">neutron.objects</span></code> directory.
+Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fields</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">common_types</span><span class="o">.</span><span class="n">UUIDField</span><span class="p">(),</span>
+    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">obj_fields</span><span class="o">.</span><span class="n">StringField</span><span class="p">(),</span>
+    <span class="s1">&#39;subnetpool_id&#39;</span><span class="p">:</span> <span class="n">common_types</span><span class="o">.</span><span class="n">UUIDField</span><span class="p">(</span><span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="s1">&#39;ip_version&#39;</span><span class="p">:</span> <span class="n">common_types</span><span class="o">.</span><span class="n">IPVersionEnumField</span><span class="p">()</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="code docutils literal notranslate"><span class="pre">VERSION</span></code> is mandatory and defines the version of the object. Initially,
+set the <code class="code docutils literal notranslate"><span class="pre">VERSION</span></code> field to 1.0.
+Change <code class="code docutils literal notranslate"><span class="pre">VERSION</span></code> if fields or their types are modified. When you change
+the version of objects being exposed via RPC, add method
+<code class="code docutils literal notranslate"><span class="pre">obj_make_compatible(self,</span> <span class="pre">primitive,</span> <span class="pre">target_version)</span></code>. For example, if
+a new version introduces a new parameter, it needs to be removed for previous
+versions:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">oslo_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">versionutils</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">obj_make_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">primitive</span><span class="p">,</span> <span class="n">target_version</span><span class="p">):</span>
+    <span class="n">_target_version</span> <span class="o">=</span> <span class="n">versionutils</span><span class="o">.</span><span class="n">convert_version_to_tuple</span><span class="p">(</span><span class="n">target_version</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">_target_version</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>  <span class="c1"># version 1.1 introduces &quot;new_parameter&quot;</span>
+        <span class="n">primitive</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;new_parameter&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In the following example the object has changed an attribute definition. For
+example, in version 1.1 <code class="code docutils literal notranslate"><span class="pre">description</span></code> is allowed to be <code class="code docutils literal notranslate"><span class="pre">None</span></code> but
+not in version 1.0:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">oslo_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">versionutils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">oslo_versionedobjects</span><span class="w"> </span><span class="kn">import</span> <span class="n">exception</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">obj_make_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">primitive</span><span class="p">,</span> <span class="n">target_version</span><span class="p">):</span>
+    <span class="n">_target_version</span> <span class="o">=</span> <span class="n">versionutils</span><span class="o">.</span><span class="n">convert_version_to_tuple</span><span class="p">(</span><span class="n">target_version</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">_target_version</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>  <span class="c1"># version 1.1 changes &quot;description&quot;</span>
+        <span class="k">if</span> <span class="n">primitive</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># &quot;description&quot; was not nullable before</span>
+            <span class="k">raise</span> <span class="n">exception</span><span class="o">.</span><span class="n">IncompatibleObjectVersion</span><span class="p">(</span>
+                <span class="n">objver</span><span class="o">=</span><span class="n">target_version</span><span class="p">,</span> <span class="n">objname</span><span class="o">=</span><span class="s1">&#39;OVOName&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Using the first example as reference, this is how the unit test can be
+implemented:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">test_object_version_degradation_1_1_to_1_0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">OVO_obj_1_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method_to_create_this_OVO</span><span class="p">()</span>
+    <span class="n">OVO_obj_1_0</span> <span class="o">=</span> <span class="n">OVO_obj_1_1</span><span class="o">.</span><span class="n">obj_to_primitive</span><span class="p">(</span><span class="n">target_version</span><span class="o">=</span><span class="s1">&#39;1.0&#39;</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">assertNotIn</span><span class="p">(</span><span class="s1">&#39;new_parameter&#39;</span><span class="p">,</span> <span class="n">OVO_obj_1_0</span><span class="p">[</span><span class="s1">&#39;versioned_object.data&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Standard Attributes are automatically added to OVO fields in base class.
+Attributes <a class="footnote-reference brackets" href="#id10" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> like <code class="code docutils literal notranslate"><span class="pre">description</span></code>, <code class="code docutils literal notranslate"><span class="pre">created_at</span></code>,
+<code class="code docutils literal notranslate"><span class="pre">updated_at</span></code> and <code class="code docutils literal notranslate"><span class="pre">revision_number</span></code> are added in <a class="footnote-reference brackets" href="#id11" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
+</div>
+<p><code class="code docutils literal notranslate"><span class="pre">primary_keys</span></code> is used to define the list of fields that uniquely
+identify the object. In case of database backed objects, it’s usually mapped
+onto SQL primary keys. For immutable object fields that cannot be changed,
+there is a <code class="code docutils literal notranslate"><span class="pre">fields_no_update</span></code> list, that contains
+<code class="code docutils literal notranslate"><span class="pre">primary_keys</span></code> by default.</p>
+<p>If there is a situation where a field needs to be named differently in an
+object than in the database schema, you can use
+<code class="code docutils literal notranslate"><span class="pre">fields_need_translation</span></code>. This dictionary contains the name of the field
+in the object definition (the key) and the name of the field in the database
+(the value). This allows to have a different object layer representation for
+database persisted data.
+For example in IP allocation pools:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fields_need_translation</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;start&#39;</span><span class="p">:</span> <span class="s1">&#39;first_ip&#39;</span><span class="p">,</span>  <span class="c1"># field_ovo: field_db</span>
+    <span class="s1">&#39;end&#39;</span><span class="p">:</span> <span class="s1">&#39;last_ip&#39;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The above dictionary is used in <code class="code docutils literal notranslate"><span class="pre">modify_fields_from_db()</span></code> and in
+<code class="code docutils literal notranslate"><span class="pre">modify_fields_to_db()</span></code> methods which are implemented in base class and
+will translate the software layer to database schema naming, and vice versa. It
+can also be used to rename <code class="code docutils literal notranslate"><span class="pre">orm.relationship</span></code> backed object-type fields.</p>
+<p>Most object fields are usually directly mapped to database model attributes.
+Sometimes it’s useful to expose attributes that are not defined in the model
+table itself, like relationships and such. In this case,
+<code class="code docutils literal notranslate"><span class="pre">synthetic_fields</span></code> may become handy. This object property can define a
+list of object fields that don’t belong to the object database model and that
+are hence instead to be implemented in some custom way. Some of those fields
+map to <code class="code docutils literal notranslate"><span class="pre">orm.relationships</span></code> defined on models, while others are completely
+untangled from the database layer.</p>
+<p>When exposing existing <code class="code docutils literal notranslate"><span class="pre">orm.relationships</span></code> as an ObjectField-typed field,
+you can use the <code class="code docutils literal notranslate"><span class="pre">foreign_keys</span></code> object property that defines a link
+between two object types. When used, it allows objects framework to
+automatically instantiate child objects, and fill the relevant parent fields,
+based on <code class="code docutils literal notranslate"><span class="pre">orm.relationships</span></code> defined on parent models. In order to
+automatically populate the <code class="code docutils literal notranslate"><span class="pre">synthetic_fields</span></code>, the <code class="code docutils literal notranslate"><span class="pre">foreign_keys</span></code>
+property is introduced. <code class="code docutils literal notranslate"><span class="pre">load_synthetic_db_fields()</span></code> <a class="footnote-reference brackets" href="#id12" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a> method from
+NeutronDbObject uses <code class="code docutils literal notranslate"><span class="pre">foreign_keys</span></code> to match the foreign key in related
+object and local field that the foreign key is referring to. See simplified
+examples:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">DNSNameServerSqlModel</span><span class="p">(</span><span class="n">model_base</span><span class="o">.</span><span class="n">BASEV2</span><span class="p">):</span>
+    <span class="n">address</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">sa</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="mi">128</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">subnet_id</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">sa</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="mi">36</span><span class="p">),</span>
+                          <span class="n">sa</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;subnets.id&#39;</span><span class="p">,</span> <span class="n">ondelete</span><span class="o">=</span><span class="s2">&quot;CASCADE&quot;</span><span class="p">),</span>
+                          <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">SubnetSqlModel</span><span class="p">(</span><span class="n">model_base</span><span class="o">.</span><span class="n">BASEV2</span><span class="p">,</span> <span class="n">HasId</span><span class="p">,</span> <span class="n">HasProject</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">sa</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="n">attr</span><span class="o">.</span><span class="n">NAME_MAX_LEN</span><span class="p">))</span>
+    <span class="n">allocation_pools</span> <span class="o">=</span> <span class="n">orm</span><span class="o">.</span><span class="n">relationship</span><span class="p">(</span><span class="n">IPAllocationPoolSqlModel</span><span class="p">)</span>
+    <span class="n">dns_nameservers</span> <span class="o">=</span> <span class="n">orm</span><span class="o">.</span><span class="n">relationship</span><span class="p">(</span><span class="n">DNSNameServerSqlModel</span><span class="p">,</span>
+                                       <span class="n">backref</span><span class="o">=</span><span class="s1">&#39;subnet&#39;</span><span class="p">,</span>
+                                       <span class="n">cascade</span><span class="o">=</span><span class="s1">&#39;all, delete, delete-orphan&#39;</span><span class="p">,</span>
+                                       <span class="n">lazy</span><span class="o">=</span><span class="s1">&#39;subquery&#39;</span><span class="p">)</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">IPAllocationPoolSqlModel</span><span class="p">(</span><span class="n">model_base</span><span class="o">.</span><span class="n">BASEV2</span><span class="p">,</span> <span class="n">HasId</span><span class="p">):</span>
+    <span class="n">subnet_id</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">sa</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="mi">36</span><span class="p">),</span> <span class="n">sa</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;subnets.id&#39;</span><span class="p">))</span>
+
+<span class="nd">@obj_base</span><span class="o">.</span><span class="n">VersionedObjectRegistry</span><span class="o">.</span><span class="n">register</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DNSNameServerOVO</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">NeutronDbObject</span><span class="p">):</span>
+    <span class="n">VERSION</span> <span class="o">=</span> <span class="s1">&#39;1.0&#39;</span>
+    <span class="n">db_model</span> <span class="o">=</span> <span class="n">DNSNameServerSqlModel</span>
+
+    <span class="c1"># Created based on primary_key=True in model definition.</span>
+    <span class="c1"># The object is uniquely identified by the pair of address and</span>
+    <span class="c1"># subnet_id fields. Override the default &#39;id&#39; 1-tuple.</span>
+    <span class="n">primary_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="s1">&#39;subnet_id&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Allow to link DNSNameServerOVO child objects into SubnetOVO parent</span>
+    <span class="c1"># object fields via subnet_id child database model attribute.</span>
+    <span class="c1"># Used during loading synthetic fields in SubnetOVO get_objects.</span>
+    <span class="n">foreign_keys</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;SubnetOVO&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;subnet_id&#39;</span><span class="p">:</span> <span class="s1">&#39;id&#39;</span><span class="p">}}</span>
+
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;address&#39;</span><span class="p">:</span> <span class="n">obj_fields</span><span class="o">.</span><span class="n">StringField</span><span class="p">(),</span>
+        <span class="s1">&#39;subnet_id&#39;</span><span class="p">:</span> <span class="n">common_types</span><span class="o">.</span><span class="n">UUIDField</span><span class="p">(),</span>
+    <span class="p">}</span>
+
+<span class="nd">@obj_base</span><span class="o">.</span><span class="n">VersionedObjectRegistry</span><span class="o">.</span><span class="n">register</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubnetOVO</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">NeutronDbObject</span><span class="p">):</span>
+    <span class="n">VERSION</span> <span class="o">=</span> <span class="s1">&#39;1.0&#39;</span>
+    <span class="n">db_model</span> <span class="o">=</span>  <span class="n">SubnetSqlModel</span>
+
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">common_types</span><span class="o">.</span><span class="n">UUIDField</span><span class="p">(),</span>  <span class="c1"># HasId from model class</span>
+        <span class="s1">&#39;project_id&#39;</span><span class="p">:</span> <span class="n">obj_fields</span><span class="o">.</span><span class="n">StringField</span><span class="p">(</span><span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>  <span class="c1"># HasProject from model class</span>
+        <span class="s1">&#39;subnet_name&#39;</span><span class="p">:</span> <span class="n">obj_fields</span><span class="o">.</span><span class="n">StringField</span><span class="p">(</span><span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="s1">&#39;dns_nameservers&#39;</span><span class="p">:</span> <span class="n">obj_fields</span><span class="o">.</span><span class="n">ListOfObjectsField</span><span class="p">(</span><span class="s1">&#39;DNSNameServer&#39;</span><span class="p">,</span>
+                                                         <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="s1">&#39;allocation_pools&#39;</span><span class="p">:</span> <span class="n">obj_fields</span><span class="o">.</span><span class="n">ListOfObjectsField</span><span class="p">(</span><span class="s1">&#39;IPAllocationPoolOVO&#39;</span><span class="p">,</span>
+                                                          <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Claim dns_nameservers field as not directly mapped into the object</span>
+    <span class="c1"># database model table.</span>
+    <span class="n">synthetic_fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;allocation_pools&#39;</span><span class="p">,</span> <span class="s1">&#39;dns_nameservers&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Rename in-database subnet_name attribute into name object field</span>
+    <span class="n">fields_need_translation</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;subnet_name&#39;</span>
+    <span class="p">}</span>
+
+
+<span class="nd">@obj_base</span><span class="o">.</span><span class="n">VersionedObjectRegistry</span><span class="o">.</span><span class="n">register</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">IPAllocationPoolOVO</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">NeutronDbObject</span><span class="p">):</span>
+    <span class="n">VERSION</span> <span class="o">=</span> <span class="s1">&#39;1.0&#39;</span>
+    <span class="n">db_model</span> <span class="o">=</span> <span class="n">IPAllocationPoolSqlModel</span>
+
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;subnet_id&#39;</span><span class="p">:</span> <span class="n">common_types</span><span class="o">.</span><span class="n">UUIDField</span><span class="p">()</span>
+    <span class="p">}</span>
+
+    <span class="n">foreign_keys</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;SubnetOVO&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;subnet_id&#39;</span><span class="p">:</span> <span class="s1">&#39;id&#39;</span><span class="p">}}</span>
+</pre></div>
+</div>
+<p>The <code class="code docutils literal notranslate"><span class="pre">foreign_keys</span></code> is used in <code class="code docutils literal notranslate"><span class="pre">SubnetOVO</span></code> to populate the
+<code class="code docutils literal notranslate"><span class="pre">allocation_pools</span></code> <a class="footnote-reference brackets" href="#id13" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a> synthetic field using the
+<code class="code docutils literal notranslate"><span class="pre">IPAllocationPoolOVO</span></code> class. Single object type may be linked to multiple
+parent object types, hence <code class="code docutils literal notranslate"><span class="pre">foreign_keys</span></code> property may have multiple keys
+in the dictionary.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="code docutils literal notranslate"><span class="pre">foreign_keys</span></code> is declared in related object
+<code class="code docutils literal notranslate"><span class="pre">IPAllocationPoolOVO</span></code>, the same way as it’s done in the SQL model
+<code class="code docutils literal notranslate"><span class="pre">IPAllocationPoolSqlModel</span></code>: <code class="code docutils literal notranslate"><span class="pre">sa.ForeignKey('subnets.id')</span></code></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only single foreign key is allowed (usually parent ID), you cannot link
+through multiple model attributes.</p>
+</div>
+<p>It is important to remember about the nullable parameter. In the SQLAlchemy
+model, the nullable parameter is by default <code class="code docutils literal notranslate"><span class="pre">True</span></code>, while for OVO fields,
+the nullable is set to <code class="code docutils literal notranslate"><span class="pre">False</span></code>. Make sure you correctly map database
+column nullability properties to relevant object fields.</p>
+</section>
+<section id="synthetic-fields">
+<h2>Synthetic fields<a class="headerlink" href="#synthetic-fields" title="Link to this heading">¶</a></h2>
+<p><code class="code docutils literal notranslate"><span class="pre">synthetic_fields</span></code> is a list of fields, that are not directly backed by
+corresponding object SQL table attributes. Synthetic fields are not limited in
+types that can be used to implement them.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">fields</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;dhcp_agents&#39;</span><span class="p">:</span> <span class="n">obj_fields</span><span class="o">.</span><span class="n">ObjectField</span><span class="p">(</span><span class="s1">&#39;NetworkDhcpAgentBinding&#39;</span><span class="p">,</span>
+                                          <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="c1"># field that contains another single NeutronDbObject of NetworkDhcpAgentBinding type</span>
+    <span class="s1">&#39;shared&#39;</span><span class="p">:</span> <span class="n">obj_fields</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+    <span class="s1">&#39;subnets&#39;</span><span class="p">:</span> <span class="n">obj_fields</span><span class="o">.</span><span class="n">ListOfObjectsField</span><span class="p">(</span><span class="s1">&#39;Subnet&#39;</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="c1"># All three fields do not belong to corresponding SQL table, and will be</span>
+<span class="c1"># implemented in some object-specific way.</span>
+<span class="n">synthetic_fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;dhcp_agents&#39;</span><span class="p">,</span> <span class="s1">&#39;shared&#39;</span><span class="p">,</span> <span class="s1">&#39;subnets&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><code class="code docutils literal notranslate"><span class="pre">ObjectField</span></code> and <code class="code docutils literal notranslate"><span class="pre">ListOfObjectsField</span></code>  take the name of object
+class as an argument.</p>
+<section id="implementing-custom-synthetic-fields">
+<h3>Implementing custom synthetic fields<a class="headerlink" href="#implementing-custom-synthetic-fields" title="Link to this heading">¶</a></h3>
+<p>Sometimes you may want to expose a field on an object that is not mapped into a
+corresponding database model attribute, or its <code class="code docutils literal notranslate"><span class="pre">orm.relationship</span></code>; or may
+want to expose a <code class="code docutils literal notranslate"><span class="pre">orm.relationship</span></code> data in a format that is not directly
+mapped onto a child object type. In this case, here is what you need to do to
+implement custom getters and setters for the custom field.
+The custom method to load the synthetic fields can be helpful if the field is
+not directly defined in the database, OVO class is not suitable to load the
+data or the related object contains only the ID and property of the parent
+object, for example <code class="code docutils literal notranslate"><span class="pre">subnet_id</span></code> and property of it: <code class="code docutils literal notranslate"><span class="pre">is_external</span></code>.</p>
+<p>In order to implement the custom method to load the synthetic field, you need
+to provide loading method in the OVO class and override the base class method
+<code class="code docutils literal notranslate"><span class="pre">from_db_object()</span></code> and <code class="code docutils literal notranslate"><span class="pre">obj_load_attr()</span></code>. The first one is
+responsible for loading the fields to object attributes when calling
+<code class="code docutils literal notranslate"><span class="pre">get_object()</span></code> and <code class="code docutils literal notranslate"><span class="pre">get_objects()</span></code>, <code class="code docutils literal notranslate"><span class="pre">create()</span></code> and
+<code class="code docutils literal notranslate"><span class="pre">update()</span></code>. The second is responsible for loading attribute when it is
+not set in object. Also, when you need to create related object with attributes
+passed in constructor, <code class="code docutils literal notranslate"><span class="pre">create()</span></code> and <code class="code docutils literal notranslate"><span class="pre">update()</span></code> methods need to be
+overwritten. Additionally <code class="code docutils literal notranslate"><span class="pre">is_external</span></code> attribute can be exposed as a
+boolean, instead of as an object-typed field. When field is changed, but it
+doesn’t need to be saved into database, <code class="code docutils literal notranslate"><span class="pre">obj_reset_changes()</span></code> can be
+called, to tell OVO library to ignore that. Let’s see an example:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nd">@obj_base</span><span class="o">.</span><span class="n">VersionedObjectRegistry</span><span class="o">.</span><span class="n">register</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExternalSubnet</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">NeutronDbObject</span><span class="p">):</span>
+    <span class="n">VERSION</span> <span class="o">=</span> <span class="s1">&#39;1.0&#39;</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;subnet_id&#39;</span><span class="p">:</span> <span class="n">common_types</span><span class="o">.</span><span class="n">UUIDField</span><span class="p">(),</span>
+              <span class="s1">&#39;is_external&#39;</span><span class="p">:</span> <span class="n">obj_fields</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">()}</span>
+    <span class="n">primary_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;subnet_id&#39;</span><span class="p">]</span>
+    <span class="n">foreign_keys</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Subnet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;subnet_id&#39;</span><span class="p">:</span> <span class="s1">&#39;id&#39;</span><span class="p">}}</span>
+
+
+<span class="nd">@obj_base</span><span class="o">.</span><span class="n">VersionedObjectRegistry</span><span class="o">.</span><span class="n">register</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Subnet</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">NeutronDbObject</span><span class="p">):</span>
+    <span class="n">VERSION</span> <span class="o">=</span> <span class="s1">&#39;1.0&#39;</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;external&#39;</span><span class="p">:</span> <span class="n">obj_fields</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">),}</span>
+    <span class="n">synthetic_fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;external&#39;</span><span class="p">]</span>
+
+    <span class="c1"># support new custom &#39;external=&#39; filter for get_objects family of</span>
+    <span class="c1"># objects API</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Subnet</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_extra_filter_name</span><span class="p">(</span><span class="s1">&#39;external&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_changes</span><span class="p">()</span>
+        <span class="k">with</span> <span class="n">db_api</span><span class="o">.</span><span class="n">context_manager</span><span class="o">.</span><span class="n">writer</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s1">&#39;external&#39;</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+                <span class="n">ExternalSubnet</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">subnet_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                    <span class="n">is_external</span><span class="o">=</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;external&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+            <span class="c1"># Call to super() to create the SQL record for the object, and</span>
+            <span class="c1"># reload its fields from the database, if needed.</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">Subnet</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_changes</span><span class="p">()</span>
+        <span class="k">with</span> <span class="n">db_api</span><span class="o">.</span><span class="n">context_manager</span><span class="o">.</span><span class="n">writer</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s1">&#39;external&#39;</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+                <span class="c1"># delete the old ExternalSubnet record, if present</span>
+                <span class="n">obj_db_api</span><span class="o">.</span><span class="n">delete_objects</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">obj_context</span><span class="p">,</span> <span class="n">ExternalSubnet</span><span class="o">.</span><span class="n">db_model</span><span class="p">,</span>
+                    <span class="n">subnet_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+                <span class="c1"># create the new intended ExternalSubnet object</span>
+                <span class="n">ExternalSubnet</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">subnet_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                    <span class="n">is_external</span><span class="o">=</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;external&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+            <span class="c1"># calling super().update() will reload the synthetic fields</span>
+            <span class="c1"># and also will update any changed non-synthetic fields, if any</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">Subnet</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+    <span class="c1"># this method is called when user of an object accesses the attribute</span>
+    <span class="c1"># and requested attribute is not set.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">obj_load_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attrname</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">attrname</span> <span class="o">==</span> <span class="s1">&#39;external&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_external</span><span class="p">()</span>
+        <span class="c1"># it is important to call super if attrname does not match</span>
+        <span class="c1"># because the base implementation is handling the nullable case</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Subnet</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">obj_load_attr</span><span class="p">(</span><span class="n">attrname</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_external</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># do the loading here</span>
+        <span class="k">if</span> <span class="n">db_obj</span><span class="p">:</span>
+            <span class="c1"># use DB model to fetch the data that may be side-loaded</span>
+            <span class="n">external</span> <span class="o">=</span> <span class="n">db_obj</span><span class="o">.</span><span class="n">external</span><span class="o">.</span><span class="n">is_external</span> <span class="k">if</span> <span class="n">db_obj</span><span class="o">.</span><span class="n">external</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># perform extra operation to fetch the data from DB</span>
+            <span class="n">external_obj</span> <span class="o">=</span> <span class="n">ExternalSubnet</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="n">context</span><span class="p">,</span>
+                <span class="n">subnet_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="n">external</span> <span class="o">=</span> <span class="n">external_obj</span><span class="o">.</span><span class="n">is_external</span> <span class="k">if</span> <span class="n">external_obj</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="c1"># it is important to set the attribute and call obj_reset_changes</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;external&#39;</span><span class="p">,</span> <span class="n">external</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obj_reset_changes</span><span class="p">([</span><span class="s1">&#39;external&#39;</span><span class="p">])</span>
+
+    <span class="c1"># this is defined in NeutronDbObject and is invoked during get_object(s)</span>
+    <span class="c1"># and create/update.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_db_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Subnet</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">from_db_object</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_external</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In the above example, the <code class="code docutils literal notranslate"><span class="pre">get_object(s)</span></code> methods do not have to be
+overwritten, because <code class="code docutils literal notranslate"><span class="pre">from_db_object()</span></code> takes care of loading the
+synthetic fields in custom way.</p>
+</section>
+</section>
+<section id="standard-attributes">
+<h2>Standard attributes<a class="headerlink" href="#standard-attributes" title="Link to this heading">¶</a></h2>
+<p>The standard attributes are added automatically in metaclass
+<code class="code docutils literal notranslate"><span class="pre">DeclarativeObject</span></code>. If adding standard attribute, it has to be added in
+<code class="docutils literal notranslate"><span class="pre">neutron/objects/extensions/standardattributes.py</span></code>. It will be added
+to all relevant objects that use the <code class="code docutils literal notranslate"><span class="pre">standardattributes</span></code> model.
+Be careful when adding something to the above, because it could trigger a
+change in the object’s <code class="code docutils literal notranslate"><span class="pre">VERSION</span></code>.
+For more on how standard attributes work, check <a class="footnote-reference brackets" href="#id14" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>.</p>
+</section>
+<section id="rbac-handling-in-objects">
+<h2>RBAC handling in objects<a class="headerlink" href="#rbac-handling-in-objects" title="Link to this heading">¶</a></h2>
+<p>The RBAC is implemented currently for resources like: Subnet(*), Network and
+QosPolicy. Subnet is a special case, because access control of Subnet depends
+on Network RBAC entries.</p>
+<p>The RBAC support for objects is defined in <code class="docutils literal notranslate"><span class="pre">neutron/objects/rbac_db.py</span></code>. It
+defines new base class <code class="code docutils literal notranslate"><span class="pre">NeutronRbacObject</span></code>. The new class wraps standard
+<code class="code docutils literal notranslate"><span class="pre">NeutronDbObject</span></code> methods like <code class="code docutils literal notranslate"><span class="pre">create()</span></code>, <code class="code docutils literal notranslate"><span class="pre">update()</span></code> and
+<code class="code docutils literal notranslate"><span class="pre">to_dict()</span></code>. It checks if the <code class="code docutils literal notranslate"><span class="pre">shared</span></code> attribute is defined in the
+<code class="code docutils literal notranslate"><span class="pre">fields</span></code> dictionary and adds it to <code class="code docutils literal notranslate"><span class="pre">synthetic_fields</span></code>. Also,
+<code class="code docutils literal notranslate"><span class="pre">rbac_db_model</span></code> is required to be defined in Network and QosPolicy
+classes.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">NeutronRbacObject</span></code> is a common place to handle all operations on the
+RBAC entries, like getting the info if resource is shared or not, creation and
+updates of them. By wrapping the <code class="code docutils literal notranslate"><span class="pre">NeutronDbObject</span></code> methods, it is
+manipulating the ‘shared’ attribute while <code class="code docutils literal notranslate"><span class="pre">create()</span></code> and <code class="code docutils literal notranslate"><span class="pre">update()</span></code>
+methods are called.</p>
+<p>The example of defining the Network OVO:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Network</span><span class="p">(</span><span class="n">standard_attr</span><span class="o">.</span><span class="n">HasStandardAttributes</span><span class="p">,</span> <span class="n">model_base</span><span class="o">.</span><span class="n">BASEV2</span><span class="p">,</span>
+          <span class="n">model_base</span><span class="o">.</span><span class="n">HasId</span><span class="p">,</span> <span class="n">model_base</span><span class="o">.</span><span class="n">HasProject</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a v2 neutron network.&quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">sa</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="n">attr</span><span class="o">.</span><span class="n">NAME_MAX_LEN</span><span class="p">))</span>
+    <span class="n">rbac_entries</span> <span class="o">=</span> <span class="n">orm</span><span class="o">.</span><span class="n">relationship</span><span class="p">(</span><span class="n">rbac_db_models</span><span class="o">.</span><span class="n">NetworkRBAC</span><span class="p">,</span>
+                                    <span class="n">backref</span><span class="o">=</span><span class="s1">&#39;network&#39;</span><span class="p">,</span> <span class="n">lazy</span><span class="o">=</span><span class="s1">&#39;joined&#39;</span><span class="p">,</span>
+                                    <span class="n">cascade</span><span class="o">=</span><span class="s1">&#39;all, delete, delete-orphan&#39;</span><span class="p">)</span>
+
+
+<span class="c1"># Note the base class for Network OVO:</span>
+<span class="nd">@obj_base</span><span class="o">.</span><span class="n">VersionedObjectRegistry</span><span class="o">.</span><span class="n">register</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Network</span><span class="p">(</span><span class="n">rbac_db</span><span class="o">.</span><span class="n">NeutronRbacObject</span><span class="p">):</span>
+    <span class="c1"># Version 1.0: Initial version</span>
+    <span class="n">VERSION</span> <span class="o">=</span> <span class="s1">&#39;1.0&#39;</span>
+
+    <span class="c1"># rbac_db_model is required to be added here</span>
+    <span class="n">rbac_db_model</span> <span class="o">=</span> <span class="n">rbac_db_models</span><span class="o">.</span><span class="n">NetworkRBAC</span>
+    <span class="n">db_model</span> <span class="o">=</span> <span class="n">models_v2</span><span class="o">.</span><span class="n">Network</span>
+
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">common_types</span><span class="o">.</span><span class="n">UUIDField</span><span class="p">(),</span>
+        <span class="s1">&#39;project_id&#39;</span><span class="p">:</span> <span class="n">obj_fields</span><span class="o">.</span><span class="n">StringField</span><span class="p">(</span><span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">obj_fields</span><span class="o">.</span><span class="n">StringField</span><span class="p">(</span><span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="c1"># share is required to be added to fields</span>
+        <span class="s1">&#39;shared&#39;</span><span class="p">:</span> <span class="n">obj_fields</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">shared</span></code> field is not added to the <code class="code docutils literal notranslate"><span class="pre">synthetic_fields</span></code>,
+because <code class="code docutils literal notranslate"><span class="pre">NeutronRbacObject</span></code> requires to add it by itself, otherwise
+<code class="code docutils literal notranslate"><span class="pre">ObjectActionError</span></code> is raised. <a class="footnote-reference brackets" href="#id15" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a></p>
+</div>
+</section>
+<section id="extensions-to-neutron-resources">
+<h2>Extensions to neutron resources<a class="headerlink" href="#extensions-to-neutron-resources" title="Link to this heading">¶</a></h2>
+<p>One of the methods to extend neutron resources is to add an arbitrary value to
+dictionary representing the data by providing
+<code class="code docutils literal notranslate"><span class="pre">extend_(subnet|port|network)_dict()</span></code> function and defining loading
+method.</p>
+<p>From DB perspective, all the data will be loaded, including all declared fields
+from DB relationships. Current implementation for core resources (Port, Subnet,
+Network etc.) is that DB result is parsed by <code class="code docutils literal notranslate"><span class="pre">make_&lt;resource&gt;_dict()</span></code> and
+<code class="code docutils literal notranslate"><span class="pre">extend_&lt;resource&gt;_dict()</span></code>. When extension is enabled,
+<code class="code docutils literal notranslate"><span class="pre">extend_&lt;resource&gt;_dict()</span></code> takes the DB results and declares new fields
+in resulting dict. When extension is not enabled, data will be fetched, but
+will not be populated into resulting dict, because
+<code class="code docutils literal notranslate"><span class="pre">extend_&lt;resource&gt;_dict()</span></code> will not be called.</p>
+<p>Plugins can still use objects for some work, but then convert them to dicts and
+work as they please, extending the dict as they wish.</p>
+<p>For example:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">TestSubnetExtension</span><span class="p">(</span><span class="n">model_base</span><span class="o">.</span><span class="n">BASEV2</span><span class="p">):</span>
+    <span class="n">subnet_id</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">sa</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="mi">36</span><span class="p">),</span>
+                          <span class="n">sa</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;subnets.id&#39;</span><span class="p">,</span> <span class="n">ondelete</span><span class="o">=</span><span class="s2">&quot;CASCADE&quot;</span><span class="p">),</span>
+                          <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">sa</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="mi">64</span><span class="p">))</span>
+    <span class="n">subnet</span> <span class="o">=</span> <span class="n">orm</span><span class="o">.</span><span class="n">relationship</span><span class="p">(</span>
+        <span class="n">models_v2</span><span class="o">.</span><span class="n">Subnet</span><span class="p">,</span>
+        <span class="c1"># here is the definition of loading the extension with Subnet model:</span>
+        <span class="n">backref</span><span class="o">=</span><span class="n">orm</span><span class="o">.</span><span class="n">backref</span><span class="p">(</span><span class="s1">&#39;extension&#39;</span><span class="p">,</span> <span class="n">cascade</span><span class="o">=</span><span class="s1">&#39;delete&#39;</span><span class="p">,</span> <span class="n">uselist</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+
+
+<span class="nd">@oslo_obj_base</span><span class="o">.</span><span class="n">VersionedObjectRegistry</span><span class="o">.</span><span class="n">register_if</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestSubnetExtensionObject</span><span class="p">(</span><span class="n">obj_base</span><span class="o">.</span><span class="n">NeutronDbObject</span><span class="p">):</span>
+    <span class="c1"># Version 1.0: Initial version</span>
+    <span class="n">VERSION</span> <span class="o">=</span> <span class="s1">&#39;1.0&#39;</span>
+
+    <span class="n">db_model</span> <span class="o">=</span> <span class="n">TestSubnetExtension</span>
+
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;subnet_id&#39;</span><span class="p">:</span> <span class="n">common_types</span><span class="o">.</span><span class="n">UUIDField</span><span class="p">(),</span>
+        <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">obj_fields</span><span class="o">.</span><span class="n">StringField</span><span class="p">(</span><span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="n">primary_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;subnet_id&#39;</span><span class="p">]</span>
+    <span class="n">foreign_keys</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Subnet&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;subnet_id&#39;</span><span class="p">:</span> <span class="s1">&#39;id&#39;</span><span class="p">}}</span>
+
+
+<span class="nd">@obj_base</span><span class="o">.</span><span class="n">VersionedObjectRegistry</span><span class="o">.</span><span class="n">register</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Subnet</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">NeutronDbObject</span><span class="p">):</span>
+    <span class="c1"># Version 1.0: Initial version</span>
+    <span class="n">VERSION</span> <span class="o">=</span> <span class="s1">&#39;1.0&#39;</span>
+
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">common_types</span><span class="o">.</span><span class="n">UUIDField</span><span class="p">(),</span>
+        <span class="s1">&#39;extension&#39;</span><span class="p">:</span> <span class="n">obj_fields</span><span class="o">.</span><span class="n">ObjectField</span><span class="p">(</span><span class="n">TestSubnetExtensionObject</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                                            <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="p">}</span>
+
+    <span class="n">synthetic_fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;extension&#39;</span><span class="p">]</span>
+
+
+<span class="c1"># when defining the extend_subnet_dict function:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">extend_subnet_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">subnet_ovo</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">subnet_ovo</span><span class="o">.</span><span class="n">extension</span><span class="o">.</span><span class="n">value</span> <span class="k">if</span> <span class="n">subnet_ovo</span><span class="o">.</span><span class="n">extension</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;subnet_extension&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+</pre></div>
+</div>
+<p>The above example is the ideal situation, where all extensions have objects
+adopted and enabled in core neutron resources.</p>
+<p>By introducing the OVO work in tree, interface between base plugin code and
+registered extension functions hasn’t been changed. Those still receive a
+SQLAlchemy model, not an object. This is achieved by capturing the
+corresponding database model on <code class="code docutils literal notranslate"><span class="pre">get_***/create/update</span></code>, and exposing it
+via <code class="code docutils literal notranslate"><span class="pre">&lt;object&gt;.db_obj</span></code></p>
+</section>
+<section id="removal-of-downgrade-checks-over-time">
+<h2>Removal of downgrade checks over time<a class="headerlink" href="#removal-of-downgrade-checks-over-time" title="Link to this heading">¶</a></h2>
+<p>While the code to check object versions is meant to remain for a long period of
+time, in the interest of not accruing too much cruft over time, they are not
+intended to be permanent.  OVO downgrade code should account for code that is
+within the upgrade window of any major OpenStack distribution.  The longest
+currently known is for Ubuntu Cloud Archive which is to upgrade four versions,
+meaning during the upgrade the control nodes would be running a release that is
+four releases newer than what is running on the computes.</p>
+<p>Known fast forward upgrade windows are:</p>
+<ul class="simple">
+<li><p>Red Hat OpenStack Platform (RHOSP): X -&gt; X+3 <a class="footnote-reference brackets" href="#id16" id="id7" role="doc-noteref"><span class="fn-bracket">[</span>7<span class="fn-bracket">]</span></a></p></li>
+<li><p>Ubuntu Cloud Archive: X -&gt; X+4 <a class="footnote-reference brackets" href="#id17" id="id8" role="doc-noteref"><span class="fn-bracket">[</span>8<span class="fn-bracket">]</span></a></p></li>
+</ul>
+<p>Therefore removal of OVO version downgrade code should be removed in the fifth
+cycle after the code was introduced.  For example, if an object version was
+introduced in Ocata then it can be removed in Train.</p>
+</section>
+<section id="backward-compatibility-for-tenant-id">
+<h2>Backward compatibility for tenant_id<a class="headerlink" href="#backward-compatibility-for-tenant-id" title="Link to this heading">¶</a></h2>
+<p>All objects can support <code class="code docutils literal notranslate"><span class="pre">tenant_id</span></code> and <code class="code docutils literal notranslate"><span class="pre">project_id</span></code> filters and
+fields at the same time; it is automatically enabled for all objects that have
+a <code class="code docutils literal notranslate"><span class="pre">project_id</span></code> field. The base <code class="code docutils literal notranslate"><span class="pre">NeutronDbObject</span></code> class has support
+for exposing <code class="code docutils literal notranslate"><span class="pre">tenant_id</span></code> in dictionary access to the object fields
+(<code class="code docutils literal notranslate"><span class="pre">subnet['tenant_id']</span></code>) and in <code class="code docutils literal notranslate"><span class="pre">to_dict()</span></code> method. There is a
+<code class="code docutils literal notranslate"><span class="pre">tenant_id</span></code> read-only property for every object that has
+<code class="code docutils literal notranslate"><span class="pre">project_id</span></code> in <code class="code docutils literal notranslate"><span class="pre">fields</span></code>. It is not exposed in
+<code class="code docutils literal notranslate"><span class="pre">obj_to_primitive()</span></code> method, so it means that <code class="code docutils literal notranslate"><span class="pre">tenant_id</span></code> will not
+be sent over RPC callback wire. When talking about filtering/sorting by
+<code class="code docutils literal notranslate"><span class="pre">tenant_id</span></code>, the filters should be converted to expose <code class="code docutils literal notranslate"><span class="pre">project_id</span></code>
+field. This means that for the long run, the API layer should translate it, but
+as temporary workaround it can be done at DB layer before passing filters to
+objects <code class="code docutils literal notranslate"><span class="pre">get_objects()</span></code> method, for example:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">convert_filters</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+    <span class="k">if</span> <span class="s1">&#39;tenant_id&#39;</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;project_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;tenant_id&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_subnets</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">filters</span><span class="p">):</span>
+    <span class="n">filters</span> <span class="o">=</span> <span class="n">convert_filters</span><span class="p">(</span><span class="o">**</span><span class="n">filters</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">subnet_obj</span><span class="o">.</span><span class="n">Subnet</span><span class="o">.</span><span class="n">get_objects</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">filters</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <code class="code docutils literal notranslate"><span class="pre">convert_filters</span></code> method is available in
+<code class="docutils literal notranslate"><span class="pre">neutron_lib.objects.utils</span></code> <a class="footnote-reference brackets" href="#id18" id="id9" role="doc-noteref"><span class="fn-bracket">[</span>9<span class="fn-bracket">]</span></a>.</p>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id10" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://opendev.org/openstack/neutron/src/tag/ocata-eol/neutron/objects/base.py#L258">https://opendev.org/openstack/neutron/src/tag/ocata-eol/neutron/objects/base.py#L258</a></p>
+</aside>
+<aside class="footnote brackets" id="id11" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://opendev.org/openstack/neutron/src/tag/ocata-eol/neutron/db/standard_attr.py">https://opendev.org/openstack/neutron/src/tag/ocata-eol/neutron/db/standard_attr.py</a></p>
+</aside>
+<aside class="footnote brackets" id="id12" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://opendev.org/openstack/neutron/src/tag/ocata-eol/neutron/objects/base.py#L516">https://opendev.org/openstack/neutron/src/tag/ocata-eol/neutron/objects/base.py#L516</a></p>
+</aside>
+<aside class="footnote brackets" id="id13" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://opendev.org/openstack/neutron/src/tag/ocata-eol/neutron/objects/base.py#L542">https://opendev.org/openstack/neutron/src/tag/ocata-eol/neutron/objects/base.py#L542</a></p>
+</aside>
+<aside class="footnote brackets" id="id14" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">5</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://docs.openstack.org/neutron/latest/contributor/internals/db_layer.html#the-standard-attribute-table">https://docs.openstack.org/neutron/latest/contributor/internals/db_layer.html#the-standard-attribute-table</a></p>
+</aside>
+<aside class="footnote brackets" id="id15" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id6">6</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://opendev.org/openstack/neutron/src/tag/ocata-eol/neutron/objects/rbac_db.py#L291">https://opendev.org/openstack/neutron/src/tag/ocata-eol/neutron/objects/rbac_db.py#L291</a></p>
+</aside>
+<aside class="footnote brackets" id="id16" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id7">7</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://access.redhat.com/support/policy/updates/openstack/platform/">https://access.redhat.com/support/policy/updates/openstack/platform/</a></p>
+</aside>
+<aside class="footnote brackets" id="id17" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">8</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://www.ubuntu.com/about/release-cycle">https://www.ubuntu.com/about/release-cycle</a></p>
+</aside>
+<aside class="footnote brackets" id="id18" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id9">9</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://opendev.org/openstack/neutron-lib/src/neutron_lib/objects/utils.py">https://opendev.org/openstack/neutron-lib/src/neutron_lib/objects/utils.py</a></p>
+</aside>
+</aside>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="network_ip_availability.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Network IP Availability Extension"></i></a>
+          
+          
+            <a href="openvswitch_firewall.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Open vSwitch Firewall Driver"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2025-05-19 21:22:43</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Contributor Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#basic-information">Basic Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-policies">Neutron Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#gerrit-rechecks">Gerrit Rechecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-stadium">Neutron Stadium</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#neutron-internals">Neutron Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#ovn-driver">OVN Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#dashboards">Dashboards</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Objects</a><ul>
+<li><a class="reference internal" href="#usage-of-objects">Usage of objects</a><ul>
+<li><a class="reference internal" href="#crud-operations">CRUD operations</a></li>
+<li><a class="reference internal" href="#filter-sort-and-paginate">Filter, sort and paginate</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#defining-your-own-object">Defining your own object</a></li>
+<li><a class="reference internal" href="#synthetic-fields">Synthetic fields</a><ul>
+<li><a class="reference internal" href="#implementing-custom-synthetic-fields">Implementing custom synthetic fields</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#standard-attributes">Standard attributes</a></li>
+<li><a class="reference internal" href="#rbac-handling-in-objects">RBAC handling in objects</a></li>
+<li><a class="reference internal" href="#extensions-to-neutron-resources">Extensions to neutron resources</a></li>
+<li><a class="reference internal" href="#removal-of-downgrade-checks-over-time">Removal of downgrade checks over time</a></li>
+<li><a class="reference internal" href="#backward-compatibility-for-tenant-id">Backward compatibility for tenant_id</a></li>
+<li><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "contributor/internals/objects_usage" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Objects in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2025-05-19 21:22:43";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "contributor/internals/objects_usage";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

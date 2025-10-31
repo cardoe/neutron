@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Open vSwitch Firewall Driver &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="OVN Design Notes" href="ovn/index.html" />
+    <link rel="prev" title="Objects" href="objects_usage.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/contributor/internals/openvswitch_firewall.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Open vSwitch Firewall Driver</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="objects_usage.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Objects"></i></a>
+    
+    
+    <a href="ovn/index.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: OVN Design Notes"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="open-vswitch-firewall-driver">
+<h1>Open vSwitch Firewall Driver<a class="headerlink" href="#open-vswitch-firewall-driver" title="Link to this heading">¶</a></h1>
+<p>The OVS driver has the same API as the current iptables firewall driver,
+keeping the state of security groups and ports inside of the firewall.
+Class <code class="docutils literal notranslate"><span class="pre">SGPortMap</span></code> was created to keep state consistent, and maps from ports
+to security groups and vice-versa. Every port and security group is represented
+by its own object encapsulating the necessary information.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Open vSwitch firewall driver uses <code class="docutils literal notranslate"><span class="pre">register</span> <span class="pre">5</span></code> for identifying the port
+related to the flow and <code class="docutils literal notranslate"><span class="pre">register</span> <span class="pre">6</span></code> which identifies the network, used
+in particular for conntrack zones.</p>
+</div>
+<section id="ingress-egress-terminology">
+<h2>Ingress/Egress Terminology<a class="headerlink" href="#ingress-egress-terminology" title="Link to this heading">¶</a></h2>
+<p>In this document, the terms <code class="docutils literal notranslate"><span class="pre">ingress</span></code> and <code class="docutils literal notranslate"><span class="pre">egress</span></code> are relative to
+a VM instance connected to OVS (or a netns connected to OVS):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ingress</span></code> applies to traffic that will ultimately go into a VM (or into
+a netns), assuming it is not dropped</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">egress</span></code> applies to traffic coming from a VM (or from a netns)</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                  <span class="o">.</span>                                     <span class="o">.</span>
+           <span class="n">_______</span><span class="o">|</span>\                             <span class="n">_______</span><span class="o">|</span>\
+          \ <span class="n">ingress</span> \                           \ <span class="n">ingress</span> \
+          <span class="o">/</span><span class="n">_______</span>  <span class="o">/</span>                           <span class="o">/</span><span class="n">_______</span>  <span class="o">/</span>
+                  <span class="o">|/</span>        <span class="o">.-----------------.</span>         <span class="o">|/</span>
+                  <span class="s1">&#39;         |                 |         &#39;</span>
+                            <span class="o">|</span>                 <span class="o">|-----------</span><span class="p">(</span> <span class="n">netns</span> <span class="n">interface</span> <span class="p">)</span>
+<span class="p">(</span> <span class="n">non</span><span class="o">-</span><span class="n">VM</span><span class="p">,</span> <span class="n">non</span><span class="o">-</span><span class="n">netns</span>     <span class="p">)</span><span class="o">---|</span>       <span class="n">OVS</span>       <span class="o">|</span>
+<span class="p">(</span> <span class="n">interface</span><span class="p">:</span> <span class="n">phy</span><span class="p">,</span> <span class="n">patch</span> <span class="p">)</span>   <span class="o">|</span>                 <span class="o">|------------</span><span class="p">(</span> <span class="n">VM</span> <span class="n">interface</span> <span class="p">)</span>
+            <span class="o">.</span>               <span class="o">|</span>                 <span class="o">|</span>   <span class="o">.</span>
+           <span class="o">/|</span><span class="n">________</span>       <span class="s1">&#39;-----------------&#39;</span>  <span class="o">/|</span><span class="n">________</span>
+          <span class="o">/</span>   <span class="n">egress</span> <span class="o">/</span>                          <span class="o">/</span>   <span class="n">egress</span> <span class="o">/</span>
+          \  <span class="n">________</span>\                          \  <span class="n">________</span>\
+           \<span class="o">|</span>                                    \<span class="o">|</span>
+            <span class="s1">&#39;                                     &#39;</span>
+</pre></div>
+</div>
+<p>Note that these terms are used differently in OVS code and documentation, where
+they are relative to the OVS bridge, with <code class="docutils literal notranslate"><span class="pre">ingress</span></code> applying to traffic as
+it comes into the OVS bridge, and <code class="docutils literal notranslate"><span class="pre">egress</span></code> applying to traffic as it leaves
+the OVS bridge.</p>
+</section>
+<section id="firewall-api-calls">
+<h2>Firewall API calls<a class="headerlink" href="#firewall-api-calls" title="Link to this heading">¶</a></h2>
+<p>There are two main calls performed by the firewall driver in order to either
+create or update a port with security groups - <code class="docutils literal notranslate"><span class="pre">prepare_port_filter</span></code> and
+<code class="docutils literal notranslate"><span class="pre">update_port_filter</span></code>. Both methods rely on the security group objects that
+are already defined in the driver and work similarly to their iptables
+counterparts. The definition of the objects will be described later in this
+document. <code class="docutils literal notranslate"><span class="pre">prepare_port_filter</span></code> must be called only once during port
+creation, and it defines the initial rules for the port. When the port is
+updated, all filtering rules are removed, and new rules are generated based on
+the available information about security groups in the driver.</p>
+<p>Security group rules can be defined in the firewall driver by calling
+<code class="docutils literal notranslate"><span class="pre">update_security_group_rules</span></code>, which rewrites all the rules for a given
+security group. If a remote security group is changed, then
+<code class="docutils literal notranslate"><span class="pre">update_security_group_members</span></code> is called to determine the set of IP
+addresses that should be allowed for this remote security group. Calling this
+method will not have any effect on existing instance ports. In other words, if
+the port is using security groups and its rules are changed by calling one of
+the above methods, then no new rules are generated for this port.
+<code class="docutils literal notranslate"><span class="pre">update_port_filter</span></code> must be called for the changes to take effect.</p>
+<p>All the machinery above is controlled by security group RPC methods, which mean
+the firewall driver doesn’t have any logic of which port should be updated
+based on the provided changes, it only accomplishes actions when called from
+the controller.</p>
+</section>
+<section id="openflow-rules">
+<h2>OpenFlow rules<a class="headerlink" href="#openflow-rules" title="Link to this heading">¶</a></h2>
+<p>At first, every connection is split into ingress and egress processes based on
+the input or output port respectively. Each port contains the initial
+hardcoded flows for ARP, DHCP and established connections, which are accepted
+by default. To detect established connections, a flow must by marked by
+conntrack first with an <code class="docutils literal notranslate"><span class="pre">action=ct()</span></code> rule. An accepted flow means that
+ingress packets for the connection are directly sent to the port, and egress
+packets are left to be normally switched by the integration bridge.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>There is a new config option <code class="docutils literal notranslate"><span class="pre">explicitly_egress_direct</span></code>, if it is set
+to True, it will direct egress unicast traffic to the local port directly
+or to the patch bridge port if the destination is in a remote host. So there
+is no NORMAL for egress in such scenario. This option is used to overcome
+the egress packet flooding when the openflow firewall is enabled.</p>
+</div>
+<p>Connections that are not matched by the above rules are sent to either the
+ingress or egress filtering table, depending on its direction. The reason the
+rules are based on security group rules in separate tables is to make it easy
+to detect these rules during removal.</p>
+<p>Security group rules are treated differently for those without a
+remote group ID and those with a remote group ID. A security group
+rule without a remote group ID is expanded into several OpenFlow rules
+by the method <code class="docutils literal notranslate"><span class="pre">create_flows_from_rule_and_port</span></code>.  A security group
+rule with a remote group ID is expressed by three sets of flows. The
+first two are conjunctive flows which will be described in the next
+section.  The third set matches on the conjunction IDs and does accept
+actions.</p>
+</section>
+<section id="flow-priorities-for-security-group-rules">
+<h2>Flow priorities for security group rules<a class="headerlink" href="#flow-priorities-for-security-group-rules" title="Link to this heading">¶</a></h2>
+<p>The OpenFlow spec says a packet should not match against multiple
+flows at the same priority <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. The firewall driver uses 8 levels of
+priorities to achieve this. The method <code class="docutils literal notranslate"><span class="pre">flow_priority_offset</span></code>
+calculates a priority for a given security group rule.  The use of
+priorities is essential with conjunction flows, which will be
+described later in the conjunction flows examples.</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Although OVS seems to magically handle overlapping flows under
+some cases, we shouldn’t rely on that.</p>
+</aside>
+</aside>
+</section>
+<section id="uses-of-conjunctive-flows">
+<h2>Uses of conjunctive flows<a class="headerlink" href="#uses-of-conjunctive-flows" title="Link to this heading">¶</a></h2>
+<p>With a security group rule with a remote group ID, flows that match on
+nw_src for remote_group_id addresses and match on dl_dst for port MAC
+addresses are needed (for ingress rules; likewise for egress
+rules). Without conjunction, this results in O(n*m) flows where n and
+m are number of ports in the remote group ID and the port security group,
+respectively.</p>
+<p>A conj_id is allocated for each (remote_group_id, security_group_id,
+direction, ethertype, flow_priority_offset) tuple.  The class
+<code class="docutils literal notranslate"><span class="pre">ConjIdMap</span></code> handles the mapping. The same conj_id is shared between
+security group rules if multiple rules belong to the same tuple above.</p>
+<p>Conjunctive flows consist of 2 dimensions. Flows that belong to the
+dimension 1 of 2 are generated by the method
+<code class="docutils literal notranslate"><span class="pre">create_flows_for_ip_address</span></code> and are in charge of IP address based
+filtering specified by their remote group IDs. Flows that belong to
+the dimension 2 of 2 are generated by the method
+<code class="docutils literal notranslate"><span class="pre">create_flows_from_rule_and_port</span></code> and modified by the method
+<code class="docutils literal notranslate"><span class="pre">substitute_conjunction_actions</span></code>, which represents the portion of
+the rule other than its remote group ID.</p>
+<p>Those dimension 2 of 2 flows are per port and contain no remote group
+information.  When there are multiple security group rules for a port,
+those flows can overlap. To avoid such a situation, flows are sorted
+and fed to <code class="docutils literal notranslate"><span class="pre">merge_port_ranges</span></code> or <code class="docutils literal notranslate"><span class="pre">merge_common_rules</span></code> methods to
+rearrange them.</p>
+</section>
+<section id="rules-example-with-explanation">
+<h2>Rules example with explanation:<a class="headerlink" href="#rules-example-with-explanation" title="Link to this heading">¶</a></h2>
+<p>The following example presents two ports on the same host. They have different
+security groups and there is ICMP traffic allowed from the first security group
+to the second security group. Ports have the following attributes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Port</span> <span class="mi">1</span>
+  <span class="o">-</span> <span class="n">plugged</span> <span class="n">to</span> <span class="n">the</span> <span class="n">port</span> <span class="mi">1</span> <span class="ow">in</span> <span class="n">OVS</span> <span class="n">bridge</span>
+  <span class="o">-</span> <span class="n">IP</span> <span class="n">address</span><span class="p">:</span> <span class="mf">192.168.0.1</span>
+  <span class="o">-</span> <span class="n">MAC</span> <span class="n">address</span><span class="p">:</span> <span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="n">a4</span><span class="p">:</span><span class="mi">22</span><span class="p">:</span><span class="mi">10</span>
+  <span class="o">-</span> <span class="n">security</span> <span class="n">group</span> <span class="mi">1</span><span class="p">:</span> <span class="n">can</span> <span class="n">send</span> <span class="n">ICMP</span> <span class="n">packets</span> <span class="n">out</span>
+  <span class="o">-</span> <span class="n">allowed</span> <span class="n">address</span> <span class="n">pair</span><span class="p">:</span> <span class="mf">10.0.0.1</span><span class="o">/</span><span class="mi">32</span><span class="p">,</span> <span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="mi">8</span><span class="n">c</span><span class="p">:</span><span class="mi">84</span><span class="p">:</span><span class="mi">13</span>
+
+<span class="n">Port</span> <span class="mi">2</span>
+  <span class="o">-</span> <span class="n">plugged</span> <span class="n">to</span> <span class="n">the</span> <span class="n">port</span> <span class="mi">2</span> <span class="ow">in</span> <span class="n">OVS</span> <span class="n">bridge</span>
+  <span class="o">-</span> <span class="n">IP</span> <span class="n">address</span><span class="p">:</span> <span class="mf">192.168.0.2</span>
+  <span class="o">-</span> <span class="n">MAC</span> <span class="n">address</span><span class="p">:</span> <span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="mi">24</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="n">c7</span>
+  <span class="o">-</span> <span class="n">security</span> <span class="n">group</span> <span class="mi">2</span><span class="p">:</span>
+     <span class="o">-</span> <span class="n">can</span> <span class="n">receive</span> <span class="n">ICMP</span> <span class="n">packets</span> <span class="kn">from</span><span class="w"> </span><span class="nn">security</span> <span class="n">group</span> <span class="mi">1</span>
+     <span class="o">-</span> <span class="n">can</span> <span class="n">receive</span> <span class="n">TCP</span> <span class="n">packets</span> <span class="kn">from</span><span class="w"> </span><span class="nn">security</span> <span class="n">group</span> <span class="mi">1</span>
+     <span class="o">-</span> <span class="n">can</span> <span class="n">receive</span> <span class="n">TCP</span> <span class="n">packets</span> <span class="n">to</span> <span class="n">port</span> <span class="mi">80</span> <span class="kn">from</span><span class="w"> </span><span class="nn">security</span> <span class="n">group</span> <span class="mi">2</span>
+     <span class="o">-</span> <span class="n">can</span> <span class="n">receive</span> <span class="n">IP</span> <span class="n">packets</span> <span class="kn">from</span><span class="w"> </span><span class="nn">security</span> <span class="n">group</span> <span class="mi">3</span>
+  <span class="o">-</span> <span class="n">allowed</span> <span class="n">address</span> <span class="n">pair</span><span class="p">:</span> <span class="mf">10.1.0.0</span><span class="o">/</span><span class="mi">24</span><span class="p">,</span> <span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="mi">8</span><span class="n">c</span><span class="p">:</span><span class="mi">84</span><span class="p">:</span><span class="mi">14</span>
+
+<span class="n">Port</span> <span class="mi">3</span>
+  <span class="o">-</span> <span class="n">patch</span> <span class="n">bridge</span> <span class="n">port</span> <span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="n">patch</span><span class="o">-</span><span class="n">tun</span><span class="p">)</span> <span class="ow">in</span> <span class="n">OVS</span> <span class="n">bridge</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">table</span> <span class="pre">0</span></code> (LOCAL_SWITCHING) - <code class="docutils literal notranslate"><span class="pre">table</span> <span class="pre">59</span></code> (PACKET_RATE_LIMIT) contain some low priority rules to continue packet
+processing in <code class="docutils literal notranslate"><span class="pre">table</span> <span class="pre">60</span></code> (TRANSIENT) aka TRANSIENT table. <code class="docutils literal notranslate"><span class="pre">table</span> <span class="pre">0</span></code> (LOCAL_SWITCHING) - <code class="docutils literal notranslate"><span class="pre">table</span> <span class="pre">59</span></code> (PACKET_RATE_LIMIT) is
+left for use to other features that take precedence over firewall, e.g.
+DVR, ARP poison/spoofing prevention, MAC spoof filtering and packet rate
+limitation etc. The only requirement is
+that after such a feature is done with its processing, it needs to pass packets
+for processing to the TRANSIENT table. This TRANSIENT table distinguishes the
+ingress traffic from the egress traffic and loads into <code class="docutils literal notranslate"><span class="pre">register</span> <span class="pre">5</span></code> a value
+identifying the port (for egress traffic based on the switch port number, and
+for ingress traffic based on the network id and destination MAC address);
+<code class="docutils literal notranslate"><span class="pre">register</span> <span class="pre">6</span></code> contains a value identifying the network (which is also the
+OVSDB port tag) to isolate connections into separate conntrack zones.
+For VLAN networks, the physical VLAN tag will be used to act as an extra
+match rule to do such identifying work as well.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>  <span class="n">priority</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">1</span> <span class="n">actions</span><span class="o">=</span><span class="n">load</span><span class="p">:</span><span class="mh">0x1</span><span class="o">-&gt;</span><span class="n">NXM_NX_REG5</span><span class="p">[],</span><span class="n">load</span><span class="p">:</span><span class="mh">0x284</span><span class="o">-&gt;</span><span class="n">NXM_NX_REG6</span><span class="p">[],</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">71</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>  <span class="n">priority</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">2</span> <span class="n">actions</span><span class="o">=</span><span class="n">load</span><span class="p">:</span><span class="mh">0x2</span><span class="o">-&gt;</span><span class="n">NXM_NX_REG5</span><span class="p">[],</span><span class="n">load</span><span class="p">:</span><span class="mh">0x284</span><span class="o">-&gt;</span><span class="n">NXM_NX_REG6</span><span class="p">[],</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">71</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>  <span class="n">priority</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span><span class="n">dl_vlan</span><span class="o">=</span><span class="mh">0x284</span><span class="p">,</span><span class="n">dl_dst</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="n">a4</span><span class="p">:</span><span class="mi">22</span><span class="p">:</span><span class="mi">10</span> <span class="n">actions</span><span class="o">=</span><span class="n">load</span><span class="p">:</span><span class="mh">0x1</span><span class="o">-&gt;</span><span class="n">NXM_NX_REG5</span><span class="p">[],</span><span class="n">load</span><span class="p">:</span><span class="mh">0x284</span><span class="o">-&gt;</span><span class="n">NXM_NX_REG6</span><span class="p">[],</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">81</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>  <span class="n">priority</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span><span class="n">dl_vlan</span><span class="o">=</span><span class="mh">0x284</span><span class="p">,</span><span class="n">dl_dst</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="mi">8</span><span class="n">c</span><span class="p">:</span><span class="mi">84</span><span class="p">:</span><span class="mi">13</span> <span class="n">actions</span><span class="o">=</span><span class="n">load</span><span class="p">:</span><span class="mh">0x1</span><span class="o">-&gt;</span><span class="n">NXM_NX_REG5</span><span class="p">[],</span><span class="n">load</span><span class="p">:</span><span class="mh">0x284</span><span class="o">-&gt;</span><span class="n">NXM_NX_REG6</span><span class="p">[],</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">81</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>  <span class="n">priority</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span><span class="n">dl_vlan</span><span class="o">=</span><span class="mh">0x284</span><span class="p">,</span><span class="n">dl_dst</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="mi">24</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="n">c7</span> <span class="n">actions</span><span class="o">=</span><span class="n">load</span><span class="p">:</span><span class="mh">0x2</span><span class="o">-&gt;</span><span class="n">NXM_NX_REG5</span><span class="p">[],</span><span class="n">load</span><span class="p">:</span><span class="mh">0x284</span><span class="o">-&gt;</span><span class="n">NXM_NX_REG6</span><span class="p">[],</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">81</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>  <span class="n">priority</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span><span class="n">dl_vlan</span><span class="o">=</span><span class="mh">0x284</span><span class="p">,</span><span class="n">dl_dst</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="mi">8</span><span class="n">c</span><span class="p">:</span><span class="mi">84</span><span class="p">:</span><span class="mi">14</span> <span class="n">actions</span><span class="o">=</span><span class="n">load</span><span class="p">:</span><span class="mh">0x2</span><span class="o">-&gt;</span><span class="n">NXM_NX_REG5</span><span class="p">[],</span><span class="n">load</span><span class="p">:</span><span class="mh">0x284</span><span class="o">-&gt;</span><span class="n">NXM_NX_REG6</span><span class="p">[],</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">81</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>  <span class="n">priority</span><span class="o">=</span><span class="mi">0</span> <span class="n">actions</span><span class="o">=</span><span class="n">NORMAL</span>
+</pre></div>
+</div>
+<p>The following table, <code class="docutils literal notranslate"><span class="pre">table</span> <span class="pre">71</span></code> (BASE_EGRESS) implements ARP spoofing protection, IP spoofing
+protection, allows traffic related to IP address allocations (DHCP, DHCPv6,
+SLAAC, NDP) for egress traffic, and allows ARP replies. Also identifies not
+tracked connections which are processed later with information obtained from
+conntrack. Notice the <code class="docutils literal notranslate"><span class="pre">zone=NXM_NX_REG6[0..15]</span></code> in <code class="docutils literal notranslate"><span class="pre">actions</span></code> when obtaining
+information from conntrack. It says every port has its own conntrack zone
+defined by the value in <code class="docutils literal notranslate"><span class="pre">register</span> <span class="pre">6</span></code> (OVSDB port tag identifying the
+network). It’s there to avoid accepting established traffic that belongs to a
+different port with the same conntrack parameters.</p>
+<p>The very first rule in <code class="docutils literal notranslate"><span class="pre">table</span> <span class="pre">71</span></code> (BASE_EGRESS) is a rule removing conntrack information for
+a use-case where a Neutron logical port is placed directly to the hypervisor.
+In such cases the kernel does conntrack lookup before the packet reaches the
+Open vSwitch bridge. Tracked packets are sent back for processing by the same
+table after conntrack information is cleared.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">110</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">trk</span> <span class="n">actions</span><span class="o">=</span><span class="n">ct_clear</span><span class="p">,</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">71</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Rules below allow ICMPv6 traffic for multicast listeners, neighbour
+solicitation and neighbour advertisement.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">95</span><span class="p">,</span><span class="n">icmp6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">dl_src</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="n">a4</span><span class="p">:</span><span class="mi">22</span><span class="p">:</span><span class="mi">11</span><span class="p">,</span><span class="n">ipv6_src</span><span class="o">=</span><span class="n">fe80</span><span class="p">::</span><span class="mi">11</span><span class="p">,</span><span class="n">icmp_type</span><span class="o">=</span><span class="mi">130</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">94</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">95</span><span class="p">,</span><span class="n">icmp6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">dl_src</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="n">a4</span><span class="p">:</span><span class="mi">22</span><span class="p">:</span><span class="mi">11</span><span class="p">,</span><span class="n">ipv6_src</span><span class="o">=</span><span class="n">fe80</span><span class="p">::</span><span class="mi">11</span><span class="p">,</span><span class="n">icmp_type</span><span class="o">=</span><span class="mi">131</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">94</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">95</span><span class="p">,</span><span class="n">icmp6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">dl_src</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="n">a4</span><span class="p">:</span><span class="mi">22</span><span class="p">:</span><span class="mi">11</span><span class="p">,</span><span class="n">ipv6_src</span><span class="o">=</span><span class="n">fe80</span><span class="p">::</span><span class="mi">11</span><span class="p">,</span><span class="n">icmp_type</span><span class="o">=</span><span class="mi">132</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">94</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">95</span><span class="p">,</span><span class="n">icmp6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">dl_src</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="n">a4</span><span class="p">:</span><span class="mi">22</span><span class="p">:</span><span class="mi">11</span><span class="p">,</span><span class="n">ipv6_src</span><span class="o">=</span><span class="n">fe80</span><span class="p">::</span><span class="mi">11</span><span class="p">,</span><span class="n">icmp_type</span><span class="o">=</span><span class="mi">135</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">94</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">95</span><span class="p">,</span><span class="n">icmp6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">dl_src</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="n">a4</span><span class="p">:</span><span class="mi">22</span><span class="p">:</span><span class="mi">11</span><span class="p">,</span><span class="n">ipv6_src</span><span class="o">=</span><span class="n">fe80</span><span class="p">::</span><span class="mi">11</span><span class="p">,</span><span class="n">icmp_type</span><span class="o">=</span><span class="mi">136</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">94</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">95</span><span class="p">,</span><span class="n">icmp6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">dl_src</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="n">a4</span><span class="p">:</span><span class="mi">22</span><span class="p">:</span><span class="mi">22</span><span class="p">,</span><span class="n">ipv6_src</span><span class="o">=</span><span class="n">fe80</span><span class="p">::</span><span class="mi">22</span><span class="p">,</span><span class="n">icmp_type</span><span class="o">=</span><span class="mi">130</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">94</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">95</span><span class="p">,</span><span class="n">icmp6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">dl_src</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="n">a4</span><span class="p">:</span><span class="mi">22</span><span class="p">:</span><span class="mi">22</span><span class="p">,</span><span class="n">ipv6_src</span><span class="o">=</span><span class="n">fe80</span><span class="p">::</span><span class="mi">22</span><span class="p">,</span><span class="n">icmp_type</span><span class="o">=</span><span class="mi">131</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">94</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">95</span><span class="p">,</span><span class="n">icmp6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">dl_src</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="n">a4</span><span class="p">:</span><span class="mi">22</span><span class="p">:</span><span class="mi">22</span><span class="p">,</span><span class="n">ipv6_src</span><span class="o">=</span><span class="n">fe80</span><span class="p">::</span><span class="mi">22</span><span class="p">,</span><span class="n">icmp_type</span><span class="o">=</span><span class="mi">132</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">94</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">95</span><span class="p">,</span><span class="n">icmp6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">dl_src</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="n">a4</span><span class="p">:</span><span class="mi">22</span><span class="p">:</span><span class="mi">22</span><span class="p">,</span><span class="n">ipv6_src</span><span class="o">=</span><span class="n">fe80</span><span class="p">::</span><span class="mi">22</span><span class="p">,</span><span class="n">icmp_type</span><span class="o">=</span><span class="mi">135</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">94</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">95</span><span class="p">,</span><span class="n">icmp6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">dl_src</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="n">a4</span><span class="p">:</span><span class="mi">22</span><span class="p">:</span><span class="mi">22</span><span class="p">,</span><span class="n">ipv6_src</span><span class="o">=</span><span class="n">fe80</span><span class="p">::</span><span class="mi">22</span><span class="p">,</span><span class="n">icmp_type</span><span class="o">=</span><span class="mi">136</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">94</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Following rules implement ARP spoofing protection</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">95</span><span class="p">,</span><span class="n">arp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">dl_src</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="n">a4</span><span class="p">:</span><span class="mi">22</span><span class="p">:</span><span class="mi">10</span><span class="p">,</span><span class="n">arp_spa</span><span class="o">=</span><span class="mf">192.168.0.1</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">94</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">95</span><span class="p">,</span><span class="n">arp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">dl_src</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="mi">8</span><span class="n">c</span><span class="p">:</span><span class="mi">84</span><span class="p">:</span><span class="mi">13</span><span class="p">,</span><span class="n">arp_spa</span><span class="o">=</span><span class="mf">10.0.0.1</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">94</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">95</span><span class="p">,</span><span class="n">arp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">dl_src</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="mi">24</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="n">c7</span><span class="p">,</span><span class="n">arp_spa</span><span class="o">=</span><span class="mf">192.168.0.2</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">94</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">95</span><span class="p">,</span><span class="n">arp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">dl_src</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="mi">8</span><span class="n">c</span><span class="p">:</span><span class="mi">84</span><span class="p">:</span><span class="mi">14</span><span class="p">,</span><span class="n">arp_spa</span><span class="o">=</span><span class="mf">10.1.0.0</span><span class="o">/</span><span class="mi">24</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">94</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>DHCP and DHCPv6 traffic is allowed to instance but DHCP servers are blocked on
+instances.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span><span class="n">udp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">tp_src</span><span class="o">=</span><span class="mi">68</span><span class="p">,</span><span class="n">tp_dst</span><span class="o">=</span><span class="mi">67</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">73</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span><span class="n">udp6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">tp_src</span><span class="o">=</span><span class="mi">546</span><span class="p">,</span><span class="n">tp_dst</span><span class="o">=</span><span class="mi">547</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">73</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span><span class="n">udp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">tp_src</span><span class="o">=</span><span class="mi">67</span><span class="p">,</span><span class="n">tp_dst</span><span class="o">=</span><span class="mi">68</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">93</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span><span class="n">udp6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">tp_src</span><span class="o">=</span><span class="mi">547</span><span class="p">,</span><span class="n">tp_dst</span><span class="o">=</span><span class="mi">546</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">93</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span><span class="n">udp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">tp_src</span><span class="o">=</span><span class="mi">68</span><span class="p">,</span><span class="n">tp_dst</span><span class="o">=</span><span class="mi">67</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">73</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span><span class="n">udp6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">tp_src</span><span class="o">=</span><span class="mi">546</span><span class="p">,</span><span class="n">tp_dst</span><span class="o">=</span><span class="mi">547</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">73</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span><span class="n">udp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">tp_src</span><span class="o">=</span><span class="mi">67</span><span class="p">,</span><span class="n">tp_dst</span><span class="o">=</span><span class="mi">68</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">93</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span><span class="n">udp6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">tp_src</span><span class="o">=</span><span class="mi">547</span><span class="p">,</span><span class="n">tp_dst</span><span class="o">=</span><span class="mi">546</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">93</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Following rules obtain conntrack information for valid IP and MAC address
+combinations. All other packets are dropped.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">65</span><span class="p">,</span><span class="n">ip</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">dl_src</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="n">a4</span><span class="p">:</span><span class="mi">22</span><span class="p">:</span><span class="mi">10</span><span class="p">,</span><span class="n">nw_src</span><span class="o">=</span><span class="mf">192.168.0.1</span> <span class="n">actions</span><span class="o">=</span><span class="n">ct</span><span class="p">(</span><span class="n">table</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span><span class="n">zone</span><span class="o">=</span><span class="n">NXM_NX_REG6</span><span class="p">[</span><span class="mf">0..15</span><span class="p">])</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">65</span><span class="p">,</span><span class="n">ip</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">dl_src</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="mi">8</span><span class="n">c</span><span class="p">:</span><span class="mi">84</span><span class="p">:</span><span class="mi">13</span><span class="p">,</span><span class="n">nw_src</span><span class="o">=</span><span class="mf">10.0.0.1</span> <span class="n">actions</span><span class="o">=</span><span class="n">ct</span><span class="p">(</span><span class="n">table</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span><span class="n">zone</span><span class="o">=</span><span class="n">NXM_NX_REG6</span><span class="p">[</span><span class="mf">0..15</span><span class="p">])</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">65</span><span class="p">,</span><span class="n">ip</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">dl_src</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="mi">24</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="n">c7</span><span class="p">,</span><span class="n">nw_src</span><span class="o">=</span><span class="mf">192.168.0.2</span> <span class="n">actions</span><span class="o">=</span><span class="n">ct</span><span class="p">(</span><span class="n">table</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span><span class="n">zone</span><span class="o">=</span><span class="n">NXM_NX_REG6</span><span class="p">[</span><span class="mf">0..15</span><span class="p">])</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">65</span><span class="p">,</span><span class="n">ip</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">dl_src</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="mi">8</span><span class="n">c</span><span class="p">:</span><span class="mi">84</span><span class="p">:</span><span class="mi">14</span><span class="p">,</span><span class="n">nw_src</span><span class="o">=</span><span class="mf">10.1.0.0</span><span class="o">/</span><span class="mi">24</span> <span class="n">actions</span><span class="o">=</span><span class="n">ct</span><span class="p">(</span><span class="n">table</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span><span class="n">zone</span><span class="o">=</span><span class="n">NXM_NX_REG6</span><span class="p">[</span><span class="mf">0..15</span><span class="p">])</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">65</span><span class="p">,</span><span class="n">ipv6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">dl_src</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="n">a4</span><span class="p">:</span><span class="mi">22</span><span class="p">:</span><span class="mi">10</span><span class="p">,</span><span class="n">ipv6_src</span><span class="o">=</span><span class="n">fe80</span><span class="p">::</span><span class="n">f816</span><span class="p">:</span><span class="mi">3</span><span class="n">eff</span><span class="p">:</span><span class="n">fea4</span><span class="p">:</span><span class="mi">2210</span> <span class="n">actions</span><span class="o">=</span><span class="n">ct</span><span class="p">(</span><span class="n">table</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span><span class="n">zone</span><span class="o">=</span><span class="n">NXM_NX_REG6</span><span class="p">[</span><span class="mf">0..15</span><span class="p">])</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">65</span><span class="p">,</span><span class="n">ipv6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">dl_src</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="mi">24</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="n">c7</span><span class="p">,</span><span class="n">ipv6_src</span><span class="o">=</span><span class="n">fe80</span><span class="p">::</span><span class="n">f816</span><span class="p">:</span><span class="mi">3</span><span class="n">eff</span><span class="p">:</span><span class="n">fe24</span><span class="p">:</span><span class="mi">57</span><span class="n">c7</span> <span class="n">actions</span><span class="o">=</span><span class="n">ct</span><span class="p">(</span><span class="n">table</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span><span class="n">zone</span><span class="o">=</span><span class="n">NXM_NX_REG6</span><span class="p">[</span><span class="mf">0..15</span><span class="p">])</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">1</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">93</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">in_port</span><span class="o">=</span><span class="mi">2</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">93</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">0</span> <span class="n">actions</span><span class="o">=</span><span class="n">drop</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">table</span> <span class="pre">72</span></code> (RULES_EGRESS) accepts only established or related connections, and implements
+rules defined by security groups. As this egress connection might also be an
+ingress connection for some other port, it’s not switched yet but eventually
+processed by the ingress pipeline.</p>
+<p>All established or new connections defined by security group rules are
+<code class="docutils literal notranslate"><span class="pre">accepted</span></code>, which will be explained later. All invalid packets are dropped.
+In the case below we allow all ICMP egress traffic.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">75</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">est</span><span class="o">-</span><span class="n">rel</span><span class="o">-</span><span class="n">rpl</span><span class="p">,</span><span class="n">icmp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">73</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">75</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">new</span><span class="o">-</span><span class="n">est</span><span class="p">,</span><span class="n">icmp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">73</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">inv</span><span class="o">+</span><span class="n">trk</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">93</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Important on the flows below is the <code class="docutils literal notranslate"><span class="pre">ct_mark=0x1</span></code>. Flows that
+were marked as not existing anymore by rule introduced later will value this
+value. Those are typically connections that were allowed by some security group
+rule and the rule was removed.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">ct_mark</span><span class="o">=</span><span class="mh">0x1</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">93</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">ct_mark</span><span class="o">=</span><span class="mh">0x1</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">93</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>All other connections that are not marked and are established or related are
+allowed.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">est</span><span class="o">-</span><span class="n">rel</span><span class="o">+</span><span class="n">rpl</span><span class="p">,</span><span class="n">ct_zone</span><span class="o">=</span><span class="mi">644</span><span class="p">,</span><span class="n">ct_mark</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">94</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">est</span><span class="o">-</span><span class="n">rel</span><span class="o">+</span><span class="n">rpl</span><span class="p">,</span><span class="n">ct_zone</span><span class="o">=</span><span class="mi">644</span><span class="p">,</span><span class="n">ct_mark</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">94</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=-</span><span class="n">new</span><span class="o">-</span><span class="n">est</span><span class="o">+</span><span class="n">rel</span><span class="o">-</span><span class="n">inv</span><span class="p">,</span><span class="n">ct_zone</span><span class="o">=</span><span class="mi">644</span><span class="p">,</span><span class="n">ct_mark</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">94</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=-</span><span class="n">new</span><span class="o">-</span><span class="n">est</span><span class="o">+</span><span class="n">rel</span><span class="o">-</span><span class="n">inv</span><span class="p">,</span><span class="n">ct_zone</span><span class="o">=</span><span class="mi">644</span><span class="p">,</span><span class="n">ct_mark</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">94</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In the following, flows are marked established for connections that weren’t
+matched in the previous flows, which means they don’t have an accepting
+security group rule anymore.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=-</span><span class="n">est</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">93</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">est</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span> <span class="n">actions</span><span class="o">=</span><span class="n">ct</span><span class="p">(</span><span class="n">commit</span><span class="p">,</span><span class="n">zone</span><span class="o">=</span><span class="n">NXM_NX_REG6</span><span class="p">[</span><span class="mf">0..15</span><span class="p">],</span><span class="n">exec</span><span class="p">(</span><span class="n">load</span><span class="p">:</span><span class="mh">0x1</span><span class="o">-&gt;</span><span class="n">NXM_NX_CT_MARK</span><span class="p">[]))</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=-</span><span class="n">est</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">93</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">est</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span> <span class="n">actions</span><span class="o">=</span><span class="n">ct</span><span class="p">(</span><span class="n">commit</span><span class="p">,</span><span class="n">zone</span><span class="o">=</span><span class="n">NXM_NX_REG6</span><span class="p">[</span><span class="mf">0..15</span><span class="p">],</span><span class="n">exec</span><span class="p">(</span><span class="n">load</span><span class="p">:</span><span class="mh">0x1</span><span class="o">-&gt;</span><span class="n">NXM_NX_CT_MARK</span><span class="p">[]))</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">0</span> <span class="n">actions</span><span class="o">=</span><span class="n">drop</span>
+</pre></div>
+</div>
+<p>In the following <code class="docutils literal notranslate"><span class="pre">table</span> <span class="pre">73</span></code> (ACCEPT_OR_INGRESS) are all detected ingress connections sent to the
+ingress pipeline. Since the connection was already accepted by the egress
+pipeline, all remaining egress connections are sent to the normal flood’n’learn
+switching in <code class="docutils literal notranslate"><span class="pre">table</span> <span class="pre">94</span></code> (ACCEPTED_EGRESS_TRAFFIC_NORMAL).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">reg6</span><span class="o">=</span><span class="mh">0x284</span><span class="p">,</span><span class="n">dl_dst</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="n">a4</span><span class="p">:</span><span class="mi">22</span><span class="p">:</span><span class="mi">10</span> <span class="n">actions</span><span class="o">=</span><span class="n">load</span><span class="p">:</span><span class="mh">0x1</span><span class="o">-&gt;</span><span class="n">NXM_NX_REG5</span><span class="p">[],</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">81</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">reg6</span><span class="o">=</span><span class="mh">0x284</span><span class="p">,</span><span class="n">dl_dst</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="mi">8</span><span class="n">c</span><span class="p">:</span><span class="mi">84</span><span class="p">:</span><span class="mi">13</span> <span class="n">actions</span><span class="o">=</span><span class="n">load</span><span class="p">:</span><span class="mh">0x1</span><span class="o">-&gt;</span><span class="n">NXM_NX_REG5</span><span class="p">[],</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">81</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">reg6</span><span class="o">=</span><span class="mh">0x284</span><span class="p">,</span><span class="n">dl_dst</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="mi">24</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="n">c7</span> <span class="n">actions</span><span class="o">=</span><span class="n">load</span><span class="p">:</span><span class="mh">0x2</span><span class="o">-&gt;</span><span class="n">NXM_NX_REG5</span><span class="p">[],</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">81</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">reg6</span><span class="o">=</span><span class="mh">0x284</span><span class="p">,</span><span class="n">dl_dst</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="mi">8</span><span class="n">c</span><span class="p">:</span><span class="mi">84</span><span class="p">:</span><span class="mi">14</span> <span class="n">actions</span><span class="o">=</span><span class="n">load</span><span class="p">:</span><span class="mh">0x2</span><span class="o">-&gt;</span><span class="n">NXM_NX_REG5</span><span class="p">[],</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">81</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">new</span><span class="o">-</span><span class="n">est</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span> <span class="n">actions</span><span class="o">=</span><span class="n">ct</span><span class="p">(</span><span class="n">commit</span><span class="p">,</span><span class="n">zone</span><span class="o">=</span><span class="n">NXM_NX_REG6</span><span class="p">[</span><span class="mf">0..15</span><span class="p">]),</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">91</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">new</span><span class="o">-</span><span class="n">est</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span> <span class="n">actions</span><span class="o">=</span><span class="n">ct</span><span class="p">(</span><span class="n">commit</span><span class="p">,</span><span class="n">zone</span><span class="o">=</span><span class="n">NXM_NX_REG6</span><span class="p">[</span><span class="mf">0..15</span><span class="p">]),</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">91</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">94</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">94</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">0</span> <span class="n">actions</span><span class="o">=</span><span class="n">drop</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">table</span> <span class="pre">81</span></code> (BASE_INGRESS) is similar to <code class="docutils literal notranslate"><span class="pre">table</span> <span class="pre">71</span></code> (BASE_EGRESS), allows basic ingress traffic for
+obtaining IP address and ARP queries. Note that the VLAN tag must be removed by
+adding <code class="docutils literal notranslate"><span class="pre">strip_vlan</span></code> to actions list, prior to injecting packet directly to
+port. Not tracked packets are sent to obtain conntrack information.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="mi">81</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">arp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span> <span class="n">actions</span><span class="o">=</span><span class="n">strip_vlan</span><span class="p">,</span><span class="n">output</span><span class="p">:</span><span class="mi">1</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">81</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">arp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span> <span class="n">actions</span><span class="o">=</span><span class="n">strip_vlan</span><span class="p">,</span><span class="n">output</span><span class="p">:</span><span class="mi">2</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">81</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">icmp6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span><span class="p">,</span><span class="n">icmp_type</span><span class="o">=</span><span class="mi">130</span> <span class="n">actions</span><span class="o">=</span><span class="n">strip_vlan</span><span class="p">,</span><span class="n">output</span><span class="p">:</span><span class="mi">1</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">81</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">icmp6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span><span class="p">,</span><span class="n">icmp_type</span><span class="o">=</span><span class="mi">131</span> <span class="n">actions</span><span class="o">=</span><span class="n">strip_vlan</span><span class="p">,</span><span class="n">output</span><span class="p">:</span><span class="mi">1</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">81</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">icmp6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span><span class="p">,</span><span class="n">icmp_type</span><span class="o">=</span><span class="mi">132</span> <span class="n">actions</span><span class="o">=</span><span class="n">strip_vlan</span><span class="p">,</span><span class="n">output</span><span class="p">:</span><span class="mi">1</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">81</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">icmp6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span><span class="p">,</span><span class="n">icmp_type</span><span class="o">=</span><span class="mi">135</span> <span class="n">actions</span><span class="o">=</span><span class="n">strip_vlan</span><span class="p">,</span><span class="n">output</span><span class="p">:</span><span class="mi">1</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">81</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">icmp6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span><span class="p">,</span><span class="n">icmp_type</span><span class="o">=</span><span class="mi">136</span> <span class="n">actions</span><span class="o">=</span><span class="n">strip_vlan</span><span class="p">,</span><span class="n">output</span><span class="p">:</span><span class="mi">1</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">81</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">icmp6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">icmp_type</span><span class="o">=</span><span class="mi">130</span> <span class="n">actions</span><span class="o">=</span><span class="n">strip_vlan</span><span class="p">,</span><span class="n">output</span><span class="p">:</span><span class="mi">2</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">81</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">icmp6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">icmp_type</span><span class="o">=</span><span class="mi">131</span> <span class="n">actions</span><span class="o">=</span><span class="n">strip_vlan</span><span class="p">,</span><span class="n">output</span><span class="p">:</span><span class="mi">2</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">81</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">icmp6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">icmp_type</span><span class="o">=</span><span class="mi">132</span> <span class="n">actions</span><span class="o">=</span><span class="n">strip_vlan</span><span class="p">,</span><span class="n">output</span><span class="p">:</span><span class="mi">2</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">81</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">icmp6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">icmp_type</span><span class="o">=</span><span class="mi">135</span> <span class="n">actions</span><span class="o">=</span><span class="n">strip_vlan</span><span class="p">,</span><span class="n">output</span><span class="p">:</span><span class="mi">2</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">81</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">icmp6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">icmp_type</span><span class="o">=</span><span class="mi">136</span> <span class="n">actions</span><span class="o">=</span><span class="n">strip_vlan</span><span class="p">,</span><span class="n">output</span><span class="p">:</span><span class="mi">2</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">81</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">95</span><span class="p">,</span><span class="n">udp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span><span class="p">,</span><span class="n">tp_src</span><span class="o">=</span><span class="mi">67</span><span class="p">,</span><span class="n">tp_dst</span><span class="o">=</span><span class="mi">68</span> <span class="n">actions</span><span class="o">=</span><span class="n">strip_vlan</span><span class="p">,</span><span class="n">output</span><span class="p">:</span><span class="mi">1</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">81</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">95</span><span class="p">,</span><span class="n">udp6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span><span class="p">,</span><span class="n">tp_src</span><span class="o">=</span><span class="mi">547</span><span class="p">,</span><span class="n">tp_dst</span><span class="o">=</span><span class="mi">546</span> <span class="n">actions</span><span class="o">=</span><span class="n">strip_vlan</span><span class="p">,</span><span class="n">output</span><span class="p">:</span><span class="mi">1</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">81</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">95</span><span class="p">,</span><span class="n">udp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">tp_src</span><span class="o">=</span><span class="mi">67</span><span class="p">,</span><span class="n">tp_dst</span><span class="o">=</span><span class="mi">68</span> <span class="n">actions</span><span class="o">=</span><span class="n">strip_vlan</span><span class="p">,</span><span class="n">output</span><span class="p">:</span><span class="mi">2</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">81</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">95</span><span class="p">,</span><span class="n">udp6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">tp_src</span><span class="o">=</span><span class="mi">547</span><span class="p">,</span><span class="n">tp_dst</span><span class="o">=</span><span class="mi">546</span> <span class="n">actions</span><span class="o">=</span><span class="n">strip_vlan</span><span class="p">,</span><span class="n">output</span><span class="p">:</span><span class="mi">2</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">81</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=-</span><span class="n">trk</span><span class="p">,</span><span class="n">ip</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span> <span class="n">actions</span><span class="o">=</span><span class="n">ct</span><span class="p">(</span><span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span><span class="n">zone</span><span class="o">=</span><span class="n">NXM_NX_REG6</span><span class="p">[</span><span class="mf">0..15</span><span class="p">])</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">81</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=-</span><span class="n">trk</span><span class="p">,</span><span class="n">ipv6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span> <span class="n">actions</span><span class="o">=</span><span class="n">ct</span><span class="p">(</span><span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span><span class="n">zone</span><span class="o">=</span><span class="n">NXM_NX_REG6</span><span class="p">[</span><span class="mf">0..15</span><span class="p">])</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">81</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=-</span><span class="n">trk</span><span class="p">,</span><span class="n">ip</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span> <span class="n">actions</span><span class="o">=</span><span class="n">ct</span><span class="p">(</span><span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span><span class="n">zone</span><span class="o">=</span><span class="n">NXM_NX_REG6</span><span class="p">[</span><span class="mf">0..15</span><span class="p">])</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">81</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=-</span><span class="n">trk</span><span class="p">,</span><span class="n">ipv6</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span> <span class="n">actions</span><span class="o">=</span><span class="n">ct</span><span class="p">(</span><span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span><span class="n">zone</span><span class="o">=</span><span class="n">NXM_NX_REG6</span><span class="p">[</span><span class="mf">0..15</span><span class="p">])</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">81</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">trk</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">82</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">81</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">trk</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">82</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">81</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">0</span> <span class="n">actions</span><span class="o">=</span><span class="n">drop</span>
+</pre></div>
+</div>
+<p>Similarly to <code class="docutils literal notranslate"><span class="pre">table</span> <span class="pre">72</span></code> (RULES_EGRESS), <code class="docutils literal notranslate"><span class="pre">table</span> <span class="pre">82</span></code> (RULES_INGRESS) accepts established and related
+connections. In this case we allow all ICMP traffic coming from
+<code class="docutils literal notranslate"><span class="pre">security</span> <span class="pre">group</span> <span class="pre">1</span></code> which is in this case only <code class="docutils literal notranslate"><span class="pre">port</span> <span class="pre">1</span></code>.
+The first four flows match on the IP addresses, and the
+next two flows match on the ICMP protocol.
+These six flows define conjunction flows, and the next two define actions for
+them.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">est</span><span class="o">-</span><span class="n">rel</span><span class="o">-</span><span class="n">rpl</span><span class="p">,</span><span class="n">ip</span><span class="p">,</span><span class="n">reg6</span><span class="o">=</span><span class="mh">0x284</span><span class="p">,</span><span class="n">nw_src</span><span class="o">=</span><span class="mf">192.168.0.1</span> <span class="n">actions</span><span class="o">=</span><span class="n">conjunction</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">est</span><span class="o">-</span><span class="n">rel</span><span class="o">-</span><span class="n">rpl</span><span class="p">,</span><span class="n">ip</span><span class="p">,</span><span class="n">reg6</span><span class="o">=</span><span class="mh">0x284</span><span class="p">,</span><span class="n">nw_src</span><span class="o">=</span><span class="mf">10.0.0.1</span> <span class="n">actions</span><span class="o">=</span><span class="n">conjunction</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">new</span><span class="o">-</span><span class="n">est</span><span class="p">,</span><span class="n">ip</span><span class="p">,</span><span class="n">reg6</span><span class="o">=</span><span class="mh">0x284</span><span class="p">,</span><span class="n">nw_src</span><span class="o">=</span><span class="mf">192.168.0.1</span> <span class="n">actions</span><span class="o">=</span><span class="n">conjunction</span><span class="p">(</span><span class="mi">19</span><span class="p">,</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">new</span><span class="o">-</span><span class="n">est</span><span class="p">,</span><span class="n">ip</span><span class="p">,</span><span class="n">reg6</span><span class="o">=</span><span class="mh">0x284</span><span class="p">,</span><span class="n">nw_src</span><span class="o">=</span><span class="mf">10.0.0.1</span> <span class="n">actions</span><span class="o">=</span><span class="n">conjunction</span><span class="p">(</span><span class="mi">19</span><span class="p">,</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">est</span><span class="o">-</span><span class="n">rel</span><span class="o">-</span><span class="n">rpl</span><span class="p">,</span><span class="n">icmp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span> <span class="n">actions</span><span class="o">=</span><span class="n">conjunction</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">new</span><span class="o">-</span><span class="n">est</span><span class="p">,</span><span class="n">icmp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span> <span class="n">actions</span><span class="o">=</span><span class="n">conjunction</span><span class="p">(</span><span class="mi">19</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span><span class="n">conj_id</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">est</span><span class="o">-</span><span class="n">rel</span><span class="o">-</span><span class="n">rpl</span><span class="p">,</span><span class="n">ip</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span> <span class="n">actions</span><span class="o">=</span><span class="n">strip_vlan</span><span class="p">,</span><span class="n">output</span><span class="p">:</span><span class="mi">2</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span><span class="n">conj_id</span><span class="o">=</span><span class="mi">19</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">new</span><span class="o">-</span><span class="n">est</span><span class="p">,</span><span class="n">ip</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span> <span class="n">actions</span><span class="o">=</span><span class="n">ct</span><span class="p">(</span><span class="n">commit</span><span class="p">,</span><span class="n">zone</span><span class="o">=</span><span class="n">NXM_NX_REG6</span><span class="p">[</span><span class="mf">0..15</span><span class="p">]),</span><span class="n">strip_vlan</span><span class="p">,</span><span class="n">output</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">92</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">inv</span><span class="o">+</span><span class="n">trk</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">93</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>There are some more security group rules with remote group IDs. Next
+we look at TCP related ones. Excerpt of flows that correspond to those
+rules are:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">est</span><span class="o">-</span><span class="n">rel</span><span class="o">-</span><span class="n">rpl</span><span class="p">,</span><span class="n">tcp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">tp_dst</span><span class="o">=</span><span class="mh">0x60</span><span class="o">/</span><span class="mh">0xffe0</span> <span class="n">actions</span><span class="o">=</span><span class="n">conjunction</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">new</span><span class="o">-</span><span class="n">est</span><span class="p">,</span><span class="n">tcp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">tp_dst</span><span class="o">=</span><span class="mh">0x60</span><span class="o">/</span><span class="mh">0xffe0</span> <span class="n">actions</span><span class="o">=</span><span class="n">conjunction</span><span class="p">(</span><span class="mi">23</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">est</span><span class="o">-</span><span class="n">rel</span><span class="o">-</span><span class="n">rpl</span><span class="p">,</span><span class="n">tcp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">tp_dst</span><span class="o">=</span><span class="mh">0x40</span><span class="o">/</span><span class="mh">0xfff0</span> <span class="n">actions</span><span class="o">=</span><span class="n">conjunction</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">new</span><span class="o">-</span><span class="n">est</span><span class="p">,</span><span class="n">tcp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">tp_dst</span><span class="o">=</span><span class="mh">0x40</span><span class="o">/</span><span class="mh">0xfff0</span> <span class="n">actions</span><span class="o">=</span><span class="n">conjunction</span><span class="p">(</span><span class="mi">23</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">est</span><span class="o">-</span><span class="n">rel</span><span class="o">-</span><span class="n">rpl</span><span class="p">,</span><span class="n">tcp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">tp_dst</span><span class="o">=</span><span class="mh">0x58</span><span class="o">/</span><span class="mh">0xfff8</span> <span class="n">actions</span><span class="o">=</span><span class="n">conjunction</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">new</span><span class="o">-</span><span class="n">est</span><span class="p">,</span><span class="n">tcp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">tp_dst</span><span class="o">=</span><span class="mh">0x58</span><span class="o">/</span><span class="mh">0xfff8</span> <span class="n">actions</span><span class="o">=</span><span class="n">conjunction</span><span class="p">(</span><span class="mi">23</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">est</span><span class="o">-</span><span class="n">rel</span><span class="o">-</span><span class="n">rpl</span><span class="p">,</span><span class="n">tcp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">tp_dst</span><span class="o">=</span><span class="mh">0x54</span><span class="o">/</span><span class="mh">0xfffc</span> <span class="n">actions</span><span class="o">=</span><span class="n">conjunction</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">new</span><span class="o">-</span><span class="n">est</span><span class="p">,</span><span class="n">tcp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">tp_dst</span><span class="o">=</span><span class="mh">0x54</span><span class="o">/</span><span class="mh">0xfffc</span> <span class="n">actions</span><span class="o">=</span><span class="n">conjunction</span><span class="p">(</span><span class="mi">23</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">est</span><span class="o">-</span><span class="n">rel</span><span class="o">-</span><span class="n">rpl</span><span class="p">,</span><span class="n">tcp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">tp_dst</span><span class="o">=</span><span class="mh">0x52</span><span class="o">/</span><span class="mh">0xfffe</span> <span class="n">actions</span><span class="o">=</span><span class="n">conjunction</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">new</span><span class="o">-</span><span class="n">est</span><span class="p">,</span><span class="n">tcp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">tp_dst</span><span class="o">=</span><span class="mh">0x52</span><span class="o">/</span><span class="mh">0xfffe</span> <span class="n">actions</span><span class="o">=</span><span class="n">conjunction</span><span class="p">(</span><span class="mi">23</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">est</span><span class="o">-</span><span class="n">rel</span><span class="o">-</span><span class="n">rpl</span><span class="p">,</span><span class="n">tcp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">tp_dst</span><span class="o">=</span><span class="mi">80</span> <span class="n">actions</span><span class="o">=</span><span class="n">conjunction</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="n">conjunction</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">est</span><span class="o">-</span><span class="n">rel</span><span class="o">-</span><span class="n">rpl</span><span class="p">,</span><span class="n">tcp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">tp_dst</span><span class="o">=</span><span class="mi">81</span> <span class="n">actions</span><span class="o">=</span><span class="n">conjunction</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">new</span><span class="o">-</span><span class="n">est</span><span class="p">,</span><span class="n">tcp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">tp_dst</span><span class="o">=</span><span class="mi">80</span> <span class="n">actions</span><span class="o">=</span><span class="n">conjunction</span><span class="p">(</span><span class="mi">23</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="n">conjunction</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">new</span><span class="o">-</span><span class="n">est</span><span class="p">,</span><span class="n">tcp</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span><span class="p">,</span><span class="n">tp_dst</span><span class="o">=</span><span class="mi">81</span> <span class="n">actions</span><span class="o">=</span><span class="n">conjunction</span><span class="p">(</span><span class="mi">23</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Only dimension 2/2 flows are shown here, as the other are similar to
+the previous ICMP example. There are many more flows but only the port
+ranges that cover from 64 to 127 are shown for brevity.</p>
+<p>The conjunction IDs 14 and 15 correspond to packets from the security
+group 1, and the conjunction IDs 22 and 23 correspond to those from
+the security group 2. These flows are from the following security group rules,</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="n">can</span> <span class="n">receive</span> <span class="n">TCP</span> <span class="n">packets</span> <span class="kn">from</span><span class="w"> </span><span class="nn">security</span> <span class="n">group</span> <span class="mi">1</span>
+<span class="o">-</span> <span class="n">can</span> <span class="n">receive</span> <span class="n">TCP</span> <span class="n">packets</span> <span class="n">to</span> <span class="n">port</span> <span class="mi">80</span> <span class="kn">from</span><span class="w"> </span><span class="nn">security</span> <span class="n">group</span> <span class="mi">2</span>
+</pre></div>
+</div>
+<p>and these rules have been processed by <code class="docutils literal notranslate"><span class="pre">merge_port_ranges</span></code> into:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="n">can</span> <span class="n">receive</span> <span class="n">TCP</span> <span class="n">packets</span> <span class="n">to</span> <span class="n">port</span> <span class="o">!=</span> <span class="mi">80</span> <span class="kn">from</span><span class="w"> </span><span class="nn">security</span> <span class="n">group</span> <span class="mi">1</span>
+<span class="o">-</span> <span class="n">can</span> <span class="n">receive</span> <span class="n">TCP</span> <span class="n">packets</span> <span class="n">to</span> <span class="n">port</span> <span class="mi">80</span> <span class="kn">from</span><span class="w"> </span><span class="nn">security</span> <span class="n">group</span> <span class="mi">1</span> <span class="ow">or</span> <span class="mi">2</span>
+</pre></div>
+</div>
+<p>before translating to flows so that there is only one matching flow
+even when the TCP destination port is 80.</p>
+<p>The remaining is a L4 protocol agnostic rule.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">est</span><span class="o">-</span><span class="n">rel</span><span class="o">-</span><span class="n">rpl</span><span class="p">,</span><span class="n">ip</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span> <span class="n">actions</span><span class="o">=</span><span class="n">conjunction</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">new</span><span class="o">-</span><span class="n">est</span><span class="p">,</span><span class="n">ip</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span> <span class="n">actions</span><span class="o">=</span><span class="n">conjunction</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Any IP packet that matches the previous TCP flows matches one of these
+flows, but the corresponding security group rules have different
+remote group IDs.  Unlike the above TCP example, there’s no convenient
+way of expressing <code class="docutils literal notranslate"><span class="pre">protocol</span> <span class="pre">!=</span> <span class="pre">TCP</span></code> or <code class="docutils literal notranslate"><span class="pre">icmp_code</span> <span class="pre">!=</span> <span class="pre">1</span></code>.  So the
+OVS firewall uses a different priority than the previous TCP flows so
+as not to mix them up.</p>
+<p>The mechanism for dropping connections that are not allowed anymore is the
+same as in <code class="docutils literal notranslate"><span class="pre">table</span> <span class="pre">72</span></code> (RULES_EGRESS).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">ct_mark</span><span class="o">=</span><span class="mh">0x1</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">93</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">ct_mark</span><span class="o">=</span><span class="mh">0x1</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">93</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">est</span><span class="o">-</span><span class="n">rel</span><span class="o">+</span><span class="n">rpl</span><span class="p">,</span><span class="n">ct_zone</span><span class="o">=</span><span class="mi">644</span><span class="p">,</span><span class="n">ct_mark</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span> <span class="n">actions</span><span class="o">=</span><span class="n">strip_vlan</span><span class="p">,</span><span class="n">output</span><span class="p">:</span><span class="mi">1</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">est</span><span class="o">-</span><span class="n">rel</span><span class="o">+</span><span class="n">rpl</span><span class="p">,</span><span class="n">ct_zone</span><span class="o">=</span><span class="mi">644</span><span class="p">,</span><span class="n">ct_mark</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span> <span class="n">actions</span><span class="o">=</span><span class="n">strip_vlan</span><span class="p">,</span><span class="n">output</span><span class="p">:</span><span class="mi">2</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=-</span><span class="n">new</span><span class="o">-</span><span class="n">est</span><span class="o">+</span><span class="n">rel</span><span class="o">-</span><span class="n">inv</span><span class="p">,</span><span class="n">ct_zone</span><span class="o">=</span><span class="mi">644</span><span class="p">,</span><span class="n">ct_mark</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span> <span class="n">actions</span><span class="o">=</span><span class="n">strip_vlan</span><span class="p">,</span><span class="n">output</span><span class="p">:</span><span class="mi">1</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=-</span><span class="n">new</span><span class="o">-</span><span class="n">est</span><span class="o">+</span><span class="n">rel</span><span class="o">-</span><span class="n">inv</span><span class="p">,</span><span class="n">ct_zone</span><span class="o">=</span><span class="mi">644</span><span class="p">,</span><span class="n">ct_mark</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span> <span class="n">actions</span><span class="o">=</span><span class="n">strip_vlan</span><span class="p">,</span><span class="n">output</span><span class="p">:</span><span class="mi">2</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=-</span><span class="n">est</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">93</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">est</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x1</span> <span class="n">actions</span><span class="o">=</span><span class="n">ct</span><span class="p">(</span><span class="n">commit</span><span class="p">,</span><span class="n">zone</span><span class="o">=</span><span class="n">NXM_NX_REG6</span><span class="p">[</span><span class="mf">0..15</span><span class="p">],</span><span class="n">exec</span><span class="p">(</span><span class="n">load</span><span class="p">:</span><span class="mh">0x1</span><span class="o">-&gt;</span><span class="n">NXM_NX_CT_MARK</span><span class="p">[]))</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=-</span><span class="n">est</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span> <span class="n">actions</span><span class="o">=</span><span class="n">resubmit</span><span class="p">(,</span><span class="mi">93</span><span class="p">)</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span><span class="n">ct_state</span><span class="o">=+</span><span class="n">est</span><span class="p">,</span><span class="n">reg5</span><span class="o">=</span><span class="mh">0x2</span> <span class="n">actions</span><span class="o">=</span><span class="n">ct</span><span class="p">(</span><span class="n">commit</span><span class="p">,</span><span class="n">zone</span><span class="o">=</span><span class="n">NXM_NX_REG6</span><span class="p">[</span><span class="mf">0..15</span><span class="p">],</span><span class="n">exec</span><span class="p">(</span><span class="n">load</span><span class="p">:</span><span class="mh">0x1</span><span class="o">-&gt;</span><span class="n">NXM_NX_CT_MARK</span><span class="p">[]))</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">0</span> <span class="n">actions</span><span class="o">=</span><span class="n">drop</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Conntrack zones on a single node are now based on the network to which
+a port is plugged in. That makes a difference between traffic on hypervisor
+only and east-west traffic. For example, if a port has a VIP that was
+migrated to a port on a different node, then the new port won’t contain
+conntrack information about previous traffic that happened with that VIP.</p>
+</div>
+<p>By default <code class="docutils literal notranslate"><span class="pre">table</span> <span class="pre">94</span></code> (ACCEPTED_EGRESS_TRAFFIC_NORMAL) will have one single flow like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="mi">94</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">1</span> <span class="n">actions</span><span class="o">=</span><span class="n">NORMAL</span>
+</pre></div>
+</div>
+<p>If <code class="docutils literal notranslate"><span class="pre">explicitly_egress_direct</span></code> is set to True, flows of <code class="docutils literal notranslate"><span class="pre">table</span> <span class="pre">94</span></code> (ACCEPTED_EGRESS_TRAFFIC_NORMAL)
+will be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="mi">94</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span><span class="n">reg6</span><span class="o">=</span><span class="mh">0x284</span><span class="p">,</span><span class="n">dl_dst</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="n">a4</span><span class="p">:</span><span class="mi">22</span><span class="p">:</span><span class="mi">10</span> <span class="n">actions</span><span class="o">=</span><span class="n">output</span><span class="p">:</span><span class="mi">1</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">94</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span><span class="n">reg6</span><span class="o">=</span><span class="mh">0x284</span><span class="p">,</span><span class="n">dl_dst</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="mi">24</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="n">c7</span> <span class="n">actions</span><span class="o">=</span><span class="n">output</span><span class="p">:</span><span class="mi">2</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">94</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">reg6</span><span class="o">=</span><span class="mh">0x284</span><span class="p">,</span><span class="n">dl_src</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="n">a4</span><span class="p">:</span><span class="mi">22</span><span class="p">:</span><span class="mi">10</span><span class="p">,</span><span class="n">dl_dst</span><span class="o">=</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="o">/</span><span class="mi">01</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span> <span class="n">actions</span><span class="o">=</span><span class="n">push_vlan</span><span class="p">:</span><span class="mh">0x8100</span><span class="p">,</span><span class="n">set_field</span><span class="p">:</span><span class="mh">0x1</span><span class="o">-&gt;</span><span class="n">vlan_vid</span><span class="p">,</span><span class="n">output</span><span class="p">:</span><span class="mi">3</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">94</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">reg6</span><span class="o">=</span><span class="mh">0x284</span><span class="p">,</span><span class="n">dl_src</span><span class="o">=</span><span class="n">fa</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">3</span><span class="n">e</span><span class="p">:</span><span class="mi">24</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="n">c7</span><span class="p">,</span><span class="n">dl_dst</span><span class="o">=</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="o">/</span><span class="mi">01</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span> <span class="n">actions</span><span class="o">=</span><span class="n">push_vlan</span><span class="p">:</span><span class="mh">0x8100</span><span class="p">,</span><span class="n">set_field</span><span class="p">:</span><span class="mh">0x1</span><span class="o">-&gt;</span><span class="n">vlan_vid</span><span class="p">,</span><span class="n">output</span><span class="p">:</span><span class="mi">3</span>
+<span class="n">table</span><span class="o">=</span><span class="mi">94</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">1</span> <span class="n">actions</span><span class="o">=</span><span class="n">NORMAL</span>
+</pre></div>
+</div>
+<p>The OVS firewall will initialize a default goto table 94 flow
+on TRANSIENT_TABLE <code class="docutils literal notranslate"><span class="pre">table</span> <span class="pre">60</span></code> (TRANSIENT), if <code class="docutils literal notranslate"><span class="pre">explicitly_egress_direct</span></code>
+is set to True, which is mainly for ports without security groups
+and disabled port_security. For instance:</p>
+<dl class="simple">
+<dt>::</dt><dd><p>table=60, priority=2 actions=resubmit(,94)</p>
+</dd>
+</dl>
+<p>Then for packets from the outside to VM without security functionalities
+(–disable-port-security –no-security-group)
+will go to table 94 and do the same direct actions.</p>
+</section>
+<section id="ovs-firewall-integration-points">
+<h2>OVS firewall integration points<a class="headerlink" href="#ovs-firewall-integration-points" title="Link to this heading">¶</a></h2>
+<p>There are three tables where packets are sent once after going through the OVS
+firewall pipeline. The tables can be used by other mechanisms that are supposed
+to work with the OVS firewall, typically L2 agent extensions.</p>
+<section id="egress-pipeline">
+<h3>Egress pipeline<a class="headerlink" href="#egress-pipeline" title="Link to this heading">¶</a></h3>
+<p>Packets are sent to <code class="docutils literal notranslate"><span class="pre">table</span> <span class="pre">91</span></code> (ACCEPTED_EGRESS_TRAFFIC) and <code class="docutils literal notranslate"><span class="pre">table</span> <span class="pre">94</span></code> (ACCEPTED_EGRESS_TRAFFIC_NORMAL) when they are considered accepted
+by the egress pipeline, and they will be processed so that they are forwarded
+to their destination by being submitted to a NORMAL action, that results in
+Ethernet flood/learn processing.</p>
+<p>Two tables are used to differentiate between the first packets of a connection
+and the following packets. This was introduced for performance reasons to
+allow the logging extension to only log the first packets of a connection.
+Only the first accepted packet of each connection session will go to <code class="docutils literal notranslate"><span class="pre">table</span> <span class="pre">91</span></code> (ACCEPTED_EGRESS_TRAFFIC)
+and the following ones will go to <code class="docutils literal notranslate"><span class="pre">table</span> <span class="pre">94</span></code> (ACCEPTED_EGRESS_TRAFFIC_NORMAL).</p>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">table</span> <span class="pre">91</span></code> (ACCEPTED_EGRESS_TRAFFIC) merely resubmits to <code class="docutils literal notranslate"><span class="pre">table</span> <span class="pre">94</span></code> (ACCEPTED_EGRESS_TRAFFIC_NORMAL) that contains the actual
+NORMAL action; this allows to have a single place where the NORMAL action can
+be overridden by other components (currently used by <code class="docutils literal notranslate"><span class="pre">networking-bagpipe</span></code>
+driver for <code class="docutils literal notranslate"><span class="pre">networking-bgpvpn</span></code>).</p>
+</section>
+<section id="ingress-pipeline">
+<h3>Ingress pipeline<a class="headerlink" href="#ingress-pipeline" title="Link to this heading">¶</a></h3>
+<p>The first packet of each connection accepted by the ingress pipeline is sent
+to <code class="docutils literal notranslate"><span class="pre">table</span> <span class="pre">92</span></code> (ACCEPTED_INGRESS_TRAFFIC). The default action in this table is DROP because at this point
+the packets have already been delivered to their destination port. This
+integration point is essentially provided for the logging extension.</p>
+<p>Packets are sent to <code class="docutils literal notranslate"><span class="pre">table</span> <span class="pre">93</span></code> (DROPPED_TRAFFIC) if processing by the ingress filtering
+concluded that they should be dropped.</p>
+</section>
+</section>
+<section id="upgrade-path-from-iptables-hybrid-driver">
+<h2>Upgrade path from iptables hybrid driver<a class="headerlink" href="#upgrade-path-from-iptables-hybrid-driver" title="Link to this heading">¶</a></h2>
+<p>During an upgrade, the agent will need to re-plug each instance’s tap device
+into the integration bridge while trying to not break existing connections. One
+of the following approaches can be taken:</p>
+<p>1) Pause the running instance in order to prevent a short period of time where
+its network interface does not have firewall rules. This can happen due to
+the firewall driver calling OVS to obtain information about OVS the port. Once
+the instance is paused and no traffic is flowing, we can delete the qvo
+interface from integration bridge, detach the tap device from the qbr bridge
+and plug the tap device back into the integration bridge. Once this is done,
+the firewall rules are applied for the OVS tap interface and the instance is
+started from its paused state.</p>
+<p>2) Set drop rules for the instance’s tap interface, delete the qbr bridge and
+related veths, plug the tap device into the integration bridge, apply the OVS
+firewall rules and finally remove the drop rules for the instance.</p>
+<p>3) Compute nodes can be upgraded one at a time. A free node can be switched to
+use the OVS firewall, and instances from other nodes can be live-migrated to
+it. Once the first node is evacuated, its firewall driver can be then be
+switched to the OVS driver.</p>
+<p>4) Once migration is complete, stale iptables rules should be cleaned-up on
+all nodes where the firewall driver was changed. They can be found by
+searching for the string ‘neutron’, for example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>iptables<span class="w"> </span>-S<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>neutron
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>During upgrading to openvswitch firewall, the security rules
+are still working for previous iptables controlled hybrid ports. But it will
+not work if one tries to replace openvswitch firewall with iptables.</p>
+</div>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="objects_usage.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Objects"></i></a>
+          
+          
+            <a href="ovn/index.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: OVN Design Notes"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2024-08-23 12:03:12</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Contributor Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#basic-information">Basic Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-policies">Neutron Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#gerrit-rechecks">Gerrit Rechecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-stadium">Neutron Stadium</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#neutron-internals">Neutron Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#ovn-driver">OVN Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#dashboards">Dashboards</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Open vSwitch Firewall Driver</a><ul>
+<li><a class="reference internal" href="#ingress-egress-terminology">Ingress/Egress Terminology</a></li>
+<li><a class="reference internal" href="#firewall-api-calls">Firewall API calls</a></li>
+<li><a class="reference internal" href="#openflow-rules">OpenFlow rules</a></li>
+<li><a class="reference internal" href="#flow-priorities-for-security-group-rules">Flow priorities for security group rules</a></li>
+<li><a class="reference internal" href="#uses-of-conjunctive-flows">Uses of conjunctive flows</a></li>
+<li><a class="reference internal" href="#rules-example-with-explanation">Rules example with explanation:</a></li>
+<li><a class="reference internal" href="#ovs-firewall-integration-points">OVS firewall integration points</a><ul>
+<li><a class="reference internal" href="#egress-pipeline">Egress pipeline</a></li>
+<li><a class="reference internal" href="#ingress-pipeline">Ingress pipeline</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#upgrade-path-from-iptables-hybrid-driver">Upgrade path from iptables hybrid driver</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "contributor/internals/openvswitch_firewall" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Open vSwitch Firewall Driver in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2024-08-23 12:03:12";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "contributor/internals/openvswitch_firewall";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

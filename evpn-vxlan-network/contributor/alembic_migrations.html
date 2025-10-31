@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Alembic Migrations &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/support-matrix.css?v=ac26a930" />
+    <script src="../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Upgrade checks" href="upgrade_checks.html" />
+    <link rel="prev" title="Client command extension support" href="client_command_extensions.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/contributor/alembic_migrations.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Alembic Migrations</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="client_command_extensions.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Client command extension support"></i></a>
+    
+    
+    <a href="upgrade_checks.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Upgrade checks"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="alembic-migrations">
+<span id="id1"></span><h1>Alembic Migrations<a class="headerlink" href="#alembic-migrations" title="Link to this heading">¶</a></h1>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
+<p>The migrations in the alembic/versions contain the changes needed to migrate
+from older Neutron releases to newer versions. A migration occurs by executing
+a script that details the changes needed to upgrade the database. The migration
+scripts are ordered so that multiple scripts can run sequentially to update the
+database.</p>
+</section>
+<section id="the-migration-wrapper">
+<h2>The Migration Wrapper<a class="headerlink" href="#the-migration-wrapper" title="Link to this heading">¶</a></h2>
+<p>The scripts are executed by Neutron’s migration wrapper <code class="docutils literal notranslate"><span class="pre">neutron-db-manage</span></code>
+which uses the Alembic library to manage the migration. Pass the <code class="docutils literal notranslate"><span class="pre">--help</span></code>
+option to the wrapper for usage information.</p>
+<p>The wrapper takes some options followed by some commands:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">neutron</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">manage</span> <span class="o">&lt;</span><span class="n">options</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">commands</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>The wrapper needs to be provided with the database connection string, which is
+usually provided in the <code class="docutils literal notranslate"><span class="pre">neutron.conf</span></code> configuration file in an installation.
+The wrapper automatically reads from <code class="docutils literal notranslate"><span class="pre">/etc/neutron/neutron.conf</span></code> if it is
+present. If the configuration is in a different location:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">neutron</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">manage</span> <span class="o">--</span><span class="n">config</span><span class="o">-</span><span class="n">file</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">neutron</span><span class="o">.</span><span class="n">conf</span> <span class="o">&lt;</span><span class="n">commands</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>Multiple <code class="docutils literal notranslate"><span class="pre">--config-file</span></code> options can be passed if needed.</p>
+<p>Instead of reading the DB connection from the configuration file(s) the
+<code class="docutils literal notranslate"><span class="pre">--database-connection</span></code> option can be used:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>neutron-db-manage --database-connection mysql+pymysql://root:secret@127.0.0.1/neutron?charset=utf8 &lt;commands&gt;
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">branches</span></code>, <code class="docutils literal notranslate"><span class="pre">current</span></code>, and <code class="docutils literal notranslate"><span class="pre">history</span></code> commands all accept a
+<code class="docutils literal notranslate"><span class="pre">--verbose</span></code> option, which, when passed, will instruct <code class="docutils literal notranslate"><span class="pre">neutron-db-manage</span></code>
+to display more verbose output for the specified command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">neutron</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">manage</span> <span class="n">current</span> <span class="o">--</span><span class="n">verbose</span>
+</pre></div>
+</div>
+<p>For some commands the wrapper needs to know the entrypoint of the core plugin
+for the installation. This can be read from the configuration file(s) or
+specified using the <code class="docutils literal notranslate"><span class="pre">--core_plugin</span></code> option:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">neutron</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">manage</span> <span class="o">--</span><span class="n">core_plugin</span> <span class="n">neutron</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">ml2</span><span class="o">.</span><span class="n">plugin</span><span class="o">.</span><span class="n">Ml2Plugin</span> <span class="o">&lt;</span><span class="n">commands</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>When giving examples below of using the wrapper the options will not be shown.
+It is assumed you will use the options that you need for your environment.</p>
+<p>For new deployments you will start with an empty database. You then upgrade
+to the latest database version via:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">neutron</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">manage</span> <span class="n">upgrade</span> <span class="n">heads</span>
+</pre></div>
+</div>
+<p>For existing deployments the database will already be at some version. To
+check the current database version:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">neutron</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">manage</span> <span class="n">current</span>
+</pre></div>
+</div>
+<p>After installing a new version of Neutron server, upgrading the database is
+the same command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">neutron</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">manage</span> <span class="n">upgrade</span> <span class="n">heads</span>
+</pre></div>
+</div>
+<p>To create a script to run the migration offline:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">neutron</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">manage</span> <span class="n">upgrade</span> <span class="n">heads</span> <span class="o">--</span><span class="n">sql</span>
+</pre></div>
+</div>
+<p>To run the offline migration between specific migration versions:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">neutron</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">manage</span> <span class="n">upgrade</span> <span class="o">&lt;</span><span class="n">start</span> <span class="n">version</span><span class="o">&gt;</span><span class="p">:</span><span class="o">&lt;</span><span class="n">end</span> <span class="n">version</span><span class="o">&gt;</span> <span class="o">--</span><span class="n">sql</span>
+</pre></div>
+</div>
+<p>Upgrade the database incrementally:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">neutron</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">manage</span> <span class="n">upgrade</span> <span class="o">--</span><span class="n">delta</span> <span class="o">&lt;</span><span class="c1"># of revs&gt;</span>
+</pre></div>
+</div>
+<p><strong>NOTE:</strong> Database downgrade is not supported.</p>
+</section>
+<section id="migration-branches">
+<h2>Migration Branches<a class="headerlink" href="#migration-branches" title="Link to this heading">¶</a></h2>
+<p>Neutron makes use of alembic branches for two purposes.</p>
+<section id="independent-sub-project-tables">
+<h3>1. Independent Sub-Project Tables<a class="headerlink" href="#independent-sub-project-tables" title="Link to this heading">¶</a></h3>
+<p>Various <a class="reference external" href="../contributor/stadium/guidelines.html">Sub-Projects</a> can be installed with Neutron. Each
+sub-project registers its own alembic branch which is responsible for migrating
+the schemas of the tables owned by the sub-project.</p>
+<p>The neutron-db-manage script detects which sub-projects have been installed by
+enumerating the <code class="docutils literal notranslate"><span class="pre">neutron.db.alembic_migrations</span></code> entrypoints. For more details
+see the <a class="reference external" href="contribute.html#entry-points">Entry Points section of Contributing extensions to Neutron</a>.</p>
+<p>The neutron-db-manage script runs the given alembic command against all
+installed sub-projects. (An exception is the <code class="docutils literal notranslate"><span class="pre">revision</span></code> command, which is
+discussed in the <a class="reference internal" href="#developers">Developers</a> section below.)</p>
+</section>
+<section id="offline-online-migrations">
+<h3>2. Offline/Online Migrations<a class="headerlink" href="#offline-online-migrations" title="Link to this heading">¶</a></h3>
+<p>Since Liberty, Neutron maintains two parallel alembic migration branches.</p>
+<p>The first one, called ‘expand’, is used to store expansion-only migration
+rules. Those rules are strictly additive and can be applied while
+neutron-server is running. Examples of additive database schema changes are:
+creating a new table, adding a new table column, adding a new index, etc.</p>
+<p>The second branch, called ‘contract’, is used to store those migration rules
+that are not safe to apply while neutron-server is running. Those include:
+column or table removal, moving data from one part of the database into another
+(renaming a column, transforming single table into multiple, etc.), introducing
+or modifying constraints, etc.</p>
+<p>The intent of the split is to allow invoking those safe migrations from
+‘expand’ branch while neutron-server is running, reducing downtime needed to
+upgrade the service.</p>
+<p>For more details, see the <a class="reference internal" href="#expand-and-contract-scripts">Expand and Contract Scripts</a> section below.</p>
+</section>
+</section>
+<section id="developers">
+<h2>Developers<a class="headerlink" href="#developers" title="Link to this heading">¶</a></h2>
+<p>A database migration script is required when you submit a change to Neutron or
+a sub-project that alters the database model definition. The migration script
+is a special python file that includes code to upgrade the database to match
+the changes in the model definition. Alembic will execute these scripts in
+order to provide a linear migration path between revisions. The
+neutron-db-manage command can be used to generate migration scripts for you to
+complete. The operations in the template are those supported by the Alembic
+migration library.</p>
+<p>The neutron-db-manage command is designed for sequential database upgrades.
+Typically, it’s executed once to reach a specific schema version. Subsequent
+executions should then resume from that achieved point. This design
+theoretically prevents scenarios where the same upgrade script runs multiple
+times, such as attempting to create an already existing table.
+However, due to potential real-world issues such as loss of the recorded
+database version or backporting of scripts, Alembic migration scripts must be
+idempotent. Therefore, scripts that modify the schema, such as adding a new
+table, should first check for the object’s existence, for example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sqlalchemy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sa</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">neutron.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">migration</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">upgrade</span><span class="p">():</span>
+    <span class="n">migration</span><span class="o">.</span><span class="n">add_column_if_not_exists</span><span class="p">(</span>
+        <span class="s1">&#39;networks&#39;</span><span class="p">,</span>
+        <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;qinq&#39;</span><span class="p">,</span> <span class="n">sa</span><span class="o">.</span><span class="n">Boolean</span><span class="p">(),</span> <span class="n">server_default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>Module <cite>neutron.db.migration</cite> provides helper functions to create table or add
+column to the existing table in the idempotent way.</p>
+<section id="running-neutron-db-manage-without-devstack">
+<span id="neutron-db-manage-without-devstack"></span><h3>Running neutron-db-manage without devstack<a class="headerlink" href="#running-neutron-db-manage-without-devstack" title="Link to this heading">¶</a></h3>
+<p>When, as a developer, you want to work with the Neutron DB schema and alembic
+migrations only, it can be rather tedious to rely on devstack just to get an
+up-to-date neutron-db-manage installed. This section describes how to work on
+the schema and migration scripts with just the unit test virtualenv and
+mysql. You can also operate on a separate test database so you don’t mess up
+the installed Neutron database.</p>
+<section id="setting-up-the-environment">
+<h4>Setting up the environment<a class="headerlink" href="#setting-up-the-environment" title="Link to this heading">¶</a></h4>
+<section id="install-mysql-service">
+<h5>Install mysql service<a class="headerlink" href="#install-mysql-service" title="Link to this heading">¶</a></h5>
+<p>This only needs to be done once since it is a system install. If you have run
+devstack on your system before, then the mysql service is already installed and
+you can skip this step.</p>
+<p>Mysql must be configured as installed by devstack, and the following script
+accomplishes this without actually running devstack:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INSTALL_MYSQL_ONLY</span><span class="o">=</span><span class="kc">True</span> <span class="o">./</span><span class="n">tools</span><span class="o">/</span><span class="n">configure_for_func_testing</span><span class="o">.</span><span class="n">sh</span> <span class="o">../</span><span class="n">devstack</span>
+</pre></div>
+</div>
+<p>Run this from the root of the neutron repo. It assumes an up-to-date clone of
+the devstack repo is in <code class="docutils literal notranslate"><span class="pre">../devstack</span></code>.</p>
+<p>Note that you must know the mysql root password. It is derived from (in order
+of precedence):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">$MYSQL_PASSWORD</span></code> in your environment</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">$MYSQL_PASSWORD</span></code> in <code class="docutils literal notranslate"><span class="pre">../devstack/local.conf</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">$MYSQL_PASSWORD</span></code> in <code class="docutils literal notranslate"><span class="pre">../devstack/localrc</span></code></p></li>
+<li><p>default of ‘secretmysql’ from <code class="docutils literal notranslate"><span class="pre">tools/configure_for_func_testing.sh</span></code></p></li>
+</ul>
+</section>
+<section id="work-on-a-test-database">
+<h5>Work on a test database<a class="headerlink" href="#work-on-a-test-database" title="Link to this heading">¶</a></h5>
+<p>Rather than using the neutron database when working on schema and alembic
+migration script changes, we can work on a test database. In the examples
+below, we use a database named <code class="docutils literal notranslate"><span class="pre">testdb</span></code>.</p>
+<p>To create the database:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mysql</span> <span class="o">-</span><span class="n">e</span> <span class="s2">&quot;create database testdb;&quot;</span>
+</pre></div>
+</div>
+<p>You will often need to clear it to re-run operations from a blank database:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mysql</span> <span class="o">-</span><span class="n">e</span> <span class="s2">&quot;drop database testdb; create database testdb;&quot;</span>
+</pre></div>
+</div>
+<p>To work on the test database instead of the neutron database, point to it with
+the <code class="docutils literal notranslate"><span class="pre">--database-connection</span></code> option:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>neutron-db-manage --database-connection mysql+pymysql://root:secretmysql@127.0.0.1/testdb?charset=utf8 &lt;commands&gt;
+</pre></div>
+</div>
+<p>You may find it convenient to set up an alias (in your .bashrc) for this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">alias</span> <span class="n">test</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">manage</span><span class="o">=</span><span class="s1">&#39;neutron-db-manage --database-connection mysql+pymysql://root:secretmysql@127.0.0.1/testdb?charset=utf8&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="create-and-activate-the-virtualenv">
+<h5>Create and activate the virtualenv<a class="headerlink" href="#create-and-activate-the-virtualenv" title="Link to this heading">¶</a></h5>
+<p>From the root of the neutron (or sub-project) repo directory, run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tox</span> <span class="o">--</span><span class="n">notest</span> <span class="o">-</span><span class="n">r</span> <span class="o">-</span><span class="n">e</span> <span class="n">py38</span>
+<span class="n">source</span> <span class="o">.</span><span class="n">tox</span><span class="o">/</span><span class="n">py38</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">activate</span>
+</pre></div>
+</div>
+<p>Now you can use the <code class="docutils literal notranslate"><span class="pre">test-db-manage</span></code> alias in place of <code class="docutils literal notranslate"><span class="pre">neutron-db-manage</span></code>
+in the script auto-generation instructions below.</p>
+<p>When you are done, exit the virtualenv:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">deactivate</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="script-auto-generation">
+<h3>Script Auto-generation<a class="headerlink" href="#script-auto-generation" title="Link to this heading">¶</a></h3>
+<p>This section describes how to auto-generate an alembic migration script for a
+model change. You may either use the system installed devstack environment, or
+a virtualenv + testdb environment as described in
+<a class="reference internal" href="#neutron-db-manage-without-devstack"><span class="std std-ref">Running neutron-db-manage without devstack</span></a>.</p>
+<p>Stop the neutron service. Work from the base directory of the neutron (or
+sub-project) repo. Check out the master branch and do <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">pull</span></code> to
+ensure it is fully up to date. Check out your development branch and rebase to
+master.</p>
+<p><strong>NOTE:</strong> Make sure you have not updated the <code class="docutils literal notranslate"><span class="pre">CONTRACT_HEAD</span></code> or
+<code class="docutils literal notranslate"><span class="pre">EXPAND_HEAD</span></code> yet at this point.</p>
+<p>Start with an empty database and upgrade to heads:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mysql</span> <span class="o">-</span><span class="n">e</span> <span class="s2">&quot;drop database neutron; create database neutron;&quot;</span>
+<span class="n">neutron</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">manage</span> <span class="n">upgrade</span> <span class="n">heads</span>
+</pre></div>
+</div>
+<p>The database schema is now created without your model changes. The alembic
+<code class="docutils literal notranslate"><span class="pre">revision</span> <span class="pre">--autogenerate</span></code> command will look for differences between the
+schema generated by the upgrade command and the schema defined by the models,
+including your model updates:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">neutron</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">manage</span> <span class="n">revision</span> <span class="o">-</span><span class="n">m</span> <span class="s2">&quot;description of revision&quot;</span> <span class="o">--</span><span class="n">autogenerate</span>
+</pre></div>
+</div>
+<p>This generates a prepopulated template with the changes needed to match the
+database state with the models.  You should inspect the autogenerated template
+to ensure that the proper models have been altered.
+When running the above command you will probably get the following error
+message:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Multiple</span> <span class="n">heads</span> <span class="n">are</span> <span class="n">present</span><span class="p">;</span> <span class="n">please</span> <span class="n">specify</span> <span class="n">the</span> <span class="n">head</span> <span class="n">revision</span> <span class="n">on</span> <span class="n">which</span> <span class="n">the</span>
+<span class="n">new</span> <span class="n">revision</span> <span class="n">should</span> <span class="n">be</span> <span class="n">based</span><span class="p">,</span> <span class="ow">or</span> <span class="n">perform</span> <span class="n">a</span> <span class="n">merge</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>This is alembic telling you that it does not know which branch (contract or
+expand) to generate the revision for. You must decide, based on whether you
+are doing contracting or expanding changes to the schema, and provide either
+the <code class="docutils literal notranslate"><span class="pre">--contract</span></code> or <code class="docutils literal notranslate"><span class="pre">--expand</span></code> option. If you have both types of changes,
+you must run the command twice, once with each option, and then manually edit
+the generated revision scripts to separate the migration operations.</p>
+<p>In rare circumstances, you may want to start with an empty migration template
+and manually author the changes necessary for an upgrade.  You can create a
+blank file for a branch via:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">neutron</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">manage</span> <span class="n">revision</span> <span class="o">-</span><span class="n">m</span> <span class="s2">&quot;description of revision&quot;</span> <span class="o">--</span><span class="n">expand</span>
+<span class="n">neutron</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">manage</span> <span class="n">revision</span> <span class="o">-</span><span class="n">m</span> <span class="s2">&quot;description of revision&quot;</span> <span class="o">--</span><span class="n">contract</span>
+</pre></div>
+</div>
+<p><strong>NOTE:</strong> If you use above command you should check that migration is created
+in a directory that is named as current release. If not, please raise the issue
+with the development team (IRC, mailing list, launchpad bug).</p>
+<p><strong>NOTE:</strong> The “description of revision” text should be a simple English
+sentence. The first 30 characters of the description will be used in the file
+name for the script, with underscores substituted for spaces. If the truncation
+occurs at an awkward point in the description, you can modify the script file
+name manually before committing.</p>
+<p>The timeline on each alembic branch should remain linear and not interleave
+with other branches, so that there is a clear path when upgrading. To verify
+that alembic branches maintain linear timelines, you can run this command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">neutron</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">manage</span> <span class="n">check_migration</span>
+</pre></div>
+</div>
+<p>If this command reports an error, you can troubleshoot by showing the migration
+timelines using the <code class="docutils literal notranslate"><span class="pre">history</span></code> command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">neutron</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">manage</span> <span class="n">history</span>
+</pre></div>
+</div>
+</section>
+<section id="expand-and-contract-scripts">
+<h3>Expand and Contract Scripts<a class="headerlink" href="#expand-and-contract-scripts" title="Link to this heading">¶</a></h3>
+<p>The obsolete “branchless” design of a migration script included that it
+indicates a specific “version” of the schema, and includes directives that
+apply all necessary changes to the database at once.  If we look for example at
+the script <code class="docutils literal notranslate"><span class="pre">2d2a8a565438_hierarchical_binding.py</span></code>, we will see:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># .../alembic_migrations/versions/2d2a8a565438_hierarchical_binding.py</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">upgrade</span><span class="p">():</span>
+
+    <span class="c1"># .. inspection code ...</span>
+
+    <span class="n">op</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span>
+        <span class="s1">&#39;ml2_port_binding_levels&#39;</span><span class="p">,</span>
+        <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;port_id&#39;</span><span class="p">,</span> <span class="n">sa</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">36</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;host&#39;</span><span class="p">,</span> <span class="n">sa</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">255</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="c1"># ... more columns ...</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">port_binding_tables</span><span class="p">:</span>
+        <span class="n">op</span><span class="o">.</span><span class="n">execute</span><span class="p">((</span>
+            <span class="s2">&quot;INSERT INTO ml2_port_binding_levels &quot;</span>
+            <span class="s2">&quot;SELECT port_id, host, 0 AS level, driver, segment AS segment_id &quot;</span>
+            <span class="s2">&quot;FROM </span><span class="si">%s</span><span class="s2"> &quot;</span>
+            <span class="s2">&quot;WHERE host &lt;&gt; &#39;&#39; &quot;</span>
+            <span class="s2">&quot;AND driver &lt;&gt; &#39;&#39;;&quot;</span>
+        <span class="p">)</span> <span class="o">%</span> <span class="n">table</span><span class="p">)</span>
+
+    <span class="n">op</span><span class="o">.</span><span class="n">drop_constraint</span><span class="p">(</span><span class="n">fk_name_dvr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;ml2_dvr_port_bindings&#39;</span><span class="p">,</span> <span class="s1">&#39;foreignkey&#39;</span><span class="p">)</span>
+    <span class="n">op</span><span class="o">.</span><span class="n">drop_column</span><span class="p">(</span><span class="s1">&#39;ml2_dvr_port_bindings&#39;</span><span class="p">,</span> <span class="s1">&#39;cap_port_filter&#39;</span><span class="p">)</span>
+    <span class="n">op</span><span class="o">.</span><span class="n">drop_column</span><span class="p">(</span><span class="s1">&#39;ml2_dvr_port_bindings&#39;</span><span class="p">,</span> <span class="s1">&#39;segment&#39;</span><span class="p">)</span>
+    <span class="n">op</span><span class="o">.</span><span class="n">drop_column</span><span class="p">(</span><span class="s1">&#39;ml2_dvr_port_bindings&#39;</span><span class="p">,</span> <span class="s1">&#39;driver&#39;</span><span class="p">)</span>
+
+    <span class="c1"># ... more DROP instructions ...</span>
+</pre></div>
+</div>
+<p>The above script contains directives that are both under the “expand”
+and “contract” categories, as well as some data migrations.
+The <code class="docutils literal notranslate"><span class="pre">op.create_table</span></code> directive is an “expand”; it may be run safely while
+the old version of the application still runs, as the old code simply doesn’t
+look for this table.
+The <code class="docutils literal notranslate"><span class="pre">op.drop_constraint</span></code> and <code class="docutils literal notranslate"><span class="pre">op.drop_column</span></code> directives are
+“contract” directives (the drop column more so than the drop constraint);
+running at least the <code class="docutils literal notranslate"><span class="pre">op.drop_column</span></code> directives means that the old version
+of the application will fail, as it will attempt to access these columns which
+no longer exist.</p>
+<p>The data migrations in this script are adding new
+rows to the newly added <code class="docutils literal notranslate"><span class="pre">ml2_port_binding_levels</span></code> table.</p>
+<p>Under the new migration script directory structure, the above script would be
+stated as two scripts; an “expand” and a “contract” script:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># expansion operations</span>
+<span class="c1"># .../alembic_migrations/versions/liberty/expand/2bde560fc638_hierarchical_binding.py</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">upgrade</span><span class="p">():</span>
+
+    <span class="n">op</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span>
+        <span class="s1">&#39;ml2_port_binding_levels&#39;</span><span class="p">,</span>
+        <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;port_id&#39;</span><span class="p">,</span> <span class="n">sa</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">36</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">sa</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;host&#39;</span><span class="p">,</span> <span class="n">sa</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">255</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="c1"># ... more columns ...</span>
+    <span class="p">)</span>
+
+
+<span class="c1"># contraction operations</span>
+<span class="c1"># .../alembic_migrations/versions/liberty/contract/4405aedc050e_hierarchical_binding.py</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">upgrade</span><span class="p">():</span>
+
+    <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">port_binding_tables</span><span class="p">:</span>
+        <span class="n">op</span><span class="o">.</span><span class="n">execute</span><span class="p">((</span>
+            <span class="s2">&quot;INSERT INTO ml2_port_binding_levels &quot;</span>
+            <span class="s2">&quot;SELECT port_id, host, 0 AS level, driver, segment AS segment_id &quot;</span>
+            <span class="s2">&quot;FROM </span><span class="si">%s</span><span class="s2"> &quot;</span>
+            <span class="s2">&quot;WHERE host &lt;&gt; &#39;&#39; &quot;</span>
+            <span class="s2">&quot;AND driver &lt;&gt; &#39;&#39;;&quot;</span>
+        <span class="p">)</span> <span class="o">%</span> <span class="n">table</span><span class="p">)</span>
+
+    <span class="n">op</span><span class="o">.</span><span class="n">drop_constraint</span><span class="p">(</span><span class="n">fk_name_dvr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;ml2_dvr_port_bindings&#39;</span><span class="p">,</span> <span class="s1">&#39;foreignkey&#39;</span><span class="p">)</span>
+    <span class="n">op</span><span class="o">.</span><span class="n">drop_column</span><span class="p">(</span><span class="s1">&#39;ml2_dvr_port_bindings&#39;</span><span class="p">,</span> <span class="s1">&#39;cap_port_filter&#39;</span><span class="p">)</span>
+    <span class="n">op</span><span class="o">.</span><span class="n">drop_column</span><span class="p">(</span><span class="s1">&#39;ml2_dvr_port_bindings&#39;</span><span class="p">,</span> <span class="s1">&#39;segment&#39;</span><span class="p">)</span>
+    <span class="n">op</span><span class="o">.</span><span class="n">drop_column</span><span class="p">(</span><span class="s1">&#39;ml2_dvr_port_bindings&#39;</span><span class="p">,</span> <span class="s1">&#39;driver&#39;</span><span class="p">)</span>
+
+    <span class="c1"># ... more DROP instructions ...</span>
+</pre></div>
+</div>
+<p>The two scripts would be present in different subdirectories and also part of
+entirely separate versioning streams.  The “expand” operations are in the
+“expand” script, and the “contract” operations are in the “contract” script.</p>
+<p>For the time being, data migration rules also belong to contract branch. There
+is expectation that eventually live data migrations move into middleware that
+will be aware about different database schema elements to converge on, but
+Neutron is still not there.</p>
+<p>Scripts that contain only expansion or contraction rules do not require a split
+into two parts.</p>
+<p>If a contraction script depends on a script from expansion stream, the
+following directive should be added in the contraction script:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">depends_on</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;&lt;expansion-revision&gt;&#39;</span><span class="p">,)</span>
+</pre></div>
+</div>
+</section>
+<section id="expand-and-contract-branch-exceptions">
+<h3>Expand and Contract Branch Exceptions<a class="headerlink" href="#expand-and-contract-branch-exceptions" title="Link to this heading">¶</a></h3>
+<p>In some cases, we have to have “expand” operations in contract migrations. For
+example, table ‘networksegments’ was renamed in contract migration, so all
+operations with this table are required to be in contract branch as well.
+For such cases, we use the <code class="docutils literal notranslate"><span class="pre">contract_creation_exceptions</span></code> that should be
+implemented as part of such migrations. This is needed to get functional tests
+pass.</p>
+<p>Usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">contract_creation_exceptions</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Docstring should explain why we allow such exception for contract</span>
+<span class="sd">    branch.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="n">sqlalchemy_obj_type</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+        <span class="c1"># For example: sa.Column: [&#39;subnets.segment_id&#39;]</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="head-files-for-conflict-management">
+<h3>HEAD files for conflict management<a class="headerlink" href="#head-files-for-conflict-management" title="Link to this heading">¶</a></h3>
+<p>In directory <code class="docutils literal notranslate"><span class="pre">neutron/db/migration/alembic_migrations/versions</span></code> there are two
+files, <code class="docutils literal notranslate"><span class="pre">CONTRACT_HEAD</span></code> and <code class="docutils literal notranslate"><span class="pre">EXPAND_HEAD</span></code>. These files contain the ID of the
+head revision in each branch. The purpose of these files is to validate the
+revision timelines and prevent non-linear changes from entering the merge
+queue.</p>
+<p>When you create a new migration script by neutron-db-manage these files will be
+updated automatically. But if another migration script is merged while your
+change is under review, you will need to resolve the conflict manually by
+changing the <code class="docutils literal notranslate"><span class="pre">down_revision</span></code> in your migration script.</p>
+</section>
+<section id="applying-database-migration-rules">
+<h3>Applying database migration rules<a class="headerlink" href="#applying-database-migration-rules" title="Link to this heading">¶</a></h3>
+<p>To apply just expansion rules, execute:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">neutron</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">manage</span> <span class="n">upgrade</span> <span class="o">--</span><span class="n">expand</span>
+</pre></div>
+</div>
+<p>After the first step is done, you can stop neutron-server, apply remaining
+non-expansive migration rules, if any:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">neutron</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">manage</span> <span class="n">upgrade</span> <span class="o">--</span><span class="n">contract</span>
+</pre></div>
+</div>
+<p>and finally, start your neutron-server again.</p>
+<p>If you have multiple neutron-server instances in your cloud, and there are
+pending contract scripts not applied to the database, full shutdown of all
+those services is required before ‘upgrade –contract’ is executed. You can
+determine whether there are any pending contract scripts by checking the
+message returned from the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">neutron</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">manage</span> <span class="n">has_offline_migrations</span>
+</pre></div>
+</div>
+<p>If you are not interested in applying safe migration rules while the service is
+running, you can still upgrade database the old way, by stopping the service,
+and then applying all available rules:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">neutron</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">manage</span> <span class="n">upgrade</span> <span class="n">head</span><span class="p">[</span><span class="n">s</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>It will apply all the rules from both the expand and the contract branches, in
+proper order.</p>
+</section>
+<section id="tagging-milestone-revisions">
+<h3>Tagging milestone revisions<a class="headerlink" href="#tagging-milestone-revisions" title="Link to this heading">¶</a></h3>
+<p>When named release (liberty, mitaka, etc.) is done for neutron or a
+sub-project, the alembic revision scripts at the head of each branch for that
+release must be tagged. This is referred to as a milestone revision tag.</p>
+<p>For example, <a class="reference external" href="https://review.opendev.org/228272">here</a> is a patch that tags
+the liberty milestone revisions for the neutron-fwaas sub-project. Note that
+each branch (expand and contract) is tagged.</p>
+<p>Tagging milestones allows neutron-db-manage to upgrade the schema to a
+milestone release, e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">neutron</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">manage</span> <span class="n">upgrade</span> <span class="n">liberty</span>
+</pre></div>
+</div>
+</section>
+<section id="generation-of-comparable-metadata-with-current-database-schema">
+<h3>Generation of comparable metadata with current database schema<a class="headerlink" href="#generation-of-comparable-metadata-with-current-database-schema" title="Link to this heading">¶</a></h3>
+<p>Directory <code class="docutils literal notranslate"><span class="pre">neutron/db/migration/models</span></code> contains module <code class="docutils literal notranslate"><span class="pre">head.py</span></code>, which
+provides all database models at current HEAD. Its purpose is to create
+comparable metadata with the current database schema. The database schema is
+generated by alembic migration scripts. The models must match, and this is
+verified by a model-migration sync test in Neutron’s functional test suite.
+That test requires all modules containing DB models to be imported by head.py
+in order to make a complete comparison.</p>
+<p>When adding new database models, developers must update this module, otherwise
+the change will fail to merge.</p>
+</section>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="client_command_extensions.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Client command extension support"></i></a>
+          
+          
+            <a href="upgrade_checks.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Upgrade checks"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2025-05-16 12:13:14</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Contributor Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index.html#basic-information">Basic Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#neutron-policies">Neutron Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#gerrit-rechecks">Gerrit Rechecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#neutron-stadium">Neutron Stadium</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#neutron-internals">Neutron Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#ovn-driver">OVN Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#dashboards">Dashboards</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Alembic Migrations</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#the-migration-wrapper">The Migration Wrapper</a></li>
+<li><a class="reference internal" href="#migration-branches">Migration Branches</a><ul>
+<li><a class="reference internal" href="#independent-sub-project-tables">1. Independent Sub-Project Tables</a></li>
+<li><a class="reference internal" href="#offline-online-migrations">2. Offline/Online Migrations</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#developers">Developers</a><ul>
+<li><a class="reference internal" href="#running-neutron-db-manage-without-devstack">Running neutron-db-manage without devstack</a><ul>
+<li><a class="reference internal" href="#setting-up-the-environment">Setting up the environment</a><ul>
+<li><a class="reference internal" href="#install-mysql-service">Install mysql service</a></li>
+<li><a class="reference internal" href="#work-on-a-test-database">Work on a test database</a></li>
+<li><a class="reference internal" href="#create-and-activate-the-virtualenv">Create and activate the virtualenv</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#script-auto-generation">Script Auto-generation</a></li>
+<li><a class="reference internal" href="#expand-and-contract-scripts">Expand and Contract Scripts</a></li>
+<li><a class="reference internal" href="#expand-and-contract-branch-exceptions">Expand and Contract Branch Exceptions</a></li>
+<li><a class="reference internal" href="#head-files-for-conflict-management">HEAD files for conflict management</a></li>
+<li><a class="reference internal" href="#applying-database-migration-rules">Applying database migration rules</a></li>
+<li><a class="reference internal" href="#tagging-milestone-revisions">Tagging milestone revisions</a></li>
+<li><a class="reference internal" href="#generation-of-comparable-metadata-with-current-database-schema">Generation of comparable metadata with current database schema</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "contributor/alembic_migrations" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Alembic Migrations in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2025-05-16 12:13:14";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "contributor/alembic_migrations";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

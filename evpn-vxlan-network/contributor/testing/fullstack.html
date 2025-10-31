@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Full Stack Testing &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="ML2 OVS with DevStack" href="ml2_ovs_devstack.html" />
+    <link rel="prev" title="Testing Neutron" href="testing.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/contributor/testing/fullstack.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Full Stack Testing</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="testing.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Testing Neutron"></i></a>
+    
+    
+    <a href="ml2_ovs_devstack.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: ML2 OVS with DevStack"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="full-stack-testing">
+<span id="fullstack-testing"></span><h1>Full Stack Testing<a class="headerlink" href="#full-stack-testing" title="Link to this heading">¶</a></h1>
+<section id="how">
+<h2>How?<a class="headerlink" href="#how" title="Link to this heading">¶</a></h2>
+<p>Full stack tests set up their own Neutron processes (Server &amp; agents). They
+assume a working Rabbit and MySQL server before the run starts. Instructions
+on how to run fullstack tests on a VM are available below.</p>
+<p>Each test defines its own topology (What and how many servers and agents should
+be running).</p>
+<p>Since the test runs on the machine itself, full stack testing enables
+“white box” testing. This means that you can, for example, create a router
+through the API and then assert that a namespace was created for it.</p>
+<p>Full stack tests run in the Neutron tree with Neutron resources alone. You
+may use the Neutron API (The Neutron server is set to NOAUTH so that Keystone
+is out of the picture). VMs may be simulated with a container-like class:
+neutron.tests.fullstack.resources.machine.FakeFullstackMachine.
+An example of its usage may be found at:
+neutron/tests/fullstack/test_connectivity.py.</p>
+<p>Full stack testing can simulate multi node testing by starting an agent
+multiple times. Specifically, each node would have its own copy of the
+OVS/DHCP/L3 agents, all configured with the same “host” value.
+Each OVS agent is connected to its own pair of br-int/br-ex, and those bridges
+are then interconnected.</p>
+<img alt="../../_images/fullstack_multinode_simulation.png" src="../../_images/fullstack_multinode_simulation.png" />
+<p>Segmentation at the database layer is guaranteed by creating a database
+per test. The messaging layer achieves segmentation by utilizing a RabbitMQ
+feature called ‘vhosts’. In short, just like a MySQL server serve multiple
+databases, so can a RabbitMQ server serve multiple messaging domains.
+Exchanges and queues in one ‘vhost’ are segmented from those in another
+‘vhost’.</p>
+<p>Please note that if the change you would like to test using fullstack tests
+involves a change to python-neutronclient as well as neutron, then you should
+make sure your fullstack tests are in a separate third change that depends on
+the python-neutronclient change using the ‘Depends-On’ tag in the commit
+message. You will need to wait for the next release of python-neutronclient,
+and a minimum version bump for python-neutronclient in the global requirements,
+before your fullstack tests will work in the gate.  This is because tox uses
+the version of python-neutronclient listed in the upper-constraints.txt file in
+the openstack/requirements repository.</p>
+</section>
+<section id="when">
+<h2>When?<a class="headerlink" href="#when" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>You’d like to test the interaction between Neutron components (Server
+and agents) and have already tested each component in isolation via unit or
+functional tests. You should have many unit tests, fewer tests to test
+a component and even fewer to test their interaction. Edge cases should
+not be tested with full stack testing.</p></li>
+<li><p>You’d like to increase coverage by testing features that require multi node
+testing such as l2pop, L3 HA and DVR.</p></li>
+<li><p>You’d like to test agent restarts. We’ve found bugs in the OVS, DHCP and
+L3 agents and haven’t found an effective way to test these scenarios. Full
+stack testing can help here as the full stack infrastructure can restart an
+agent during the test.</p></li>
+</ol>
+</section>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Link to this heading">¶</a></h2>
+<p>Neutron offers a Quality of Service API, initially offering bandwidth
+capping at the port level. In the reference implementation, it does this by
+utilizing an OVS feature.
+neutron.tests.fullstack.test_qos.TestBwLimitQoSOvs.test_bw_limit_qos_policy_rule_lifecycle
+is a positive example of how the fullstack testing infrastructure should be
+used. It creates a network, subnet, QoS policy &amp; rule and a port utilizing
+that policy. It then asserts that the expected bandwidth limitation is present
+on the OVS bridge connected to that port. The test is a true integration test,
+in the sense that it invokes the API and then asserts that Neutron interacted
+with the hypervisor appropriately.</p>
+</section>
+<section id="how-to-run-fullstack-tests-locally">
+<h2>How to run fullstack tests locally?<a class="headerlink" href="#how-to-run-fullstack-tests-locally" title="Link to this heading">¶</a></h2>
+<p>Fullstack tests can be run locally. That makes it much easier to understand
+exactly how it works, debug issues in the existing tests or write new ones.</p>
+<p>Before proceeding, please make sure that the machine runs the latest kernel
+from your distibution repositories (reboot the machine, if needed). Otherwise,
+you may experience issues with the <cite>openvswitch</cite> built from source during the
+environment preparation.</p>
+<p>To run fullstack tests locally, you should clone the following repositories
+under <cite>/opt/stack/</cite> directory (you may have to create it first with
+<cite>mkdir -p /opt/stack</cite>):</p>
+<ul class="simple">
+<li><p><cite>Devstack &lt;https://opendev.org/openstack/devstack/&gt;</cite></p></li>
+<li><p><cite>Neutron &lt;https://opendev.org/openstack/neutron&gt;</cite></p></li>
+<li><p><cite>Requirements &lt;https://opendev.org/openstack/requirements&gt;</cite></p></li>
+</ul>
+<p>When repositories are available locally, the first thing which needs to be
+done is preparation of the environment. There is a simple script in Neutron
+to do that:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">export</span><span class="w"> </span><span class="nv">VENV</span><span class="o">=</span>dsvm-fullstack
+<span class="gp">$ </span>tools/configure_for_func_testing.sh<span class="w"> </span>/opt/stack/devstack<span class="w"> </span>-i
+</pre></div>
+</div>
+<p>This will prepare needed files, install required packages, etc. When it is
+done you should see a message like:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Phew, we&#39;re done!</span>
+</pre></div>
+</div>
+<p>That means that all went well and you should be ready to run fullstack tests
+locally.</p>
+<p>Fullstack tests execute a custom dhclient-script. From kernel version 4.14
+onward, apparmor on certain distros could deny the execution of this script.
+To be sure, check journalctl</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">journalctl</span> <span class="o">|</span> <span class="n">grep</span> <span class="n">DENIED</span> <span class="o">|</span> <span class="n">grep</span> <span class="n">fullstack</span><span class="o">-</span><span class="n">dhclient</span><span class="o">-</span><span class="n">script</span>
+</pre></div>
+</div>
+<p>To execute these tests, the easiest workaround is to disable apparmor</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">systemctl</span> <span class="n">stop</span> <span class="n">apparmor</span>
+<span class="n">sudo</span> <span class="n">systemctl</span> <span class="n">disable</span> <span class="n">apparmor</span>
+</pre></div>
+</div>
+<p>A more granular solution could be to disable apparmor only for dhclient</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">ln</span> <span class="o">-</span><span class="n">s</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">apparmor</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">sbin</span><span class="o">.</span><span class="n">dhclient</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">apparmor</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">disable</span><span class="o">/</span>
+</pre></div>
+</div>
+<p>Now that your environment is ready for tests, you can try to run just one:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>tox<span class="w"> </span>-e<span class="w"> </span>dsvm-fullstack<span class="w"> </span>neutron.tests.fullstack.test_qos.TestBwLimitQoSOvs.test_bw_limit_qos_policy_rule_lifecycle
+<span class="go">dsvm-fullstack create: /opt/stack/neutron/.tox/dsvm-fullstack</span>
+<span class="go">dsvm-fullstack installdeps: -chttps://releases.openstack.org/constraints/upper/master, -r/opt/stack/neutron/requirements.txt, -r/opt/stack/neutron/test-requirements.txt, -r/opt/stack/neutron/neutron/tests/functional/requirements.txt</span>
+<span class="go">dsvm-fullstack develop-inst: /opt/stack/neutron</span>
+<span class="go">{0} neutron.tests.fullstack.test_qos.TestBwLimitQoSOvs.test_bw_limit_qos_policy_rule_lifecycle(ingress) [40.395436s] ... ok</span>
+<span class="go">{1} neutron.tests.fullstack.test_qos.TestBwLimitQoSOvs.test_bw_limit_qos_policy_rule_lifecycle(egress) [43.277898s] ... ok</span>
+<span class="go">Stopping rootwrap daemon process with pid=12657</span>
+<span class="go">Running upgrade for neutron ...</span>
+<span class="go">OK</span>
+<span class="go">/usr/lib/python3.8/subprocess.py:942: ResourceWarning: subprocess 13475 is still running</span>
+<span class="go">  _warn(&quot;subprocess %s is still running&quot; % self.pid,</span>
+<span class="go">ResourceWarning: Enable tracemalloc to get the object allocation traceback</span>
+<span class="go">Stopping rootwrap daemon process with pid=12669</span>
+<span class="go">Running upgrade for neutron ...</span>
+<span class="go">OK</span>
+<span class="go">/usr/lib/python3.8/subprocess.py:942: ResourceWarning: subprocess 13477 is still running</span>
+<span class="go">  _warn(&quot;subprocess %s is still running&quot; % self.pid,</span>
+<span class="go">ResourceWarning: Enable tracemalloc to get the object allocation traceback</span>
+
+<span class="go">======</span>
+<span class="go">Totals</span>
+<span class="go">======</span>
+<span class="go">Ran: 2 tests in 43.3367 sec.</span>
+<span class="go"> - Passed: 2</span>
+<span class="go"> - Skipped: 0</span>
+<span class="go"> - Expected Fail: 0</span>
+<span class="go"> - Unexpected Success: 0</span>
+<span class="go"> - Failed: 0</span>
+<span class="go">Sum of execute time for each test: 83.6733 sec.</span>
+
+<span class="go">==============</span>
+<span class="go">Worker Balance</span>
+<span class="go">==============</span>
+<span class="go"> - Worker 0 (1 tests) =&gt; 0:00:40.395436</span>
+<span class="go"> - Worker 1 (1 tests) =&gt; 0:00:43.277898</span>
+<span class="go">___________________________________________________________________________________________________________________________________________________________ summary ___________________________________________________________________________________________________________________________________________________________</span>
+<span class="go">  dsvm-fullstack: commands succeeded</span>
+<span class="go">  congratulations :)</span>
+</pre></div>
+</div>
+<p>That means that our test was run successfully.
+Now you can start hacking, write new fullstack tests or debug failing ones as
+needed.</p>
+</section>
+<section id="debugging-tests-locally">
+<h2>Debugging tests locally<a class="headerlink" href="#debugging-tests-locally" title="Link to this heading">¶</a></h2>
+<p>If you need to debug a fullstack test locally you can use the <code class="docutils literal notranslate"><span class="pre">remote_pdb</span></code>
+module for that. First need to install remote_pdb module in the virtual
+environment created for fullstack testing by tox.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>.tox/dsvm-fullstack/bin/pip<span class="w"> </span>install<span class="w"> </span>remote_pdb
+</pre></div>
+</div>
+<p>Then you need to install a breakpoint in your code. For example, lets do that
+in the
+neutron.tests.fullstack.test_qos.TestBwLimitQoSOvs.test_bw_limit_qos_policy_rule_lifecycle
+module:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">test_bw_limit_qos_policy_rule_lifecycle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">remote_pdb</span><span class="p">;</span> <span class="n">remote_pdb</span><span class="o">.</span><span class="n">set_trace</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">1234</span><span class="p">)</span>
+    <span class="n">new_limit</span> <span class="o">=</span> <span class="n">BANDWIDTH_LIMIT</span> <span class="o">+</span> <span class="mi">100</span>
+</pre></div>
+</div>
+<p>Now you can run the test again:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>tox<span class="w"> </span>-e<span class="w"> </span>dsvm-fullstack<span class="w"> </span>neutron.tests.fullstack.test_qos.TestBwLimitQoSOvs.test_bw_limit_qos_policy_rule_lifecycle
+</pre></div>
+</div>
+<p>It will pause with message like:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">RemotePdb session open at 127.0.0.1:1234, waiting for connection ...</span>
+</pre></div>
+</div>
+<p>And now you can start debugging using <code class="docutils literal notranslate"><span class="pre">telnet</span></code> tool:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>telnet<span class="w"> </span><span class="m">127</span>.0.0.1<span class="w"> </span><span class="m">1234</span>
+<span class="go">Trying 127.0.0.1...</span>
+<span class="go">Connected to 127.0.0.1.</span>
+<span class="go">Escape character is &#39;^]&#39;.</span>
+<span class="go">&gt;</span>
+<span class="go">/opt/stack/neutron/neutron/tests/fullstack/test_qos.py(208)test_bw_limit_qos_policy_rule_lifecycle()</span>
+<span class="go">-&gt; new_limit = BANDWIDTH_LIMIT + 100</span>
+<span class="gp gp-VirtualEnv">(Pdb)</span>
+</pre></div>
+</div>
+<p>From that point you can start debugging your code in the same way you
+usually do with <code class="docutils literal notranslate"><span class="pre">pdb</span></code> module.</p>
+</section>
+<section id="checking-test-logs">
+<h2>Checking test logs<a class="headerlink" href="#checking-test-logs" title="Link to this heading">¶</a></h2>
+<p>Each fullstack test is spawning its own, isolated environment with needed
+services. So, for example, it can be <code class="docutils literal notranslate"><span class="pre">neutron-server</span></code>, <code class="docutils literal notranslate"><span class="pre">neutron-ovs-agent</span></code>
+or <code class="docutils literal notranslate"><span class="pre">neutron-dhcp-agent</span></code>. And often there is a need to check logs of some of
+those processes. That is of course possible when running fullstack tests
+locally. By default, logs are stored in
+<code class="docutils literal notranslate"><span class="pre">/opt/stack/logs/dsvm-fullstack-logs</span></code>.
+The logs directory can be defined by the environment variable <code class="docutils literal notranslate"><span class="pre">OS_LOG_PATH</span></code>.
+In that directory there are directories with names matching names of the
+tests, for example:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ls<span class="w"> </span>-l
+<span class="go">total 224</span>
+<span class="go">drwxr-xr-x 2 vagrant vagrant   4096 Nov 26 16:49 TestBwLimitQoSOvs.test_bw_limit_qos_policy_rule_lifecycle_egress_</span>
+<span class="go">-rw-rw-r-- 1 vagrant vagrant  94928 Nov 26 16:50 TestBwLimitQoSOvs.test_bw_limit_qos_policy_rule_lifecycle_egress_.txt</span>
+<span class="go">drwxr-xr-x 2 vagrant vagrant   4096 Nov 26 16:49 TestBwLimitQoSOvs.test_bw_limit_qos_policy_rule_lifecycle_ingress_</span>
+<span class="go">-rw-rw-r-- 1 vagrant vagrant 121027 Nov 26 16:54 TestBwLimitQoSOvs.test_bw_limit_qos_policy_rule_lifecycle_ingress_.txt</span>
+</pre></div>
+</div>
+<p>For each test there is a directory and txt file with the same name. This txt
+file contains the log from the test runner. So you can check exactly what was
+done by the test when it was run. This file contains logs from all runs of the
+same test. So if you run the test 10 times, you will have the logs from all
+10 runs of the test.
+In the directory with same name there are logs from the neutron services run
+during the test, for example:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ls<span class="w"> </span>-l<span class="w"> </span>TestBwLimitQoSOvs.test_bw_limit_qos_policy_rule_lifecycle_ingress_/
+<span class="go">total 1836</span>
+<span class="go">-rw-rw-r-- 1 vagrant vagrant 333371 Nov 26 16:40 neutron-openvswitch-agent--2020-11-26--16-40-38-818499.log</span>
+<span class="go">-rw-rw-r-- 1 vagrant vagrant 552097 Nov 26 16:53 neutron-openvswitch-agent--2020-11-26--16-49-29-716615.log</span>
+<span class="go">-rw-rw-r-- 1 vagrant vagrant 461483 Nov 26 16:41 neutron-server--2020-11-26--16-40-35-875937.log</span>
+<span class="go">-rw-rw-r-- 1 vagrant vagrant 526070 Nov 26 16:54 neutron-server--2020-11-26--16-49-26-758447.log</span>
+</pre></div>
+</div>
+<p>Here each file is only from one run and one service. In the name of the file
+there is timestamp of when the service was started.</p>
+</section>
+<section id="debugging-fullstack-failures-in-the-gate">
+<h2>Debugging fullstack failures in the gate<a class="headerlink" href="#debugging-fullstack-failures-in-the-gate" title="Link to this heading">¶</a></h2>
+<p>Sometimes there is a need to investigate reason that a test failed in the gate.
+After every <code class="docutils literal notranslate"><span class="pre">neutron-fullstack</span></code> job run, on the Zuul job page there are logs
+available. In the directory <code class="docutils literal notranslate"><span class="pre">controller/logs/dsvm-fullstack-logs</span></code> you can
+find exactly the same files with logs from each test case as mentioned above.</p>
+<p>You can also check, for example, the journal log from the node where the tests
+were run. All those logs are available in the file
+<code class="docutils literal notranslate"><span class="pre">controller/logs/devstack.journal.xz</span></code> in the jobs logs.
+In <code class="docutils literal notranslate"><span class="pre">controller/logs/devstack.journal.README.txt</span></code> there are also
+instructions on how to download and check those journal logs locally.</p>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="testing.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Testing Neutron"></i></a>
+          
+          
+            <a href="ml2_ovs_devstack.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: ML2 OVS with DevStack"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2024-08-26 17:49:17</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Contributor Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#basic-information">Basic Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-policies">Neutron Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#gerrit-rechecks">Gerrit Rechecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-stadium">Neutron Stadium</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-internals">Neutron Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#ovn-driver">OVN Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#dashboards">Dashboards</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Full Stack Testing</a><ul>
+<li><a class="reference internal" href="#how">How?</a></li>
+<li><a class="reference internal" href="#when">When?</a></li>
+<li><a class="reference internal" href="#example">Example</a></li>
+<li><a class="reference internal" href="#how-to-run-fullstack-tests-locally">How to run fullstack tests locally?</a></li>
+<li><a class="reference internal" href="#debugging-tests-locally">Debugging tests locally</a></li>
+<li><a class="reference internal" href="#checking-test-logs">Checking test logs</a></li>
+<li><a class="reference internal" href="#debugging-fullstack-failures-in-the-gate">Debugging fullstack failures in the gate</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "contributor/testing/fullstack" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Full Stack Testing in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2024-08-26 17:49:17";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "contributor/testing/fullstack";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

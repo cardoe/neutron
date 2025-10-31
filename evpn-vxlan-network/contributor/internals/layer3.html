@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Layer 3 Networking via Layer 3 &amp; OpenVSwitch Agents &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Live-migration" href="live_migration.html" />
+    <link rel="prev" title="L3 Agent Extensions" href="l3_agent_extensions.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/contributor/internals/layer3.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Layer 3 Networking via Layer 3 &amp; OpenVSwitch Agents</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="l3_agent_extensions.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: L3 Agent Extensions"></i></a>
+    
+    
+    <a href="live_migration.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Live-migration"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="layer-3-networking-via-layer-3-openvswitch-agents">
+<h1>Layer 3 Networking via Layer 3 &amp; OpenVSwitch Agents<a class="headerlink" href="#layer-3-networking-via-layer-3-openvswitch-agents" title="Link to this heading">¶</a></h1>
+<p>This page discusses the usage of Neutron with Layer 3 functionality enabled.</p>
+<section id="neutron-logical-network-setup">
+<h2>Neutron logical network setup<a class="headerlink" href="#neutron-logical-network-setup" title="Link to this heading">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>vagrant@bionic64:~/devstack$ openstack network list
++--------------------------------------+---------+----------------------------------------------------------------------------+
+| ID                                   | Name    | Subnets                                                                    |
++--------------------------------------+---------+----------------------------------------------------------------------------+
+| 6ece2847-971b-487a-9c7b-184651ebbc82 | public  | 0d9c4261-4046-462f-9d92-64fb89bc3ae6, 9e90b059-da97-45b8-8cb8-f9370217e181 |
+| 713bae25-8276-4e0a-a453-e59a1d65425a | private | 6fa3bab9-103e-45d5-872c-91f21b52ceda, c5c9f5c2-145d-46d2-a513-cf675530eaed |
++--------------------------------------+---------+----------------------------------------------------------------------------+
+
+vagrant@bionic64:~/devstack$ openstack subnet list
++--------------------------------------+---------------------+--------------------------------------+--------------------+
+| ID                                   | Name                | Network                              | Subnet             |
++--------------------------------------+---------------------+--------------------------------------+--------------------+
+| 0d9c4261-4046-462f-9d92-64fb89bc3ae6 | public-subnet       | 6ece2847-971b-487a-9c7b-184651ebbc82 | 172.24.4.0/24      |
+| 6fa3bab9-103e-45d5-872c-91f21b52ceda | ipv6-private-subnet | 713bae25-8276-4e0a-a453-e59a1d65425a | 2001:db8:8000::/64 |
+| 9e90b059-da97-45b8-8cb8-f9370217e181 | ipv6-public-subnet  | 6ece2847-971b-487a-9c7b-184651ebbc82 | 2001:db8::/64      |
+| c5c9f5c2-145d-46d2-a513-cf675530eaed | private-subnet      | 713bae25-8276-4e0a-a453-e59a1d65425a | 10.0.0.0/24        |
++--------------------------------------+---------------------+--------------------------------------+--------------------+
+
+vagrant@bionic64:~/devstack$ openstack port list
++--------------------------------------+------+-------------------+----------------------------------------------------------------------------------------------------+--------+
+| ID                                   | Name | MAC Address       | Fixed IP Addresses                                                                                 | Status |
++--------------------------------------+------+-------------------+----------------------------------------------------------------------------------------------------+--------+
+| 420abb60-2a5a-4e80-90a3-3ff47742dc53 |      | fa:16:3e:2d:5c:4e | ip_address=&#39;172.24.4.7&#39;, subnet_id=&#39;0d9c4261-4046-462f-9d92-64fb89bc3ae6&#39;                          | ACTIVE |
+|                                      |      |                   | ip_address=&#39;2001:db8::1&#39;, subnet_id=&#39;9e90b059-da97-45b8-8cb8-f9370217e181&#39;                         |        |
+| b42d789d-c9ed-48a1-8822-839c4599301e |      | fa:16:3e:0a:ff:24 | ip_address=&#39;10.0.0.1&#39;, subnet_id=&#39;c5c9f5c2-145d-46d2-a513-cf675530eaed&#39;                            | ACTIVE |
+| cfff6574-091c-4d16-a54b-5b7f3eab89ce |      | fa:16:3e:a0:a3:9e | ip_address=&#39;10.0.0.2&#39;, subnet_id=&#39;c5c9f5c2-145d-46d2-a513-cf675530eaed&#39;                            | ACTIVE |
+|                                      |      |                   | ip_address=&#39;2001:db8:8000:0:f816:3eff:fea0:a39e&#39;, subnet_id=&#39;6fa3bab9-103e-45d5-872c-91f21b52ceda&#39; |        |
+| e3b7fede-277e-4c72-b66c-418a582b61ca |      | fa:16:3e:13:dd:42 | ip_address=&#39;2001:db8:8000::1&#39;, subnet_id=&#39;6fa3bab9-103e-45d5-872c-91f21b52ceda&#39;                    | ACTIVE |
++--------------------------------------+------+-------------------+----------------------------------------------------------------------------------------------------+--------+
+
+
+vagrant@bionic64:~/devstack$ openstack subnet show c5c9f5c2-145d-46d2-a513-cf675530eaed
++-------------------+--------------------------------------+
+| Field             | Value                                |
++-------------------+--------------------------------------+
+| allocation_pools  | 10.0.0.2-10.0.0.254                  |
+| cidr              | 10.0.0.0/24                          |
+| created_at        | 2016-11-08T21:55:22Z                 |
+| description       |                                      |
+| dns_nameservers   |                                      |
+| enable_dhcp       | True                                 |
+| gateway_ip        | 10.0.0.1                             |
+| host_routes       |                                      |
+| id                | c5c9f5c2-145d-46d2-a513-cf675530eaed |
+| ip_version        | 4                                    |
+| ipv6_address_mode | None                                 |
+| ipv6_ra_mode      | None                                 |
+| name              | private-subnet                       |
+| network_id        | 713bae25-8276-4e0a-a453-e59a1d65425a |
+| project_id        | 35e3820f7490493ca9e3a5e685393298     |
+| revision_number   | 2                                    |
+| service_types     |                                      |
+| subnetpool_id     | b1f81d96-d51d-41f3-96b5-a0da16ad7f0d |
+| updated_at        | 2016-11-08T21:55:22Z                 |
++-------------------+--------------------------------------+
+</pre></div>
+</div>
+</section>
+<section id="neutron-logical-router-setup">
+<h2>Neutron logical router setup<a class="headerlink" href="#neutron-logical-router-setup" title="Link to this heading">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>vagrant@bionic64:~/devstack$ openstack router list
++--------------------------------------+---------+--------+-------+-------------+-------+----------------------------------+
+| ID                                   | Name    | Status | State | Distributed | HA    | Project                          |
++--------------------------------------+---------+--------+-------+-------------+-------+----------------------------------+
+| 82fa9a47-246e-4da8-a864-53ea8daaed42 | router1 | ACTIVE | UP    | False       | False | 35e3820f7490493ca9e3a5e685393298 |
++--------------------------------------+---------+--------+-------+-------------+-------+----------------------------------+
+vagrant@bionic64:~/devstack$ openstack router show router1
++-------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Field                   | Value                                                                                                                                                |
++-------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
+| admin_state_up          | UP                                                                                                                                                   |
+| availability_zone_hints |                                                                                                                                                      |
+| availability_zones      | nova                                                                                                                                                 |
+| created_at              | 2016-11-08T21:55:30Z                                                                                                                                 |
+| description             |                                                                                                                                                      |
+| distributed             | False                                                                                                                                                |
+| external_gateway_info   | {&quot;network_id&quot;: &quot;6ece2847-971b-487a-9c7b-184651ebbc82&quot;, &quot;enable_snat&quot;: true, &quot;external_fixed_ips&quot;: [{&quot;subnet_id&quot;: &quot;0d9c4261-4046-462f-                |
+|                         | 9d92-64fb89bc3ae6&quot;, &quot;ip_address&quot;: &quot;172.24.4.7&quot;}, {&quot;subnet_id&quot;: &quot;9e90b059-da97-45b8-8cb8-f9370217e181&quot;, &quot;ip_address&quot;: &quot;2001:db8::1&quot;}]}                |
+| flavor_id               | None                                                                                                                                                 |
+| ha                      | False                                                                                                                                                |
+| id                      | 82fa9a47-246e-4da8-a864-53ea8daaed42                                                                                                                 |
+| name                    | router1                                                                                                                                              |
+| project_id              | 35e3820f7490493ca9e3a5e685393298                                                                                                                     |
+| revision_number         | 8                                                                                                                                                    |
+| routes                  |                                                                                                                                                      |
+| status                  | ACTIVE                                                                                                                                               |
+| updated_at              | 2016-11-08T21:55:51Z                                                                                                                                 |
++-------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
+vagrant@bionic64:~/devstack$ openstack port list --router router1
++--------------------------------------+------+-------------------+---------------------------------------------------------------------------------+--------+
+| ID                                   | Name | MAC Address       | Fixed IP Addresses                                                              | Status |
++--------------------------------------+------+-------------------+---------------------------------------------------------------------------------+--------+
+| 420abb60-2a5a-4e80-90a3-3ff47742dc53 |      | fa:16:3e:2d:5c:4e | ip_address=&#39;172.24.4.7&#39;, subnet_id=&#39;0d9c4261-4046-462f-9d92-64fb89bc3ae6&#39;       | ACTIVE |
+|                                      |      |                   | ip_address=&#39;2001:db8::1&#39;, subnet_id=&#39;9e90b059-da97-45b8-8cb8-f9370217e181&#39;      |        |
+| b42d789d-c9ed-48a1-8822-839c4599301e |      | fa:16:3e:0a:ff:24 | ip_address=&#39;10.0.0.1&#39;, subnet_id=&#39;c5c9f5c2-145d-46d2-a513-cf675530eaed&#39;         | ACTIVE |
+| e3b7fede-277e-4c72-b66c-418a582b61ca |      | fa:16:3e:13:dd:42 | ip_address=&#39;2001:db8:8000::1&#39;, subnet_id=&#39;6fa3bab9-103e-45d5-872c-91f21b52ceda&#39; | ACTIVE |
++--------------------------------------+------+-------------------+---------------------------------------------------------------------------------+--------+
+</pre></div>
+</div>
+<p>See the <a class="reference external" href="../../admin/deploy-ovs-selfservice.html#create-initial-networks">Networking Guide</a>
+for more detail on the creation of networks, subnets, and routers.</p>
+</section>
+<section id="neutron-routers-are-realized-in-openvswitch">
+<h2>Neutron Routers are realized in OpenVSwitch<a class="headerlink" href="#neutron-routers-are-realized-in-openvswitch" title="Link to this heading">¶</a></h2>
+<img alt="../../_images/under-the-hood-scenario-1-ovs-network.png" src="../../_images/under-the-hood-scenario-1-ovs-network.png" />
+<p>“router1” in the Neutron logical network is realized through a port
+(“qr-0ba8700e-da”) in OpenVSwitch - attached to “br-int”:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>vagrant@bionic64:~/devstack$ sudo ovs-vsctl show
+b9b27fc3-5057-47e7-ba64-0b6afe70a398
+    Bridge br-int
+        Port &quot;qr-0ba8700e-da&quot;
+            tag: 1
+            Interface &quot;qr-0ba8700e-da&quot;
+                type: internal
+        Port br-int
+            Interface br-int
+                type: internal
+        Port int-br-ex
+            Interface int-br-ex
+        Port &quot;tapbb60d1bb-0c&quot;
+            tag: 1
+            Interface &quot;tapbb60d1bb-0c&quot;
+                type: internal
+        Port &quot;qvob2044570-ad&quot;
+            tag: 1
+            Interface &quot;qvob2044570-ad&quot;
+        Port &quot;int-br-eth1&quot;
+            Interface &quot;int-br-eth1&quot;
+    Bridge &quot;br-eth1&quot;
+        Port &quot;phy-br-eth1&quot;
+            Interface &quot;phy-br-eth1&quot;
+        Port &quot;br-eth1&quot;
+            Interface &quot;br-eth1&quot;
+                type: internal
+    Bridge br-ex
+        Port phy-br-ex
+            Interface phy-br-ex
+        Port &quot;qg-0143bce1-08&quot;
+            Interface &quot;qg-0143bce1-08&quot;
+                type: internal
+        Port br-ex
+            Interface br-ex
+                type: internal
+    ovs_version: &quot;1.4.0+build0&quot;
+
+
+vagrant@bionic64:~/devstack$ brctl show
+bridge name         bridge id           STP enabled    interfaces
+br-eth1             0000.e2e7fc5ccb4d   no
+br-ex               0000.82ee46beaf4d   no             phy-br-ex
+                                                       qg-41efb3f9-f0
+                                                       qg-77e0666b-cd
+br-int              0000.5e46cb509849   no             int-br-ex
+                                                       qr-54c9cd83-43
+                                                       qvo199abeb2-63
+                                                       qvo1abbbb60-b8
+                                                       tap74b45335-cc
+qbr199abeb2-63      8000.ba06e5f8675c   no             qvb199abeb2-63
+                                                       tap199abeb2-63
+qbr1abbbb60-b8      8000.46a87ed4fb66   no             qvb1abbbb60-b8
+                                                       tap1abbbb60-b8
+virbr0              8000.000000000000   yes
+</pre></div>
+</div>
+</section>
+<section id="finding-the-router-in-ip-ipconfig">
+<h2>Finding the router in ip/ipconfig<a class="headerlink" href="#finding-the-router-in-ip-ipconfig" title="Link to this heading">¶</a></h2>
+<p>The neutron-l3-agent uses the Linux IP stack and iptables to perform L3
+forwarding and NAT. In order to support multiple routers with potentially
+overlapping IP addresses, neutron-l3-agent defaults to using Linux network
+namespaces to provide isolated forwarding contexts. As a result,
+the IP addresses of routers will not be visible simply by running
+“ip addr list” or “ifconfig” on
+the node. Similarly, you will not be able to directly ping fixed IPs.</p>
+<p>To do either of these things, you must run the command within a particular
+router’s network
+namespace. The namespace will have the name “qrouter-&lt;UUID of the router&gt;.</p>
+<img alt="../../_images/under-the-hood-scenario-1-ovs-netns.png" src="../../_images/under-the-hood-scenario-1-ovs-netns.png" />
+<p>For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>vagrant@bionic64:~$ openstack router list
++--------------------------------------+---------+-------------------------------------------------------------------------+
+| ID                                   | Name    | Status | State | Distributed | HA    | Project                          |
++--------------------------------------+---------+-------------------------------------------------------------------------+
+| ad948c6e-afb6-422a-9a7b-0fc44cbb3910 | router1 | Active | UP    | True        | False | 35e3820f7490493ca9e3a5e685393298 |
++--------------------------------------+---------+-------------------------------------------------------------------------+
+vagrant@bionic64:~/devstack$ sudo ip netns exec qrouter-ad948c6e-afb6-422a-9a7b-0fc44cbb3910 ip addr list
+18: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 16436 qdisc noqueue state UNKNOWN
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+19: qr-54c9cd83-43: &lt;BROADCAST,MULTICAST,PROMISC,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UNKNOWN
+    link/ether fa:16:3e:dd:c1:8f brd ff:ff:ff:ff:ff:ff
+    inet 10.0.0.1/24 brd 10.0.0.255 scope global qr-54c9cd83-43
+    inet6 fe80::f816:3eff:fedd:c18f/64 scope link
+       valid_lft forever preferred_lft forever
+20: qg-77e0666b-cd: &lt;BROADCAST,MULTICAST,PROMISC,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UNKNOWN
+    link/ether fa:16:3e:1f:d3:ec brd ff:ff:ff:ff:ff:ff
+    inet 192.168.27.130/28 brd 192.168.27.143 scope global qg-77e0666b-cd
+    inet6 fe80::f816:3eff:fe1f:d3ec/64 scope link
+       valid_lft forever preferred_lft forever
+</pre></div>
+</div>
+</section>
+<section id="provider-networking">
+<h2>Provider Networking<a class="headerlink" href="#provider-networking" title="Link to this heading">¶</a></h2>
+<p>Neutron can also be configured to create provider networks.</p>
+</section>
+<section id="l3-agent-extensions">
+<h2>L3 agent extensions<a class="headerlink" href="#l3-agent-extensions" title="Link to this heading">¶</a></h2>
+<p>See <a class="reference internal" href="l3_agent_extensions.html"><span class="doc">L3 Agent Extensions</span></a>.</p>
+</section>
+<section id="further-reading">
+<h2>Further Reading<a class="headerlink" href="#further-reading" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="http://packetpushers.net/openstack-quantum-network-implementation-in-linux/">Packet Pushers - Neutron Network Implementation on Linux</a></p></li>
+<li><p><a class="reference external" href="../../admin/index.html">OpenStack Networking Guide</a></p></li>
+<li><p><a class="reference external" href="https://docs.openstack.org/api-ref/network/v2/index.html#layer-3-networking">Neutron - Layer 3 API extension</a></p></li>
+<li><p><a class="reference external" href="http://techbackground.blogspot.com/2013/05/the-quantum-l3-router-and-floating-ips.html">Darragh O’Reilly -  The Quantum L3 router and floating IPs</a></p></li>
+</ul>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="l3_agent_extensions.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: L3 Agent Extensions"></i></a>
+          
+          
+            <a href="live_migration.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Live-migration"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2024-11-06 18:59:15</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Contributor Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#basic-information">Basic Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-policies">Neutron Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#gerrit-rechecks">Gerrit Rechecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-stadium">Neutron Stadium</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#neutron-internals">Neutron Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#ovn-driver">OVN Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#dashboards">Dashboards</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Layer 3 Networking via Layer 3 &amp; OpenVSwitch Agents</a><ul>
+<li><a class="reference internal" href="#neutron-logical-network-setup">Neutron logical network setup</a></li>
+<li><a class="reference internal" href="#neutron-logical-router-setup">Neutron logical router setup</a></li>
+<li><a class="reference internal" href="#neutron-routers-are-realized-in-openvswitch">Neutron Routers are realized in OpenVSwitch</a></li>
+<li><a class="reference internal" href="#finding-the-router-in-ip-ipconfig">Finding the router in ip/ipconfig</a></li>
+<li><a class="reference internal" href="#provider-networking">Provider Networking</a></li>
+<li><a class="reference internal" href="#l3-agent-extensions">L3 agent extensions</a></li>
+<li><a class="reference internal" href="#further-reading">Further Reading</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "contributor/internals/layer3" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Layer 3 Networking via Layer 3 & OpenVSwitch Agents in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2024-11-06 18:59:15";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "contributor/internals/layer3";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>dhcp_agent.ini &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/support-matrix.css?v=ac26a930" />
+    <script src="../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="l3_agent.ini" href="l3-agent.html" />
+    <link rel="prev" title="sriov_agent.ini" href="sriov-agent.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/configuration/dhcp-agent.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>dhcp_agent.ini</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="sriov-agent.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: sriov_agent.ini"></i></a>
+    
+    
+    <a href="l3-agent.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: l3_agent.ini"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="dhcp-agent-ini">
+<h1>dhcp_agent.ini<a class="headerlink" href="#dhcp-agent-ini" title="Link to this heading">¶</a></h1>
+<section id="default">
+<span id="DEFAULT"></span><h2>DEFAULT<a class="headerlink" href="#default" title="Link to this heading">¶</a></h2>
+</section>
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.debug">
+<span class="sig-name descname"><span class="pre">debug</span></span><a class="headerlink" href="#DEFAULT.debug" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+<dt class="field-odd">Mutable<span class="colon">:</span></dt>
+<dd class="field-odd"><p>This option can be changed without restarting.</p>
+</dd>
+</dl>
+<p>If set to true, the logging level will be set to DEBUG instead of the default INFO level.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.log_config_append">
+<span class="sig-name descname"><span class="pre">log_config_append</span></span><a class="headerlink" href="#DEFAULT.log_config_append" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">&lt;None&gt;</span></code></p>
+</dd>
+<dt class="field-odd">Mutable<span class="colon">:</span></dt>
+<dd class="field-odd"><p>This option can be changed without restarting.</p>
+</dd>
+</dl>
+<p>The name of a logging configuration file. This file is appended to any existing logging configuration files. For details about logging configuration files, see the Python logging module documentation. Note that when logging configuration files are used then all logging configuration is set in the configuration file and other logging configuration options are ignored (for example, log-date-format).</p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Deprecated Variations</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Group</p></th>
+<th class="head"><p>Name</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DEFAULT</p></td>
+<td><p>log-config</p></td>
+</tr>
+<tr class="row-odd"><td><p>DEFAULT</p></td>
+<td><p>log_config</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.log_date_format">
+<span class="sig-name descname"><span class="pre">log_date_format</span></span><a class="headerlink" href="#DEFAULT.log_date_format" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">%Y-%m-%d</span> <span class="pre">%H:%M:%S</span></code></p>
+</dd>
+</dl>
+<p>Defines the format string for %(asctime)s in log records. Default: the value above . This option is ignored if log_config_append is set.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.log_file">
+<span class="sig-name descname"><span class="pre">log_file</span></span><a class="headerlink" href="#DEFAULT.log_file" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">&lt;None&gt;</span></code></p>
+</dd>
+</dl>
+<p>(Optional) Name of log file to send logging output to. If no default is set, logging will go to stderr as defined by use_stderr. This option is ignored if log_config_append is set.</p>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-text">Deprecated Variations</span><a class="headerlink" href="#id2" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Group</p></th>
+<th class="head"><p>Name</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DEFAULT</p></td>
+<td><p>logfile</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.log_dir">
+<span class="sig-name descname"><span class="pre">log_dir</span></span><a class="headerlink" href="#DEFAULT.log_dir" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">&lt;None&gt;</span></code></p>
+</dd>
+</dl>
+<p>(Optional) The base directory used for relative log_file  paths. This option is ignored if log_config_append is set.</p>
+<table class="docutils align-default" id="id3">
+<caption><span class="caption-text">Deprecated Variations</span><a class="headerlink" href="#id3" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Group</p></th>
+<th class="head"><p>Name</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DEFAULT</p></td>
+<td><p>logdir</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.watch_log_file">
+<span class="sig-name descname"><span class="pre">watch_log_file</span></span><a class="headerlink" href="#DEFAULT.watch_log_file" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Uses logging handler designed to watch file system. When log file is moved or removed this handler will open a new log file with specified path instantaneously. It makes sense only if log_file option is specified and Linux platform is used. This option is ignored if log_config_append is set.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This option is deprecated for removal.
+Its value may be silently ignored 
+in the future.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Reason<span class="colon">:</span></dt>
+<dd class="field-odd"><p>This function is known to have bene broken for long time, and depends on the unmaintained library</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.use_syslog">
+<span class="sig-name descname"><span class="pre">use_syslog</span></span><a class="headerlink" href="#DEFAULT.use_syslog" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Use syslog for logging. Existing syslog format is DEPRECATED and will be changed later to honor RFC5424. This option is ignored if log_config_append is set.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.use_journal">
+<span class="sig-name descname"><span class="pre">use_journal</span></span><a class="headerlink" href="#DEFAULT.use_journal" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Enable journald for logging. If running in a systemd environment you may wish to enable journal support. Doing so will use the journal native protocol which includes structured metadata in addition to log messages.This option is ignored if log_config_append is set.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.syslog_log_facility">
+<span class="sig-name descname"><span class="pre">syslog_log_facility</span></span><a class="headerlink" href="#DEFAULT.syslog_log_facility" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">LOG_USER</span></code></p>
+</dd>
+</dl>
+<p>Syslog facility to receive log lines. This option is ignored if log_config_append is set.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.use_json">
+<span class="sig-name descname"><span class="pre">use_json</span></span><a class="headerlink" href="#DEFAULT.use_json" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Use JSON formatting for logging. This option is ignored if log_config_append is set.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.use_stderr">
+<span class="sig-name descname"><span class="pre">use_stderr</span></span><a class="headerlink" href="#DEFAULT.use_stderr" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Log output to standard error. This option is ignored if log_config_append is set.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.log_color">
+<span class="sig-name descname"><span class="pre">log_color</span></span><a class="headerlink" href="#DEFAULT.log_color" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>(Optional) Set the ‘color’ key according to log levels. This option takes effect only when logging to stderr or stdout is used. This option is ignored if log_config_append is set.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.log_rotate_interval">
+<span class="sig-name descname"><span class="pre">log_rotate_interval</span></span><a class="headerlink" href="#DEFAULT.log_rotate_interval" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p>
+</dd>
+</dl>
+<p>The amount of time before the log files are rotated. This option is ignored unless log_rotation_type is set to “interval”.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.log_rotate_interval_type">
+<span class="sig-name descname"><span class="pre">log_rotate_interval_type</span></span><a class="headerlink" href="#DEFAULT.log_rotate_interval_type" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">days</span></code></p>
+</dd>
+<dt class="field-odd">Valid Values<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Seconds, Minutes, Hours, Days, Weekday, Midnight</p>
+</dd>
+</dl>
+<p>Rotation interval type. The time of the last file change (or the time when the service was started) is used when scheduling the next rotation.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.max_logfile_count">
+<span class="sig-name descname"><span class="pre">max_logfile_count</span></span><a class="headerlink" href="#DEFAULT.max_logfile_count" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">30</span></code></p>
+</dd>
+</dl>
+<p>Maximum number of rotated log files.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.max_logfile_size_mb">
+<span class="sig-name descname"><span class="pre">max_logfile_size_mb</span></span><a class="headerlink" href="#DEFAULT.max_logfile_size_mb" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">200</span></code></p>
+</dd>
+</dl>
+<p>Log file maximum size in MB. This option is ignored if “log_rotation_type” is not set to “size”.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.log_rotation_type">
+<span class="sig-name descname"><span class="pre">log_rotation_type</span></span><a class="headerlink" href="#DEFAULT.log_rotation_type" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">none</span></code></p>
+</dd>
+<dt class="field-odd">Valid Values<span class="colon">:</span></dt>
+<dd class="field-odd"><p>interval, size, none</p>
+</dd>
+</dl>
+<p>Log rotation type.</p>
+<p class="rubric">Possible values</p>
+<dl class="simple">
+<dt>interval</dt><dd><p>Rotate logs at predefined time intervals.</p>
+</dd>
+<dt>size</dt><dd><p>Rotate logs once they reach a predefined size.</p>
+</dd>
+<dt>none</dt><dd><p>Do not rotate log files.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.logging_context_format_string">
+<span class="sig-name descname"><span class="pre">logging_context_format_string</span></span><a class="headerlink" href="#DEFAULT.logging_context_format_string" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">%(asctime)s.%(msecs)03d</span> <span class="pre">%(process)d</span> <span class="pre">%(levelname)s</span> <span class="pre">%(name)s</span> <span class="pre">[%(global_request_id)s</span> <span class="pre">%(request_id)s</span> <span class="pre">%(user_identity)s]</span> <span class="pre">%(instance)s%(message)s</span></code></p>
+</dd>
+</dl>
+<p>Format string to use for log messages with context. Used by oslo_log.formatters.ContextFormatter</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.logging_default_format_string">
+<span class="sig-name descname"><span class="pre">logging_default_format_string</span></span><a class="headerlink" href="#DEFAULT.logging_default_format_string" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">%(asctime)s.%(msecs)03d</span> <span class="pre">%(process)d</span> <span class="pre">%(levelname)s</span> <span class="pre">%(name)s</span> <span class="pre">[-]</span> <span class="pre">%(instance)s%(message)s</span></code></p>
+</dd>
+</dl>
+<p>Format string to use for log messages when context is undefined. Used by oslo_log.formatters.ContextFormatter</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.logging_debug_format_suffix">
+<span class="sig-name descname"><span class="pre">logging_debug_format_suffix</span></span><a class="headerlink" href="#DEFAULT.logging_debug_format_suffix" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">%(funcName)s</span> <span class="pre">%(pathname)s:%(lineno)d</span></code></p>
+</dd>
+</dl>
+<p>Additional data to append to log message when logging level for the message is DEBUG. Used by oslo_log.formatters.ContextFormatter</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.logging_exception_prefix">
+<span class="sig-name descname"><span class="pre">logging_exception_prefix</span></span><a class="headerlink" href="#DEFAULT.logging_exception_prefix" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">%(asctime)s.%(msecs)03d</span> <span class="pre">%(process)d</span> <span class="pre">ERROR</span> <span class="pre">%(name)s</span> <span class="pre">%(instance)s</span></code></p>
+</dd>
+</dl>
+<p>Prefix each line of exception output with this format. Used by oslo_log.formatters.ContextFormatter</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.logging_user_identity_format">
+<span class="sig-name descname"><span class="pre">logging_user_identity_format</span></span><a class="headerlink" href="#DEFAULT.logging_user_identity_format" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">%(user)s</span> <span class="pre">%(project)s</span> <span class="pre">%(domain)s</span> <span class="pre">%(system_scope)s</span> <span class="pre">%(user_domain)s</span> <span class="pre">%(project_domain)s</span></code></p>
+</dd>
+</dl>
+<p>Defines the format string for %(user_identity)s that is used in logging_context_format_string. Used by oslo_log.formatters.ContextFormatter</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.default_log_levels">
+<span class="sig-name descname"><span class="pre">default_log_levels</span></span><a class="headerlink" href="#DEFAULT.default_log_levels" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">['amqp=WARN',</span> <span class="pre">'amqplib=WARN',</span> <span class="pre">'boto=WARN',</span> <span class="pre">'qpid=WARN',</span> <span class="pre">'sqlalchemy=WARN',</span> <span class="pre">'suds=INFO',</span> <span class="pre">'oslo.messaging=INFO',</span> <span class="pre">'oslo_messaging=INFO',</span> <span class="pre">'iso8601=WARN',</span> <span class="pre">'requests.packages.urllib3.connectionpool=WARN',</span> <span class="pre">'urllib3.connectionpool=WARN',</span> <span class="pre">'websocket=WARN',</span> <span class="pre">'requests.packages.urllib3.util.retry=WARN',</span> <span class="pre">'urllib3.util.retry=WARN',</span> <span class="pre">'keystonemiddleware=WARN',</span> <span class="pre">'routes.middleware=WARN',</span> <span class="pre">'stevedore=WARN',</span> <span class="pre">'taskflow=WARN',</span> <span class="pre">'keystoneauth=WARN',</span> <span class="pre">'oslo.cache=INFO',</span> <span class="pre">'oslo_policy=INFO',</span> <span class="pre">'dogpile.core.dogpile=INFO']</span></code></p>
+</dd>
+</dl>
+<p>List of package logging levels in logger=LEVEL pairs. This option is ignored if log_config_append is set.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.publish_errors">
+<span class="sig-name descname"><span class="pre">publish_errors</span></span><a class="headerlink" href="#DEFAULT.publish_errors" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Enables or disables publication of error events.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.instance_format">
+<span class="sig-name descname"><span class="pre">instance_format</span></span><a class="headerlink" href="#DEFAULT.instance_format" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">&quot;[instance:</span> <span class="pre">%(uuid)s]</span> <span class="pre">&quot;</span></code></p>
+</dd>
+</dl>
+<p>The format for an instance that is passed with the log message.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.instance_uuid_format">
+<span class="sig-name descname"><span class="pre">instance_uuid_format</span></span><a class="headerlink" href="#DEFAULT.instance_uuid_format" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">&quot;[instance:</span> <span class="pre">%(uuid)s]</span> <span class="pre">&quot;</span></code></p>
+</dd>
+</dl>
+<p>The format for an instance UUID that is passed with the log message.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.rate_limit_interval">
+<span class="sig-name descname"><span class="pre">rate_limit_interval</span></span><a class="headerlink" href="#DEFAULT.rate_limit_interval" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p>
+</dd>
+</dl>
+<p>Interval, number of seconds, of log rate limiting.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.rate_limit_burst">
+<span class="sig-name descname"><span class="pre">rate_limit_burst</span></span><a class="headerlink" href="#DEFAULT.rate_limit_burst" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p>
+</dd>
+</dl>
+<p>Maximum number of logged messages per rate_limit_interval.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.rate_limit_except_level">
+<span class="sig-name descname"><span class="pre">rate_limit_except_level</span></span><a class="headerlink" href="#DEFAULT.rate_limit_except_level" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">CRITICAL</span></code></p>
+</dd>
+<dt class="field-odd">Valid Values<span class="colon">:</span></dt>
+<dd class="field-odd"><p>CRITICAL, ERROR, INFO, WARNING, DEBUG, ‘’</p>
+</dd>
+</dl>
+<p>Log level name used by rate limiting. Logs with level greater or equal to rate_limit_except_level are not filtered. An empty string means that all levels are filtered.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.fatal_deprecations">
+<span class="sig-name descname"><span class="pre">fatal_deprecations</span></span><a class="headerlink" href="#DEFAULT.fatal_deprecations" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Enables or disables fatal status of deprecations.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.ovs_use_veth">
+<span class="sig-name descname"><span class="pre">ovs_use_veth</span></span><a class="headerlink" href="#DEFAULT.ovs_use_veth" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Uses veth for an OVS interface or not. Support kernels with limited namespace support (e.g. RHEL 6.5) and rate limiting on router’s gateway port so long as ovs_use_veth is set to True.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.interface_driver">
+<span class="sig-name descname"><span class="pre">interface_driver</span></span><a class="headerlink" href="#DEFAULT.interface_driver" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">openvswitch</span></code></p>
+</dd>
+</dl>
+<p>The driver used to manage virtual interfaces.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.rpc_response_max_timeout">
+<span class="sig-name descname"><span class="pre">rpc_response_max_timeout</span></span><a class="headerlink" href="#DEFAULT.rpc_response_max_timeout" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">600</span></code></p>
+</dd>
+</dl>
+<p>Maximum seconds to wait for a response from an RPC call.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.resync_interval">
+<span class="sig-name descname"><span class="pre">resync_interval</span></span><a class="headerlink" href="#DEFAULT.resync_interval" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">5</span></code></p>
+</dd>
+</dl>
+<p>The DHCP agent will resync its state with Neutron to recover from any transient notification or RPC errors. The interval is the maximum number of seconds between attempts. The resync can be done more often based on the events triggered.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.resync_throttle">
+<span class="sig-name descname"><span class="pre">resync_throttle</span></span><a class="headerlink" href="#DEFAULT.resync_throttle" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p>
+</dd>
+</dl>
+<p>Throttle the number of resync state events between the local DHCP state and Neutron to only once per ‘resync_throttle’ seconds. The value of throttle introduces a minimum interval between resync state events. Otherwise the resync may end up in a busy-loop. The value must be less than resync_interval.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.dhcp_driver">
+<span class="sig-name descname"><span class="pre">dhcp_driver</span></span><a class="headerlink" href="#DEFAULT.dhcp_driver" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">neutron.agent.linux.dhcp.Dnsmasq</span></code></p>
+</dd>
+</dl>
+<p>The driver used to manage the DHCP server.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.enable_isolated_metadata">
+<span class="sig-name descname"><span class="pre">enable_isolated_metadata</span></span><a class="headerlink" href="#DEFAULT.enable_isolated_metadata" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>The DHCP server can assist with providing metadata support on isolated networks. Setting this value to True will cause the DHCP server to append specific host routes to the DHCP request. The metadata service will only be activated when the subnet does not contain any router port. The guest instance must be configured to request host routes via DHCP (Option 121). This option does not have any effect when force_metadata is set to True.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.force_metadata">
+<span class="sig-name descname"><span class="pre">force_metadata</span></span><a class="headerlink" href="#DEFAULT.force_metadata" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>In some cases the Neutron router is not present to provide the metadata IP but the DHCP server can be used to provide this info. Setting this value will force the DHCP server to append specific host routes to the DHCP request. If this option is set, then the metadata service will be activated for all of the networks.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.enable_metadata_network">
+<span class="sig-name descname"><span class="pre">enable_metadata_network</span></span><a class="headerlink" href="#DEFAULT.enable_metadata_network" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Allows for serving metadata requests coming from a dedicated metadata access network whose CIDR is 169.254.169.254/16 (or larger prefix), and is connected to a Neutron router from which the VMs send metadata:1 request. In this case DHCP Option 121 will not be injected in VMs, as they will be able to reach 169.254.169.254 through a router. This option requires enable_isolated_metadata = True.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.num_sync_threads">
+<span class="sig-name descname"><span class="pre">num_sync_threads</span></span><a class="headerlink" href="#DEFAULT.num_sync_threads" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">4</span></code></p>
+</dd>
+</dl>
+<p>Number of threads to use during sync process. Should not exceed connection pool size configured on server.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.bulk_reload_interval">
+<span class="sig-name descname"><span class="pre">bulk_reload_interval</span></span><a class="headerlink" href="#DEFAULT.bulk_reload_interval" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p>
+</dd>
+<dt class="field-odd">Minimum Value<span class="colon">:</span></dt>
+<dd class="field-odd"><p>0</p>
+</dd>
+</dl>
+<p>Time to sleep between reloading the DHCP allocations. This will only be invoked if the value is not 0. If a network has N updates in X seconds then it will reload once and not N times.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.dhcp_confs">
+<span class="sig-name descname"><span class="pre">dhcp_confs</span></span><a class="headerlink" href="#DEFAULT.dhcp_confs" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">$state_path/dhcp</span></code></p>
+</dd>
+</dl>
+<p>Location to store DHCP server config files.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.dnsmasq_config_file">
+<span class="sig-name descname"><span class="pre">dnsmasq_config_file</span></span><a class="headerlink" href="#DEFAULT.dnsmasq_config_file" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">''</span></code></p>
+</dd>
+</dl>
+<p>Override the default dnsmasq settings with this file.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.dnsmasq_dns_servers">
+<span class="sig-name descname"><span class="pre">dnsmasq_dns_servers</span></span><a class="headerlink" href="#DEFAULT.dnsmasq_dns_servers" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">[]</span></code></p>
+</dd>
+</dl>
+<p>Comma-separated list of the DNS servers which will be used as forwarders.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.dnsmasq_base_log_dir">
+<span class="sig-name descname"><span class="pre">dnsmasq_base_log_dir</span></span><a class="headerlink" href="#DEFAULT.dnsmasq_base_log_dir" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">&lt;None&gt;</span></code></p>
+</dd>
+</dl>
+<p>Base log dir for dnsmasq logging. The log contains DHCP and DNS log information and is useful for debugging issues with either DHCP or DNS. If this section is null, disable dnsmasq log.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.dnsmasq_local_resolv">
+<span class="sig-name descname"><span class="pre">dnsmasq_local_resolv</span></span><a class="headerlink" href="#DEFAULT.dnsmasq_local_resolv" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Enables the dnsmasq service to provide name resolution for instances via DNS resolvers on the host running the DHCP agent. Effectively removes the ‘–no-resolv’ option from the dnsmasq process arguments. Adding custom DNS resolvers to the ‘dnsmasq_dns_servers’ option disables this feature.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.dnsmasq_lease_max">
+<span class="sig-name descname"><span class="pre">dnsmasq_lease_max</span></span><a class="headerlink" href="#DEFAULT.dnsmasq_lease_max" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">16777216</span></code></p>
+</dd>
+</dl>
+<p>Limit number of leases to prevent a denial-of-service.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.dhcp_broadcast_reply">
+<span class="sig-name descname"><span class="pre">dhcp_broadcast_reply</span></span><a class="headerlink" href="#DEFAULT.dhcp_broadcast_reply" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Use broadcast in DHCP replies.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.dnsmasq_enable_addr6_list">
+<span class="sig-name descname"><span class="pre">dnsmasq_enable_addr6_list</span></span><a class="headerlink" href="#DEFAULT.dnsmasq_enable_addr6_list" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Enable dhcp-host entry with list of addresses when port has multiple IPv6 addresses in the same subnet.</p>
+</dd></dl>
+
+<section id="agent">
+<span id="agent"></span><h2>agent<a class="headerlink" href="#agent" title="Link to this heading">¶</a></h2>
+</section>
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="agent.availability_zone">
+<span class="sig-name descname"><span class="pre">availability_zone</span></span><a class="headerlink" href="#agent.availability_zone" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">nova</span></code></p>
+</dd>
+</dl>
+<p>Availability zone of this node</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="agent.report_interval">
+<span class="sig-name descname"><span class="pre">report_interval</span></span><a class="headerlink" href="#agent.report_interval" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>floating point</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">30</span></code></p>
+</dd>
+</dl>
+<p>Seconds between nodes reporting state to server; should be less than agent_down_time, best if it is half or less than agent_down_time.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="agent.log_agent_heartbeats">
+<span class="sig-name descname"><span class="pre">log_agent_heartbeats</span></span><a class="headerlink" href="#agent.log_agent_heartbeats" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Log agent heartbeats</p>
+</dd></dl>
+
+<section id="metadata-rate-limiting">
+<span id="metadata_rate_limiting"></span><h2>metadata_rate_limiting<a class="headerlink" href="#metadata-rate-limiting" title="Link to this heading">¶</a></h2>
+</section>
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="metadata_rate_limiting.rate_limit_enabled">
+<span class="sig-name descname"><span class="pre">rate_limit_enabled</span></span><a class="headerlink" href="#metadata_rate_limiting.rate_limit_enabled" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Enable rate limiting on the metadata API.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="metadata_rate_limiting.ip_versions">
+<span class="sig-name descname"><span class="pre">ip_versions</span></span><a class="headerlink" href="#metadata_rate_limiting.ip_versions" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">[4]</span></code></p>
+</dd>
+</dl>
+<p>Comma separated list of the metadata address IP versions (4, 6) for which rate limiting will be enabled. The default is to rate limit only for the metadata IPv4 address. NOTE: at the moment, the open source version of HAProxy only allows us to rate limit for IPv4 or IPv6, but not both at the same time.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="metadata_rate_limiting.base_window_duration">
+<span class="sig-name descname"><span class="pre">base_window_duration</span></span><a class="headerlink" href="#metadata_rate_limiting.base_window_duration" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">10</span></code></p>
+</dd>
+</dl>
+<p>Duration (seconds) of the base window on the metadata API.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="metadata_rate_limiting.base_query_rate_limit">
+<span class="sig-name descname"><span class="pre">base_query_rate_limit</span></span><a class="headerlink" href="#metadata_rate_limiting.base_query_rate_limit" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">10</span></code></p>
+</dd>
+</dl>
+<p>Max number of queries to accept during the base window.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="metadata_rate_limiting.burst_window_duration">
+<span class="sig-name descname"><span class="pre">burst_window_duration</span></span><a class="headerlink" href="#metadata_rate_limiting.burst_window_duration" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">10</span></code></p>
+</dd>
+</dl>
+<p>Duration (seconds) of the burst window on the metadata API.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="metadata_rate_limiting.burst_query_rate_limit">
+<span class="sig-name descname"><span class="pre">burst_query_rate_limit</span></span><a class="headerlink" href="#metadata_rate_limiting.burst_query_rate_limit" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">10</span></code></p>
+</dd>
+</dl>
+<p>Max number of queries to accept during the burst window.</p>
+</dd></dl>
+
+<section id="ovs">
+<span id="ovs"></span><h2>ovs<a class="headerlink" href="#ovs" title="Link to this heading">¶</a></h2>
+</section>
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="ovs.ovsdb_connection">
+<span class="sig-name descname"><span class="pre">ovsdb_connection</span></span><a class="headerlink" href="#ovs.ovsdb_connection" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">tcp:127.0.0.1:6640</span></code></p>
+</dd>
+</dl>
+<p>The connection string for the OVSDB backend. Will be used for all OVSDB commands and by ovsdb-client when monitoring</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="ovs.ssl_key_file">
+<span class="sig-name descname"><span class="pre">ssl_key_file</span></span><a class="headerlink" href="#ovs.ssl_key_file" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">&lt;None&gt;</span></code></p>
+</dd>
+</dl>
+<p>The SSL private key file to use when interacting with OVSDB. Required when using an “ssl:” prefixed ovsdb_connection</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="ovs.ssl_cert_file">
+<span class="sig-name descname"><span class="pre">ssl_cert_file</span></span><a class="headerlink" href="#ovs.ssl_cert_file" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">&lt;None&gt;</span></code></p>
+</dd>
+</dl>
+<p>The SSL certificate file to use when interacting with OVSDB. Required when using an “ssl:” prefixed ovsdb_connection</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="ovs.ssl_ca_cert_file">
+<span class="sig-name descname"><span class="pre">ssl_ca_cert_file</span></span><a class="headerlink" href="#ovs.ssl_ca_cert_file" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">&lt;None&gt;</span></code></p>
+</dd>
+</dl>
+<p>The Certificate Authority (CA) certificate to use when interacting with OVSDB. Required when using an “ssl:” prefixed ovsdb_connection</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="ovs.ovsdb_debug">
+<span class="sig-name descname"><span class="pre">ovsdb_debug</span></span><a class="headerlink" href="#ovs.ovsdb_debug" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Enable OVSDB debug logs</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="ovs.ovsdb_timeout">
+<span class="sig-name descname"><span class="pre">ovsdb_timeout</span></span><a class="headerlink" href="#ovs.ovsdb_timeout" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">10</span></code></p>
+</dd>
+</dl>
+<p>Timeout in seconds for OVSDB commands. If the timeout expires, OVSDB commands will fail with ALARMCLOCK error.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="ovs.bridge_mac_table_size">
+<span class="sig-name descname"><span class="pre">bridge_mac_table_size</span></span><a class="headerlink" href="#ovs.bridge_mac_table_size" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">50000</span></code></p>
+</dd>
+</dl>
+<p>The maximum number of MAC addresses to learn on a bridge managed by the Neutron OVS agent. Values outside a reasonable range (10 to 1,000,000) might be overridden by Open vSwitch according to the documentation.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="ovs.igmp_snooping_enable">
+<span class="sig-name descname"><span class="pre">igmp_snooping_enable</span></span><a class="headerlink" href="#ovs.igmp_snooping_enable" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Enable IGMP snooping for integration bridge. If this option is set to True, support for Internet Group Management Protocol (IGMP) is enabled in integration bridge.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="ovs.igmp_flood">
+<span class="sig-name descname"><span class="pre">igmp_flood</span></span><a class="headerlink" href="#ovs.igmp_flood" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Multicast packets (except reports) are unconditionally forwarded to the ports bridging a logical network to a physical network.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="ovs.igmp_flood_reports">
+<span class="sig-name descname"><span class="pre">igmp_flood_reports</span></span><a class="headerlink" href="#ovs.igmp_flood_reports" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+</dd>
+</dl>
+<p>Multicast reports are unconditionally forwarded to the ports bridging a logical network to a physical network.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="ovs.igmp_flood_unregistered">
+<span class="sig-name descname"><span class="pre">igmp_flood_unregistered</span></span><a class="headerlink" href="#ovs.igmp_flood_unregistered" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>This option enables or disables flooding of unregistered multicast packets to all ports. If False, The switch will send unregistered multicast packets only to ports connected to multicast routers.</p>
+</dd></dl>
+
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="sriov-agent.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: sriov_agent.ini"></i></a>
+          
+          
+            <a href="l3-agent.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: l3_agent.ini"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2017-07-13 06:34:22</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Configuration Guide</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="config.html">Configuration Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="policy.html">Policy Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="custom_policy_roles.html">Custom Policy Roles</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributor/index.html">Contributor Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">dhcp_agent.ini</a><ul>
+<li><a class="reference internal" href="#default">DEFAULT</a></li>
+<li><a class="reference internal" href="#agent">agent</a></li>
+<li><a class="reference internal" href="#metadata-rate-limiting">metadata_rate_limiting</a></li>
+<li><a class="reference internal" href="#ovs">ovs</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "configuration/dhcp-agent" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "dhcp_agent.ini in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2017-07-13 06:34:22";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "configuration/dhcp-agent";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

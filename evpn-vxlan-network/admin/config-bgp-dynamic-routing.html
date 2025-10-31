@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>BGP Dynamic Routing &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/support-matrix.css?v=ac26a930" />
+    <script src="../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="BGP Floating IPs over L2 Segmented Networks" href="config-bgp-floating-ip-over-l2-segmented-network.html" />
+    <link rel="prev" title="Availability Zones" href="config-az.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/admin/config-bgp-dynamic-routing.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>BGP Dynamic Routing</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="config-az.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Availability Zones"></i></a>
+    
+    
+    <a href="config-bgp-floating-ip-over-l2-segmented-network.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: BGP Floating IPs over L2 Segmented Networks"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="bgp-dynamic-routing">
+<span id="config-bgp-dynamic-routing"></span><h1>BGP Dynamic Routing<a class="headerlink" href="#bgp-dynamic-routing" title="Link to this heading">¶</a></h1>
+<p>BGP dynamic routing enables advertisement of self-service (private) network
+prefixes to physical network devices that support BGP such as routers, thus
+removing the conventional dependency on static routes. The feature relies
+on <a class="reference internal" href="config-address-scopes.html#config-address-scopes"><span class="std std-ref">address scopes</span></a> and requires knowledge of
+their operation for proper deployment.</p>
+<p>BGP dynamic routing consists of a service plug-in and an agent. The service
+plug-in implements the Networking service extension and the agent manages BGP
+peering sessions. A cloud administrator creates and configures a BGP speaker
+using the CLI or API and manually schedules it to one or more hosts running
+the agent. Agents can reside on hosts with or without other Networking
+service agents. Prefix advertisement depends on the binding of external
+networks to a BGP speaker and the address scope of external and internal
+IP address ranges or subnets.</p>
+<img alt="BGP dynamic routing overview" src="../_images/bgp-dynamic-routing-overview.png" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although self-service networks generally use private IP address ranges
+(RFC1918) for IPv4 subnets, BGP dynamic routing can advertise any IPv4
+address ranges.</p>
+</div>
+<section id="example-configuration">
+<h2>Example configuration<a class="headerlink" href="#example-configuration" title="Link to this heading">¶</a></h2>
+<p>The example configuration involves the following components:</p>
+<ul class="simple">
+<li><p>One BGP agent.</p></li>
+<li><p>One address scope containing IP address range 203.0.113.0/24 for
+provider networks, and IP address ranges 192.0.2.0/25 and 192.0.2.128/25
+for self-service networks.</p></li>
+<li><p>One provider network using IP address range 203.0.113.0/24.</p></li>
+<li><p>Three self-service networks.</p>
+<ul>
+<li><p>Self-service networks 1 and 2 use IP address ranges inside of
+the address scope.</p></li>
+<li><p>Self-service network 3 uses a unique IP address range 198.51.100.0/24 to
+demonstrate that the BGP speaker does not advertise prefixes outside
+of address scopes.</p></li>
+</ul>
+</li>
+<li><p>Three routers. Each router connects one self-service network to the
+provider network.</p>
+<ul>
+<li><p>Router 1 contains IP addresses 203.0.113.11 and 192.0.2.1</p></li>
+<li><p>Router 2 contains IP addresses 203.0.113.12 and 192.0.2.129</p></li>
+<li><p>Router 3 contains IP addresses 203.0.113.13 and 198.51.100.1</p></li>
+</ul>
+</li>
+<li><p>One preexisting peering network 10.0.0.0/24 on the host running the
+neutron BGP dynamic routing agent to facilitate BGP communication with its
+peer. 10.0.0.1 is the address for the host and 10.0.0.2 the address for the
+peer.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The example configuration assumes sufficient knowledge about the
+Networking service, routing, and BGP. For basic deployment of the
+Networking service, consult one of the
+<a class="reference internal" href="deploy.html#deploy"><span class="std std-ref">Deployment examples</span></a>. For more information on BGP, see
+<a class="reference external" href="https://tools.ietf.org/html/rfc4271">RFC 4271</a>.</p>
+</div>
+<section id="controller-node">
+<h3>Controller node<a class="headerlink" href="#controller-node" title="Link to this heading">¶</a></h3>
+<ul>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">neutron.conf</span></code> file, enable the conventional layer-3 and BGP
+dynamic routing service plug-ins:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[DEFAULT]</span>
+<span class="na">service_plugins</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">neutron_dynamic_routing.services.bgp.bgp_plugin.BgpPlugin,neutron.services.l3_router.l3_router_plugin.L3RouterPlugin</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="agent-nodes">
+<h3>Agent nodes<a class="headerlink" href="#agent-nodes" title="Link to this heading">¶</a></h3>
+<ul>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">bgp_dragent.ini</span></code> file:</p>
+<ul>
+<li><p>Configure the driver.</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[BGP]</span>
+<span class="na">bgp_speaker_driver</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">neutron_dynamic_routing.services.bgp.agent.driver.os_ken.driver.OsKenBgpDriver</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The agent currently only supports the os-ken BGP driver.</p>
+</div>
+</li>
+<li><p>Configure the router ID.</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[BGP]</span>
+<span class="na">bgp_router_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">ROUTER_ID</span>
+</pre></div>
+</div>
+<p>Replace <code class="docutils literal notranslate"><span class="pre">ROUTER_ID</span></code> with a suitable unique 32-bit number, typically an
+IPv4 address on the host running the agent. For example, 10.0.0.1.</p>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="verify-service-operation">
+<h3>Verify service operation<a class="headerlink" href="#verify-service-operation" title="Link to this heading">¶</a></h3>
+<ol class="arabic">
+<li><p>Source the administrative project credentials.</p></li>
+<li><p>Verify presence and operation of each BGP dynamic routing agent.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>agent<span class="w"> </span>list<span class="w"> </span>--agent-type<span class="w"> </span>bgp
+<span class="go">+--------------------------------------+---------------------------+------------+-------------------+-------+-------+---------------------+</span>
+<span class="go">| ID                                   | Agent Type                | Host       | Availability Zone | Alive | State | Binary              |</span>
+<span class="go">+--------------------------------------+---------------------------+------------+-------------------+-------+-------+---------------------+</span>
+<span class="go">| 37729181-2224-48d8-89ef-16eca8e2f77e | BGP dynamic routing agent | controller | None              | :-)   | UP    | neutron-bgp-dragent |</span>
+<span class="go">+--------------------------------------+---------------------------+------------+-------------------+-------+-------+---------------------+</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="create-the-address-scope-and-subnet-pools">
+<h3>Create the address scope and subnet pools<a class="headerlink" href="#create-the-address-scope-and-subnet-pools" title="Link to this heading">¶</a></h3>
+<ol class="arabic">
+<li><p>Create an address scope. The provider (external) and self-service networks
+must belong to the same address scope for the agent to advertise those
+self-service network prefixes.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>address<span class="w"> </span>scope<span class="w"> </span>create<span class="w"> </span>--share<span class="w"> </span>--ip-version<span class="w"> </span><span class="m">4</span><span class="w"> </span>bgp
+
+<span class="go">+------------+--------------------------------------+</span>
+<span class="go">| Field      | Value                                |</span>
+<span class="go">+------------+--------------------------------------+</span>
+<span class="go">| headers    |                                      |</span>
+<span class="go">| id         | f71c958f-dbe8-49a2-8fb9-19c5f52a37f1 |</span>
+<span class="go">| ip_version | 4                                    |</span>
+<span class="go">| name       | bgp                                  |</span>
+<span class="go">| project_id | 86acdbd1d72745fd8e8320edd7543400     |</span>
+<span class="go">| shared     | True                                 |</span>
+<span class="go">+------------+--------------------------------------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create subnet pools. The provider and self-service networks use different
+pools.</p>
+<ul>
+<li><p>Create the provider network pool.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>pool<span class="w"> </span>create<span class="w"> </span>--pool-prefix<span class="w"> </span><span class="m">203</span>.0.113.0/24<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--address-scope<span class="w"> </span>bgp<span class="w"> </span>provider
+
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| Field             | Value                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| address_scope_id  | f71c958f-dbe8-49a2-8fb9-19c5f52a37f1 |</span>
+<span class="go">| created_at        | 2017-01-12T14:58:57Z                 |</span>
+<span class="go">| default_prefixlen | 8                                    |</span>
+<span class="go">| default_quota     | None                                 |</span>
+<span class="go">| description       |                                      |</span>
+<span class="go">| headers           |                                      |</span>
+<span class="go">| id                | 63532225-b9a0-445a-9935-20a15f9f68d1 |</span>
+<span class="go">| ip_version        | 4                                    |</span>
+<span class="go">| is_default        | False                                |</span>
+<span class="go">| max_prefixlen     | 32                                   |</span>
+<span class="go">| min_prefixlen     | 8                                    |</span>
+<span class="go">| name              | provider                             |</span>
+<span class="go">| prefixes          | 203.0.113.0/24                       |</span>
+<span class="go">| project_id        | 86acdbd1d72745fd8e8320edd7543400     |</span>
+<span class="go">| revision_number   | 1                                    |</span>
+<span class="go">| shared            | False                                |</span>
+<span class="go">| tags              | []                                   |</span>
+<span class="go">| updated_at        | 2017-01-12T14:58:57Z                 |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create the self-service network pool.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>pool<span class="w"> </span>create<span class="w"> </span>--pool-prefix<span class="w"> </span><span class="m">192</span>.0.2.0/25<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--pool-prefix<span class="w"> </span><span class="m">192</span>.0.2.128/25<span class="w"> </span>--address-scope<span class="w"> </span>bgp<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--share<span class="w"> </span>selfservice
+
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| Field             | Value                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| address_scope_id  | f71c958f-dbe8-49a2-8fb9-19c5f52a37f1 |</span>
+<span class="go">| created_at        | 2017-01-12T15:02:31Z                 |</span>
+<span class="go">| default_prefixlen | 8                                    |</span>
+<span class="go">| default_quota     | None                                 |</span>
+<span class="go">| description       |                                      |</span>
+<span class="go">| headers           |                                      |</span>
+<span class="go">| id                | 8d8270b1-b194-4b7e-914c-9c741dcbd49b |</span>
+<span class="go">| ip_version        | 4                                    |</span>
+<span class="go">| is_default        | False                                |</span>
+<span class="go">| max_prefixlen     | 32                                   |</span>
+<span class="go">| min_prefixlen     | 8                                    |</span>
+<span class="go">| name              | selfservice                          |</span>
+<span class="go">| prefixes          | 192.0.2.0/25, 192.0.2.128/25         |</span>
+<span class="go">| project_id        | 86acdbd1d72745fd8e8320edd7543400     |</span>
+<span class="go">| revision_number   | 1                                    |</span>
+<span class="go">| shared            | True                                 |</span>
+<span class="go">| tags              | []                                   |</span>
+<span class="go">| updated_at        | 2017-01-12T15:02:31Z                 |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="create-the-provider-and-self-service-networks">
+<h3>Create the provider and self-service networks<a class="headerlink" href="#create-the-provider-and-self-service-networks" title="Link to this heading">¶</a></h3>
+<ol class="arabic">
+<li><p>Create the provider network.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>create<span class="w"> </span>provider<span class="w"> </span>--external<span class="w"> </span>--provider-physical-network<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>provider<span class="w"> </span>--provider-network-type<span class="w"> </span>flat
+<span class="go">Created a new network:</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+<span class="go">| Field                     | Value                                |</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+<span class="go">| admin_state_up            | UP                                   |</span>
+<span class="go">| availability_zone_hints   |                                      |</span>
+<span class="go">| availability_zones        |                                      |</span>
+<span class="go">| created_at                | 2016-12-21T08:47:41Z                 |</span>
+<span class="go">| description               |                                      |</span>
+<span class="go">| headers                   |                                      |</span>
+<span class="go">| id                        | 190ca651-2ee3-4a4b-891f-dedda47974fe |</span>
+<span class="go">| ipv4_address_scope        | None                                 |</span>
+<span class="go">| ipv6_address_scope        | None                                 |</span>
+<span class="go">| is_default                | False                                |</span>
+<span class="go">| mtu                       | 1450                                 |</span>
+<span class="go">| name                      | provider                             |</span>
+<span class="go">| port_security_enabled     | True                                 |</span>
+<span class="go">| project_id                | c961a8f6d3654657885226378ade8220     |</span>
+<span class="go">| provider:network_type     | flat                                 |</span>
+<span class="go">| provider:physical_network | provider                             |</span>
+<span class="go">| provider:segmentation_id  | 66                                   |</span>
+<span class="go">| revision_number           | 3                                    |</span>
+<span class="go">| router:external           | External                             |</span>
+<span class="go">| shared                    | False                                |</span>
+<span class="go">| status                    | ACTIVE                               |</span>
+<span class="go">| subnets                   |                                      |</span>
+<span class="go">| tags                      | []                                   |</span>
+<span class="go">| updated_at                | 2016-12-21T08:47:41Z                 |</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create a subnet on the provider network using an IP address range from
+the provider subnet pool.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>create<span class="w"> </span>--subnet-pool<span class="w"> </span>provider<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--prefix-length<span class="w"> </span><span class="m">24</span><span class="w"> </span>--gateway<span class="w"> </span><span class="m">203</span>.0.113.1<span class="w"> </span>--network<span class="w"> </span>provider<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--allocation-pool<span class="w"> </span><span class="nv">start</span><span class="o">=</span><span class="m">203</span>.0.113.11,end<span class="o">=</span><span class="m">203</span>.0.113.254<span class="w"> </span>provider
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| Field             | Value                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| allocation_pools  | 203.0.113.11-203.0.113.254           |</span>
+<span class="go">| cidr              | 203.0.113.0/24                       |</span>
+<span class="go">| created_at        | 2016-03-17T23:17:16                  |</span>
+<span class="go">| description       |                                      |</span>
+<span class="go">| dns_nameservers   |                                      |</span>
+<span class="go">| enable_dhcp       | True                                 |</span>
+<span class="go">| gateway_ip        | 203.0.113.1                          |</span>
+<span class="go">| host_routes       |                                      |</span>
+<span class="go">| id                | 8ed65d41-2b2a-4f3a-9f92-45adb266e01a |</span>
+<span class="go">| ip_version        | 4                                    |</span>
+<span class="go">| ipv6_address_mode | None                                 |</span>
+<span class="go">| ipv6_ra_mode      | None                                 |</span>
+<span class="go">| name              | provider                             |</span>
+<span class="go">| network_id        | 68ec148c-181f-4656-8334-8f4eb148689d |</span>
+<span class="go">| project_id        | b3ac05ef10bf441fbf4aa17f16ae1e6d     |</span>
+<span class="go">| segment_id        | None                                 |</span>
+<span class="go">| service_types     |                                      |</span>
+<span class="go">| subnetpool_id     | 3771c0e7-7096-46d3-a3bd-699c58e70259 |</span>
+<span class="go">| tags              |                                      |</span>
+<span class="go">| updated_at        | 2016-03-17T23:17:16                  |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The IP address allocation pool starting at <code class="docutils literal notranslate"><span class="pre">.11</span></code> improves clarity of
+the diagrams. You can safely omit it.</p>
+</div>
+</li>
+<li><p>Create the self-service networks.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>create<span class="w"> </span>selfservice1
+<span class="go">Created a new network:</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+<span class="go">| Field                     | Value                                |</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+<span class="go">| admin_state_up            | UP                                   |</span>
+<span class="go">| availability_zone_hints   |                                      |</span>
+<span class="go">| availability_zones        |                                      |</span>
+<span class="go">| created_at                | 2016-12-21T08:49:38Z                 |</span>
+<span class="go">| description               |                                      |</span>
+<span class="go">| headers                   |                                      |</span>
+<span class="go">| id                        | 9d842606-ef3d-4160-9ed9-e03fa63aed96 |</span>
+<span class="go">| ipv4_address_scope        | None                                 |</span>
+<span class="go">| ipv6_address_scope        | None                                 |</span>
+<span class="go">| mtu                       | 1450                                 |</span>
+<span class="go">| name                      | selfservice1                         |</span>
+<span class="go">| port_security_enabled     | True                                 |</span>
+<span class="go">| project_id                | c961a8f6d3654657885226378ade8220     |</span>
+<span class="go">| provider:network_type     | vxlan                                |</span>
+<span class="go">| provider:physical_network | None                                 |</span>
+<span class="go">| provider:segmentation_id  | 106                                  |</span>
+<span class="go">| revision_number           | 3                                    |</span>
+<span class="go">| router:external           | Internal                             |</span>
+<span class="go">| shared                    | False                                |</span>
+<span class="go">| status                    | ACTIVE                               |</span>
+<span class="go">| subnets                   |                                      |</span>
+<span class="go">| tags                      | []                                   |</span>
+<span class="go">| updated_at                | 2016-12-21T08:49:38Z                 |</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+
+<span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>create<span class="w"> </span>selfservice2
+<span class="go">Created a new network:</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+<span class="go">| Field                     | Value                                |</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+<span class="go">| admin_state_up            | UP                                   |</span>
+<span class="go">| availability_zone_hints   |                                      |</span>
+<span class="go">| availability_zones        |                                      |</span>
+<span class="go">| created_at                | 2016-12-21T08:50:05Z                 |</span>
+<span class="go">| description               |                                      |</span>
+<span class="go">| headers                   |                                      |</span>
+<span class="go">| id                        | f85639e1-d23f-438e-b2b1-f40570d86b1c |</span>
+<span class="go">| ipv4_address_scope        | None                                 |</span>
+<span class="go">| ipv6_address_scope        | None                                 |</span>
+<span class="go">| mtu                       | 1450                                 |</span>
+<span class="go">| name                      | selfservice2                         |</span>
+<span class="go">| port_security_enabled     | True                                 |</span>
+<span class="go">| project_id                | c961a8f6d3654657885226378ade8220     |</span>
+<span class="go">| provider:network_type     | vxlan                                |</span>
+<span class="go">| provider:physical_network | None                                 |</span>
+<span class="go">| provider:segmentation_id  | 21                                   |</span>
+<span class="go">| revision_number           | 3                                    |</span>
+<span class="go">| router:external           | Internal                             |</span>
+<span class="go">| shared                    | False                                |</span>
+<span class="go">| status                    | ACTIVE                               |</span>
+<span class="go">| subnets                   |                                      |</span>
+<span class="go">| tags                      | []                                   |</span>
+<span class="go">| updated_at                | 2016-12-21T08:50:05Z                 |</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+
+<span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>create<span class="w"> </span>selfservice3
+<span class="go">Created a new network:</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+<span class="go">| Field                     | Value                                |</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+<span class="go">| admin_state_up            | UP                                   |</span>
+<span class="go">| availability_zone_hints   |                                      |</span>
+<span class="go">| availability_zones        |                                      |</span>
+<span class="go">| created_at                | 2016-12-21T08:50:35Z                 |</span>
+<span class="go">| description               |                                      |</span>
+<span class="go">| headers                   |                                      |</span>
+<span class="go">| id                        | eeccdb82-5cf4-4999-8ab3-e7dc99e7d43b |</span>
+<span class="go">| ipv4_address_scope        | None                                 |</span>
+<span class="go">| ipv6_address_scope        | None                                 |</span>
+<span class="go">| mtu                       | 1450                                 |</span>
+<span class="go">| name                      | selfservice3                         |</span>
+<span class="go">| port_security_enabled     | True                                 |</span>
+<span class="go">| project_id                | c961a8f6d3654657885226378ade8220     |</span>
+<span class="go">| provider:network_type     | vxlan                                |</span>
+<span class="go">| provider:physical_network | None                                 |</span>
+<span class="go">| provider:segmentation_id  | 86                                   |</span>
+<span class="go">| revision_number           | 3                                    |</span>
+<span class="go">| router:external           | Internal                             |</span>
+<span class="go">| shared                    | False                                |</span>
+<span class="go">| status                    | ACTIVE                               |</span>
+<span class="go">| subnets                   |                                      |</span>
+<span class="go">| tags                      | []                                   |</span>
+<span class="go">| updated_at                | 2016-12-21T08:50:35Z                 |</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create a subnet on the first two self-service networks using an IP address
+range from the self-service subnet pool.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>create<span class="w"> </span>--network<span class="w"> </span>selfservice1<span class="w"> </span>--subnet-pool<span class="w"> </span>selfservice<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--prefix-length<span class="w"> </span><span class="m">25</span><span class="w"> </span>selfservice1
+<span class="go">+-------------------+----------------------------------------------------+</span>
+<span class="go">| Field             | Value                                              |</span>
+<span class="go">+-------------------+----------------------------------------------------+</span>
+<span class="go">| allocation_pools  | 192.0.2.2-192.0.2.127                              |</span>
+<span class="go">| cidr              | 192.0.2.0/25                                       |</span>
+<span class="go">| created_at        | 2016-03-17T23:20:20                                |</span>
+<span class="go">| description       |                                                    |</span>
+<span class="go">| dns_nameservers   |                                                    |</span>
+<span class="go">| enable_dhcp       | True                                               |</span>
+<span class="go">| gateway_ip        | 198.51.100.1                                       |</span>
+<span class="go">| host_routes       |                                                    |</span>
+<span class="go">| id                | 8edd3dc2-df40-4d71-816e-a4586d61c809               |</span>
+<span class="go">| ip_version        | 4                                                  |</span>
+<span class="go">| ipv6_address_mode |                                                    |</span>
+<span class="go">| ipv6_ra_mode      |                                                    |</span>
+<span class="go">| name              | selfservice1                                       |</span>
+<span class="go">| network_id        | be79de1e-5f56-11e6-9dfb-233e41cec48c               |</span>
+<span class="go">| project_id        | b3ac05ef10bf441fbf4aa17f16ae1e6d                   |</span>
+<span class="go">| revision_number   | 1                                                  |</span>
+<span class="go">| subnetpool_id     | c7e9737a-cfd3-45b5-a861-d1cee1135a92               |</span>
+<span class="go">| tags              | []                                                 |</span>
+<span class="go">| tenant_id         | b3ac05ef10bf441fbf4aa17f16ae1e6d                   |</span>
+<span class="go">| updated_at        | 2016-03-17T23:20:20                                |</span>
+<span class="go">+-------------------+----------------------------------------------------+</span>
+
+<span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>create<span class="w"> </span>--network<span class="w"> </span>selfservice2<span class="w"> </span>--subnet-pool<span class="w"> </span>selfservice<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--prefix-length<span class="w"> </span><span class="m">25</span><span class="w"> </span>selfservice2
+<span class="go">+-------------------+------------------------------------------------+</span>
+<span class="go">| Field             | Value                                          |</span>
+<span class="go">+-------------------+------------------------------------------------+</span>
+<span class="go">| allocation_pools  | 192.0.2.130-192.0.2.254                        |</span>
+<span class="go">| cidr              | 192.0.2.128/25                                 |</span>
+<span class="go">| created_at        | 2016-03-17T23:20:20                            |</span>
+<span class="go">| description       |                                                |</span>
+<span class="go">| dns_nameservers   |                                                |</span>
+<span class="go">| enable_dhcp       | True                                           |</span>
+<span class="go">| gateway_ip        | 192.0.2.129                                    |</span>
+<span class="go">| host_routes       |                                                |</span>
+<span class="go">| id                | 8edd3dc2-df40-4d71-816e-a4586d61c809           |</span>
+<span class="go">| ip_version        | 4                                              |</span>
+<span class="go">| ipv6_address_mode |                                                |</span>
+<span class="go">| ipv6_ra_mode      |                                                |</span>
+<span class="go">| name              | selfservice2                                   |</span>
+<span class="go">| network_id        | c1fd9846-5f56-11e6-a8ac-0f998d9cc0a2           |</span>
+<span class="go">| project_id        | b3ac05ef10bf441fbf4aa17f16ae1e6d               |</span>
+<span class="go">| revision_number   | 1                                              |</span>
+<span class="go">| subnetpool_id     | c7e9737a-cfd3-45b5-a861-d1cee1135a92           |</span>
+<span class="go">| tags              | []                                             |</span>
+<span class="go">| tenant_id         | b3ac05ef10bf441fbf4aa17f16ae1e6d               |</span>
+<span class="go">| updated_at        | 2016-03-17T23:20:20                            |</span>
+<span class="go">+-------------------+------------------------------------------------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create a subnet on the last self-service network using an IP address
+range outside of the address scope.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>create<span class="w"> </span>--network<span class="w"> </span>selfservice3<span class="w"> </span>--prefix<span class="w"> </span><span class="m">198</span>.51.100.0/24<span class="w"> </span>subnet3
+<span class="go">+-------------------+----------------------------------------------------+</span>
+<span class="go">| Field             | Value                                              |</span>
+<span class="go">+-------------------+----------------------------------------------------+</span>
+<span class="go">| allocation_pools  | 198.51.100.2-198.51.100.254                        |</span>
+<span class="go">| cidr              | 198.51.100.0/24                                    |</span>
+<span class="go">| created_at        | 2016-03-17T23:20:20                                |</span>
+<span class="go">| description       |                                                    |</span>
+<span class="go">| dns_nameservers   |                                                    |</span>
+<span class="go">| enable_dhcp       | True                                               |</span>
+<span class="go">| gateway_ip        | 198.51.100.1                                       |</span>
+<span class="go">| host_routes       |                                                    |</span>
+<span class="go">| id                | cd9f9156-5f59-11e6-aeec-172ec7ee939a               |</span>
+<span class="go">| ip_version        | 4                                                  |</span>
+<span class="go">| ipv6_address_mode |                                                    |</span>
+<span class="go">| ipv6_ra_mode      |                                                    |</span>
+<span class="go">| name              | selfservice3                                       |</span>
+<span class="go">| network_id        | c283dc1c-5f56-11e6-bfb6-efc30e1eb73b               |</span>
+<span class="go">| project_id        | b3ac05ef10bf441fbf4aa17f16ae1e6d                   |</span>
+<span class="go">| revision_number   | 1                                                  |</span>
+<span class="go">| subnetpool_id     |                                                    |</span>
+<span class="go">| tags              | []                                                 |</span>
+<span class="go">| tenant_id         | b3ac05ef10bf441fbf4aa17f16ae1e6d                   |</span>
+<span class="go">| updated_at        | 2016-03-17T23:20:20                                |</span>
+<span class="go">+-------------------+----------------------------------------------------+</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="create-and-configure-the-routers">
+<h3>Create and configure the routers<a class="headerlink" href="#create-and-configure-the-routers" title="Link to this heading">¶</a></h3>
+<ol class="arabic">
+<li><p>Create the routers.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>router<span class="w"> </span>create<span class="w"> </span>router1
+<span class="go">+-------------------------+--------------------------------------+</span>
+<span class="go">| Field                   | Value                                |</span>
+<span class="go">+-------------------------+--------------------------------------+</span>
+<span class="go">| admin_state_up          | UP                                   |</span>
+<span class="go">| availability_zone_hints |                                      |</span>
+<span class="go">| availability_zones      |                                      |</span>
+<span class="go">| created_at              | 2017-01-10T13:15:19Z                 |</span>
+<span class="go">| description             |                                      |</span>
+<span class="go">| distributed             | False                                |</span>
+<span class="go">| external_gateway_info   | null                                 |</span>
+<span class="go">| flavor_id               | None                                 |</span>
+<span class="go">| ha                      | False                                |</span>
+<span class="go">| headers                 |                                      |</span>
+<span class="go">| id                      | 3f6f4ef8-63be-11e6-bbb3-2fbcef363ab8 |</span>
+<span class="go">| name                    | router1                              |</span>
+<span class="go">| project_id              | b3ac05ef10bf441fbf4aa17f16ae1e6d     |</span>
+<span class="go">| revision_number         | 1                                    |</span>
+<span class="go">| routes                  |                                      |</span>
+<span class="go">| status                  | ACTIVE                               |</span>
+<span class="go">| tags                    | []                                   |</span>
+<span class="go">| updated_at              | 2017-01-10T13:15:19Z                 |</span>
+<span class="go">+-------------------------+--------------------------------------+</span>
+
+<span class="gp">$ </span>openstack<span class="w"> </span>router<span class="w"> </span>create<span class="w"> </span>router2
+<span class="go">+-------------------------+--------------------------------------+</span>
+<span class="go">| Field                   | Value                                |</span>
+<span class="go">+-------------------------+--------------------------------------+</span>
+<span class="go">| admin_state_up          | UP                                   |</span>
+<span class="go">| availability_zone_hints |                                      |</span>
+<span class="go">| availability_zones      |                                      |</span>
+<span class="go">| created_at              | 2017-01-10T13:15:19Z                 |</span>
+<span class="go">| description             |                                      |</span>
+<span class="go">| distributed             | False                                |</span>
+<span class="go">| external_gateway_info   | null                                 |</span>
+<span class="go">| flavor_id               | None                                 |</span>
+<span class="go">| ha                      | False                                |</span>
+<span class="go">| headers                 |                                      |</span>
+<span class="go">| id                      | 3fd21a60-63be-11e6-9c95-5714c208c499 |</span>
+<span class="go">| name                    | router2                              |</span>
+<span class="go">| project_id              | b3ac05ef10bf441fbf4aa17f16ae1e6d     |</span>
+<span class="go">| revision_number         | 1                                    |</span>
+<span class="go">| routes                  |                                      |</span>
+<span class="go">| status                  | ACTIVE                               |</span>
+<span class="go">| tags                    | []                                   |</span>
+<span class="go">| updated_at              | 2017-01-10T13:15:19Z                 |</span>
+<span class="go">+-------------------------+--------------------------------------+</span>
+
+<span class="gp">$ </span>openstack<span class="w"> </span>router<span class="w"> </span>create<span class="w"> </span>router3
+<span class="go">+-------------------------+--------------------------------------+</span>
+<span class="go">| Field                   | Value                                |</span>
+<span class="go">+-------------------------+--------------------------------------+</span>
+<span class="go">| admin_state_up          | UP                                   |</span>
+<span class="go">| availability_zone_hints |                                      |</span>
+<span class="go">| availability_zones      |                                      |</span>
+<span class="go">| created_at              | 2017-01-10T13:15:19Z                 |</span>
+<span class="go">| description             |                                      |</span>
+<span class="go">| distributed             | False                                |</span>
+<span class="go">| external_gateway_info   | null                                 |</span>
+<span class="go">| flavor_id               | None                                 |</span>
+<span class="go">| ha                      | False                                |</span>
+<span class="go">| headers                 |                                      |</span>
+<span class="go">| id                      | 40069a4c-63be-11e6-9ecc-e37c1eaa7e84 |</span>
+<span class="go">| name                    | router3                              |</span>
+<span class="go">| project_id              | b3ac05ef10bf441fbf4aa17f16ae1e6d     |</span>
+<span class="go">| revision_number         | 1                                    |</span>
+<span class="go">| routes                  |                                      |</span>
+<span class="go">| status                  | ACTIVE                               |</span>
+<span class="go">| tags                    | []                                   |</span>
+<span class="go">| updated_at              | 2017-01-10T13:15:19Z                 |</span>
+<span class="go">+-------------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>For each router, add one self-service subnet as an interface on the router.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>router<span class="w"> </span>add<span class="w"> </span>subnet<span class="w"> </span>router1<span class="w"> </span>selfservice1
+
+<span class="gp">$ </span>openstack<span class="w"> </span>router<span class="w"> </span>add<span class="w"> </span>subnet<span class="w"> </span>router2<span class="w"> </span>selfservice2
+
+<span class="gp">$ </span>openstack<span class="w"> </span>router<span class="w"> </span>add<span class="w"> </span>subnet<span class="w"> </span>router3<span class="w"> </span>selfservice3
+</pre></div>
+</div>
+</li>
+<li><p>Add the provider network as a gateway on each router.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>router<span class="w"> </span><span class="nb">set</span><span class="w"> </span>--external-gateway<span class="w"> </span>provider<span class="w"> </span>router1
+
+<span class="gp">$ </span>openstack<span class="w"> </span>router<span class="w"> </span><span class="nb">set</span><span class="w"> </span>--external-gateway<span class="w"> </span>provider<span class="w"> </span>router2
+
+<span class="gp">$ </span>openstack<span class="w"> </span>router<span class="w"> </span><span class="nb">set</span><span class="w"> </span>--external-gateway<span class="w"> </span>provider<span class="w"> </span>router3
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="create-and-configure-the-bgp-speaker">
+<h3>Create and configure the BGP speaker<a class="headerlink" href="#create-and-configure-the-bgp-speaker" title="Link to this heading">¶</a></h3>
+<p>The BGP speaker advertises the next-hop IP address for eligible self-service
+networks and floating IP addresses for instances using those networks.</p>
+<ol class="arabic">
+<li><p>Create the BGP speaker.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>bgp<span class="w"> </span>speaker<span class="w"> </span>create<span class="w"> </span>--ip-version<span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--local-as<span class="w"> </span>LOCAL_AS<span class="w"> </span>bgpspeaker
+<span class="go">Created a new bgp_speaker:</span>
+<span class="go">+-----------------------------------+--------------------------------------+</span>
+<span class="go">| Field                             | Value                                |</span>
+<span class="go">+-----------------------------------+--------------------------------------+</span>
+<span class="go">| advertise_floating_ip_host_routes | True                                 |</span>
+<span class="go">| advertise_tenant_networks         | True                                 |</span>
+<span class="go">| id                                | 5f227f14-4f46-4eca-9524-fc5a1eabc358 |</span>
+<span class="go">| ip_version                        | 4                                    |</span>
+<span class="go">| local_as                          | 1234                                 |</span>
+<span class="go">| name                              | bgpspeaker                           |</span>
+<span class="go">| networks                          |                                      |</span>
+<span class="go">| peers                             |                                      |</span>
+<span class="go">| tenant_id                         | b3ac05ef10bf441fbf4aa17f16ae1e6d     |</span>
+<span class="go">+-----------------------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>Replace <code class="docutils literal notranslate"><span class="pre">LOCAL_AS</span></code> with an appropriate local autonomous system number.
+The example configuration uses AS 1234.</p>
+</li>
+<li><p>A BGP speaker requires association with a provider network to determine
+eligible prefixes. The association builds a list of all virtual routers
+with gateways on provider and self-service networks in the same address
+scope so the BGP speaker can advertise self-service network prefixes with
+the corresponding router as the next-hop IP address. Associate the BGP
+speaker with the provider network.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>bgp<span class="w"> </span>speaker<span class="w"> </span>add<span class="w"> </span>network<span class="w"> </span>bgpspeaker<span class="w"> </span>provider
+<span class="go">Added network provider to BGP speaker bgpspeaker.</span>
+</pre></div>
+</div>
+</li>
+<li><p>Verify association of the provider network with the BGP speaker.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>bgp<span class="w"> </span>speaker<span class="w"> </span>show<span class="w"> </span>bgpspeaker
+<span class="go">+-----------------------------------+--------------------------------------+</span>
+<span class="go">| Field                             | Value                                |</span>
+<span class="go">+-----------------------------------+--------------------------------------+</span>
+<span class="go">| advertise_floating_ip_host_routes | True                                 |</span>
+<span class="go">| advertise_tenant_networks         | True                                 |</span>
+<span class="go">| id                                | 5f227f14-4f46-4eca-9524-fc5a1eabc358 |</span>
+<span class="go">| ip_version                        | 4                                    |</span>
+<span class="go">| local_as                          | 1234                                 |</span>
+<span class="go">| name                              | bgpspeaker                           |</span>
+<span class="go">| networks                          | 68ec148c-181f-4656-8334-8f4eb148689d |</span>
+<span class="go">| peers                             |                                      |</span>
+<span class="go">| tenant_id                         | b3ac05ef10bf441fbf4aa17f16ae1e6d     |</span>
+<span class="go">+-----------------------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>Verify the prefixes and next-hop IP addresses that the BGP speaker
+advertises.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>bgp<span class="w"> </span>speaker<span class="w"> </span>list<span class="w"> </span>advertised<span class="w"> </span>routes<span class="w"> </span>bgpspeaker
+<span class="go">+-----------------+--------------+</span>
+<span class="go">| Destination     | Nexthop      |</span>
+<span class="go">+-----------------+--------------+</span>
+<span class="go">| 192.0.2.0/25    | 203.0.113.11 |</span>
+<span class="go">| 192.0.2.128/25  | 203.0.113.12 |</span>
+<span class="go">+-----------------+--------------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create a BGP peer.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>bgp<span class="w"> </span>peer<span class="w"> </span>create<span class="w"> </span>--peer-ip<span class="w"> </span><span class="m">10</span>.0.0.2<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--remote-as<span class="w"> </span>REMOTE_AS<span class="w"> </span>bgppeer
+<span class="go">Created a new bgp_peer:</span>
+<span class="go">+-----------+--------------------------------------+</span>
+<span class="go">| Field     | Value                                |</span>
+<span class="go">+-----------+--------------------------------------+</span>
+<span class="go">| auth_type | none                                 |</span>
+<span class="go">| id        | 35c89ca0-ac5a-4298-a815-0b073c2362e9 |</span>
+<span class="go">| name      | bgppeer                              |</span>
+<span class="go">| peer_ip   | 10.0.0.2                             |</span>
+<span class="go">| remote_as | 4321                                 |</span>
+<span class="go">| tenant_id | b3ac05ef10bf441fbf4aa17f16ae1e6d     |</span>
+<span class="go">+-----------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>Replace <code class="docutils literal notranslate"><span class="pre">REMOTE_AS</span></code> with an appropriate remote autonomous system number.
+The example configuration uses AS 4321 which triggers EBGP peering.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The host containing the BGP agent must have layer-3 connectivity to
+the provider router.</p>
+</div>
+</li>
+<li><p>Add a BGP peer to the BGP speaker.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>bgp<span class="w"> </span>speaker<span class="w"> </span>add<span class="w"> </span>peer<span class="w"> </span>bgpspeaker<span class="w"> </span>bgppeer
+<span class="go">Added BGP peer bgppeer to BGP speaker bgpspeaker.</span>
+</pre></div>
+</div>
+</li>
+<li><p>Verify addition of the BGP peer to the BGP speaker.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>bgp<span class="w"> </span>speaker<span class="w"> </span>show<span class="w"> </span>bgpspeaker
+<span class="go">+-----------------------------------+--------------------------------------+</span>
+<span class="go">| Field                             | Value                                |</span>
+<span class="go">+-----------------------------------+--------------------------------------+</span>
+<span class="go">| advertise_floating_ip_host_routes | True                                 |</span>
+<span class="go">| advertise_tenant_networks         | True                                 |</span>
+<span class="go">| id                                | 5f227f14-4f46-4eca-9524-fc5a1eabc358 |</span>
+<span class="go">| ip_version                        | 4                                    |</span>
+<span class="go">| local_as                          | 1234                                 |</span>
+<span class="go">| name                              | bgpspeaker                           |</span>
+<span class="go">| networks                          | 68ec148c-181f-4656-8334-8f4eb148689d |</span>
+<span class="go">| peers                             | 35c89ca0-ac5a-4298-a815-0b073c2362e9 |</span>
+<span class="go">| tenant_id                         | b3ac05ef10bf441fbf4aa17f16ae1e6d     |</span>
+<span class="go">+-----------------------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>After creating a peering session, you cannot change the local or remote
+autonomous system numbers.</p>
+</div>
+</li>
+</ol>
+</section>
+<section id="schedule-the-bgp-speaker-to-an-agent">
+<h3>Schedule the BGP speaker to an agent<a class="headerlink" href="#schedule-the-bgp-speaker-to-an-agent" title="Link to this heading">¶</a></h3>
+<ol class="arabic">
+<li><p>Unlike most agents, BGP speakers require manual scheduling to an agent.
+BGP speakers only form peering sessions and begin prefix advertisement
+after scheduling to an agent. Schedule the BGP speaker to agent
+<code class="docutils literal notranslate"><span class="pre">37729181-2224-48d8-89ef-16eca8e2f77e</span></code>.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>bgp<span class="w"> </span>dragent<span class="w"> </span>add<span class="w"> </span>speaker<span class="w"> </span><span class="m">37729181</span>-2224-48d8-89ef-16eca8e2f77e<span class="w"> </span>bgpspeaker
+<span class="go">Associated BGP speaker bgpspeaker to the Dynamic Routing agent.</span>
+</pre></div>
+</div>
+</li>
+<li><p>Verify scheduling of the BGP speaker to the agent.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>bgp<span class="w"> </span>dragent<span class="w"> </span>list<span class="w"> </span>--bgp-speaker<span class="w"> </span>bgpspeaker
+<span class="go">+--------------------------------------+------------+-------+-------+</span>
+<span class="go">| ID                                   | Host       | State | Alive |</span>
+<span class="go">+--------------------------------------+------------+-------+-------+</span>
+<span class="go">| 37729181-2224-48d8-89ef-16eca8e2f77e | controller | True  | :-)   |</span>
+<span class="go">+--------------------------------------+------------+-------+-------+</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+</section>
+<section id="prefix-advertisement">
+<h2>Prefix advertisement<a class="headerlink" href="#prefix-advertisement" title="Link to this heading">¶</a></h2>
+<p>BGP dynamic routing advertises prefixes for self-service networks and host
+routes for floating IP addresses.</p>
+<p>Advertisement of a self-service network requires satisfying the following
+conditions:</p>
+<ul class="simple">
+<li><p>The external and self-service network reside in the same address scope.</p></li>
+<li><p>The router contains an interface on the self-service subnet and a gateway
+on the external network.</p></li>
+<li><p>The BGP speaker associates with the external network that provides a
+gateway on the router.</p></li>
+<li><p>The BGP speaker has the <code class="docutils literal notranslate"><span class="pre">advertise_tenant_networks</span></code> attribute set to
+<code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+</ul>
+<img alt="Example of prefix advertisements with self-service networks" src="../_images/bgp-dynamic-routing-example1.png" />
+<p>Advertisement of a floating IP address requires satisfying the following
+conditions:</p>
+<ul class="simple">
+<li><p>The router with the floating IP address binding contains a gateway on
+an external network with the BGP speaker association.</p></li>
+<li><p>The BGP speaker has the <code class="docutils literal notranslate"><span class="pre">advertise_floating_ip_host_routes</span></code> attribute
+set to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+</ul>
+<img alt="Example of prefix advertisements with floating IP addresses" src="../_images/bgp-dynamic-routing-example2.png" />
+</section>
+<section id="operation-with-distributed-virtual-routers-dvr">
+<h2>Operation with Distributed Virtual Routers (DVR)<a class="headerlink" href="#operation-with-distributed-virtual-routers-dvr" title="Link to this heading">¶</a></h2>
+<p>For both floating IP and IPv4 fixed IP addresses, the BGP speaker advertises
+the floating IP agent gateway on the corresponding compute node as the
+next-hop IP address. When using IPv6 fixed IP addresses, the BGP speaker
+advertises the DVR SNAT node as the next-hop IP address.</p>
+<p>For example, consider the following components:</p>
+<ol class="arabic simple">
+<li><p>A provider network using IP address range 203.0.113.0/24, and supporting
+floating IP addresses 203.0.113.101, 203.0.113.102, and 203.0.113.103.</p></li>
+<li><p>A self-service network using IP address range 198.51.100.0/24.</p></li>
+<li><p>Instances with fixed IP’s 198.51.100.11, 198.51.100.12, and 198.51.100.13</p></li>
+<li><p>The SNAT gateway resides on 203.0.113.11.</p></li>
+<li><p>The floating IP agent gateways (one per compute node) reside on
+203.0.113.12, 203.0.113.13, and 203.0.113.14.</p></li>
+<li><p>Three instances, one per compute node, each with a floating IP
+address.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">advertise_tenant_networks</span></code> is set to <code class="docutils literal notranslate"><span class="pre">False</span></code> on the BGP speaker</p></li>
+</ol>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>bgp<span class="w"> </span>speaker<span class="w"> </span>list<span class="w"> </span>advertised<span class="w"> </span>routes<span class="w"> </span>bgpspeaker
+<span class="go">+------------------+--------------+</span>
+<span class="go">| Destination      | Nexthop      |</span>
+<span class="go">+------------------+--------------+</span>
+<span class="go">| 198.51.100.0/24  | 203.0.113.11 |</span>
+<span class="go">| 203.0.113.101/32 | 203.0.113.12 |</span>
+<span class="go">| 203.0.113.102/32 | 203.0.113.13 |</span>
+<span class="go">| 203.0.113.103/32 | 203.0.113.14 |</span>
+<span class="go">+------------------+--------------+</span>
+</pre></div>
+</div>
+<p>When floating IP’s are disassociated and <code class="docutils literal notranslate"><span class="pre">advertise_tenant_networks</span></code> is
+set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, the following routes will be advertised:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>bgp<span class="w"> </span>speaker<span class="w"> </span>list<span class="w"> </span>advertised<span class="w"> </span>routes<span class="w"> </span>bgpspeaker
+<span class="go">+------------------+--------------+</span>
+<span class="go">| Destination      | Nexthop      |</span>
+<span class="go">+------------------+--------------+</span>
+<span class="go">| 198.51.100.0/24  | 203.0.113.11 |</span>
+<span class="go">| 198.51.100.11/32 | 203.0.113.12 |</span>
+<span class="go">| 198.51.100.12/32 | 203.0.113.13 |</span>
+<span class="go">| 198.51.100.13/32 | 203.0.113.14 |</span>
+<span class="go">+------------------+--------------+</span>
+</pre></div>
+</div>
+<p>You can also identify floating IP agent gateways in your environment to
+assist with verifying operation of the BGP speaker.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>port<span class="w"> </span>list<span class="w"> </span>--device-owner<span class="w"> </span>network:floatingip_agent_gateway
+<span class="go">+--------------------------------------+------+-------------------+--------------------------------------------------------------------------------------------------------+</span>
+<span class="go">| ID                                   | Name | MAC Address       | Fixed IP Addresses                                                                                     |</span>
+<span class="go">+--------------------------------------+------+-------------------+--------------------------------------------------------------------------------------------------------+</span>
+<span class="go">| 87cf2970-4970-462e-939e-00e808295dfa |      | fa:16:3e:7c:68:e3 | ip_address=&#39;203.0.113.12&#39;, subnet_id=&#39;8ed65d41-2b2a-4f3a-9f92-45adb266e01a&#39;                            |</span>
+<span class="go">| 8d218440-0d2e-49d0-8a7b-3266a6146dc1 |      | fa:16:3e:9d:78:cf | ip_address=&#39;203.0.113.13&#39;, subnet_id=&#39;8ed65d41-2b2a-4f3a-9f92-45adb266e01a&#39;                            |</span>
+<span class="go">| 87cf2970-4970-462e-939e-00e802281dfa |      | fa:16:3e:6b:18:e0 | ip_address=&#39;203.0.113.14&#39;, subnet_id=&#39;8ed65d41-2b2a-4f3a-9f92-45adb266e01a&#39;                            |</span>
+<span class="go">+--------------------------------------+------+-------------------+--------------------------------------------------------------------------------------------------------+</span>
+</pre></div>
+</div>
+</section>
+<section id="ipv6">
+<span id="config-bgp-dynamic-routing-for-ipv6"></span><h2>IPv6<a class="headerlink" href="#ipv6" title="Link to this heading">¶</a></h2>
+<p>BGP dynamic routing supports peering via IPv6 and advertising IPv6 prefixes.</p>
+<ul class="simple">
+<li><p>To enable peering via IPv6, create a BGP peer and use an IPv6 address for
+<code class="docutils literal notranslate"><span class="pre">peer_ip</span></code>.</p></li>
+<li><p>To enable advertising IPv6 prefixes, create an address scope with
+<code class="docutils literal notranslate"><span class="pre">ip_version=6</span></code> and a BGP speaker with <code class="docutils literal notranslate"><span class="pre">ip_version=6</span></code>.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>DVR lacks support for routing directly to a fixed IPv6 address via the
+floating IP agent gateway port and thus prevents the BGP speaker from
+advertising /128 host routes.</p>
+</div>
+</section>
+<section id="high-availability">
+<h2>High availability<a class="headerlink" href="#high-availability" title="Link to this heading">¶</a></h2>
+<p>BGP dynamic routing supports scheduling a BGP speaker to multiple agents
+which effectively multiplies prefix advertisements to the same peer. If
+an agent fails, the peer continues to receive advertisements from one or
+more operational agents.</p>
+<ol class="arabic">
+<li><p>Show available dynamic routing agents.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>agent<span class="w"> </span>list<span class="w"> </span>--agent-type<span class="w"> </span>bgp
+<span class="go">+--------------------------------------+---------------------------+------- --+-------------------+-------+-------+---------------------------+</span>
+<span class="go">| ID                                   | Agent Type                | Host     | Availability Zone | Alive | State | Binary                    |</span>
+<span class="go">+--------------------------------------+---------------------------+----------+-------------------+-------+-------+---------------------------+</span>
+<span class="go">| 37729181-2224-48d8-89ef-16eca8e2f77e | BGP dynamic routing agent | bgp-ha1  | None              | :-)   | UP    | neutron-bgp-dragent       |</span>
+<span class="go">| 1a2d33bb-9321-30a2-76ab-22eff3d2f56a | BGP dynamic routing agent | bgp-ha2  | None              | :-)   | UP    | neutron-bgp-dragent       |</span>
+<span class="go">+--------------------------------------+---------------------------+----------+-------------------+-------+-------+---------------------------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>Schedule BGP speaker to multiple agents.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>bgp<span class="w"> </span>dragent<span class="w"> </span>add<span class="w"> </span>speaker<span class="w"> </span><span class="m">37729181</span>-2224-48d8-89ef-16eca8e2f77e<span class="w"> </span>bgpspeaker
+<span class="go">Associated BGP speaker bgpspeaker to the Dynamic Routing agent.</span>
+
+<span class="gp">$ </span>openstack<span class="w"> </span>bgp<span class="w"> </span>dragent<span class="w"> </span>add<span class="w"> </span>speaker<span class="w"> </span>1a2d33bb-9321-30a2-76ab-22eff3d2f56a<span class="w"> </span>bgpspeaker
+<span class="go">Associated BGP speaker bgpspeaker to the Dynamic Routing agent.</span>
+
+<span class="gp">$ </span>openstack<span class="w"> </span>bgp<span class="w"> </span>dragent<span class="w"> </span>list<span class="w"> </span>--bgp-speaker<span class="w"> </span>bgpspeaker
+<span class="go">+--------------------------------------+---------+-------+-------+</span>
+<span class="go">| ID                                   | Host    | State | Alive |</span>
+<span class="go">+--------------------------------------+---------+-------+-------+</span>
+<span class="go">| 37729181-2224-48d8-89ef-16eca8e2f77e | bgp-ha1 | True  | :-)   |</span>
+<span class="go">| 1a2d33bb-9321-30a2-76ab-22eff3d2f56a | bgp-ha2 | True  | :-)   |</span>
+<span class="go">+--------------------------------------+---------+-------+-------+</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="config-az.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Availability Zones"></i></a>
+          
+          
+            <a href="config-bgp-floating-ip-over-l2-segmented-network.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: BGP Floating IPs over L2 Segmented Networks"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2023-09-15 18:12:45</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation Guide</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">OpenStack Networking Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deploy.html">Deployment examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ops.html">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">Migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ovn/index.html">OVN Driver Administration Guide</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributor/index.html">Contributor Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">BGP Dynamic Routing</a><ul>
+<li><a class="reference internal" href="#example-configuration">Example configuration</a><ul>
+<li><a class="reference internal" href="#controller-node">Controller node</a></li>
+<li><a class="reference internal" href="#agent-nodes">Agent nodes</a></li>
+<li><a class="reference internal" href="#verify-service-operation">Verify service operation</a></li>
+<li><a class="reference internal" href="#create-the-address-scope-and-subnet-pools">Create the address scope and subnet pools</a></li>
+<li><a class="reference internal" href="#create-the-provider-and-self-service-networks">Create the provider and self-service networks</a></li>
+<li><a class="reference internal" href="#create-and-configure-the-routers">Create and configure the routers</a></li>
+<li><a class="reference internal" href="#create-and-configure-the-bgp-speaker">Create and configure the BGP speaker</a></li>
+<li><a class="reference internal" href="#schedule-the-bgp-speaker-to-an-agent">Schedule the BGP speaker to an agent</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#prefix-advertisement">Prefix advertisement</a></li>
+<li><a class="reference internal" href="#operation-with-distributed-virtual-routers-dvr">Operation with Distributed Virtual Routers (DVR)</a></li>
+<li><a class="reference internal" href="#ipv6">IPv6</a></li>
+<li><a class="reference internal" href="#high-availability">High availability</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "admin/config-bgp-dynamic-routing" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "BGP Dynamic Routing in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2023-09-15 18:12:45";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "admin/config-bgp-dynamic-routing";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

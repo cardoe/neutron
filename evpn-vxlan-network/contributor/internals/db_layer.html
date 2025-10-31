@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Database Layer &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Database Models Relocation" href="db_models.html" />
+    <link rel="prev" title="Code Profiling" href="code_profiling.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/contributor/internals/db_layer.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Database Layer</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="code_profiling.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Code Profiling"></i></a>
+    
+    
+    <a href="db_models.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Database Models Relocation"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="database-layer">
+<h1>Database Layer<a class="headerlink" href="#database-layer" title="Link to this heading">¶</a></h1>
+<p>This section contains some common information that will be useful for
+developers that need to do some database changes as well as to execute queries
+using the oslo.db API.</p>
+<section id="difference-between-default-and-server-default-parameters-for-columns">
+<h2>Difference between ‘default’ and ‘server_default’ parameters for columns<a class="headerlink" href="#difference-between-default-and-server-default-parameters-for-columns" title="Link to this heading">¶</a></h2>
+<p>For columns it is possible to set ‘default’ or ‘server_default’. What is the
+difference between them and why should they be used?</p>
+<p>The explanation is quite simple:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://docs.sqlalchemy.org/en/rel_0_9/core/metadata.html#sqlalchemy.schema.Column.params.default">default</a> - the default value that SQLAlchemy will specify in queries for creating instances of a given model;</p></li>
+<li><p><a class="reference external" href="http://docs.sqlalchemy.org/en/rel_0_9/core/metadata.html#sqlalchemy.schema.Column.params.server_default">server_default</a> - the default value for a column that SQLAlchemy will specify in DDL.</p></li>
+</ul>
+<p>Summarizing, ‘default’ is useless in migrations and only ‘server_default’
+should be used. For synchronizing migrations with models server_default
+parameter should also be added in model. If default value in database is not
+needed, ‘server_default’ should not be used. The declarative approach can be
+bypassed
+(i.e. ‘default’ may be omitted in the model) if default is enforced through
+business logic.</p>
+</section>
+<section id="database-migrations">
+<h2>Database migrations<a class="headerlink" href="#database-migrations" title="Link to this heading">¶</a></h2>
+<p>For details on the neutron-db-manage wrapper and alembic migrations, see
+<a class="reference external" href="alembic_migrations.html">Alembic Migrations</a>.</p>
+</section>
+<section id="module-neutron.tests.functional.db.test_migrations">
+<span id="tests-to-verify-that-database-migrations-and-models-are-in-sync"></span><span id="testing-database-migrations"></span><h2>Tests to verify that database migrations and models are in sync<a class="headerlink" href="#module-neutron.tests.functional.db.test_migrations" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="neutron.tests.functional.db.test_migrations.TestModelsMigrations">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">neutron.tests.functional.db.test_migrations.</span></span><span class="sig-name descname"><span class="pre">TestModelsMigrations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.tests.functional.db.test_migrations.TestModelsMigrations" title="Link to this definition">¶</a></dt>
+<dd><p>Test for checking of equality models state and migrations.</p>
+<p>For the opportunistic testing you need to set up a db named
+‘openstack_citest’ with user ‘openstack_citest’ and password
+‘openstack_citest’ on localhost.
+The test will then use that db and user/password combo to run the tests.</p>
+<p>For MySQL on Ubuntu this can be done with the following commands:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mysql</span> <span class="o">-</span><span class="n">u</span> <span class="n">root</span>
+<span class="o">&gt;</span><span class="n">create</span> <span class="n">database</span> <span class="n">openstack_citest</span><span class="p">;</span>
+<span class="o">&gt;</span><span class="n">grant</span> <span class="nb">all</span> <span class="n">privileges</span> <span class="n">on</span> <span class="n">openstack_citest</span><span class="o">.*</span> <span class="n">to</span>
+ <span class="n">openstack_citest</span><span class="nd">@localhost</span> <span class="n">identified</span> <span class="n">by</span> <span class="s1">&#39;openstack_citest&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Output is a list that contains information about differences between db and
+models. Output example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;add_table&#39;</span><span class="p">,</span>
+  <span class="n">Table</span><span class="p">(</span><span class="s1">&#39;bat&#39;</span><span class="p">,</span> <span class="n">MetaData</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span>
+        <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(),</span> <span class="n">table</span><span class="o">=&lt;</span><span class="n">bat</span><span class="o">&gt;</span><span class="p">),</span> <span class="n">schema</span><span class="o">=</span><span class="kc">None</span><span class="p">)),</span>
+ <span class="p">(</span><span class="s1">&#39;remove_table&#39;</span><span class="p">,</span>
+  <span class="n">Table</span><span class="p">(</span><span class="sa">u</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">MetaData</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span>
+        <span class="n">Column</span><span class="p">(</span><span class="sa">u</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="n">VARCHAR</span><span class="p">(),</span> <span class="n">table</span><span class="o">=&lt;</span><span class="n">bar</span><span class="o">&gt;</span><span class="p">),</span> <span class="n">schema</span><span class="o">=</span><span class="kc">None</span><span class="p">)),</span>
+ <span class="p">(</span><span class="s1">&#39;add_column&#39;</span><span class="p">,</span>
+  <span class="kc">None</span><span class="p">,</span>
+  <span class="s1">&#39;foo&#39;</span><span class="p">,</span>
+  <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">(),</span> <span class="n">table</span><span class="o">=&lt;</span><span class="n">foo</span><span class="o">&gt;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="s1">&#39;remove_column&#39;</span><span class="p">,</span>
+  <span class="kc">None</span><span class="p">,</span>
+  <span class="s1">&#39;foo&#39;</span><span class="p">,</span>
+  <span class="n">Column</span><span class="p">(</span><span class="sa">u</span><span class="s1">&#39;old_data&#39;</span><span class="p">,</span> <span class="n">VARCHAR</span><span class="p">(),</span> <span class="n">table</span><span class="o">=</span><span class="kc">None</span><span class="p">)),</span>
+ <span class="p">[(</span><span class="s1">&#39;modify_nullable&#39;</span><span class="p">,</span>
+   <span class="kc">None</span><span class="p">,</span>
+   <span class="s1">&#39;foo&#39;</span><span class="p">,</span>
+   <span class="sa">u</span><span class="s1">&#39;x&#39;</span><span class="p">,</span>
+   <span class="p">{</span><span class="s1">&#39;existing_server_default&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+   <span class="s1">&#39;existing_type&#39;</span><span class="p">:</span> <span class="n">INTEGER</span><span class="p">()},</span>
+   <span class="kc">True</span><span class="p">,</span>
+   <span class="kc">False</span><span class="p">)]]</span>
+</pre></div>
+</div>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">remove_*</span></code> means that there is extra table/column/constraint in db;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">add_*</span></code> means that it is missing in db;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">modify_*</span></code> means that on column in db is set wrong
+type/nullable/server_default. Element contains information:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>what should be modified,</p></li>
+<li><p>schema,</p></li>
+<li><p>table,</p></li>
+<li><p>column,</p></li>
+<li><p>existing correct column parameters,</p></li>
+<li><p>right value,</p></li>
+<li><p>wrong value.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<p>This class also contains tests for branches, like that correct operations
+are used in contract and expand branches.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.tests.functional.db.test_migrations.TestModelsMigrations.db_sync">
+<span class="sig-name descname"><span class="pre">db_sync</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">engine</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.tests.functional.db.test_migrations.TestModelsMigrations.db_sync" title="Link to this definition">¶</a></dt>
+<dd><p>Run migration scripts with the given engine instance.</p>
+<p>This method must be implemented in subclasses and run migration scripts
+for a DB the given engine is connected to.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.tests.functional.db.test_migrations.TestModelsMigrations.filter_metadata_diff">
+<span class="sig-name descname"><span class="pre">filter_metadata_diff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diff</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.tests.functional.db.test_migrations.TestModelsMigrations.filter_metadata_diff" title="Link to this definition">¶</a></dt>
+<dd><p>Filter changes before assert in test_models_sync().</p>
+<p>Allow subclasses to whitelist/blacklist changes. By default, no
+filtering is performed, changes are returned as is.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>diff</strong> – a list of differences (see <cite>compare_metadata()</cite> docs for
+details on format)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a list of differences</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.tests.functional.db.test_migrations.TestModelsMigrations.get_engine">
+<span class="sig-name descname"><span class="pre">get_engine</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#neutron.tests.functional.db.test_migrations.TestModelsMigrations.get_engine" title="Link to this definition">¶</a></dt>
+<dd><p>Return the engine instance to be used when running tests.</p>
+<p>This method must be implemented in subclasses and return an engine
+instance to be used when running tests.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.tests.functional.db.test_migrations.TestModelsMigrations.get_metadata">
+<span class="sig-name descname"><span class="pre">get_metadata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#neutron.tests.functional.db.test_migrations.TestModelsMigrations.get_metadata" title="Link to this definition">¶</a></dt>
+<dd><p>Return the metadata instance to be used for schema comparison.</p>
+<p>This method must be implemented in subclasses and return the metadata
+instance attached to the BASE model.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.tests.functional.db.test_migrations.TestModelsMigrations.include_object">
+<span class="sig-name descname"><span class="pre">include_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reflected</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compare_to</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.tests.functional.db.test_migrations.TestModelsMigrations.include_object" title="Link to this definition">¶</a></dt>
+<dd><p>Return True for objects that should be compared.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>object</strong> – a SchemaItem object such as a Table or Column object</p></li>
+<li><p><strong>name</strong> – the name of the object</p></li>
+<li><p><strong>type</strong> – a string describing the type of object (e.g. “table”)</p></li>
+<li><p><strong>reflected</strong> – True if the given object was produced based on
+table reflection, False if it’s from a local
+MetaData object</p></li>
+<li><p><strong>compare_to</strong> – the object being compared against, if available,
+else None</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.tests.functional.db.test_migrations.TestModelsMigrations.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#neutron.tests.functional.db.test_migrations.TestModelsMigrations.setUp" title="Link to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="the-standard-attribute-table">
+<h2>The Standard Attribute Table<a class="headerlink" href="#the-standard-attribute-table" title="Link to this heading">¶</a></h2>
+<p>There are many attributes that we would like to store in the database which
+are common across many Neutron objects (e.g. tags, timestamps, rbac entries).
+We have previously been handling this by duplicating the schema to every table
+via model mixins. This means that a DB migration is required for each object
+that wants to adopt one of these common attributes. This becomes even more
+cumbersome when the relationship between the attribute and the object is
+many-to-one because each object then needs its own table for the attributes
+(assuming referential integrity is a concern).</p>
+<p>To address this issue, the ‘standardattribute’ table is available. Any model
+can add support for this table by inheriting the ‘HasStandardAttributes’ mixin
+in neutron.db.standard_attr. This mixin will add a standard_attr_id BigInteger
+column to the model with a foreign key relationship to the ‘standardattribute’
+table. The model will then be able to access any columns of the
+‘standardattribute’ table and any tables related to it.</p>
+<p>A model that inherits HasStandardAttributes must implement the property
+‘api_collections’, which is a list of API resources that the new object
+may appear under. In most cases, this will only be one (e.g. ‘ports’ for
+the Port model). This is used by all of the service plugins that add standard
+attribute fields to determine which API responses need to be populated.</p>
+<p>A model that supports tag mechanism must implement the property
+‘collection_resource_map’ which is a dict of ‘collection_name’ and
+‘resource_name’ for API resources. And also the model must implement
+‘tag_support’ with a value True.</p>
+<p>The introduction of a new standard attribute only requires one column addition
+to the ‘standardattribute’ table for one-to-one relationships or a new table
+for one-to-many or one-to-zero relationships. Then all of the models using the
+‘HasStandardAttribute’ mixin will automatically gain access to the new
+attribute.</p>
+<p>Any attributes that will apply to every neutron resource (e.g. timestamps)
+can be added directly to the ‘standardattribute’ table. For things that will
+frequently be NULL for most entries (e.g. a column to store an error reason),
+a new table should be added and joined to in a query to prevent a bunch of
+NULL entries in the database.</p>
+</section>
+<section id="session-handling">
+<h2>Session handling<a class="headerlink" href="#session-handling" title="Link to this heading">¶</a></h2>
+<p>The main information reference is in <a class="reference external" href="https://opendev.org/openstack/oslo.db/src/branch/master/doc/source/user/usage.rst">Usage</a>,
+that provides an initial picture of how to use oslo.db in Neutron. Any request
+call to the Neutron server API must have a “neutron_context” parameter, that is
+an instance of <a class="reference external" href="https://opendev.org/openstack/neutron-lib/src/tag/2.21.0/neutron_lib/context.py#L142">Context</a>.
+This context holds a <cite>sqlalchemy.orm.session.Session</cite> instance that “manages
+persistence operations for ORM-mapped objects” (from SQLAlchemy documentation).
+A <cite>Session</cite> establishes all conversations with the database and represents a
+“holding zone” for all loaded or associated objects during its lifespan.</p>
+<p>A <cite>Session</cite> instance establishes a transaction to the database using the
+defined <cite>Engine</cite>. This transaction represents an SQL transaction that is “a
+logical unit of work that contains one or more SQL statements”. Regardless of
+the number of statements this transaction may have, the execution is atomic; if
+the transaction fails, any previous SQL statement already executed that implies
+a change in the database is undone (rollback).</p>
+</section>
+<section id="database-transactions">
+<h2>Database transactions<a class="headerlink" href="#database-transactions" title="Link to this heading">¶</a></h2>
+<p>Any Neutron database operation, regardless of the type and the amount, should
+be executed inside a transaction. There are two type of transactions:</p>
+<ul class="simple">
+<li><p>Reader: for reading operations.</p></li>
+<li><p>Writer: for any operation that implies a change in the database, like a
+register creation, modification or deletion.</p></li>
+</ul>
+<p>The neutron-lib library provides an API wrapper for the oslo.db operations.
+The <cite>CONTEXT_READER</cite> and <cite>CONTEXT_WRITER</cite> context managers can be used both
+as decorators or context managers. For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">neutron_lib.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">api</span> <span class="k">as</span> <span class="n">db_api</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">neutron.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models_v2</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_ports</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">network_id</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">db_api</span><span class="o">.</span><span class="n">CONTEXT_READER</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">models_v2</span><span class="o">.</span><span class="n">Port</span><span class="p">)</span>
+        <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">models_v2</span><span class="o">.</span><span class="n">Port</span><span class="o">.</span><span class="n">network_id</span> <span class="o">==</span> <span class="n">network_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+<span class="nd">@db_api</span><span class="o">.</span><span class="n">CONTEXT_WRITER</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">delete_port</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">port_id</span><span class="p">)</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">models_v2</span><span class="o">.</span><span class="n">Port</span><span class="p">)</span>
+    <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">models_v2</span><span class="o">.</span><span class="n">Port</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">port_id</span><span class="p">)</span>
+    <span class="n">query</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The transaction contexts can be nested. For example, if inside a context a
+decorated method is called, the current transaction is preserved. There is only
+one exception on this rule: a reader context cannot be upgraded to writer. That
+means inside a reader context it is not possible to start a writer context. The
+following exception will be raised:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ne">TypeError</span><span class="p">:</span> <span class="n">Can</span><span class="s1">&#39;t upgrade a READER transaction to a WRITER mid-transaction</span>
+</pre></div>
+</div>
+<p>Another consideration that must be taken when implementing/reviewing new code
+is that, as commented before, a transaction is an atomic operation on the
+database. If the database layer (SQLAlchemy, oslo.db) returns a database
+exception, the current active transaction should end. In other words, we can
+catch, if needed, the exception raised and retry any needed operation, but any
+further database command should be executed in a new context. This is needed to
+allow the context wrapper (writer, reader) to properly finish the operation,
+for example rolling back the already executed commands. Check the patch
+<a class="reference external" href="https://review.opendev.org/c/openstack/neutron/+/843263">https://review.opendev.org/c/openstack/neutron/+/843263</a> as an example of
+how to handle database exceptions.</p>
+</section>
+<section id="retry-decorators">
+<h2>Retry decorators<a class="headerlink" href="#retry-decorators" title="Link to this heading">¶</a></h2>
+<p>This is an appendix for
+<a class="reference internal" href="retries.html"><span class="doc">Retrying Operations</span></a></p>
+<p>This is also related to the previous section. The neutron-lib library provides
+a decorator called <cite>retry_if_session_inactive</cite> that can be used to retry
+any method if the context session is not active; in other words, there is no
+active transaction when the method is called. The session is retrieved from
+the “context” parameter passed into the method (it is a must to have this
+parameter in the method signature).</p>
+<p>This retry decorator can be used along with a transaction decorator but the
+retry decorator must be declared before the context one. If we first declare
+the database context (writer or reader) and then the retry decorator, the retry
+context would be always called from inside an active transaction making it
+useless. An example of a good implementation (first the retry decorator and
+then the reader one):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@db_api</span><span class="o">.</span><span class="n">retry_if_session_inactive</span><span class="p">()</span>
+<span class="nd">@db_api</span><span class="o">.</span><span class="n">CONTEXT_READER</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_ports_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_ports_query</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">filters</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="code_profiling.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Code Profiling"></i></a>
+          
+          
+            <a href="db_models.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Database Models Relocation"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2024-11-05 13:27:15</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Contributor Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#basic-information">Basic Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-policies">Neutron Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#gerrit-rechecks">Gerrit Rechecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-stadium">Neutron Stadium</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#neutron-internals">Neutron Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#ovn-driver">OVN Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#dashboards">Dashboards</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Database Layer</a><ul>
+<li><a class="reference internal" href="#difference-between-default-and-server-default-parameters-for-columns">Difference between ‘default’ and ‘server_default’ parameters for columns</a></li>
+<li><a class="reference internal" href="#database-migrations">Database migrations</a></li>
+<li><a class="reference internal" href="#module-neutron.tests.functional.db.test_migrations">Tests to verify that database migrations and models are in sync</a><ul>
+<li><a class="reference internal" href="#neutron.tests.functional.db.test_migrations.TestModelsMigrations"><code class="docutils literal notranslate"><span class="pre">TestModelsMigrations</span></code></a><ul>
+<li><a class="reference internal" href="#neutron.tests.functional.db.test_migrations.TestModelsMigrations.db_sync"><code class="docutils literal notranslate"><span class="pre">TestModelsMigrations.db_sync()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.tests.functional.db.test_migrations.TestModelsMigrations.filter_metadata_diff"><code class="docutils literal notranslate"><span class="pre">TestModelsMigrations.filter_metadata_diff()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.tests.functional.db.test_migrations.TestModelsMigrations.get_engine"><code class="docutils literal notranslate"><span class="pre">TestModelsMigrations.get_engine()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.tests.functional.db.test_migrations.TestModelsMigrations.get_metadata"><code class="docutils literal notranslate"><span class="pre">TestModelsMigrations.get_metadata()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.tests.functional.db.test_migrations.TestModelsMigrations.include_object"><code class="docutils literal notranslate"><span class="pre">TestModelsMigrations.include_object()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.tests.functional.db.test_migrations.TestModelsMigrations.setUp"><code class="docutils literal notranslate"><span class="pre">TestModelsMigrations.setUp()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-standard-attribute-table">The Standard Attribute Table</a></li>
+<li><a class="reference internal" href="#session-handling">Session handling</a></li>
+<li><a class="reference internal" href="#database-transactions">Database transactions</a></li>
+<li><a class="reference internal" href="#retry-decorators">Retry decorators</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "contributor/internals/db_layer" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Database Layer in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2024-11-05 13:27:15";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "contributor/internals/db_layer";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

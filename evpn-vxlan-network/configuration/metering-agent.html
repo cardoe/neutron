@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Neutron Metering system &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/support-matrix.css?v=ac26a930" />
+    <script src="../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Policy Reference" href="policy.html" />
+    <link rel="prev" title="metadata_agent.ini" href="metadata-agent.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/configuration/metering-agent.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Neutron Metering system</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="metadata-agent.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: metadata_agent.ini"></i></a>
+    
+    
+    <a href="policy.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Policy Reference"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="neutron-metering-system">
+<h1>Neutron Metering system<a class="headerlink" href="#neutron-metering-system" title="Link to this heading">¶</a></h1>
+<p>The Neutron metering service enables operators to account the traffic in/out
+of the OpenStack environment. The concept is quite simple, operators can
+create metering labels, and decide if the labels are applied to all projects
+(tenants) or if they are applied to a specific one. Then, the operator needs
+to create traffic rules in the metering labels. The traffic rules are used
+to match traffic in/out of the OpenStack environment, and the accounting of
+packets and bytes is sent to the notification queue for further processing
+by Ceilometer (or some other system that is consuming that queue). The
+message sent in the queue is of type <code class="docutils literal notranslate"><span class="pre">event</span></code>. Therefore, it requires an
+event processing configuration to be added/enabled in Ceilometer.</p>
+<p>The metering agent has the following configurations:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">driver</span></code>: the driver used to implement the metering rules. The default
+is <code class="docutils literal notranslate"><span class="pre">neutron.services.metering.drivers.noop</span></code>, which means, we do not
+execute anything in the networking host. The only driver implemented so far
+is <code class="docutils literal notranslate"><span class="pre">neutron.services.metering.drivers.iptables.iptables_driver.IptablesMeteringDriver</span></code>.
+Therefore, only <code class="docutils literal notranslate"><span class="pre">iptables</span></code> is supported so far;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">measure_interval</span></code>: the interval in seconds used to gather the bytes and
+packets information from the network plane. The default value is <code class="docutils literal notranslate"><span class="pre">30</span></code>
+seconds;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">report_interval</span></code>: the interval in seconds used to generated the report
+(message) of the data that is gathered. The default value is <code class="docutils literal notranslate"><span class="pre">300</span></code>
+seconds.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">granular_traffic_data</span></code>: Defines if the metering agent driver should
+present traffic data in a granular fashion, instead of grouping all of the
+traffic data for all projects and routers where the labels were assigned
+to. The default value is <code class="docutils literal notranslate"><span class="pre">False</span></code> for backward compatibility.</p></li>
+</ul>
+<section id="non-granular-traffic-messages">
+<h2>Non-granular traffic messages<a class="headerlink" href="#non-granular-traffic-messages" title="Link to this heading">¶</a></h2>
+<p>The non-granular (<code class="docutils literal notranslate"><span class="pre">granular_traffic_data</span> <span class="pre">=</span> <span class="pre">False</span></code>) traffic messages (here
+also called as legacy) have the following format; bear in mind that if labels
+are shared, then the counters are for all routers of all projects where the
+labels were applied.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w"> </span><span class="nt">&quot;pkts&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;the number of packets that matched the rules of the labels&gt;&quot;</span><span class="p">,</span>
+<span class="w"> </span><span class="nt">&quot;bytes&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;the number of bytes that matched the rules of the labels&gt;&quot;</span><span class="p">,</span>
+<span class="w"> </span><span class="nt">&quot;time&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;seconds between the first data collection and the last one&gt;&quot;</span><span class="p">,</span>
+<span class="w"> </span><span class="nt">&quot;first_update&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;timeutils.utcnow_ts() of the first collection&quot;</span><span class="p">,</span>
+<span class="w"> </span><span class="nt">&quot;last_update&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;timeutils.utcnow_ts() of the last collection&quot;</span><span class="p">,</span>
+<span class="w"> </span><span class="nt">&quot;host&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;neutron metering agent host name&gt;&quot;</span><span class="p">,</span>
+<span class="w"> </span><span class="nt">&quot;label_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;the label id&gt;&quot;</span><span class="p">,</span>
+<span class="w"> </span><span class="nt">&quot;tenant_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;the tenant id&gt;&quot;</span>
+<span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">first_update</span></code> and <code class="docutils literal notranslate"><span class="pre">last_update</span></code> timestamps represent the moment
+when the first and last data collection happened within the report interval.
+On the other hand, the <code class="docutils literal notranslate"><span class="pre">time</span></code> represents the difference between those two
+timestamp.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">tenant_id</span></code> is only consistent when labels are not shared. Otherwise,
+they will contain the project id of the last router of the last project
+processed when the agent is started up. In other words, it is better not
+use it when dealing with shared labels.</p>
+<p>All of the messages generated in this configuration mode are sent to the
+message bus as <code class="docutils literal notranslate"><span class="pre">l3.meter</span></code> events.</p>
+</section>
+<section id="granular-traffic-messages">
+<h2>Granular traffic messages<a class="headerlink" href="#granular-traffic-messages" title="Link to this heading">¶</a></h2>
+<p>The granular (<code class="docutils literal notranslate"><span class="pre">granular_traffic_data</span> <span class="pre">=</span> <span class="pre">True</span></code>) traffic messages allow
+operators to obtain granular information for shared metering labels.
+Therefore, a single label, when configured as <code class="docutils literal notranslate"><span class="pre">shared=True</span></code> and applied in
+all projects/routers of the environment, it will generate data in a granular
+fashion.</p>
+<p>It (the metering agent) will account the traffic counter data in the
+following granularities.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">label</span></code> – all of the traffic counter for a given label. One must bear
+in mind that a label can be assigned to multiple routers. Therefore, this
+granularity represents all aggregation for all data for all routers of all
+projects where the label has been applied.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">router</span></code> – all of the traffic counter for all labels that are assigned to
+the router.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">project</span></code> – all of the traffic counters for all labels of all routers that
+a project has.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">router-label</span></code> – all of the traffic counters for a router and the given
+label.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">project-label</span></code> – all of the traffic counters for all routers of a project
+that have a given label.</p></li>
+</ul>
+<p>Each granularity presented here is sent to the message bus with different
+events types that vary according to the granularity. The mapping between
+granularity and event type is presented as follows.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">label</span></code> – event type <code class="docutils literal notranslate"><span class="pre">l3.meter.label</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">router</span></code> – event type <code class="docutils literal notranslate"><span class="pre">l3.meter.router</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">project</span></code> – event type <code class="docutils literal notranslate"><span class="pre">l3.meter.project</span></code>..</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">router-label</span></code> – event type <code class="docutils literal notranslate"><span class="pre">l3.meter.label_router</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">project-label</span></code> – event type <code class="docutils literal notranslate"><span class="pre">l3.meter.label_project</span></code>.</p></li>
+</ul>
+<p>Furthermore, we have metadata that is appended to the messages depending on
+the granularity. As follows we present the mapping between the granularities
+and the metadata that will be available.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">label</span></code>, <code class="docutils literal notranslate"><span class="pre">router-label</span></code>, and <code class="docutils literal notranslate"><span class="pre">project-label</span></code> granularities – have the
+metadata <code class="docutils literal notranslate"><span class="pre">label_id</span></code>, <code class="docutils literal notranslate"><span class="pre">label_name</span></code>, <code class="docutils literal notranslate"><span class="pre">label_shared</span></code>, <code class="docutils literal notranslate"><span class="pre">project_id</span></code> (if
+shared, this value will come with <code class="docutils literal notranslate"><span class="pre">all</span></code> for the <code class="docutils literal notranslate"><span class="pre">label</span></code> granularity), and
+<code class="docutils literal notranslate"><span class="pre">router_id</span></code> (only for <code class="docutils literal notranslate"><span class="pre">router-label</span></code> granularity).</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">router</span></code> granularity – has the <code class="docutils literal notranslate"><span class="pre">router_id</span></code> and <code class="docutils literal notranslate"><span class="pre">project_id</span></code>
+metadata.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">project</span></code> granularity only has the <code class="docutils literal notranslate"><span class="pre">project_id</span></code> metadata.</p></li>
+</ul>
+<p>The message will also contain some attributes that can be found in the
+legacy mode such as <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">pkts</span></code>, <code class="docutils literal notranslate"><span class="pre">time</span></code>, <code class="docutils literal notranslate"><span class="pre">first_update</span></code>,
+<code class="docutils literal notranslate"><span class="pre">last_update</span></code>, and <code class="docutils literal notranslate"><span class="pre">host</span></code>. As follows we present an example of JSON message
+with all of the possible attributes.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;resource_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;router-f0f745d9a59c47fdbbdd187d718f9e41-label-00c714f1-49c8-462c-8f5d-f05f21e035c7&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;project_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;f0f745d9a59c47fdbbdd187d718f9e41&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;first_update&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1591058790</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;bytes&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;label_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;00c714f1-49c8-462c-8f5d-f05f21e035c7&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;label_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;test1&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;last_update&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1591059037</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;host&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;hostname&gt;&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;time&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">247</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;pkts&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;label_shared&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">resource_id</span></code> is a unique identified for the “resource” being
+monitored. Here we consider a resource to be any of the granularities that
+we handle.</p>
+</section>
+<section id="sample-of-metering-agent-ini">
+<h2>Sample of metering_agent.ini<a class="headerlink" href="#sample-of-metering-agent-ini" title="Link to this heading">¶</a></h2>
+<p>As follows we present all of the possible configuration one can use in the
+metering agent init file.</p>
+<section id="default">
+<span id="DEFAULT"></span><h3>DEFAULT<a class="headerlink" href="#default" title="Link to this heading">¶</a></h3>
+</section>
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.debug">
+<span class="sig-name descname"><span class="pre">debug</span></span><a class="headerlink" href="#DEFAULT.debug" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+<dt class="field-odd">Mutable<span class="colon">:</span></dt>
+<dd class="field-odd"><p>This option can be changed without restarting.</p>
+</dd>
+</dl>
+<p>If set to true, the logging level will be set to DEBUG instead of the default INFO level.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.log_config_append">
+<span class="sig-name descname"><span class="pre">log_config_append</span></span><a class="headerlink" href="#DEFAULT.log_config_append" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">&lt;None&gt;</span></code></p>
+</dd>
+<dt class="field-odd">Mutable<span class="colon">:</span></dt>
+<dd class="field-odd"><p>This option can be changed without restarting.</p>
+</dd>
+</dl>
+<p>The name of a logging configuration file. This file is appended to any existing logging configuration files. For details about logging configuration files, see the Python logging module documentation. Note that when logging configuration files are used then all logging configuration is set in the configuration file and other logging configuration options are ignored (for example, log-date-format).</p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Deprecated Variations</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Group</p></th>
+<th class="head"><p>Name</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DEFAULT</p></td>
+<td><p>log-config</p></td>
+</tr>
+<tr class="row-odd"><td><p>DEFAULT</p></td>
+<td><p>log_config</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.log_date_format">
+<span class="sig-name descname"><span class="pre">log_date_format</span></span><a class="headerlink" href="#DEFAULT.log_date_format" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">%Y-%m-%d</span> <span class="pre">%H:%M:%S</span></code></p>
+</dd>
+</dl>
+<p>Defines the format string for %(asctime)s in log records. Default: the value above . This option is ignored if log_config_append is set.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.log_file">
+<span class="sig-name descname"><span class="pre">log_file</span></span><a class="headerlink" href="#DEFAULT.log_file" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">&lt;None&gt;</span></code></p>
+</dd>
+</dl>
+<p>(Optional) Name of log file to send logging output to. If no default is set, logging will go to stderr as defined by use_stderr. This option is ignored if log_config_append is set.</p>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-text">Deprecated Variations</span><a class="headerlink" href="#id2" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Group</p></th>
+<th class="head"><p>Name</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DEFAULT</p></td>
+<td><p>logfile</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.log_dir">
+<span class="sig-name descname"><span class="pre">log_dir</span></span><a class="headerlink" href="#DEFAULT.log_dir" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">&lt;None&gt;</span></code></p>
+</dd>
+</dl>
+<p>(Optional) The base directory used for relative log_file  paths. This option is ignored if log_config_append is set.</p>
+<table class="docutils align-default" id="id3">
+<caption><span class="caption-text">Deprecated Variations</span><a class="headerlink" href="#id3" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Group</p></th>
+<th class="head"><p>Name</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DEFAULT</p></td>
+<td><p>logdir</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.watch_log_file">
+<span class="sig-name descname"><span class="pre">watch_log_file</span></span><a class="headerlink" href="#DEFAULT.watch_log_file" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Uses logging handler designed to watch file system. When log file is moved or removed this handler will open a new log file with specified path instantaneously. It makes sense only if log_file option is specified and Linux platform is used. This option is ignored if log_config_append is set.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This option is deprecated for removal.
+Its value may be silently ignored 
+in the future.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Reason<span class="colon">:</span></dt>
+<dd class="field-odd"><p>This function is known to have bene broken for long time, and depends on the unmaintained library</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.use_syslog">
+<span class="sig-name descname"><span class="pre">use_syslog</span></span><a class="headerlink" href="#DEFAULT.use_syslog" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Use syslog for logging. Existing syslog format is DEPRECATED and will be changed later to honor RFC5424. This option is ignored if log_config_append is set.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.use_journal">
+<span class="sig-name descname"><span class="pre">use_journal</span></span><a class="headerlink" href="#DEFAULT.use_journal" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Enable journald for logging. If running in a systemd environment you may wish to enable journal support. Doing so will use the journal native protocol which includes structured metadata in addition to log messages.This option is ignored if log_config_append is set.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.syslog_log_facility">
+<span class="sig-name descname"><span class="pre">syslog_log_facility</span></span><a class="headerlink" href="#DEFAULT.syslog_log_facility" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">LOG_USER</span></code></p>
+</dd>
+</dl>
+<p>Syslog facility to receive log lines. This option is ignored if log_config_append is set.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.use_json">
+<span class="sig-name descname"><span class="pre">use_json</span></span><a class="headerlink" href="#DEFAULT.use_json" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Use JSON formatting for logging. This option is ignored if log_config_append is set.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.use_stderr">
+<span class="sig-name descname"><span class="pre">use_stderr</span></span><a class="headerlink" href="#DEFAULT.use_stderr" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Log output to standard error. This option is ignored if log_config_append is set.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.log_color">
+<span class="sig-name descname"><span class="pre">log_color</span></span><a class="headerlink" href="#DEFAULT.log_color" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>(Optional) Set the ‘color’ key according to log levels. This option takes effect only when logging to stderr or stdout is used. This option is ignored if log_config_append is set.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.log_rotate_interval">
+<span class="sig-name descname"><span class="pre">log_rotate_interval</span></span><a class="headerlink" href="#DEFAULT.log_rotate_interval" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p>
+</dd>
+</dl>
+<p>The amount of time before the log files are rotated. This option is ignored unless log_rotation_type is set to “interval”.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.log_rotate_interval_type">
+<span class="sig-name descname"><span class="pre">log_rotate_interval_type</span></span><a class="headerlink" href="#DEFAULT.log_rotate_interval_type" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">days</span></code></p>
+</dd>
+<dt class="field-odd">Valid Values<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Seconds, Minutes, Hours, Days, Weekday, Midnight</p>
+</dd>
+</dl>
+<p>Rotation interval type. The time of the last file change (or the time when the service was started) is used when scheduling the next rotation.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.max_logfile_count">
+<span class="sig-name descname"><span class="pre">max_logfile_count</span></span><a class="headerlink" href="#DEFAULT.max_logfile_count" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">30</span></code></p>
+</dd>
+</dl>
+<p>Maximum number of rotated log files.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.max_logfile_size_mb">
+<span class="sig-name descname"><span class="pre">max_logfile_size_mb</span></span><a class="headerlink" href="#DEFAULT.max_logfile_size_mb" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">200</span></code></p>
+</dd>
+</dl>
+<p>Log file maximum size in MB. This option is ignored if “log_rotation_type” is not set to “size”.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.log_rotation_type">
+<span class="sig-name descname"><span class="pre">log_rotation_type</span></span><a class="headerlink" href="#DEFAULT.log_rotation_type" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">none</span></code></p>
+</dd>
+<dt class="field-odd">Valid Values<span class="colon">:</span></dt>
+<dd class="field-odd"><p>interval, size, none</p>
+</dd>
+</dl>
+<p>Log rotation type.</p>
+<p class="rubric">Possible values</p>
+<dl class="simple">
+<dt>interval</dt><dd><p>Rotate logs at predefined time intervals.</p>
+</dd>
+<dt>size</dt><dd><p>Rotate logs once they reach a predefined size.</p>
+</dd>
+<dt>none</dt><dd><p>Do not rotate log files.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.logging_context_format_string">
+<span class="sig-name descname"><span class="pre">logging_context_format_string</span></span><a class="headerlink" href="#DEFAULT.logging_context_format_string" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">%(asctime)s.%(msecs)03d</span> <span class="pre">%(process)d</span> <span class="pre">%(levelname)s</span> <span class="pre">%(name)s</span> <span class="pre">[%(global_request_id)s</span> <span class="pre">%(request_id)s</span> <span class="pre">%(user_identity)s]</span> <span class="pre">%(instance)s%(message)s</span></code></p>
+</dd>
+</dl>
+<p>Format string to use for log messages with context. Used by oslo_log.formatters.ContextFormatter</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.logging_default_format_string">
+<span class="sig-name descname"><span class="pre">logging_default_format_string</span></span><a class="headerlink" href="#DEFAULT.logging_default_format_string" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">%(asctime)s.%(msecs)03d</span> <span class="pre">%(process)d</span> <span class="pre">%(levelname)s</span> <span class="pre">%(name)s</span> <span class="pre">[-]</span> <span class="pre">%(instance)s%(message)s</span></code></p>
+</dd>
+</dl>
+<p>Format string to use for log messages when context is undefined. Used by oslo_log.formatters.ContextFormatter</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.logging_debug_format_suffix">
+<span class="sig-name descname"><span class="pre">logging_debug_format_suffix</span></span><a class="headerlink" href="#DEFAULT.logging_debug_format_suffix" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">%(funcName)s</span> <span class="pre">%(pathname)s:%(lineno)d</span></code></p>
+</dd>
+</dl>
+<p>Additional data to append to log message when logging level for the message is DEBUG. Used by oslo_log.formatters.ContextFormatter</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.logging_exception_prefix">
+<span class="sig-name descname"><span class="pre">logging_exception_prefix</span></span><a class="headerlink" href="#DEFAULT.logging_exception_prefix" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">%(asctime)s.%(msecs)03d</span> <span class="pre">%(process)d</span> <span class="pre">ERROR</span> <span class="pre">%(name)s</span> <span class="pre">%(instance)s</span></code></p>
+</dd>
+</dl>
+<p>Prefix each line of exception output with this format. Used by oslo_log.formatters.ContextFormatter</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.logging_user_identity_format">
+<span class="sig-name descname"><span class="pre">logging_user_identity_format</span></span><a class="headerlink" href="#DEFAULT.logging_user_identity_format" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">%(user)s</span> <span class="pre">%(project)s</span> <span class="pre">%(domain)s</span> <span class="pre">%(system_scope)s</span> <span class="pre">%(user_domain)s</span> <span class="pre">%(project_domain)s</span></code></p>
+</dd>
+</dl>
+<p>Defines the format string for %(user_identity)s that is used in logging_context_format_string. Used by oslo_log.formatters.ContextFormatter</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.default_log_levels">
+<span class="sig-name descname"><span class="pre">default_log_levels</span></span><a class="headerlink" href="#DEFAULT.default_log_levels" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">['amqp=WARN',</span> <span class="pre">'amqplib=WARN',</span> <span class="pre">'boto=WARN',</span> <span class="pre">'qpid=WARN',</span> <span class="pre">'sqlalchemy=WARN',</span> <span class="pre">'suds=INFO',</span> <span class="pre">'oslo.messaging=INFO',</span> <span class="pre">'oslo_messaging=INFO',</span> <span class="pre">'iso8601=WARN',</span> <span class="pre">'requests.packages.urllib3.connectionpool=WARN',</span> <span class="pre">'urllib3.connectionpool=WARN',</span> <span class="pre">'websocket=WARN',</span> <span class="pre">'requests.packages.urllib3.util.retry=WARN',</span> <span class="pre">'urllib3.util.retry=WARN',</span> <span class="pre">'keystonemiddleware=WARN',</span> <span class="pre">'routes.middleware=WARN',</span> <span class="pre">'stevedore=WARN',</span> <span class="pre">'taskflow=WARN',</span> <span class="pre">'keystoneauth=WARN',</span> <span class="pre">'oslo.cache=INFO',</span> <span class="pre">'oslo_policy=INFO',</span> <span class="pre">'dogpile.core.dogpile=INFO']</span></code></p>
+</dd>
+</dl>
+<p>List of package logging levels in logger=LEVEL pairs. This option is ignored if log_config_append is set.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.publish_errors">
+<span class="sig-name descname"><span class="pre">publish_errors</span></span><a class="headerlink" href="#DEFAULT.publish_errors" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Enables or disables publication of error events.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.instance_format">
+<span class="sig-name descname"><span class="pre">instance_format</span></span><a class="headerlink" href="#DEFAULT.instance_format" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">&quot;[instance:</span> <span class="pre">%(uuid)s]</span> <span class="pre">&quot;</span></code></p>
+</dd>
+</dl>
+<p>The format for an instance that is passed with the log message.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.instance_uuid_format">
+<span class="sig-name descname"><span class="pre">instance_uuid_format</span></span><a class="headerlink" href="#DEFAULT.instance_uuid_format" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">&quot;[instance:</span> <span class="pre">%(uuid)s]</span> <span class="pre">&quot;</span></code></p>
+</dd>
+</dl>
+<p>The format for an instance UUID that is passed with the log message.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.rate_limit_interval">
+<span class="sig-name descname"><span class="pre">rate_limit_interval</span></span><a class="headerlink" href="#DEFAULT.rate_limit_interval" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p>
+</dd>
+</dl>
+<p>Interval, number of seconds, of log rate limiting.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.rate_limit_burst">
+<span class="sig-name descname"><span class="pre">rate_limit_burst</span></span><a class="headerlink" href="#DEFAULT.rate_limit_burst" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p>
+</dd>
+</dl>
+<p>Maximum number of logged messages per rate_limit_interval.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.rate_limit_except_level">
+<span class="sig-name descname"><span class="pre">rate_limit_except_level</span></span><a class="headerlink" href="#DEFAULT.rate_limit_except_level" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">CRITICAL</span></code></p>
+</dd>
+<dt class="field-odd">Valid Values<span class="colon">:</span></dt>
+<dd class="field-odd"><p>CRITICAL, ERROR, INFO, WARNING, DEBUG, ‘’</p>
+</dd>
+</dl>
+<p>Log level name used by rate limiting. Logs with level greater or equal to rate_limit_except_level are not filtered. An empty string means that all levels are filtered.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.fatal_deprecations">
+<span class="sig-name descname"><span class="pre">fatal_deprecations</span></span><a class="headerlink" href="#DEFAULT.fatal_deprecations" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Enables or disables fatal status of deprecations.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.ovs_use_veth">
+<span class="sig-name descname"><span class="pre">ovs_use_veth</span></span><a class="headerlink" href="#DEFAULT.ovs_use_veth" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Uses veth for an OVS interface or not. Support kernels with limited namespace support (e.g. RHEL 6.5) and rate limiting on router’s gateway port so long as ovs_use_veth is set to True.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.interface_driver">
+<span class="sig-name descname"><span class="pre">interface_driver</span></span><a class="headerlink" href="#DEFAULT.interface_driver" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">openvswitch</span></code></p>
+</dd>
+</dl>
+<p>The driver used to manage virtual interfaces.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.rpc_response_max_timeout">
+<span class="sig-name descname"><span class="pre">rpc_response_max_timeout</span></span><a class="headerlink" href="#DEFAULT.rpc_response_max_timeout" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">600</span></code></p>
+</dd>
+</dl>
+<p>Maximum seconds to wait for a response from an RPC call.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.driver">
+<span class="sig-name descname"><span class="pre">driver</span></span><a class="headerlink" href="#DEFAULT.driver" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">neutron.services.metering.drivers.noop.noop_driver.NoopMeteringDriver</span></code></p>
+</dd>
+</dl>
+<p>Metering driver</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.measure_interval">
+<span class="sig-name descname"><span class="pre">measure_interval</span></span><a class="headerlink" href="#DEFAULT.measure_interval" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">30</span></code></p>
+</dd>
+</dl>
+<p>Interval between two metering measures</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.report_interval">
+<span class="sig-name descname"><span class="pre">report_interval</span></span><a class="headerlink" href="#DEFAULT.report_interval" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">300</span></code></p>
+</dd>
+</dl>
+<p>Interval between two metering reports</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="DEFAULT.granular_traffic_data">
+<span class="sig-name descname"><span class="pre">granular_traffic_data</span></span><a class="headerlink" href="#DEFAULT.granular_traffic_data" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Defines if the metering agent driver should present traffic data in a granular fashion, instead of grouping all of the traffic data for all projects and routers where the labels were assigned to. The default value is <cite>False</cite> for backward compatibility.</p>
+</dd></dl>
+
+<section id="agent">
+<span id="agent"></span><h3>agent<a class="headerlink" href="#agent" title="Link to this heading">¶</a></h3>
+</section>
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="agent.report_interval">
+<span class="sig-name descname"><span class="pre">report_interval</span></span><a class="headerlink" href="#agent.report_interval" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>floating point</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">30</span></code></p>
+</dd>
+</dl>
+<p>Seconds between nodes reporting state to server; should be less than agent_down_time, best if it is half or less than agent_down_time.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="agent.log_agent_heartbeats">
+<span class="sig-name descname"><span class="pre">log_agent_heartbeats</span></span><a class="headerlink" href="#agent.log_agent_heartbeats" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Log agent heartbeats</p>
+</dd></dl>
+
+<section id="ovs">
+<span id="ovs"></span><h3>ovs<a class="headerlink" href="#ovs" title="Link to this heading">¶</a></h3>
+</section>
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="ovs.ovsdb_connection">
+<span class="sig-name descname"><span class="pre">ovsdb_connection</span></span><a class="headerlink" href="#ovs.ovsdb_connection" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">tcp:127.0.0.1:6640</span></code></p>
+</dd>
+</dl>
+<p>The connection string for the OVSDB backend. Will be used for all OVSDB commands and by ovsdb-client when monitoring</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="ovs.ssl_key_file">
+<span class="sig-name descname"><span class="pre">ssl_key_file</span></span><a class="headerlink" href="#ovs.ssl_key_file" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">&lt;None&gt;</span></code></p>
+</dd>
+</dl>
+<p>The SSL private key file to use when interacting with OVSDB. Required when using an “ssl:” prefixed ovsdb_connection</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="ovs.ssl_cert_file">
+<span class="sig-name descname"><span class="pre">ssl_cert_file</span></span><a class="headerlink" href="#ovs.ssl_cert_file" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">&lt;None&gt;</span></code></p>
+</dd>
+</dl>
+<p>The SSL certificate file to use when interacting with OVSDB. Required when using an “ssl:” prefixed ovsdb_connection</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="ovs.ssl_ca_cert_file">
+<span class="sig-name descname"><span class="pre">ssl_ca_cert_file</span></span><a class="headerlink" href="#ovs.ssl_ca_cert_file" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">&lt;None&gt;</span></code></p>
+</dd>
+</dl>
+<p>The Certificate Authority (CA) certificate to use when interacting with OVSDB. Required when using an “ssl:” prefixed ovsdb_connection</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="ovs.ovsdb_debug">
+<span class="sig-name descname"><span class="pre">ovsdb_debug</span></span><a class="headerlink" href="#ovs.ovsdb_debug" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Enable OVSDB debug logs</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="ovs.ovsdb_timeout">
+<span class="sig-name descname"><span class="pre">ovsdb_timeout</span></span><a class="headerlink" href="#ovs.ovsdb_timeout" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">10</span></code></p>
+</dd>
+</dl>
+<p>Timeout in seconds for OVSDB commands. If the timeout expires, OVSDB commands will fail with ALARMCLOCK error.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="ovs.bridge_mac_table_size">
+<span class="sig-name descname"><span class="pre">bridge_mac_table_size</span></span><a class="headerlink" href="#ovs.bridge_mac_table_size" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">50000</span></code></p>
+</dd>
+</dl>
+<p>The maximum number of MAC addresses to learn on a bridge managed by the Neutron OVS agent. Values outside a reasonable range (10 to 1,000,000) might be overridden by Open vSwitch according to the documentation.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="ovs.igmp_snooping_enable">
+<span class="sig-name descname"><span class="pre">igmp_snooping_enable</span></span><a class="headerlink" href="#ovs.igmp_snooping_enable" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Enable IGMP snooping for integration bridge. If this option is set to True, support for Internet Group Management Protocol (IGMP) is enabled in integration bridge.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="ovs.igmp_flood">
+<span class="sig-name descname"><span class="pre">igmp_flood</span></span><a class="headerlink" href="#ovs.igmp_flood" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>Multicast packets (except reports) are unconditionally forwarded to the ports bridging a logical network to a physical network.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="ovs.igmp_flood_reports">
+<span class="sig-name descname"><span class="pre">igmp_flood_reports</span></span><a class="headerlink" href="#ovs.igmp_flood_reports" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+</dd>
+</dl>
+<p>Multicast reports are unconditionally forwarded to the ports bridging a logical network to a physical network.</p>
+</dd></dl>
+
+<dl class="oslo.config option">
+<dt class="sig sig-object oslo.config" id="ovs.igmp_flood_unregistered">
+<span class="sig-name descname"><span class="pre">igmp_flood_unregistered</span></span><a class="headerlink" href="#ovs.igmp_flood_unregistered" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+<p>This option enables or disables flooding of unregistered multicast packets to all ports. If False, The switch will send unregistered multicast packets only to ports connected to multicast routers.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="metadata-agent.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: metadata_agent.ini"></i></a>
+          
+          
+            <a href="policy.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Policy Reference"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2023-07-03 09:21:28</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Configuration Guide</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="config.html">Configuration Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="policy.html">Policy Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="custom_policy_roles.html">Custom Policy Roles</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributor/index.html">Contributor Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Neutron Metering system</a><ul>
+<li><a class="reference internal" href="#non-granular-traffic-messages">Non-granular traffic messages</a></li>
+<li><a class="reference internal" href="#granular-traffic-messages">Granular traffic messages</a></li>
+<li><a class="reference internal" href="#sample-of-metering-agent-ini">Sample of metering_agent.ini</a><ul>
+<li><a class="reference internal" href="#default">DEFAULT</a></li>
+<li><a class="reference internal" href="#agent">agent</a></li>
+<li><a class="reference internal" href="#ovs">ovs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "configuration/metering-agent" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Neutron Metering system in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2023-07-03 09:21:28";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "configuration/metering-agent";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Reference architecture &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Provider networks" href="provider-networks.html" />
+    <link rel="prev" title="OpenStack and OVN Tutorial" href="../tutorial.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/admin/ovn/refarch/refarch.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Reference architecture</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="../tutorial.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: OpenStack and OVN Tutorial"></i></a>
+    
+    
+    <a href="provider-networks.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Provider networks"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="reference-architecture">
+<span id="refarch-refarch"></span><h1>Reference architecture<a class="headerlink" href="#reference-architecture" title="Link to this heading">¶</a></h1>
+<p>The reference architecture defines the minimum environment necessary
+to deploy OpenStack with Open Virtual Network (OVN) integration for
+the Networking service in production with sufficient expectations
+of scale and performance. For evaluation purposes, you can deploy this
+environment using the <a class="reference internal" href="../../../install/ovn/index.html"><span class="doc">Installation Guide</span></a> or
+<a class="reference external" href="https://github.com/openstack/neutron/tree/master/vagrant/ovn">Vagrant</a>.
+Any scaling or performance evaluations should use bare metal instead of
+virtual machines.</p>
+<section id="layout">
+<h2>Layout<a class="headerlink" href="#layout" title="Link to this heading">¶</a></h2>
+<p>The reference architecture includes a minimum of four nodes.</p>
+<p>The controller node contains the following components that provide enough
+functionality to launch basic instances:</p>
+<ul class="simple">
+<li><p>One network interface for management</p></li>
+<li><p>Identity service</p></li>
+<li><p>Image service</p></li>
+<li><p>Networking management with ML2 mechanism driver for OVN (control plane)</p></li>
+<li><p>Compute management (control plane)</p></li>
+</ul>
+<p>The database node contains the following components:</p>
+<ul class="simple">
+<li><p>One network interface for management</p></li>
+<li><p>OVN northbound service (<code class="docutils literal notranslate"><span class="pre">ovn-northd</span></code>)</p></li>
+<li><p>Open vSwitch (OVS) database service (<code class="docutils literal notranslate"><span class="pre">ovsdb-server</span></code>) for the OVN
+northbound database (<code class="docutils literal notranslate"><span class="pre">ovnnb.db</span></code>)</p></li>
+<li><p>Open vSwitch (OVS) database service (<code class="docutils literal notranslate"><span class="pre">ovsdb-server</span></code>) for the OVN
+southbound database (<code class="docutils literal notranslate"><span class="pre">ovnsb.db</span></code>)</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For functional evaluation only, you can combine the controller and
+database nodes.</p>
+</div>
+<p>The two compute nodes contain the following components:</p>
+<ul class="simple">
+<li><p>Two or three network interfaces for management, overlay networks, and
+optionally provider networks</p></li>
+<li><p>Compute management (hypervisor)</p></li>
+<li><p>Hypervisor (KVM)</p></li>
+<li><p>OVN controller service (<code class="docutils literal notranslate"><span class="pre">ovn-controller</span></code>)</p></li>
+<li><p>OVS data plane service (<code class="docutils literal notranslate"><span class="pre">ovs-vswitchd</span></code>)</p></li>
+<li><p>OVS database service (<code class="docutils literal notranslate"><span class="pre">ovsdb-server</span></code>) with OVS local configuration
+(<code class="docutils literal notranslate"><span class="pre">conf.db</span></code>) database</p></li>
+<li><p>OVN metadata agent (<code class="docutils literal notranslate"><span class="pre">ovn-metadata-agent</span></code>)</p></li>
+</ul>
+<p>The gateway nodes contain the following components:</p>
+<ul class="simple">
+<li><p>Three network interfaces for management, overlay networks and provider
+networks.</p></li>
+<li><p>OVN controller service (<code class="docutils literal notranslate"><span class="pre">ovn-controller</span></code>)</p></li>
+<li><p>OVS data plane service (<code class="docutils literal notranslate"><span class="pre">ovs-vswitchd</span></code>)</p></li>
+<li><p>OVS database service (<code class="docutils literal notranslate"><span class="pre">ovsdb-server</span></code>) with OVS local configuration
+(<code class="docutils literal notranslate"><span class="pre">conf.db</span></code>) database</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Each OVN metadata agent provides metadata service locally on the compute
+nodes in a lightweight way. Each network being accessed by the instances of
+the compute node will have a corresponding metadata ovnmeta-$net_uuid
+namespace, and inside an haproxy will funnel the requests to the
+ovn-metadata-agent over a unix socket.</p>
+<p>Such namespace can be very helpful for debug purposes to access the local
+instances on the compute node. If you login as root on such compute node
+you can execute:</p>
+<p>ip netns ovnmeta-$net_uuid exec ssh <a class="reference external" href="mailto:user&#37;&#52;&#48;my&#46;instance&#46;ip&#46;address">user<span>&#64;</span>my<span>&#46;</span>instance<span>&#46;</span>ip<span>&#46;</span>address</a></p>
+</div>
+<section id="hardware-layout">
+<h3>Hardware layout<a class="headerlink" href="#hardware-layout" title="Link to this heading">¶</a></h3>
+<img alt="Hardware layout" class="align-center" src="../../../_images/ovn-hw.png" />
+</section>
+<section id="service-layout">
+<h3>Service layout<a class="headerlink" href="#service-layout" title="Link to this heading">¶</a></h3>
+<img alt="Service layout" class="align-center" src="../../../_images/ovn-services.png" />
+</section>
+</section>
+<section id="networking-service-with-ovn-integration">
+<h2>Networking service with OVN integration<a class="headerlink" href="#networking-service-with-ovn-integration" title="Link to this heading">¶</a></h2>
+<p>The reference architecture deploys the Networking service with OVN
+integration as described in the following scenarios:</p>
+<img alt="Architecture for Networking service with OVN integration" class="align-center" src="../../../_images/ovn-architecture1.png" />
+<p>With ovn driver, all the E/W traffic which traverses a virtual
+router is completely distributed, going from compute to compute node
+without passing through the gateway nodes.</p>
+<p>N/S traffic that needs SNAT (without floating IPs) will always pass
+through the centralized gateway nodes, although, as soon as you
+have more than one gateway node ovn driver will make use of
+the HA capabilities of ovn.</p>
+<section id="centralized-floating-ips">
+<h3>Centralized Floating IPs<a class="headerlink" href="#centralized-floating-ips" title="Link to this heading">¶</a></h3>
+<p>In this architecture, all the N/S router traffic (snat and floating
+IPs) goes through the gateway nodes.</p>
+<p>The compute nodes don’t need connectivity to the external network,
+although it could be provided if we wanted to have direct connectivity
+to such network from some instances.</p>
+<p>For external connectivity, gateway nodes have to set <code class="docutils literal notranslate"><span class="pre">ovn-cms-options</span></code>
+with <code class="docutils literal notranslate"><span class="pre">enable-chassis-as-gw</span></code> in Open_vSwitch table’s external_ids column,
+for example:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ovs-vsctl<span class="w"> </span><span class="nb">set</span><span class="w"> </span>open<span class="w"> </span>.<span class="w"> </span>external-ids:ovn-cms-options<span class="o">=</span><span class="s2">&quot;enable-chassis-as-gw&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="distributed-floating-ips-dvr">
+<h3>Distributed Floating IPs (DVR)<a class="headerlink" href="#distributed-floating-ips-dvr" title="Link to this heading">¶</a></h3>
+<p>In this architecture, the floating IP N/S traffic flows directly
+from/to the compute nodes through the specific provider network
+bridge. In this case compute nodes need connectivity to the external
+network.</p>
+<p>Each compute node contains the following network components:</p>
+<img alt="Compute node network components" class="align-center" src="../../../_images/ovn-compute1.png" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The Networking service creates a unique network namespace for each
+virtual network that enables the metadata service.</p>
+</div>
+<p>Several external connections can be optionally created via provider
+bridges. Those can be used for direct vm connectivity to the specific
+networks or the use of distributed floating ips.</p>
+</section>
+</section>
+<section id="accessing-ovn-database-content">
+<span id="refarch-database-access"></span><h2>Accessing OVN database content<a class="headerlink" href="#accessing-ovn-database-content" title="Link to this heading">¶</a></h2>
+<p>OVN stores configuration data in a collection of OVS database tables.
+The following commands show the contents of the most common database
+tables in the northbound and southbound databases. The example database
+output in this section uses these commands with various output filters.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ovn-nbctl<span class="w"> </span>list<span class="w"> </span>Logical_Switch
+<span class="gp">$ </span>ovn-nbctl<span class="w"> </span>list<span class="w"> </span>Logical_Switch_Port
+<span class="gp">$ </span>ovn-nbctl<span class="w"> </span>list<span class="w"> </span>ACL
+<span class="gp">$ </span>ovn-nbctl<span class="w"> </span>list<span class="w"> </span>Address_Set
+<span class="gp">$ </span>ovn-nbctl<span class="w"> </span>list<span class="w"> </span>Logical_Router
+<span class="gp">$ </span>ovn-nbctl<span class="w"> </span>list<span class="w"> </span>Logical_Router_Port
+<span class="gp">$ </span>ovn-nbctl<span class="w"> </span>list<span class="w"> </span>Gateway_Chassis
+
+<span class="gp">$ </span>ovn-sbctl<span class="w"> </span>list<span class="w"> </span>Chassis
+<span class="gp">$ </span>ovn-sbctl<span class="w"> </span>list<span class="w"> </span>Encap
+<span class="gp">$ </span>ovn-nbctl<span class="w"> </span>list<span class="w"> </span>Address_Set
+<span class="gp">$ </span>ovn-sbctl<span class="w"> </span>lflow-list
+<span class="gp">$ </span>ovn-sbctl<span class="w"> </span>list<span class="w"> </span>Multicast_Group
+<span class="gp">$ </span>ovn-sbctl<span class="w"> </span>list<span class="w"> </span>Datapath_Binding
+<span class="gp">$ </span>ovn-sbctl<span class="w"> </span>list<span class="w"> </span>Port_Binding
+<span class="gp">$ </span>ovn-sbctl<span class="w"> </span>list<span class="w"> </span>MAC_Binding
+<span class="gp">$ </span>ovn-sbctl<span class="w"> </span>list<span class="w"> </span>Gateway_Chassis
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>By default, you must run these commands from the node containing
+the OVN databases.</p>
+</div>
+</section>
+<section id="adding-a-compute-node">
+<span id="refarch-adding-compute-node"></span><h2>Adding a compute node<a class="headerlink" href="#adding-a-compute-node" title="Link to this heading">¶</a></h2>
+<p>When you add a compute node to the environment, the OVN controller
+service on it connects to the OVN southbound database and registers
+the node as a chassis.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">_uuid               : 9be8639d-1d0b-4e3d-9070-03a655073871</span>
+<span class="go">encaps              : [2fcefdf4-a5e7-43ed-b7b2-62039cc7e32e]</span>
+<span class="go">external_ids        : {ovn-bridge-mappings=&quot;&quot;}</span>
+<span class="go">hostname            : &quot;compute1&quot;</span>
+<span class="go">name                : &quot;410ee302-850b-4277-8610-fa675d620cb7&quot;</span>
+<span class="go">vtep_logical_switches: []</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">encaps</span></code> field value refers to tunnel endpoint information
+for the compute node.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">_uuid               : 2fcefdf4-a5e7-43ed-b7b2-62039cc7e32e</span>
+<span class="go">ip                  : &quot;10.0.0.32&quot;</span>
+<span class="go">options             : {}</span>
+<span class="go">type                : geneve</span>
+</pre></div>
+</div>
+</section>
+<section id="security-groups-rules">
+<h2>Security Groups/Rules<a class="headerlink" href="#security-groups-rules" title="Link to this heading">¶</a></h2>
+<p>When a Neutron Security Group is created, the equivalent Port Group in OVN
+(pg-&lt;security_group_id&gt; is created). This Port Group references Neutron SG id
+in its external_ids column.</p>
+<p>When a Neutron Port is created, the equivalent Logical Port in OVN is added to
+those Port Groups associated to the Neutron Security Groups this port belongs
+to.</p>
+<p>When a Neutron Port is deleted, the associated Logical Port in OVN is deleted.
+Since the schema includes a weak reference to the port, when the LSP gets
+deleted, it is automatically deleted from any Port Group entry where it was
+previously present.</p>
+<p>Every time a security group rule is created, instead of figuring out the ports
+affected by its SG and inserting an ACL row which will be referenced by
+different Logical Switches, we just reference it from the associated
+Port Group.</p>
+<section id="ovn-operations">
+<h3>OVN operations<a class="headerlink" href="#ovn-operations" title="Link to this heading">¶</a></h3>
+<ol class="arabic">
+<li><p>Creating a security group will cause the OVN mechanism driver to create
+a port group in the Port_Group table of the northbound DB:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">_uuid               : e96c5994-695d-4b9c-a17b-c7375ad281e2</span>
+<span class="go">acls                : [33c3c2d0-bc7b-421b-ace9-10884851521a, c22170ec-da5d-4a59-b118-f7f0e370ebc4]</span>
+<span class="go">external_ids        : {&quot;neutron:security_group_id&quot;=&quot;ccbeffee-7b98-4b6f-adf7-d42027ca6447&quot;}</span>
+<span class="go">name                : pg_ccbeffee_7b98_4b6f_adf7_d42027ca6447</span>
+<span class="go">ports               : []</span>
+</pre></div>
+</div>
+<p>And it also creates the default ACLs for egress traffic in the ACL table of
+the northbound DB:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">_uuid               : 33c3c2d0-bc7b-421b-ace9-10884851521a</span>
+<span class="go">action              : allow-related</span>
+<span class="go">direction           : from-lport</span>
+<span class="go">external_ids        : {&quot;neutron:security_group_rule_id&quot;=&quot;655b0d7e-144e-4bd8-9243-10a261b91041&quot;}</span>
+<span class="go">log                 : false</span>
+<span class="go">match               : &quot;inport == @pg_ccbeffee_7b98_4b6f_adf7_d42027ca6447 &amp;&amp; ip4&quot;</span>
+<span class="go">meter               : []</span>
+<span class="go">name                : []</span>
+<span class="go">priority            : 1002</span>
+<span class="go">severity            : []</span>
+
+<span class="go">_uuid               : c22170ec-da5d-4a59-b118-f7f0e370ebc4</span>
+<span class="go">action              : allow-related</span>
+<span class="go">direction           : from-lport</span>
+<span class="go">external_ids        : {&quot;neutron:security_group_rule_id&quot;=&quot;a303a34f-5f19-494f-a9e2-e23f246bfcad&quot;}</span>
+<span class="go">log                 : false</span>
+<span class="go">match               : &quot;inport == @pg_ccbeffee_7b98_4b6f_adf7_d42027ca6447 &amp;&amp; ip6&quot;</span>
+<span class="go">meter               : []</span>
+<span class="go">name                : []</span>
+<span class="go">priority            : 1002</span>
+<span class="go">severity            : []</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="ports-with-no-security-groups">
+<h3>Ports with no security groups<a class="headerlink" href="#ports-with-no-security-groups" title="Link to this heading">¶</a></h3>
+<p>When a port doesn’t belong to any Security Group and port security is enabled,
+we, by default, drop all the traffic to/from that port. In order to implement
+this through Port Groups, we’ll create a special Port Group with a fixed name
+(<code class="docutils literal notranslate"><span class="pre">neutron_pg_drop</span></code>) which holds the ACLs to drop all the traffic.</p>
+<p>This PG is created automatically once before neutron-server forks into workers.</p>
+</section>
+</section>
+<section id="networks">
+<h2>Networks<a class="headerlink" href="#networks" title="Link to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="provider-networks.html">Provider networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="selfservice-networks.html">Self-service networks</a></li>
+</ul>
+</div>
+</section>
+<section id="routers">
+<h2>Routers<a class="headerlink" href="#routers" title="Link to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="routers.html">Routers</a></li>
+</ul>
+</div>
+</section>
+<section id="instances">
+<h2>Instances<a class="headerlink" href="#instances" title="Link to this heading">¶</a></h2>
+<p>Launching an instance causes the same series of operations regardless
+of the network. The following example uses the <code class="docutils literal notranslate"><span class="pre">provider</span></code> provider
+network, <code class="docutils literal notranslate"><span class="pre">cirros</span></code> image, <code class="docutils literal notranslate"><span class="pre">m1.tiny</span></code> flavor, <code class="docutils literal notranslate"><span class="pre">default</span></code> security
+group, and <code class="docutils literal notranslate"><span class="pre">mykey</span></code> key.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="launch-instance-provider-network.html">Launch an instance on a provider network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="launch-instance-selfservice-network.html">Launch an instance on a self-service network</a></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="../tutorial.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: OpenStack and OVN Tutorial"></i></a>
+          
+          
+            <a href="provider-networks.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Provider networks"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2022-03-05 08:18:39</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">OpenStack Networking Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../intro.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../deploy.html">Deployment examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ops.html">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../migration.html">Migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../misc.html">Miscellaneous</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html">OVN Driver Administration Guide</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor/index.html">Contributor Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Reference architecture</a><ul>
+<li><a class="reference internal" href="#layout">Layout</a><ul>
+<li><a class="reference internal" href="#hardware-layout">Hardware layout</a></li>
+<li><a class="reference internal" href="#service-layout">Service layout</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#networking-service-with-ovn-integration">Networking service with OVN integration</a><ul>
+<li><a class="reference internal" href="#centralized-floating-ips">Centralized Floating IPs</a></li>
+<li><a class="reference internal" href="#distributed-floating-ips-dvr">Distributed Floating IPs (DVR)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#accessing-ovn-database-content">Accessing OVN database content</a></li>
+<li><a class="reference internal" href="#adding-a-compute-node">Adding a compute node</a></li>
+<li><a class="reference internal" href="#security-groups-rules">Security Groups/Rules</a><ul>
+<li><a class="reference internal" href="#ovn-operations">OVN operations</a></li>
+<li><a class="reference internal" href="#ports-with-no-security-groups">Ports with no security groups</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#networks">Networks</a></li>
+<li><a class="reference internal" href="#routers">Routers</a></li>
+<li><a class="reference internal" href="#instances">Instances</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "admin/ovn/refarch/refarch" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Reference architecture in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2022-03-05 08:18:39";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "admin/ovn/refarch/refarch";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

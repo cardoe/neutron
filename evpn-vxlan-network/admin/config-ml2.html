@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ML2 Plug-in &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/support-matrix.css?v=ac26a930" />
+    <script src="../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="MTU Considerations" href="config-mtu.html" />
+    <link rel="prev" title="Metadata Service Query Rate-limiting" href="config-metadata-rate-limiting.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/admin/config-ml2.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>ML2 Plug-in</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="config-metadata-rate-limiting.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Metadata Service Query Rate-limiting"></i></a>
+    
+    
+    <a href="config-mtu.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: MTU Considerations"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="ml2-plug-in">
+<span id="config-plugin-ml2"></span><h1>ML2 Plug-in<a class="headerlink" href="#ml2-plug-in" title="Link to this heading">¶</a></h1>
+<section id="architecture">
+<h2>Architecture<a class="headerlink" href="#architecture" title="Link to this heading">¶</a></h2>
+<p>The Modular Layer 2 (ML2) neutron plug-in is a framework allowing OpenStack
+Networking to simultaneously use the variety of layer 2 networking
+technologies found in complex real-world data centers. The ML2 framework
+distinguishes between the two kinds of drivers that can be configured:</p>
+<ul>
+<li><p>Type drivers</p>
+<p>Define how an OpenStack network is technically realized. Example: VXLAN</p>
+<p>Each available network type is managed by an ML2 type driver. Type drivers
+maintain any needed type-specific network state. They validate the type
+specific information for provider networks and are responsible for the
+allocation of a free segment in project networks.</p>
+</li>
+<li><p>Mechanism drivers</p>
+<p>Define the mechanism to access an OpenStack network of a certain type.
+Example: Open vSwitch mechanism driver.</p>
+<p>The mechanism driver is responsible for taking the information established by
+the type driver and ensuring that it is properly applied given the
+specific networking mechanisms that have been enabled.</p>
+<p>Mechanism drivers can utilize L2 agents (via RPC) and/or interact directly
+with external devices or controllers.</p>
+</li>
+</ul>
+<p>Multiple mechanism and type drivers can be used simultaneously to access
+different ports of the same virtual network.</p>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">Todo</p>
+<p>Picture showing relationships</p>
+</div>
+<section id="ml2-driver-support-matrix">
+<h3>ML2 driver support matrix<a class="headerlink" href="#ml2-driver-support-matrix" title="Link to this heading">¶</a></h3>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-text">Mechanism drivers and L2 agents</span><a class="headerlink" href="#id2" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>type driver / mech driver</p></th>
+<th class="head"><p>Flat</p></th>
+<th class="head"><p>VLAN</p></th>
+<th class="head"><p>VXLAN</p></th>
+<th class="head"><p>GRE</p></th>
+<th class="head"><p>Geneve</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Open vSwitch</p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+</tr>
+<tr class="row-odd"><td><p>OVN</p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+<td><p>yes (requires OVN 20.09+)</p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+</tr>
+<tr class="row-even"><td><p>SRIOV</p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+</tr>
+<tr class="row-odd"><td><p>MacVTap</p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+</tr>
+<tr class="row-even"><td><p>L2 population</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>L2 population is a special mechanism driver that optimizes BUM (Broadcast,
+unknown destination address, multicast) traffic in the overlay networks
+VXLAN, GRE and Geneve. It needs to be used in conjunction with the
+Open vSwitch mechanism driver and cannot be used as standalone mechanism
+driver. For more information, see the <em>Mechanism drivers</em> section below.</p>
+</div>
+</section>
+</section>
+<section id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Link to this heading">¶</a></h2>
+<section id="network-type-drivers">
+<h3>Network type drivers<a class="headerlink" href="#network-type-drivers" title="Link to this heading">¶</a></h3>
+<p>To enable type drivers in the ML2 plug-in. Edit the
+<code class="docutils literal notranslate"><span class="pre">/etc/neutron/plugins/ml2/ml2_conf.ini</span></code> file:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[ml2]</span>
+<span class="na">type_drivers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">flat,vlan,vxlan,gre</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For more details，see the <a class="reference external" href="https://bugs.launchpad.net/openstack-manuals/+bug/1567792">Bug 1567792</a>.</p>
+</div>
+<p>For more details, see the
+<a class="reference external" href="../configuration/ml2-conf.html">Networking configuration options</a>
+of Configuration Reference.</p>
+<p>The following type drivers are available</p>
+<ul class="simple">
+<li><p>Flat</p></li>
+<li><p>VLAN</p></li>
+<li><p>GRE</p></li>
+<li><p>VXLAN</p></li>
+</ul>
+<section id="provider-network-types">
+<h4>Provider network types<a class="headerlink" href="#provider-network-types" title="Link to this heading">¶</a></h4>
+<p>Provider networks provide connectivity like project networks.
+But only administrative (privileged) users can manage those
+networks because they interface with the physical network infrastructure.
+More information about provider networks see
+<a class="reference internal" href="intro-os-networking.html"><span class="doc">OpenStack Networking</span></a>.</p>
+<ul>
+<li><p>Flat</p>
+<p>The administrator needs to configure a list of physical network names that
+can be used for provider networks.
+For more details, see the related section in the
+<a class="reference external" href="../configuration/ml2-conf.html#ml2-type-flat">Configuration Reference</a>.</p>
+</li>
+<li><p>VLAN</p>
+<p>The administrator needs to configure a list of physical network names that
+can be used for provider networks.
+For more details, see the related section in the
+<a class="reference external" href="../configuration/ml2-conf.html#ml2-type-vlan">Configuration Reference</a>.</p>
+</li>
+<li><p>GRE</p>
+<p>No additional configuration required.</p>
+</li>
+<li><p>VXLAN</p>
+<p>The administrator can configure the VXLAN multicast group that should be
+used.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>VXLAN multicast group configuration is not applicable for the Open
+vSwitch agent.</p>
+</div>
+</li>
+</ul>
+</section>
+<section id="project-network-types">
+<h4>Project network types<a class="headerlink" href="#project-network-types" title="Link to this heading">¶</a></h4>
+<p>Project networks provide connectivity to instances for a particular
+project. Regular (non-privileged) users can manage project networks
+within the allocation that an administrator or operator defines for
+them. More information about project and provider networks see
+<a class="reference internal" href="intro-os-networking.html"><span class="doc">OpenStack Networking</span></a>.</p>
+<p>Project network configurations are made in the
+<code class="docutils literal notranslate"><span class="pre">/etc/neutron/plugins/ml2/ml2_conf.ini</span></code> configuration file on the neutron
+server:</p>
+<ul>
+<li><p>VLAN</p>
+<p>The administrator needs to configure the range of VLAN IDs that can be
+used for project network allocation.
+For more details, see the related section in the
+<a class="reference external" href="../configuration/ml2-conf.html#ml2-type-vlan">Configuration Reference</a>.</p>
+</li>
+<li><p>GRE</p>
+<p>The administrator needs to configure the range of tunnel IDs that can be
+used for project network allocation.
+For more details, see the related section in the
+<a class="reference external" href="../configuration/ml2-conf.html#ml2-type-gre">Configuration Reference</a>.</p>
+</li>
+<li><p>VXLAN</p>
+<p>The administrator needs to configure the range of VXLAN IDs that can be
+used for project network allocation.
+For more details, see the related section in the
+<a class="reference external" href="../configuration/ml2-conf.html#ml2-type-vxlan">Configuration Reference</a>.</p>
+</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Flat networks for project allocation are not supported. They only
+can exist as a provider network.</p>
+</div>
+</section>
+</section>
+<section id="mechanism-drivers">
+<h3>Mechanism drivers<a class="headerlink" href="#mechanism-drivers" title="Link to this heading">¶</a></h3>
+<p>To enable mechanism drivers in the ML2 plug-in, edit the
+<code class="docutils literal notranslate"><span class="pre">/etc/neutron/plugins/ml2/ml2_conf.ini</span></code> file on the neutron server:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[ml2]</span>
+<span class="na">mechanism_drivers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">ovs,l2pop</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For more details, see the <a class="reference external" href="https://bugs.launchpad.net/openstack-manuals/+bug/1567792">Bug 1567792</a>.</p>
+</div>
+<p>For more details, see the
+<a class="reference external" href="../configuration/ml2-conf.html#ml2">Configuration Reference</a>.</p>
+<ul>
+<li><p>Open vSwitch</p>
+<p>No additional configurations required for the mechanism driver. Additional
+agent configuration is required. For details, see the related <em>L2 agent</em>
+section below.</p>
+</li>
+<li><p>OVN</p>
+<p>The administrator must configure some additional configuration options for
+the mechanism driver. When this driver is used, architecture of the Neutron
+application in the cluster is different from what it is with other drivers
+like e.g. Open vSwitch.
+For details, see <a class="reference internal" href="ovn/refarch/refarch.html#refarch-refarch"><span class="std std-ref">OVN reference architecture</span></a>.</p>
+</li>
+<li><p>SRIOV</p>
+<p>The SRIOV driver accepts all PCI vendor devices.</p>
+</li>
+<li><p>MacVTap</p>
+<p>No additional configurations required for the mechanism driver. Additional
+agent configuration is required. Please see the related section.</p>
+</li>
+<li><p>L2 population</p>
+<p>The administrator can configure some optional configuration options. For more
+details, see the related section in the
+<a class="reference external" href="../configuration/ml2-conf.html#l2pop">Configuration Reference</a>.</p>
+</li>
+<li><p>Specialized</p>
+<ul>
+<li><p>Open source</p>
+<p>External open source mechanism drivers exist as well as the neutron
+integrated reference implementations. Configuration of those drivers is not
+part of this document. For example:</p>
+<ul class="simple">
+<li><p>OpenDaylight</p></li>
+<li><p>OpenContrail</p></li>
+</ul>
+</li>
+<li><p>Proprietary (vendor)</p>
+<p>External mechanism drivers from various vendors exist as well as the
+neutron integrated reference implementations.</p>
+<p>Configuration of those drivers is not part of this document.</p>
+</li>
+</ul>
+</li>
+</ul>
+<section id="supported-vnic-types">
+<h4>Supported VNIC types<a class="headerlink" href="#supported-vnic-types" title="Link to this heading">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">vnic_type_prohibit_list</span></code> option is used to remove values from the
+mechanism driver’s <code class="docutils literal notranslate"><span class="pre">supported_vnic_types</span></code> list.</p>
+<table class="docutils align-default" id="id3">
+<caption><span class="caption-text">Mechanism drivers and supported VNIC types</span><a class="headerlink" href="#id3" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>mech driver / supported_vnic_types</p></th>
+<th class="head"><p>supported VNIC types</p></th>
+<th class="head"><p>prohibiting available</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>OVN</p></td>
+<td><p>normal, direct, direct_macvtap, direct_physical</p></td>
+<td><p>no</p></td>
+</tr>
+<tr class="row-odd"><td><p>MacVTap</p></td>
+<td><p>macvtap</p></td>
+<td><p>no</p></td>
+</tr>
+<tr class="row-even"><td><p>Open vSwitch</p></td>
+<td><p>normal, direct</p></td>
+<td><p>yes (ovs_driver vnic_type_prohibit_list, see: <a class="reference external" href="../configuration/ml2-conf.html#ovs_driver">Configuration Reference</a>)</p></td>
+</tr>
+<tr class="row-odd"><td><p>SRIOV</p></td>
+<td><p>direct, macvtap, direct_physical</p></td>
+<td><p>yes (sriov_driver vnic_type_prohibit_list, see: <a class="reference external" href="../configuration/ml2-conf.html#sriov_driver">Configuration Reference</a>)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="extension-drivers">
+<h3>Extension Drivers<a class="headerlink" href="#extension-drivers" title="Link to this heading">¶</a></h3>
+<p>The ML2 plug-in also supports extension drivers that allows other pluggable
+drivers to extend the core resources implemented in the ML2 plug-in
+(<code class="docutils literal notranslate"><span class="pre">networks</span></code>, <code class="docutils literal notranslate"><span class="pre">ports</span></code>, etc.). Examples of extension drivers include support
+for QoS, port security, etc. For more details see the <code class="docutils literal notranslate"><span class="pre">extension_drivers</span></code>
+configuration option in the
+<a class="reference external" href="../configuration/ml2-conf.html#ml2.extension_drivers">Configuration Reference</a>.</p>
+</section>
+<section id="agents">
+<h3>Agents<a class="headerlink" href="#agents" title="Link to this heading">¶</a></h3>
+<section id="l2-agent">
+<h4>L2 agent<a class="headerlink" href="#l2-agent" title="Link to this heading">¶</a></h4>
+<p>An L2 agent serves layer 2 (Ethernet) network connectivity to OpenStack
+resources. It typically runs on each Network Node and on each Compute Node.</p>
+<ul>
+<li><p>Open vSwitch agent</p>
+<p>The Open vSwitch agent configures the Open vSwitch to realize L2 networks for
+OpenStack resources.</p>
+<p>Configuration for the Open vSwitch agent is typically done in the
+<code class="docutils literal notranslate"><span class="pre">openvswitch_agent.ini</span></code> configuration file. Make sure that on agent start
+you pass this configuration file as argument.</p>
+<p>For a detailed list of configuration options, see the related section in the
+<a class="reference external" href="../configuration/openvswitch-agent.html">Configuration Reference</a>.</p>
+</li>
+<li><p>SRIOV Nic Switch agent</p>
+<p>The sriov nic switch agent configures PCI virtual functions to realize L2
+networks for OpenStack instances. Network attachments for other resources
+like routers, DHCP, and so on are not supported.</p>
+<p>Configuration for the SRIOV nic switch agent is typically done in the
+<code class="docutils literal notranslate"><span class="pre">sriov_agent.ini</span></code> configuration file. Make sure that on agent start
+you pass this configuration file as argument.</p>
+<p>For a detailed list of configuration options, see the related section in the
+<a class="reference external" href="../configuration/sriov-agent.html">Configuration Reference</a>.</p>
+</li>
+<li><p>MacVTap agent</p>
+<p>The MacVTap agent uses kernel MacVTap devices for realizing L2
+networks for OpenStack instances. Network attachments for other resources
+like routers, DHCP, and so on are not supported.</p>
+<p>Configuration for the MacVTap agent is typically done in the
+<code class="docutils literal notranslate"><span class="pre">macvtap_agent.ini</span></code> configuration file. Make sure that on agent start
+you pass this configuration file as argument.</p>
+<p>For a detailed list of configuration options, see the related section in the
+<a class="reference external" href="../configuration/macvtap-agent.html">Configuration Reference</a>.</p>
+</li>
+</ul>
+</section>
+<section id="l3-agent">
+<h4>L3 agent<a class="headerlink" href="#l3-agent" title="Link to this heading">¶</a></h4>
+<p>The L3 agent offers advanced layer 3 services, like virtual Routers and
+Floating IPs. It requires an L2 agent running in parallel.</p>
+<p>Configuration for the L3 agent is typically done in the
+<code class="docutils literal notranslate"><span class="pre">l3_agent.ini</span></code> configuration file. Make sure that on agent start
+you pass this configuration file as argument.</p>
+<p>For a detailed list of configuration options, see the related section in the
+<a class="reference external" href="../configuration/l3-agent.html">Configuration Reference</a>.</p>
+</section>
+<section id="dhcp-agent">
+<h4>DHCP agent<a class="headerlink" href="#dhcp-agent" title="Link to this heading">¶</a></h4>
+<p>The DHCP agent is responsible for DHCP (Dynamic Host Configuration
+Protocol) and RADVD (Router Advertisement Daemon) services.
+It requires a running L2 agent on the same node.</p>
+<p>Configuration for the DHCP agent is typically done in the
+<code class="docutils literal notranslate"><span class="pre">dhcp_agent.ini</span></code> configuration file. Make sure that on agent start
+you pass this configuration file as argument.</p>
+<p>For a detailed list of configuration options, see the related section in the
+<a class="reference external" href="../configuration/dhcp-agent.html">Configuration Reference</a>.</p>
+</section>
+<section id="metadata-agent">
+<h4>Metadata agent<a class="headerlink" href="#metadata-agent" title="Link to this heading">¶</a></h4>
+<p>The Metadata agent allows instances to access cloud-init meta data and user
+data via the network. It requires a running L2 agent on the same node.</p>
+<p>Configuration for the Metadata agent is typically done in the
+<code class="docutils literal notranslate"><span class="pre">metadata_agent.ini</span></code> configuration file. Make sure that on agent start
+you pass this configuration file as argument.</p>
+<p>For a detailed list of configuration options, see the related section in the
+<a class="reference external" href="../configuration/metadata-agent.html">Configuration Reference</a>.</p>
+</section>
+<section id="l3-metering-agent">
+<h4>L3 metering agent<a class="headerlink" href="#l3-metering-agent" title="Link to this heading">¶</a></h4>
+<p>The L3 metering agent enables layer3 traffic metering. It requires a running L3
+agent on the same node.</p>
+<p>Configuration for the L3 metering agent is typically done in the
+<code class="docutils literal notranslate"><span class="pre">metering_agent.ini</span></code> configuration file. Make sure that on agent start
+you pass this configuration file as argument.</p>
+<p>For a detailed list of configuration options, see the related section in the
+<a class="reference external" href="../configuration/metering-agent.html">Configuration Reference</a>.</p>
+</section>
+</section>
+<section id="security">
+<h3>Security<a class="headerlink" href="#security" title="Link to this heading">¶</a></h3>
+<p>L2 agents support some important security configurations.</p>
+<ul>
+<li><p>Security Groups</p>
+<p>For more details, see the related section in the
+<a class="reference external" href="../configuration/ml2-conf.html#securitygroup">Configuration Reference</a>.</p>
+</li>
+<li><p>Arp Spoofing Prevention</p>
+<p>Configured in the <em>L2 agent</em> configuration.</p>
+</li>
+</ul>
+</section>
+</section>
+<section id="reference-implementations">
+<h2>Reference implementations<a class="headerlink" href="#reference-implementations" title="Link to this heading">¶</a></h2>
+<section id="overview">
+<h3>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h3>
+<p>In this section, the combination of a mechanism driver and an L2 agent is
+called ‘reference implementation’. The following table lists these
+implementations:</p>
+<table class="docutils align-default" id="id4">
+<caption><span class="caption-text">Mechanism drivers and L2 agents</span><a class="headerlink" href="#id4" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Mechanism Driver</p></th>
+<th class="head"><p>L2 agent</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Open vSwitch</p></td>
+<td><p>Open vSwitch agent</p></td>
+</tr>
+<tr class="row-odd"><td><p>OVN</p></td>
+<td><p>No (there is ovn-controller running on nodes)</p></td>
+</tr>
+<tr class="row-even"><td><p>SRIOV</p></td>
+<td><p>SRIOV nic switch agent</p></td>
+</tr>
+<tr class="row-odd"><td><p>MacVTap</p></td>
+<td><p>MacVTap agent</p></td>
+</tr>
+<tr class="row-even"><td><p>L2 population</p></td>
+<td><p>Open vSwitch agent</p></td>
+</tr>
+</tbody>
+</table>
+<p>The following tables shows which reference implementations support which
+non-L2 neutron agents:</p>
+<table class="docutils align-default" id="id5">
+<caption><span class="caption-text">Reference implementations and other agents</span><a class="headerlink" href="#id5" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Reference Implementation</p></th>
+<th class="head"><p>L3 agent</p></th>
+<th class="head"><p>DHCP agent</p></th>
+<th class="head"><p>Metadata agent</p></th>
+<th class="head"><p>L3 Metering agent</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Open vSwitch &amp; Open vSwitch agent</p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+</tr>
+<tr class="row-odd"><td><p>OVN</p></td>
+<td><p>no (own L3 implementation)</p></td>
+<td><p>no (DHCP provided by OVN, fully distributed)</p></td>
+<td><p>yes (running on compute nodes, fully distributed)</p></td>
+<td><p>no</p></td>
+</tr>
+<tr class="row-even"><td><p>SRIOV &amp; SRIOV nic switch agent</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+</tr>
+<tr class="row-odd"><td><p>MacVTap &amp; MacVTap agent</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>L2 population is not listed here, as it is not a standalone mechanism.
+If other agents are supported depends on the conjunctive mechanism driver
+that is used for binding a port.</p>
+<p>More information about L2 population see the
+<a class="reference external" href="https://networkop.co.uk/blog/2016/05/06/neutron-l2pop/">OpenStack Manuals</a>.</p>
+</div>
+</section>
+<section id="buying-guide">
+<h3>Buying guide<a class="headerlink" href="#buying-guide" title="Link to this heading">¶</a></h3>
+<p>This guide characterizes the L2 reference implementations that currently exist.</p>
+<ul>
+<li><p>Open vSwitch mechanism and Open vSwitch agent</p>
+<p>Can be used for instance network attachments as well as for attachments of
+other network resources like routers, DHCP, and so on.</p>
+</li>
+<li><p>OVN mechanism driver</p>
+<p>Can be used for instance network attachments as well as for attachments of
+other network resources like routers, metadata ports, and so on.</p>
+</li>
+<li><p>SRIOV mechanism driver and SRIOV NIC switch agent</p>
+<p>Can only be used for instance network attachments (device_owner = compute).</p>
+<p>Is deployed besides an other mechanism driver and L2 agent such as OVS. It
+offers instances direct access to the network adapter
+through a PCI Virtual Function (VF). This gives an instance direct access to
+hardware capabilities and high performance networking.</p>
+<p>The cloud consumer can decide via the neutron APIs VNIC_TYPE attribute, if
+an instance gets a normal OVS port or an SRIOV port.</p>
+<p>Due to direct connection, some features are not available when using SRIOV.
+For example, DVR, security groups, migration.</p>
+<p>For more information see the <a class="reference internal" href="config-sriov.html#config-sriov"><span class="std std-ref">SR-IOV</span></a>.</p>
+</li>
+<li><p>MacVTap mechanism driver and MacVTap agent</p>
+<p>Can only be used for instance network attachments (device_owner = compute)
+and not for attachment of other resources like routers, DHCP, and so on.</p>
+<p>It is positioned as alternative to Open vSwitch support on the compute node
+for internal deployments.</p>
+<p>MacVTap offers a direct connection with very little overhead between
+instances and down to the adapter. You can use MacVTap agent on the
+compute node when you require a network connection that is performance
+critical. It does not require specific hardware (like with SRIOV).</p>
+<p>Due to the direct connection, some features are not available when using
+it on the compute node. For example, DVR, security groups and arp-spoofing
+protection.</p>
+</li>
+</ul>
+</section>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="config-metadata-rate-limiting.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Metadata Service Query Rate-limiting"></i></a>
+          
+          
+            <a href="config-mtu.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: MTU Considerations"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2024-08-26 17:49:17</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation Guide</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">OpenStack Networking Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deploy.html">Deployment examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ops.html">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">Migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ovn/index.html">OVN Driver Administration Guide</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributor/index.html">Contributor Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">ML2 Plug-in</a><ul>
+<li><a class="reference internal" href="#architecture">Architecture</a><ul>
+<li><a class="reference internal" href="#ml2-driver-support-matrix">ML2 driver support matrix</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li><a class="reference internal" href="#network-type-drivers">Network type drivers</a><ul>
+<li><a class="reference internal" href="#provider-network-types">Provider network types</a></li>
+<li><a class="reference internal" href="#project-network-types">Project network types</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#mechanism-drivers">Mechanism drivers</a><ul>
+<li><a class="reference internal" href="#supported-vnic-types">Supported VNIC types</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#extension-drivers">Extension Drivers</a></li>
+<li><a class="reference internal" href="#agents">Agents</a><ul>
+<li><a class="reference internal" href="#l2-agent">L2 agent</a></li>
+<li><a class="reference internal" href="#l3-agent">L3 agent</a></li>
+<li><a class="reference internal" href="#dhcp-agent">DHCP agent</a></li>
+<li><a class="reference internal" href="#metadata-agent">Metadata agent</a></li>
+<li><a class="reference internal" href="#l3-metering-agent">L3 metering agent</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#security">Security</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#reference-implementations">Reference implementations</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#buying-guide">Buying guide</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "admin/config-ml2" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "ML2 Plug-in in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2024-08-26 17:49:17";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "admin/config-ml2";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

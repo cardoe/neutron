@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Blueprints and Specs &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Bugs" href="bugs.html" />
+    <link rel="prev" title="Neutron Policies" href="index.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/contributor/policies/blueprints.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Blueprints and Specs</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="index.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Neutron Policies"></i></a>
+    
+    
+    <a href="bugs.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Bugs"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="blueprints-and-specs">
+<span id="neutron-blueprints"></span><h1>Blueprints and Specs<a class="headerlink" href="#blueprints-and-specs" title="Link to this heading">¶</a></h1>
+<p>The Neutron team uses the <a class="reference external" href="http://opendev.org/openstack/neutron-specs">neutron-specs</a> repository for its
+specification reviews. Detailed information can be found on the <a class="reference external" href="https://wiki.openstack.org/wiki/Blueprints">wiki</a>. Please also find
+additional information in the reviews.rst file.</p>
+<p>The Neutron team does not enforce deadlines for specs. These can be submitted
+throughout the release cycle. The drivers team will review this on a regular
+basis throughout the release, and based on the load for the milestones, will
+assign these into milestones or move them to the backlog for selection into
+a future release.</p>
+<p>Please note that we use a <a class="reference external" href="http://opendev.org/openstack/neutron-specs/src/specs/template.rst">template</a>
+for spec submissions. It is not required to fill out all sections in the
+template. Review of the spec may require filling in information left out by
+the submitter.</p>
+<section id="sub-projects-and-specs">
+<h2>Sub-Projects and Specs<a class="headerlink" href="#sub-projects-and-specs" title="Link to this heading">¶</a></h2>
+<p>The <a class="reference external" href="http://opendev.org/openstack/neutron-specs">neutron-specs</a>
+repository is only meant for specs from Neutron itself, and the advanced
+services repositories as well. This includes FWaaS and VPNaaS. Other
+sub-projects are encouraged to fold their specs into their own devref code
+in their sub-project gerrit repositories. Please see additional comments
+in the Neutron teams <a class="reference internal" href="neutron-teams.html#specs-core-reviewer-team"><span class="std std-ref">section</span></a>
+for reviewer requirements of the neutron-specs repository.</p>
+</section>
+<section id="neutron-request-for-feature-enhancements">
+<span id="request-for-feature-enhancement"></span><h2>Neutron Request for Feature Enhancements<a class="headerlink" href="#neutron-request-for-feature-enhancements" title="Link to this heading">¶</a></h2>
+<p>In Liberty the team introduced the concept of feature requests. Feature
+requests are tracked as Launchpad bugs, by tagging them with a set of tags
+starting with <cite>rfe</cite>, enabling the submission and review of feature requests
+before code is submitted.
+This allows the team to verify the validity of a feature request before the
+process of submitting a neutron-spec is undertaken, or code is written.  It
+also allows the community to express interest in a feature by subscribing to
+the bug and posting a comment in Launchpad. The ‘rfe’ tag should not be used
+for work that is already well-defined and has an assignee. If you are intending
+to submit code immediately, a simple bug report will suffice. Note the
+temptation to game the system exists, but given the history in Neutron for this
+type of activity, it will not be tolerated and will be called out as such in
+public on the mailing list.</p>
+<p>RFEs can be submitted by anyone and by having the community vote on them in
+Launchpad, we can gauge interest in features. The drivers team will evaluate
+these on a weekly basis along with the specs. RFEs will be evaluated in the
+current cycle against existing project priorities and available resources.</p>
+<p>The workflow for the life an RFE in Launchpad is as follows:</p>
+<ul>
+<li><p>The bug is submitted and will by default land in the “New” state.
+Anyone can make a bug an RFE by adding the <cite>rfe</cite> tag.</p></li>
+<li><p>As soon as a member of the neutron-drivers team acknowledges the bug,
+the <cite>rfe</cite> tag will be replaced with the <cite>rfe-confirmed</cite> tag. No assignee, or
+milestone is set at this time. The importance will be set to ‘Wishlist’ to
+signal the fact that the report is indeed a feature or enhancement and there
+is no severity associated to it.</p></li>
+<li><p>A member of the neutron-drivers team replaces the <cite>rfe-confirmed</cite> tag with
+the <cite>rfe-triaged</cite> tag when he/she thinks it’s ready to be discussed in the
+drivers meeting.  The bug will be in this state while the discussion is
+ongoing.</p></li>
+<li><p>The neutron-drivers team will evaluate the RFE and may advise the submitter
+to file a spec in neutron-specs to elaborate on the feature request, in case
+the RFE requires extra scrutiny, more design discussion, etc.</p></li>
+<li><p>The PTL will work with the Lieutenant for the area being identified by the
+RFE to evaluate resources against the current workload.</p></li>
+<li><p>A member of the Neutron release team (or the PTL) will register a matching
+Launchpad blueprint to be used for milestone tracking purposes, and for
+identifying the responsible assignee and approver. If the RFE has a spec
+the blueprint will have a pointer to the spec document, which will become
+available on <a class="reference external" href="http://specs.openstack.org/openstack/neutron-specs/">specs.o.o.</a>
+once it is approved and merged. The blueprint will then be linked to the
+original RFE bug report as a pointer to the discussion that led to the
+approval of the RFE.
+The blueprint submitter will also need to identify the following:</p>
+<ul>
+<li><p>Priority: there will be only two priorities to choose from, High and Low.
+It is worth noting that priority is not to be confused with
+<a class="reference external" href="https://docs.openstack.org/project-team-guide/bugs.html#Importance">importance</a>,
+which is a property of Launchpad Bugs. Priority gives an indication of
+how promptly a work item should be tackled to allow it to complete. High
+priority is to be chosen for work items that must make substantial
+progress in the span of the targeted release, and deal with the
+following aspects:</p>
+<ul class="simple">
+<li><p>OpenStack cross-project interaction and interoperability issues;</p></li>
+<li><p>Issues that affect the existing system’s usability;</p></li>
+<li><p>Stability and testability of the platform;</p></li>
+<li><p>Risky implementations that may require complex and/or pervasive
+changes to API and the logical model;</p></li>
+</ul>
+<p>Low priority is to be chosen for everything else. RFEs without an
+associated blueprint are effectively equivalent to low priority items.
+Bear in mind that, even though staffing should take priorities into
+account (i.e. by giving more resources to high priority items over low
+priority ones), the open source reality is that they can both proceed at
+their own pace and low priority items can indeed complete faster than high
+priority ones, even though they are given fewer resources.</p>
+</li>
+<li><p>Drafter: who is going to submit and iterate on the spec proposal; he/she
+may be the RFE submitter.</p></li>
+<li><p>Assignee: who is going to develop the bulk of the code, or the
+go-to contributor, if more people are involved. Typically this is
+the RFE submitter, but not necessarily.</p></li>
+<li><p>Approver: a member of the Neutron team who can commit enough time
+during the ongoing release cycle to ensure that code posted for review
+does not languish, and that all aspects of the feature development are
+taken care of (client, server changes and/or support from other projects
+if needed - tempest, nova, openstack-infra, devstack, etc.), as well as
+comprehensive testing.
+This is typically a core member who has enough experience with what it
+takes to get code merged, but other resources amongst the wider team can
+also be identified. Approvers are volunteers who show a specific interest
+in the blueprint specification, and have enough insight in the area of
+work so that they can make effective code reviews and provide design
+feedback. An approver will not work in isolation, as he/she can and will
+reach out for help to get the job done; however he/she is the main
+point of contact with the following responsibilities:</p>
+<ul class="simple">
+<li><p>Pair up with the drafter/assignee in order to help skip development
+blockers.</p></li>
+<li><p>Review patches associated with the blueprint: approver and assignee
+should touch base regularly and ping each other when new code is
+available for review, or if review feedback goes unaddressed.</p></li>
+<li><p>Reach out to other reviewers for feedback in areas that may step
+out of the zone of her/his confidence.</p></li>
+<li><p>Escalate issues, and raise warnings to the release team/PTL if the
+effort shows slow progress. Approver and assignee are key parts to land
+a blueprint: should the approver and/or assignee be unable to continue
+the commitment during the release cycle, it is the Approver’s
+responsibility to reach out the release team/PTL so that replacements
+can be identified.</p></li>
+<li><p>Provide a status update during the Neutron IRC meeting, if required.</p></li>
+</ul>
+<p>Approver <a class="reference external" href="https://blueprints.launchpad.net/neutron/+assignments">assignments</a>
+must be carefully identified to ensure that no-one overcommits. A
+Neutron contributor develops code himself/herself, and if he/she is an
+approver of more than a couple of blueprints in a single cycle/milestone
+(depending on the complexity of the spec), it may mean that he/she is
+clearly oversubscribed.</p>
+</li>
+</ul>
+<p>The Neutron team will review the status of blueprints targeted for the
+milestone during their weekly meeting to ensure a smooth progression of
+the work planned. Blueprints for which resources cannot be identified
+will have to be deferred.</p>
+</li>
+<li><p>In either case (a spec being required or not), once the discussion has
+happened and there is positive consensus on the RFE, the report is
+‘approved’, and its tag will move from <cite>rfe-triaged</cite> to <cite>rfe-approved</cite>.</p></li>
+<li><p>An RFE can be occasionally marked as ‘rfe-postponed’ if the team identifies
+a dependency between the proposed RFE and other pending tasks that prevent
+the RFE from being worked on immediately.</p></li>
+<li><p>Once an RFE is approved, it needs volunteers. Approved RFEs that do not have
+an assignee but sound relatively simple or limited in scope (e.g. the
+addition of a new API with no ramification in the plugin backends), should be
+promoted during team meetings or the ML so that volunteers can pick them up
+and get started with neutron development. The team will regularly scan
+<cite>rfe-approved</cite> or <cite>rfe-postponed</cite> RFEs to see what their latest status is and
+mark them incomplete if no assignees can be found, or they are no longer
+relevant.</p></li>
+<li><p>As for setting the milestone (both for RFE bugs or blueprints), the current
+milestone is always chosen, assuming that work will start as soon as the
+feature is approved. Work that fails to complete by the defined milestone
+will roll over automatically until it gets completed or abandoned.</p></li>
+<li><p>If the code fails to merge, the bug report may be marked as incomplete,
+unassigned and untargeted, and it will be garbage collected by
+the Launchpad Janitor if no-one takes over in time. Renewed interest in the
+feature will have to go through RFE submission process once again.</p></li>
+</ul>
+<p>In summary:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>State</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>New</p></td>
+<td><p>This is where all RFE’s start, as filed by the community</p></td>
+</tr>
+<tr class="row-odd"><td><p>Incomplete</p></td>
+<td><dl class="simple">
+<dt>Drivers/LTs - Move to this state to mean,</dt><dd><p>“more information needed before proceeding”</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="row-even"><td><p>Confirmed</p></td>
+<td><dl class="simple">
+<dt>Drivers/LTs - Move to this state to mean,</dt><dd><p>“yes, I see that you filed it”</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Triaged</p></td>
+<td><dl class="simple">
+<dt>Drivers/LTs - Move to this state to mean,</dt><dd><p>“discussion is ongoing”</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="row-even"><td><p>Won’t Fix</p></td>
+<td><p>Drivers/LTs - Move to this state to reject an RFE</p></td>
+</tr>
+</tbody>
+</table>
+<p>Once the triaging (discussion is complete) and the RFE is approved, the tag
+goes from ‘rfe’ to ‘rfe-approved’, and at this point the bug report goes
+through the usual state transition. Note, that the importance will be set to
+‘wishlist’, to reflect the fact that the bug report is indeed not a bug, but
+a new feature or enhancement. This will also help have RFEs that are not
+followed up by a blueprint standout in the Launchpad <a class="reference external" href="https://launchpad.net/neutron/+milestones">milestone dashboards</a>.</p>
+<p>The drivers team will be discussing the following bug reports during their
+IRC meeting:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=NEW&amp;field.tag=rfe">New RFE’s</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INCOMPLETE&amp;field.tag=rfe">Incomplete RFE’s</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=rfe-confirmed">Confirmed RFE’s</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=rfe-triaged">Triaged RFE’s</a></p></li>
+</ul>
+</section>
+<section id="rfe-submission-guidelines">
+<h2>RFE Submission Guidelines<a class="headerlink" href="#rfe-submission-guidelines" title="Link to this heading">¶</a></h2>
+<p>Before we dive into the guidelines for writing a good RFE, it is worth
+mentioning that depending on your level of engagement with the Neutron project
+and your role (user, developer, deployer, operator, etc.), you are more than
+welcome to have a preliminary discussion of a potential RFE by reaching out to
+other people involved in the project. This usually happens by posting mails on
+the relevant mailing lists
+(e.g. <a class="reference external" href="http://lists.openstack.org">openstack-discuss</a> - include [neutron] in
+the subject) or on #openstack-neutron IRC channel on OFTC. If current ongoing
+code reviews are related to your feature, posting comments/questions on gerrit
+may also be a way to engage. Some amount of interaction with Neutron developers
+will give you an idea of the plausibility and form of your RFE before you
+submit it. That said, this is not mandatory.</p>
+<p>When you submit a bug report on <a class="reference external" href="https://bugs.launchpad.net/neutron/+filebug">https://bugs.launchpad.net/neutron/+filebug</a>,
+there are two fields that must be filled: ‘summary’ and ‘further information’.
+The ‘summary’ must be brief enough to fit in one line: if you can’t describe it
+in a few words it may mean that you are either trying to capture more than one
+RFE at once, or that you are having a hard time defining what you are trying to
+solve at all.</p>
+<p>The ‘further information’ section must be a description of what you would like
+to see implemented in Neutron. The description should provide enough details
+for a knowledgeable developer to understand what is the existing problem in the
+current platform that needs to be addressed, or what is the enhancement that
+would make the platform more capable, both for a functional and a
+non-functional standpoint. To this aim it is important to describe ‘why’ you
+believe the RFE should be accepted, and motivate the reason why without it
+Neutron is a poorer platform. The description should be self contained, and no
+external references should be necessary to further explain the RFE.</p>
+<p>In other words, when you write an RFE you should ask yourself the following
+questions:</p>
+<ul class="simple">
+<li><p>What is that I (specify what user - a user can be a human or another system)
+cannot do today when interacting with Neutron? On the other hand, is there a
+Neutron component X that is unable to accomplish something?</p></li>
+<li><p>Is there something that you would like Neutron handle better, ie. in a more
+scalable, or in a more reliable way?</p></li>
+<li><p>What is that I would like to see happen after the RFE is accepted and
+implemented?</p></li>
+<li><p>Why do you think it is important?</p></li>
+</ul>
+<p>Once you are happy with what you wrote, add ‘rfe’ as tag, and submit. Do not
+worry, we are here to help you get it right! Happy hacking.</p>
+</section>
+<section id="missing-your-target">
+<h2>Missing your target<a class="headerlink" href="#missing-your-target" title="Link to this heading">¶</a></h2>
+<p>There are occasions when a spec will be approved and the code will not land in
+the cycle it was targeted at. For these cases, the work flow to get the spec
+into the next release is as follows:</p>
+<ul class="simple">
+<li><p>During the RC window, the PTL will create a directory named ‘&lt;release&gt;’ under
+the ‘backlog’ directory in the neutron specs repo, and he/she will move all
+specs that did not make the release to this directory.</p></li>
+<li><p>Anyone can propose a patch to neutron-specs which moves a spec from the
+previous release into the new release directory.</p></li>
+</ul>
+<p>The specs which are moved in this way can be fast-tracked into the next
+release. Please note that it is required to re-propose the spec for the new
+release.</p>
+</section>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">¶</a></h2>
+<p>The above process involves two places where any given feature can start to be
+documented - namely in the RFE bug, and in the spec - and in addition to those
+Neutron has a substantial <a class="reference internal" href="../index.html"><span class="doc">developer reference guide</span></a>
+(aka ‘devref’), and user-facing docs such as
+the <a class="reference internal" href="../../admin/index.html"><span class="doc">networking guide</span></a>. So it might be asked:</p>
+<ul class="simple">
+<li><p>What is the relationship between all of those?</p></li>
+<li><p>What is the point of devref documentation, if everything has already been
+described in the spec?</p></li>
+</ul>
+<p>The answers have been beautifully expressed in an <a class="reference external" href="http://lists.openstack.org/pipermail/openstack-dev/2015-December/081458.html">openstack-dev post</a>:</p>
+<ol class="arabic simple">
+<li><p>RFE: “I want X”</p></li>
+<li><p>Spec: “I plan to implement X like this”</p></li>
+<li><p>devref: “How X is implemented and how to extend it”</p></li>
+<li><p>OS docs: “API and guide for using X”</p></li>
+</ol>
+<p>Once a feature X has been implemented, we shouldn’t have to go to back to its
+RFE bug or spec to find information on it.  The devref may reuse a lot of
+content from the spec, but the spec is not maintained and the implementation
+may differ in some ways from what was intended when the spec was agreed.  The
+devref should be kept current with refactorings, etc., of the implementation.</p>
+<p>Devref content should be added as part of the implementation of a new feature.
+Since the spec is not maintained after the feature is implemented, the devref
+should include a maintained version of the information from the spec.</p>
+<p>If a feature requires OS docs (4), the feature patch shall include the new,
+or updated, documentation changes.  If the feature is purely a developer
+facing thing, (4) is not needed.</p>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="index.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Neutron Policies"></i></a>
+          
+          
+            <a href="bugs.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Bugs"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2024-08-23 12:03:12</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Contributor Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#basic-information">Basic Information</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#neutron-policies">Neutron Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#gerrit-rechecks">Gerrit Rechecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-stadium">Neutron Stadium</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-internals">Neutron Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#ovn-driver">OVN Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#dashboards">Dashboards</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Blueprints and Specs</a><ul>
+<li><a class="reference internal" href="#sub-projects-and-specs">Sub-Projects and Specs</a></li>
+<li><a class="reference internal" href="#neutron-request-for-feature-enhancements">Neutron Request for Feature Enhancements</a></li>
+<li><a class="reference internal" href="#rfe-submission-guidelines">RFE Submission Guidelines</a></li>
+<li><a class="reference internal" href="#missing-your-target">Missing your target</a></li>
+<li><a class="reference internal" href="#documentation">Documentation</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "contributor/policies/blueprints" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Blueprints and Specs in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2024-08-23 12:03:12";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "contributor/policies/blueprints";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

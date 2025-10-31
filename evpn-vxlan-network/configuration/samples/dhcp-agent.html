@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Sample dhcp_agent.ini &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Sample l3_agent.ini" href="l3-agent.html" />
+    <link rel="prev" title="Sample sriov_agent.ini" href="sriov-agent.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/configuration/samples/dhcp-agent.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Sample dhcp_agent.ini</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="sriov-agent.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Sample sriov_agent.ini"></i></a>
+    
+    
+    <a href="l3-agent.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Sample l3_agent.ini"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="sample-dhcp-agent-ini">
+<h1>Sample dhcp_agent.ini<a class="headerlink" href="#sample-dhcp-agent-ini" title="Link to this heading">¶</a></h1>
+<p>This sample configuration can also be viewed in <a class="reference external" href="../../_static/config-samples/dhcp_agent.conf.sample">the raw format</a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">DEFAULT</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From neutron.base.agent</span>
+<span class="c1">#</span>
+
+<span class="c1"># Uses veth for an OVS interface or not. Support kernels with limited namespace</span>
+<span class="c1"># support (e.g. RHEL 6.5) and rate limiting on router&#39;s gateway port so long as</span>
+<span class="c1"># ovs_use_veth is set to True. (boolean value)</span>
+<span class="c1">#ovs_use_veth = false</span>
+
+<span class="c1"># The driver used to manage virtual interfaces. (string value)</span>
+<span class="c1">#interface_driver = openvswitch</span>
+
+<span class="c1"># Maximum seconds to wait for a response from an RPC call. (integer value)</span>
+<span class="c1">#rpc_response_max_timeout = 600</span>
+
+<span class="c1">#</span>
+<span class="c1"># From neutron.dhcp.agent</span>
+<span class="c1">#</span>
+
+<span class="c1"># The DHCP agent will resync its state with Neutron to recover from any</span>
+<span class="c1"># transient notification or RPC errors. The interval is the maximum number of</span>
+<span class="c1"># seconds between attempts. The resync can be done more often based on the</span>
+<span class="c1"># events triggered. (integer value)</span>
+<span class="c1">#resync_interval = 5</span>
+
+<span class="c1"># Throttle the number of resync state events between the local DHCP state and</span>
+<span class="c1"># Neutron to only once per &#39;resync_throttle&#39; seconds. The value of throttle</span>
+<span class="c1"># introduces a minimum interval between resync state events. Otherwise the</span>
+<span class="c1"># resync may end up in a busy-loop. The value must be less than</span>
+<span class="c1"># resync_interval. (integer value)</span>
+<span class="c1">#resync_throttle = 1</span>
+
+<span class="c1"># The driver used to manage the DHCP server. (string value)</span>
+<span class="c1">#dhcp_driver = neutron.agent.linux.dhcp.Dnsmasq</span>
+
+<span class="c1"># The DHCP server can assist with providing metadata support on isolated</span>
+<span class="c1"># networks. Setting this value to True will cause the DHCP server to append</span>
+<span class="c1"># specific host routes to the DHCP request. The metadata service will only be</span>
+<span class="c1"># activated when the subnet does not contain any router port. The guest</span>
+<span class="c1"># instance must be configured to request host routes via DHCP (Option 121).</span>
+<span class="c1"># This option does not have any effect when force_metadata is set to True.</span>
+<span class="c1"># (boolean value)</span>
+<span class="c1">#enable_isolated_metadata = false</span>
+
+<span class="c1"># In some cases the Neutron router is not present to provide the metadata IP</span>
+<span class="c1"># but the DHCP server can be used to provide this info. Setting this value will</span>
+<span class="c1"># force the DHCP server to append specific host routes to the DHCP request. If</span>
+<span class="c1"># this option is set, then the metadata service will be activated for all of</span>
+<span class="c1"># the networks. (boolean value)</span>
+<span class="c1">#force_metadata = false</span>
+
+<span class="c1"># Allows for serving metadata requests coming from a dedicated metadata access</span>
+<span class="c1"># network whose CIDR is 169.254.169.254/16 (or larger prefix), and is connected</span>
+<span class="c1"># to a Neutron router from which the VMs send metadata:1 request. In this case</span>
+<span class="c1"># DHCP Option 121 will not be injected in VMs, as they will be able to reach</span>
+<span class="c1"># 169.254.169.254 through a router. This option requires</span>
+<span class="c1"># enable_isolated_metadata = True. (boolean value)</span>
+<span class="c1">#enable_metadata_network = false</span>
+
+<span class="c1"># Number of threads to use during sync process. Should not exceed connection</span>
+<span class="c1"># pool size configured on server. (integer value)</span>
+<span class="c1">#num_sync_threads = 4</span>
+
+<span class="c1"># Time to sleep between reloading the DHCP allocations. This will only be</span>
+<span class="c1"># invoked if the value is not 0. If a network has N updates in X seconds then</span>
+<span class="c1"># it will reload once and not N times. (integer value)</span>
+<span class="c1"># Minimum value: 0</span>
+<span class="c1">#bulk_reload_interval = 0</span>
+
+<span class="c1"># Location to store DHCP server config files. (string value)</span>
+<span class="c1">#dhcp_confs = $state_path/dhcp</span>
+
+<span class="c1"># Override the default dnsmasq settings with this file. (string value)</span>
+<span class="c1">#dnsmasq_config_file =</span>
+
+<span class="c1"># Comma-separated list of the DNS servers which will be used as forwarders.</span>
+<span class="c1"># (list value)</span>
+<span class="c1">#dnsmasq_dns_servers =</span>
+
+<span class="c1"># Base log dir for dnsmasq logging. The log contains DHCP and DNS log</span>
+<span class="c1"># information and is useful for debugging issues with either DHCP or DNS. If</span>
+<span class="c1"># this section is null, disable dnsmasq log. (string value)</span>
+<span class="c1">#dnsmasq_base_log_dir = &lt;None&gt;</span>
+
+<span class="c1"># Enables the dnsmasq service to provide name resolution for instances via DNS</span>
+<span class="c1"># resolvers on the host running the DHCP agent. Effectively removes the &#39;--no-</span>
+<span class="c1"># resolv&#39; option from the dnsmasq process arguments. Adding custom DNS</span>
+<span class="c1"># resolvers to the &#39;dnsmasq_dns_servers&#39; option disables this feature. (boolean</span>
+<span class="c1"># value)</span>
+<span class="c1">#dnsmasq_local_resolv = false</span>
+
+<span class="c1"># Limit number of leases to prevent a denial-of-service. (integer value)</span>
+<span class="c1">#dnsmasq_lease_max = 16777216</span>
+
+<span class="c1"># Use broadcast in DHCP replies. (boolean value)</span>
+<span class="c1">#dhcp_broadcast_reply = false</span>
+
+<span class="c1"># Enable dhcp-host entry with list of addresses when port has multiple IPv6</span>
+<span class="c1"># addresses in the same subnet. (boolean value)</span>
+<span class="c1">#dnsmasq_enable_addr6_list = false</span>
+
+<span class="c1">#</span>
+<span class="c1"># From oslo.log</span>
+<span class="c1">#</span>
+
+<span class="c1"># If set to true, the logging level will be set to DEBUG instead of the default</span>
+<span class="c1"># INFO level. (boolean value)</span>
+<span class="c1"># Note: This option can be changed without restarting.</span>
+<span class="c1">#debug = false</span>
+
+<span class="c1"># The name of a logging configuration file. This file is appended to any</span>
+<span class="c1"># existing logging configuration files. For details about logging configuration</span>
+<span class="c1"># files, see the Python logging module documentation. Note that when logging</span>
+<span class="c1"># configuration files are used then all logging configuration is set in the</span>
+<span class="c1"># configuration file and other logging configuration options are ignored (for</span>
+<span class="c1"># example, log-date-format). (string value)</span>
+<span class="c1"># Note: This option can be changed without restarting.</span>
+<span class="c1"># Deprecated group/name - [DEFAULT]/log_config</span>
+<span class="c1">#log_config_append = &lt;None&gt;</span>
+
+<span class="c1"># Defines the format string for %%(asctime)s in log records. Default:</span>
+<span class="c1"># %(default)s . This option is ignored if log_config_append is set. (string</span>
+<span class="c1"># value)</span>
+<span class="c1">#log_date_format = %Y-%m-%d %H:%M:%S</span>
+
+<span class="c1"># (Optional) Name of log file to send logging output to. If no default is set,</span>
+<span class="c1"># logging will go to stderr as defined by use_stderr. This option is ignored if</span>
+<span class="c1"># log_config_append is set. (string value)</span>
+<span class="c1"># Deprecated group/name - [DEFAULT]/logfile</span>
+<span class="c1">#log_file = &lt;None&gt;</span>
+
+<span class="c1"># (Optional) The base directory used for relative log_file  paths. This option</span>
+<span class="c1"># is ignored if log_config_append is set. (string value)</span>
+<span class="c1"># Deprecated group/name - [DEFAULT]/logdir</span>
+<span class="c1">#log_dir = &lt;None&gt;</span>
+
+<span class="c1"># DEPRECATED: Uses logging handler designed to watch file system. When log file</span>
+<span class="c1"># is moved or removed this handler will open a new log file with specified path</span>
+<span class="c1"># instantaneously. It makes sense only if log_file option is specified and</span>
+<span class="c1"># Linux platform is used. This option is ignored if log_config_append is set.</span>
+<span class="c1"># (boolean value)</span>
+<span class="c1"># This option is deprecated for removal.</span>
+<span class="c1"># Its value may be silently ignored in the future.</span>
+<span class="c1"># Reason: This function is known to have bene broken for long time, and depends</span>
+<span class="c1"># on the unmaintained library</span>
+<span class="c1">#watch_log_file = false</span>
+
+<span class="c1"># Use syslog for logging. Existing syslog format is DEPRECATED and will be</span>
+<span class="c1"># changed later to honor RFC5424. This option is ignored if log_config_append</span>
+<span class="c1"># is set. (boolean value)</span>
+<span class="c1">#use_syslog = false</span>
+
+<span class="c1"># Enable journald for logging. If running in a systemd environment you may wish</span>
+<span class="c1"># to enable journal support. Doing so will use the journal native protocol</span>
+<span class="c1"># which includes structured metadata in addition to log messages.This option is</span>
+<span class="c1"># ignored if log_config_append is set. (boolean value)</span>
+<span class="c1">#use_journal = false</span>
+
+<span class="c1"># Syslog facility to receive log lines. This option is ignored if</span>
+<span class="c1"># log_config_append is set. (string value)</span>
+<span class="c1">#syslog_log_facility = LOG_USER</span>
+
+<span class="c1"># Use JSON formatting for logging. This option is ignored if log_config_append</span>
+<span class="c1"># is set. (boolean value)</span>
+<span class="c1">#use_json = false</span>
+
+<span class="c1"># Log output to standard error. This option is ignored if log_config_append is</span>
+<span class="c1"># set. (boolean value)</span>
+<span class="c1">#use_stderr = false</span>
+
+<span class="c1"># (Optional) Set the &#39;color&#39; key according to log levels. This option takes</span>
+<span class="c1"># effect only when logging to stderr or stdout is used. This option is ignored</span>
+<span class="c1"># if log_config_append is set. (boolean value)</span>
+<span class="c1">#log_color = false</span>
+
+<span class="c1"># The amount of time before the log files are rotated. This option is ignored</span>
+<span class="c1"># unless log_rotation_type is set to &quot;interval&quot;. (integer value)</span>
+<span class="c1">#log_rotate_interval = 1</span>
+
+<span class="c1"># Rotation interval type. The time of the last file change (or the time when</span>
+<span class="c1"># the service was started) is used when scheduling the next rotation. (string</span>
+<span class="c1"># value)</span>
+<span class="c1"># Possible values:</span>
+<span class="c1"># Seconds - &lt;No description provided&gt;</span>
+<span class="c1"># Minutes - &lt;No description provided&gt;</span>
+<span class="c1"># Hours - &lt;No description provided&gt;</span>
+<span class="c1"># Days - &lt;No description provided&gt;</span>
+<span class="c1"># Weekday - &lt;No description provided&gt;</span>
+<span class="c1"># Midnight - &lt;No description provided&gt;</span>
+<span class="c1">#log_rotate_interval_type = days</span>
+
+<span class="c1"># Maximum number of rotated log files. (integer value)</span>
+<span class="c1">#max_logfile_count = 30</span>
+
+<span class="c1"># Log file maximum size in MB. This option is ignored if &quot;log_rotation_type&quot; is</span>
+<span class="c1"># not set to &quot;size&quot;. (integer value)</span>
+<span class="c1">#max_logfile_size_mb = 200</span>
+
+<span class="c1"># Log rotation type. (string value)</span>
+<span class="c1"># Possible values:</span>
+<span class="c1"># interval - Rotate logs at predefined time intervals.</span>
+<span class="c1"># size - Rotate logs once they reach a predefined size.</span>
+<span class="c1"># none - Do not rotate log files.</span>
+<span class="c1">#log_rotation_type = none</span>
+
+<span class="c1"># Format string to use for log messages with context. Used by</span>
+<span class="c1"># oslo_log.formatters.ContextFormatter (string value)</span>
+<span class="c1">#logging_context_format_string = %(asctime)s.%(msecs)03d %(process)d %(levelname)s %(name)s [%(global_request_id)s %(request_id)s %(user_identity)s] %(instance)s%(message)s</span>
+
+<span class="c1"># Format string to use for log messages when context is undefined. Used by</span>
+<span class="c1"># oslo_log.formatters.ContextFormatter (string value)</span>
+<span class="c1">#logging_default_format_string = %(asctime)s.%(msecs)03d %(process)d %(levelname)s %(name)s [-] %(instance)s%(message)s</span>
+
+<span class="c1"># Additional data to append to log message when logging level for the message</span>
+<span class="c1"># is DEBUG. Used by oslo_log.formatters.ContextFormatter (string value)</span>
+<span class="c1">#logging_debug_format_suffix = %(funcName)s %(pathname)s:%(lineno)d</span>
+
+<span class="c1"># Prefix each line of exception output with this format. Used by</span>
+<span class="c1"># oslo_log.formatters.ContextFormatter (string value)</span>
+<span class="c1">#logging_exception_prefix = %(asctime)s.%(msecs)03d %(process)d ERROR %(name)s %(instance)s</span>
+
+<span class="c1"># Defines the format string for %(user_identity)s that is used in</span>
+<span class="c1"># logging_context_format_string. Used by oslo_log.formatters.ContextFormatter</span>
+<span class="c1"># (string value)</span>
+<span class="c1">#logging_user_identity_format = %(user)s %(project)s %(domain)s %(system_scope)s %(user_domain)s %(project_domain)s</span>
+
+<span class="c1"># List of package logging levels in logger=LEVEL pairs. This option is ignored</span>
+<span class="c1"># if log_config_append is set. (list value)</span>
+<span class="c1">#default_log_levels = amqp=WARN,amqplib=WARN,boto=WARN,qpid=WARN,sqlalchemy=WARN,suds=INFO,oslo.messaging=INFO,oslo_messaging=INFO,iso8601=WARN,requests.packages.urllib3.connectionpool=WARN,urllib3.connectionpool=WARN,websocket=WARN,requests.packages.urllib3.util.retry=WARN,urllib3.util.retry=WARN,keystonemiddleware=WARN,routes.middleware=WARN,stevedore=WARN,taskflow=WARN,keystoneauth=WARN,oslo.cache=INFO,oslo_policy=INFO,dogpile.core.dogpile=INFO</span>
+
+<span class="c1"># Enables or disables publication of error events. (boolean value)</span>
+<span class="c1">#publish_errors = false</span>
+
+<span class="c1"># The format for an instance that is passed with the log message. (string</span>
+<span class="c1"># value)</span>
+<span class="c1">#instance_format = &quot;[instance: %(uuid)s] &quot;</span>
+
+<span class="c1"># The format for an instance UUID that is passed with the log message. (string</span>
+<span class="c1"># value)</span>
+<span class="c1">#instance_uuid_format = &quot;[instance: %(uuid)s] &quot;</span>
+
+<span class="c1"># Interval, number of seconds, of log rate limiting. (integer value)</span>
+<span class="c1">#rate_limit_interval = 0</span>
+
+<span class="c1"># Maximum number of logged messages per rate_limit_interval. (integer value)</span>
+<span class="c1">#rate_limit_burst = 0</span>
+
+<span class="c1"># Log level name used by rate limiting. Logs with level greater or equal to</span>
+<span class="c1"># rate_limit_except_level are not filtered. An empty string means that all</span>
+<span class="c1"># levels are filtered. (string value)</span>
+<span class="c1"># Possible values:</span>
+<span class="c1"># CRITICAL - &lt;No description provided&gt;</span>
+<span class="c1"># ERROR - &lt;No description provided&gt;</span>
+<span class="c1"># INFO - &lt;No description provided&gt;</span>
+<span class="c1"># WARNING - &lt;No description provided&gt;</span>
+<span class="c1"># DEBUG - &lt;No description provided&gt;</span>
+<span class="c1"># &#39;&#39; - &lt;No description provided&gt;</span>
+<span class="c1">#rate_limit_except_level = CRITICAL</span>
+
+<span class="c1"># Enables or disables fatal status of deprecations. (boolean value)</span>
+<span class="c1">#fatal_deprecations = false</span>
+
+
+<span class="p">[</span><span class="n">agent</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From neutron.az.agent</span>
+<span class="c1">#</span>
+
+<span class="c1"># Availability zone of this node (string value)</span>
+<span class="c1">#availability_zone = nova</span>
+
+<span class="c1">#</span>
+<span class="c1"># From neutron.base.agent</span>
+<span class="c1">#</span>
+
+<span class="c1"># Seconds between nodes reporting state to server; should be less than</span>
+<span class="c1"># agent_down_time, best if it is half or less than agent_down_time. (floating</span>
+<span class="c1"># point value)</span>
+<span class="c1">#report_interval = 30</span>
+
+<span class="c1"># Log agent heartbeats (boolean value)</span>
+<span class="c1">#log_agent_heartbeats = false</span>
+
+
+<span class="p">[</span><span class="n">metadata_rate_limiting</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From neutron.dhcp.agent</span>
+<span class="c1">#</span>
+
+<span class="c1"># Enable rate limiting on the metadata API. (boolean value)</span>
+<span class="c1">#rate_limit_enabled = false</span>
+
+<span class="c1"># Comma separated list of the metadata address IP versions (4, 6) for which</span>
+<span class="c1"># rate limiting will be enabled. The default is to rate limit only for the</span>
+<span class="c1"># metadata IPv4 address. NOTE: at the moment, the open source version of</span>
+<span class="c1"># HAProxy only allows us to rate limit for IPv4 or IPv6, but not both at the</span>
+<span class="c1"># same time. (list value)</span>
+<span class="c1">#ip_versions = 4</span>
+
+<span class="c1"># Duration (seconds) of the base window on the metadata API. (integer value)</span>
+<span class="c1">#base_window_duration = 10</span>
+
+<span class="c1"># Max number of queries to accept during the base window. (integer value)</span>
+<span class="c1">#base_query_rate_limit = 10</span>
+
+<span class="c1"># Duration (seconds) of the burst window on the metadata API. (integer value)</span>
+<span class="c1">#burst_window_duration = 10</span>
+
+<span class="c1"># Max number of queries to accept during the burst window. (integer value)</span>
+<span class="c1">#burst_query_rate_limit = 10</span>
+
+
+<span class="p">[</span><span class="n">ovs</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From neutron.base.agent</span>
+<span class="c1">#</span>
+
+<span class="c1"># The connection string for the OVSDB backend. Will be used for all OVSDB</span>
+<span class="c1"># commands and by ovsdb-client when monitoring (string value)</span>
+<span class="c1">#ovsdb_connection = tcp:127.0.0.1:6640</span>
+
+<span class="c1"># The SSL private key file to use when interacting with OVSDB. Required when</span>
+<span class="c1"># using an &quot;ssl:&quot; prefixed ovsdb_connection (string value)</span>
+<span class="c1">#ssl_key_file = &lt;None&gt;</span>
+
+<span class="c1"># The SSL certificate file to use when interacting with OVSDB. Required when</span>
+<span class="c1"># using an &quot;ssl:&quot; prefixed ovsdb_connection (string value)</span>
+<span class="c1">#ssl_cert_file = &lt;None&gt;</span>
+
+<span class="c1"># The Certificate Authority (CA) certificate to use when interacting with</span>
+<span class="c1"># OVSDB. Required when using an &quot;ssl:&quot; prefixed ovsdb_connection (string value)</span>
+<span class="c1">#ssl_ca_cert_file = &lt;None&gt;</span>
+
+<span class="c1"># Enable OVSDB debug logs (boolean value)</span>
+<span class="c1">#ovsdb_debug = false</span>
+
+<span class="c1"># Timeout in seconds for OVSDB commands. If the timeout expires, OVSDB commands</span>
+<span class="c1"># will fail with ALARMCLOCK error. (integer value)</span>
+<span class="c1">#ovsdb_timeout = 10</span>
+
+<span class="c1"># The maximum number of MAC addresses to learn on a bridge managed by the</span>
+<span class="c1"># Neutron OVS agent. Values outside a reasonable range (10 to 1,000,000) might</span>
+<span class="c1"># be overridden by Open vSwitch according to the documentation. (integer value)</span>
+<span class="c1">#bridge_mac_table_size = 50000</span>
+
+<span class="c1"># Enable IGMP snooping for integration bridge. If this option is set to True,</span>
+<span class="c1"># support for Internet Group Management Protocol (IGMP) is enabled in</span>
+<span class="c1"># integration bridge. (boolean value)</span>
+<span class="c1">#igmp_snooping_enable = false</span>
+
+<span class="c1"># Multicast packets (except reports) are unconditionally forwarded to the ports</span>
+<span class="c1"># bridging a logical network to a physical network. (boolean value)</span>
+<span class="c1">#igmp_flood = false</span>
+
+<span class="c1"># Multicast reports are unconditionally forwarded to the ports bridging a</span>
+<span class="c1"># logical network to a physical network. (boolean value)</span>
+<span class="c1">#igmp_flood_reports = true</span>
+
+<span class="c1"># This option enables or disables flooding of unregistered multicast packets to</span>
+<span class="c1"># all ports. If False, The switch will send unregistered multicast packets only</span>
+<span class="c1"># to ports connected to multicast routers. (boolean value)</span>
+<span class="c1">#igmp_flood_unregistered = false</span>
+</pre></div>
+</div>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="sriov-agent.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Sample sriov_agent.ini"></i></a>
+          
+          
+            <a href="l3-agent.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Sample l3_agent.ini"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2017-07-13 06:34:22</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributor/index.html">Contributor Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "configuration/samples/dhcp-agent" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Sample dhcp_agent.ini in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2017-07-13 06:34:22";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "configuration/samples/dhcp-agent";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>BGP Floating IPs over L2 Segmented Networks &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/support-matrix.css?v=ac26a930" />
+    <script src="../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Agents and Services" href="config-services-agent.html" />
+    <link rel="prev" title="BGP Dynamic Routing" href="config-bgp-dynamic-routing.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/admin/config-bgp-floating-ip-over-l2-segmented-network.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>BGP Floating IPs over L2 Segmented Networks</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="config-bgp-dynamic-routing.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: BGP Dynamic Routing"></i></a>
+    
+    
+    <a href="config-services-agent.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Agents and Services"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="bgp-floating-ips-over-l2-segmented-networks">
+<span id="config-bgp-floating-ip-over-l2-segmented-network"></span><h1>BGP Floating IPs over L2 Segmented Networks<a class="headerlink" href="#bgp-floating-ips-over-l2-segmented-networks" title="Link to this heading">¶</a></h1>
+<p>The general principle is that L2 connectivity will be bound to a single rack.
+Everything outside the switches of the rack will be routed using BGP. To
+perform the BGP announcement, neutron-dynamic-routing is leveraged.</p>
+<p>To achieve this, on each rack, servers are setup with a different management
+network using a vlan ID per rack (light green and orange network below).
+Note that a unique vlan ID per rack isn’t mandatory, it’s also possible to
+use the same vlan ID on all racks. The point here is only to isolate L2
+segments (typically, routing between the switch of each racks will be done
+over BGP, without L2 connectivity).</p>
+<img alt="../_images/bgp-floating-ip-over-l2-segmented-network.png" src="../_images/bgp-floating-ip-over-l2-segmented-network.png" />
+<p>On the OpenStack side, a provider network must be setup, which is using a
+different subnet range and vlan ID for each rack. This includes:</p>
+<ul class="simple">
+<li><p>an address scope</p></li>
+<li><p>some network segments for that network, which are attached to a named
+physical network</p></li>
+<li><p>a subnet pool using that address scope</p></li>
+<li><p>one provider network subnet per segment (each subnet+segment pair matches
+one rack physical network name)</p></li>
+</ul>
+<p>A segment is attached to a specific vlan and physical network name. In the
+above figure, the provider network is represented by 2 subnets: the dark green
+and the red ones. The dark green subnet is on one network segment, and the red
+one on another. Both subnet are of the subnet service type
+“network:floatingip_agent_gateway”, so that they cannot be used by virtual
+machines directly.</p>
+<p>On top of all of this, a floating IP subnet without a segment is added, which
+spans in all of the racks. This subnet must have the below service types:</p>
+<ul class="simple">
+<li><p>network:routed</p></li>
+<li><p>network:floatingip</p></li>
+<li><p>network:router_gateway</p></li>
+</ul>
+<p>Since the network:routed subnet isn’t bound to a segment, it can be used on all
+racks. As the service types network:floatingip and network:router_gateway are
+used for the provider network, the subnet can only be used for floating IPs and
+router gateways, meaning that the subnet using segments will be used as
+floating IP gateways (ie: the next HOP to reach these floating IP / router
+external gateways).</p>
+<section id="configuring-the-neutron-api-side">
+<h2>Configuring the Neutron API side<a class="headerlink" href="#configuring-the-neutron-api-side" title="Link to this heading">¶</a></h2>
+<p>On the controller side (ie: API and RPC server), only the Neutron Dynamic
+Routing Python library must be installed (for example, in the Debian case,
+that would be the neutron-dynamic-routing-common and
+python3-neutron-dynamic-routing packages). On top of that, “segments” and
+“bgp” must be added to the list of plugins in service_plugins. For example
+in neutron.conf:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[DEFAULT]</span>
+<span class="na">service_plugins</span><span class="o">=</span><span class="s">router,metering,qos,trunk,segments,bgp</span>
+</pre></div>
+</div>
+</section>
+<section id="the-bgp-agent">
+<h2>The BGP agent<a class="headerlink" href="#the-bgp-agent" title="Link to this heading">¶</a></h2>
+<p>The neutron-bgp-agent must be installed. Best is to install it twice per rack,
+on any machine (it doesn’t mater much where). Then each of these BGP agents
+will establish a session with one switch, and advertise all of the BGP
+configuration.</p>
+</section>
+<section id="setting-up-bgp-peering-with-the-switches">
+<h2>Setting-up BGP peering with the switches<a class="headerlink" href="#setting-up-bgp-peering-with-the-switches" title="Link to this heading">¶</a></h2>
+<p>A peer that represents the network equipment must be created. Then a matching
+BGP speaker needs to be created. Then, the BGP speaker must be
+associated to a dynamic-routing-agent (in our example, the dynamic-routing
+agents run on compute 1 and 4). Finally, the peer is added to the BGP speaker,
+so the speaker initiates a BGP session to the network equipment.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="c1"># Create a BGP peer to represent the switch 1,</span>
+<span class="gp">$ </span><span class="c1"># which runs FRR on 10.1.0.253 with AS 64601</span>
+<span class="gp">$ </span>openstack<span class="w"> </span>bgp<span class="w"> </span>peer<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--peer-ip<span class="w"> </span><span class="m">10</span>.1.0.253<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--remote-as<span class="w"> </span><span class="m">64601</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>rack1-switch-1
+
+<span class="gp">$ </span><span class="c1"># Create a BGP speaker on compute-1</span>
+<span class="gp">$ </span><span class="nv">BGP_SPEAKER_ID_COMPUTE_1</span><span class="o">=</span><span class="k">$(</span>openstack<span class="w"> </span>bgp<span class="w"> </span>speaker<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--local-as<span class="w"> </span><span class="m">64999</span><span class="w"> </span>--ip-version<span class="w"> </span><span class="m">4</span><span class="w"> </span>mycloud-compute-1.example.com<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--format<span class="w"> </span>value<span class="w"> </span>-c<span class="w"> </span>id<span class="k">)</span>
+
+<span class="gp">$ </span><span class="c1"># Get the agent ID of the dragent running on compute 1</span>
+<span class="gp">$ </span><span class="nv">BGP_AGENT_ID_COMPUTE_1</span><span class="o">=</span><span class="k">$(</span>openstack<span class="w"> </span>network<span class="w"> </span>agent<span class="w"> </span>list<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--host<span class="w"> </span>mycloud-compute-1.example.com<span class="w"> </span>--agent-type<span class="w"> </span>bgp<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--format<span class="w"> </span>value<span class="w"> </span>-c<span class="w"> </span>ID<span class="k">)</span>
+
+<span class="gp">$ </span><span class="c1"># Add the BGP speaker to the dragent of compute 1</span>
+<span class="gp">$ </span>openstack<span class="w"> </span>bgp<span class="w"> </span>dragent<span class="w"> </span>add<span class="w"> </span>speaker<span class="w"> </span><span class="se">\</span>
+<span class="gp">      $</span><span class="o">{</span>BGP_AGENT_ID_COMPUTE_1<span class="o">}</span><span class="w"> </span><span class="si">${</span><span class="nv">BGP_SPEAKER_ID_COMPUTE_1</span><span class="si">}</span>
+
+<span class="gp">$ </span><span class="c1"># Add the BGP peer to the speaker of compute 1</span>
+<span class="gp">$ </span>openstack<span class="w"> </span>bgp<span class="w"> </span>speaker<span class="w"> </span>add<span class="w"> </span>peer<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>compute-1.example.com<span class="w"> </span>rack1-switch-1
+
+<span class="gp">$ </span><span class="c1"># Tell the speaker not to advertize tenant networks</span>
+<span class="gp">$ </span>openstack<span class="w"> </span>bgp<span class="w"> </span>speaker<span class="w"> </span><span class="nb">set</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--no-advertise-tenant-networks<span class="w"> </span>mycloud-compute-1.example.com
+</pre></div>
+</div>
+<p>It is possible to repeat this operation for a 2nd machine on the same rack,
+if the deployment is using bonding (and then, LACP between both switches),
+as per the figure above. It also can be done on each rack. One way to
+deploy is to select two computers in each rack (for example, one compute
+node and one network node), and install the neutron-dynamic-routing-agent
+on each of them, so they can “talk” to both switches of the rack. All of
+this depends on what the configuration is on the switch side. It may be
+that you only need to talk to two ToR racks in the whole deployment. The
+thing you must know is that you can deploy as many dynamic-routing agent
+as needed, and that one agent can talk to a single device.</p>
+</section>
+<section id="setting-up-physical-network-names">
+<h2>Setting-up physical network names<a class="headerlink" href="#setting-up-physical-network-names" title="Link to this heading">¶</a></h2>
+<p>Before setting-up the provider network, the physical network name must be set
+in each host, according to the rack names. On the compute or network nodes,
+this is done in /etc/neutron/plugins/ml2/openvswitch_agent.ini using the
+bridge_mappings directive:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[ovs]</span>
+<span class="na">bridge_mappings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">physnet-rack1:br-ex</span>
+</pre></div>
+</div>
+<p>All of the physical networks created this way must be added in the
+configuration of the neutron-server as well (ie: this is used by both
+neutron-api and neutron-rpc-server). For example, with 3 racks,
+here’s how /etc/neutron/plugins/ml2/ml2_conf.ini should look like:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[ml2_type_flat]</span>
+<span class="na">flat_networks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">physnet-rack1,physnet-rack2,physnet-rack3</span>
+
+<span class="k">[ml2_type_vlan]</span>
+<span class="na">network_vlan_ranges</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">physnet-rack1,physnet-rack2,physnet-rack3</span>
+</pre></div>
+</div>
+<p>Once this is done, the provider network can be created, using physnet-rack1
+as “physical network”.</p>
+</section>
+<section id="setting-up-the-provider-network">
+<h2>Setting-up the provider network<a class="headerlink" href="#setting-up-the-provider-network" title="Link to this heading">¶</a></h2>
+<p>Everything that is in the provider network’s scope will be advertised through
+BGP. Here is how to create the network scope:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="c1"># Create the address scope</span>
+<span class="gp">$ </span>openstack<span class="w"> </span>address<span class="w"> </span>scope<span class="w"> </span>create<span class="w"> </span>--share<span class="w"> </span>--ip-version<span class="w"> </span><span class="m">4</span><span class="w"> </span>provider-addr-scope
+</pre></div>
+</div>
+<p>Then, the network can be ceated using the physical network name set above:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="c1"># Create the provider network that spawns over all racks</span>
+<span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>create<span class="w"> </span>--external<span class="w"> </span>--share<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--provider-physical-network<span class="w"> </span>physnet-rack1<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--provider-network-type<span class="w"> </span>vlan<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--provider-segment<span class="w"> </span><span class="m">11</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>provider-network
+</pre></div>
+</div>
+<p>This automatically creates a network AND a segment. Though by default, this
+segment has no name, which isn’t convenient. This name can be changed though:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="c1"># Get the network ID:</span>
+<span class="gp">$ </span><span class="nv">PROVIDER_NETWORK_ID</span><span class="o">=</span><span class="k">$(</span>openstack<span class="w"> </span>network<span class="w"> </span>show<span class="w"> </span>provider-network<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--format<span class="w"> </span>value<span class="w"> </span>-c<span class="w"> </span>id<span class="k">)</span>
+
+<span class="gp">$ </span><span class="c1"># Get the segment ID:</span>
+<span class="gp">$ </span><span class="nv">FIRST_SEGMENT_ID</span><span class="o">=</span><span class="k">$(</span>openstack<span class="w"> </span>network<span class="w"> </span>segment<span class="w"> </span>list<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--format<span class="w"> </span>csv<span class="w"> </span>-c<span class="w"> </span>ID<span class="w"> </span>-c<span class="w"> </span>Network<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>q<span class="w"> </span>-H<span class="w"> </span>-d,<span class="w"> </span><span class="s2">&quot;SELECT ID FROM - WHERE Network=&#39;</span><span class="si">${</span><span class="nv">PROVIDER_NETWORK_ID</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="k">)</span>
+
+<span class="gp">$ </span><span class="c1"># Set the 1st segment name, matching the rack name</span>
+<span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>segment<span class="w"> </span><span class="nb">set</span><span class="w"> </span>--name<span class="w"> </span>segment-rack1<span class="w"> </span><span class="si">${</span><span class="nv">FIRST_SEGMENT_ID</span><span class="si">}</span>
+</pre></div>
+</div>
+</section>
+<section id="setting-up-the-2nd-segment">
+<h2>Setting-up the 2nd segment<a class="headerlink" href="#setting-up-the-2nd-segment" title="Link to this heading">¶</a></h2>
+<p>The 2nd segment, which will be attached to our provider network, is created
+this way:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="c1"># Create the 2nd segment, matching the 2nd rack name</span>
+<span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>segment<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--physical-network<span class="w"> </span>physnet-rack2<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--network-type<span class="w"> </span>vlan<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--segment<span class="w"> </span><span class="m">13</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--network<span class="w"> </span>provider-network<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>segment-rack2
+</pre></div>
+</div>
+</section>
+<section id="setting-up-the-provider-subnets-for-the-bgp-next-hop-routing">
+<h2>Setting-up the provider subnets for the BGP next HOP routing<a class="headerlink" href="#setting-up-the-provider-subnets-for-the-bgp-next-hop-routing" title="Link to this heading">¶</a></h2>
+<p>These subnets will be in use in different racks, depending on what physical
+network is in use in the machines. In order to use the address scope, subnet
+pools must be used. Here is how to create the subnet pool with the two ranges
+to use later when creating the subnets:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="c1"># Create the provider subnet pool which includes all ranges for all racks</span>
+<span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>pool<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--pool-prefix<span class="w"> </span><span class="m">10</span>.1.0.0/24<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--pool-prefix<span class="w"> </span><span class="m">10</span>.2.0.0/24<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--address-scope<span class="w"> </span>provider-addr-scope<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--share<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>provider-subnet-pool
+</pre></div>
+</div>
+<p>Then, this is how to create the two subnets. In this example, we are keeping
+the addresses in .1 for the gateway, .2 for the DHCP server, and .253 +.254,
+as these addresses will be used by the switches for the BGP announcements:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="c1"># Create the subnet for the physnet-rack-1, using the segment-rack-1, and</span>
+<span class="gp">$ </span><span class="c1"># the subnet_service_type network:floatingip_agent_gateway</span>
+<span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--service-type<span class="w"> </span><span class="s1">&#39;network:floatingip_agent_gateway&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--subnet-pool<span class="w"> </span>provider-subnet-pool<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--subnet-range<span class="w"> </span><span class="m">10</span>.1.0.0/24<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--allocation-pool<span class="w"> </span><span class="nv">start</span><span class="o">=</span><span class="m">10</span>.1.0.3,end<span class="o">=</span><span class="m">10</span>.1.0.252<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--gateway<span class="w"> </span><span class="m">10</span>.1.0.1<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--network<span class="w"> </span>provider-network<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--network-segment<span class="w"> </span>segment-rack1<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>provider-subnet-rack1
+
+<span class="gp">$ </span><span class="c1"># The same, for the 2nd rack</span>
+<span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--service-type<span class="w"> </span><span class="s1">&#39;network:floatingip_agent_gateway&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--subnet-pool<span class="w"> </span>provider-subnet-pool<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--subnet-range<span class="w"> </span><span class="m">10</span>.2.0.0/24<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--allocation-pool<span class="w"> </span><span class="nv">start</span><span class="o">=</span><span class="m">10</span>.2.0.3,end<span class="o">=</span><span class="m">10</span>.2.0.252<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--gateway<span class="w"> </span><span class="m">10</span>.2.0.1<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--network<span class="w"> </span>provider-network<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--network-segment<span class="w"> </span>segment-rack2<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>provider-subnet-rack2
+</pre></div>
+</div>
+<p>Note the service types. network:floatingip_agent_gateway makes sure that these
+subnets will be in use only as gateways (ie: the next BGP hop). The above can
+be repeated for each new rack.</p>
+</section>
+<section id="adding-a-subnet-for-vm-floating-ips-and-router-gateways">
+<h2>Adding a subnet for VM floating IPs and router gateways<a class="headerlink" href="#adding-a-subnet-for-vm-floating-ips-and-router-gateways" title="Link to this heading">¶</a></h2>
+<p>This is to be repeated each time a new subnet must be created for floating IPs
+and router gateways. First, the range is added in the subnet pool, then the
+subnet itself is created:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="c1"># Add a new prefix in the subnet pool for the floating IPs:</span>
+<span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>pool<span class="w"> </span><span class="nb">set</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--pool-prefix<span class="w"> </span><span class="m">203</span>.0.113.0/24<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>provider-subnet-pool
+
+<span class="gp">$ </span><span class="c1"># Create the floating IP subnet</span>
+<span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>create<span class="w"> </span>vm-fip<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--service-type<span class="w"> </span><span class="s1">&#39;network:routed&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--service-type<span class="w"> </span><span class="s1">&#39;network:floatingip&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--service-type<span class="w"> </span><span class="s1">&#39;network:router_gateway&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--subnet-pool<span class="w"> </span>provider-subnet-pool<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--subnet-range<span class="w"> </span><span class="m">203</span>.0.113.0/24<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--network<span class="w"> </span>provider-network
+</pre></div>
+</div>
+<p>The service-type network:routed ensures we’re using BGP through the provider
+network to advertize the IPs. network:floatingip and network:router_gateway
+limits the use of these IPs to floating IPs and router gateways.</p>
+</section>
+<section id="setting-up-bgp-advertizing">
+<h2>Setting-up BGP advertizing<a class="headerlink" href="#setting-up-bgp-advertizing" title="Link to this heading">¶</a></h2>
+<p>The provider network needs to be added to each of the BGP speakers. This means
+each time a new rack is setup, the provider network must be added to the 2 BGP
+speakers of that rack.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="c1"># Add the provider network to the BGP speakers.</span>
+<span class="gp">$ </span>openstack<span class="w"> </span>bgp<span class="w"> </span>speaker<span class="w"> </span>add<span class="w"> </span>network<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>mycloud-compute-1.example.com<span class="w"> </span>provider-network
+<span class="gp">$ </span>openstack<span class="w"> </span>bgp<span class="w"> </span>speaker<span class="w"> </span>add<span class="w"> </span>network<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>mycloud-compute-4.example.com<span class="w"> </span>provider-network
+</pre></div>
+</div>
+<p>In this example, we’ve selected two compute nodes that are also running an
+instance of the neutron-dynamic-routing-agent daemon.</p>
+</section>
+<section id="per-project-operation">
+<h2>Per project operation<a class="headerlink" href="#per-project-operation" title="Link to this heading">¶</a></h2>
+<p>This can be done by each customer. A subnet pool isn’t mandatory, but it is
+nice to have. Typically, the customer network will not be advertized through
+BGP (but this can be done if needed).</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="c1"># Create the tenant private network</span>
+<span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>create<span class="w"> </span>tenant-network
+
+<span class="gp">$ </span><span class="c1"># Self-service network pool:</span>
+<span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>pool<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--pool-prefix<span class="w"> </span><span class="m">192</span>.168.130.0/23<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--share<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>tenant-subnet-pool
+
+<span class="gp">$ </span><span class="c1"># Self-service subnet:</span>
+<span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--network<span class="w"> </span>tenant-network<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--subnet-pool<span class="w"> </span>tenant-subnet-pool<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--prefix-length<span class="w"> </span><span class="m">24</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>tenant-subnet-1
+
+<span class="gp">$ </span><span class="c1"># Create the router</span>
+<span class="gp">$ </span>openstack<span class="w"> </span>router<span class="w"> </span>create<span class="w"> </span>tenant-router
+
+<span class="gp">$ </span><span class="c1"># Add the tenant subnet to the tenant router</span>
+<span class="gp">$ </span>openstack<span class="w"> </span>router<span class="w"> </span>add<span class="w"> </span>subnet<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>tenant-router<span class="w"> </span>tenant-subnet-1
+
+<span class="gp">$ </span><span class="c1"># Set the router&#39;s default gateway. This will use one public IP.</span>
+<span class="gp">$ </span>openstack<span class="w"> </span>router<span class="w"> </span><span class="nb">set</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--external-gateway<span class="w"> </span>provider-network<span class="w"> </span>tenant-router
+
+<span class="gp">$ </span><span class="c1"># Create a first VM on the tenant subnet</span>
+<span class="gp">$ </span>openstack<span class="w"> </span>server<span class="w"> </span>create<span class="w"> </span>--image<span class="w"> </span>debian-10.5.0-openstack-amd64.qcow2<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--flavor<span class="w"> </span>cpu2-ram6-disk20<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--nic<span class="w"> </span>net-id<span class="o">=</span>tenant-network<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--key-name<span class="w"> </span>yubikey-zigo<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>test-server-1
+
+<span class="gp">$ </span><span class="c1"># Eventually, add a floating IP</span>
+<span class="gp">$ </span>openstack<span class="w"> </span>floating<span class="w"> </span>ip<span class="w"> </span>create<span class="w"> </span>provider-network
+<span class="go">+---------------------+--------------------------------------+</span>
+<span class="go">| Field               | Value                                |</span>
+<span class="go">+---------------------+--------------------------------------+</span>
+<span class="go">| created_at          | 2020-12-15T11:48:36Z                 |</span>
+<span class="go">| description         |                                      |</span>
+<span class="go">| dns_domain          | None                                 |</span>
+<span class="go">| dns_name            | None                                 |</span>
+<span class="go">| fixed_ip_address    | None                                 |</span>
+<span class="go">| floating_ip_address | 203.0.113.17                         |</span>
+<span class="go">| floating_network_id | 859f5302-7b22-4c50-92f8-1f71d6f3f3f4 |</span>
+<span class="go">| id                  | 01de252b-4b78-4198-bc28-1328393bf084 |</span>
+<span class="go">| name                | 203.0.113.17                         |</span>
+<span class="go">| port_details        | None                                 |</span>
+<span class="go">| port_id             | None                                 |</span>
+<span class="go">| project_id          | d71a5d98aef04386b57736a4ea4f3644     |</span>
+<span class="go">| qos_policy_id       | None                                 |</span>
+<span class="go">| revision_number     | 0                                    |</span>
+<span class="go">| router_id           | None                                 |</span>
+<span class="go">| status              | DOWN                                 |</span>
+<span class="go">| subnet_id           | None                                 |</span>
+<span class="go">| tags                | []                                   |</span>
+<span class="go">| updated_at          | 2020-12-15T11:48:36Z                 |</span>
+<span class="go">+---------------------+--------------------------------------+</span>
+<span class="gp">$ </span>openstack<span class="w"> </span>server<span class="w"> </span>add<span class="w"> </span>floating<span class="w"> </span>ip<span class="w"> </span>test-server-1<span class="w"> </span><span class="m">203</span>.0.113.17
+</pre></div>
+</div>
+</section>
+<section id="cumulus-switch-configuration">
+<h2>Cumulus switch configuration<a class="headerlink" href="#cumulus-switch-configuration" title="Link to this heading">¶</a></h2>
+<p>Because of the way Neutron works, for each new port associated with an IP
+address, a GARP is issued, to inform the switch about the new MAC / IP
+association. Unfortunately, this confuses the switches where they may think
+they should use local ARP table to route the packet, rather than giving it to
+the next HOP to route. The definitive solution would be to patch Neutron to
+make it stop sending GARP for any port on a subnet with the network:routed
+service type. Such patch would be hard to write, though lucky, there’s a fix
+that works (at least with Cumulus switches). Here’s how.</p>
+<p>In /etc/network/switchd.conf we change this:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="c1"># configure a route instead of a neighbor with the same ip/mask</span>
+<span class="c1">#route.route_preferred_over_neigh = FALSE</span>
+<span class="na">route.route_preferred_over_neigh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">TRUE</span>
+</pre></div>
+</div>
+<p>and then simply restart switchd:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">systemctl restart switchd</span>
+</pre></div>
+</div>
+<p>This reboots the switch ASIC of the switch, so it may be a dangerous thing to
+do with no switch redundancy (so be careful when doing it). The completely safe
+procedure, if having 2 switches per rack, looks like this:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span>save<span class="w"> </span>clagd<span class="w"> </span>priority
+<span class="go">OLDPRIO=$(clagctl status | sed -r -n  &#39;s/.*Our.*Role: ([0-9]+) 0.*/\1/p&#39;)</span>
+<span class="gp"># </span>make<span class="w"> </span>sure<span class="w"> </span>that<span class="w"> </span>this<span class="w"> </span>switch<span class="w"> </span>is<span class="w"> </span>not<span class="w"> </span>the<span class="w"> </span>primary<span class="w"> </span>clag<span class="w"> </span>switch.<span class="w"> </span>otherwise<span class="w"> </span>the
+<span class="gp"># </span>secondary<span class="w"> </span>switch<span class="w"> </span>will<span class="w"> </span>also<span class="w"> </span>shutdown<span class="w"> </span>all<span class="w"> </span>interfaces<span class="w"> </span>when<span class="w"> </span>loosing<span class="w"> </span>contact
+<span class="gp"># </span>with<span class="w"> </span>the<span class="w"> </span>primary<span class="w"> </span>switch.
+<span class="go">clagctl priority 16535</span>
+
+<span class="gp"># </span>tell<span class="w"> </span>neighbors<span class="w"> </span>to<span class="w"> </span>not<span class="w"> </span>route<span class="w"> </span>through<span class="w"> </span>this<span class="w"> </span>router
+<span class="go">vtysh</span>
+<span class="go">vtysh# router bgp 64999</span>
+<span class="go">vtysh# bgp graceful-shutdown</span>
+<span class="go">vtysh# exit</span>
+<span class="go">systemctl restart switchd</span>
+<span class="go">clagctl priority $OLDPRIO</span>
+</pre></div>
+</div>
+</section>
+<section id="verification">
+<h2>Verification<a class="headerlink" href="#verification" title="Link to this heading">¶</a></h2>
+<p>If everything goes well, the floating IPs are advertized over BGP through the
+provider network. Here is an example with 4 VMs deployed on 2 racks. Neutron
+is here picking-up IPs on the segmented network as Nexthop.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="c1"># Check the advertized routes:</span>
+<span class="gp">$ </span>openstack<span class="w"> </span>bgp<span class="w"> </span>speaker<span class="w"> </span>list<span class="w"> </span>advertised<span class="w"> </span>routes<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>mycloud-compute-4.example.com
+<span class="go">+-----------------+-----------+</span>
+<span class="go">| Destination     | Nexthop   |</span>
+<span class="go">+-----------------+-----------+</span>
+<span class="go">| 203.0.113.17/32 | 10.1.0.48 |</span>
+<span class="go">| 203.0.113.20/32 | 10.1.0.65 |</span>
+<span class="go">| 203.0.113.40/32 | 10.2.0.23 |</span>
+<span class="go">| 203.0.113.55/32 | 10.2.0.35 |</span>
+<span class="go">+-----------------+-----------+</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="config-bgp-dynamic-routing.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: BGP Dynamic Routing"></i></a>
+          
+          
+            <a href="config-services-agent.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Agents and Services"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2023-09-15 18:12:45</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation Guide</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">OpenStack Networking Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deploy.html">Deployment examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ops.html">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">Migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ovn/index.html">OVN Driver Administration Guide</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributor/index.html">Contributor Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">BGP Floating IPs over L2 Segmented Networks</a><ul>
+<li><a class="reference internal" href="#configuring-the-neutron-api-side">Configuring the Neutron API side</a></li>
+<li><a class="reference internal" href="#the-bgp-agent">The BGP agent</a></li>
+<li><a class="reference internal" href="#setting-up-bgp-peering-with-the-switches">Setting-up BGP peering with the switches</a></li>
+<li><a class="reference internal" href="#setting-up-physical-network-names">Setting-up physical network names</a></li>
+<li><a class="reference internal" href="#setting-up-the-provider-network">Setting-up the provider network</a></li>
+<li><a class="reference internal" href="#setting-up-the-2nd-segment">Setting-up the 2nd segment</a></li>
+<li><a class="reference internal" href="#setting-up-the-provider-subnets-for-the-bgp-next-hop-routing">Setting-up the provider subnets for the BGP next HOP routing</a></li>
+<li><a class="reference internal" href="#adding-a-subnet-for-vm-floating-ips-and-router-gateways">Adding a subnet for VM floating IPs and router gateways</a></li>
+<li><a class="reference internal" href="#setting-up-bgp-advertizing">Setting-up BGP advertizing</a></li>
+<li><a class="reference internal" href="#per-project-operation">Per project operation</a></li>
+<li><a class="reference internal" href="#cumulus-switch-configuration">Cumulus switch configuration</a></li>
+<li><a class="reference internal" href="#verification">Verification</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "admin/config-bgp-floating-ip-over-l2-segmented-network" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "BGP Floating IPs over L2 Segmented Networks in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2023-09-15 18:12:45";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "admin/config-bgp-floating-ip-over-l2-segmented-network";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

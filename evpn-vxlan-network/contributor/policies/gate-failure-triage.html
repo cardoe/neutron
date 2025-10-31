@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Gate Failure Triage &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Pre-release check list" href="release-checklist.html" />
+    <link rel="prev" title="Contributor Onboarding" href="contributor-onboarding.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/contributor/policies/gate-failure-triage.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Gate Failure Triage</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="contributor-onboarding.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Contributor Onboarding"></i></a>
+    
+    
+    <a href="release-checklist.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Pre-release check list"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="gate-failure-triage">
+<h1>Gate Failure Triage<a class="headerlink" href="#gate-failure-triage" title="Link to this heading">¶</a></h1>
+<p>This page provides guidelines for spotting and assessing neutron gate failures.
+Some hints for triaging failures are also provided.</p>
+<section id="spotting-gate-failures">
+<h2>Spotting Gate Failures<a class="headerlink" href="#spotting-gate-failures" title="Link to this heading">¶</a></h2>
+<p>This can be achieved using several tools:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://grafana.opendev.org/d/f913631585/neutron-failure-rate">Grafana dashboard</a></p></li>
+<li><p><a class="reference external" href="https://opensearch.logs.openstack.org/_dashboards/app/discover?security_tenant=global">OpenSearch</a></p></li>
+</ul>
+<p>For checking gate failures with opensearch please see <a class="reference external" href="https://docs.openstack.org/project-team-guide/testing.html#checking-status-of-other-job-results">documentation</a>.
+The following query will return failures for a specific job:</p>
+<dl class="simple">
+<dt>&gt; build_status:FAILURE AND message:Finished AND</dt><dd><p>build_name:”check-tempest-dsvm-neutron” AND build_queue:”gate”</p>
+</dd>
+</dl>
+<p>And divided by the total number of jobs executed:</p>
+<dl class="simple">
+<dt>&gt; message:Finished AND build_name:”check-tempest-dsvm-neutron” AND</dt><dd><p>build_queue:”gate”</p>
+</dd>
+</dl>
+<p>It will return the failure rate in the selected period for a given job. It is
+important to remark that failures in the check queue might be misleading as
+the problem causing the failure is most of the time in the patch being checked.
+Therefore it is always advisable to work on failures occurred in the gate
+queue. However, these failures are a precious resource for assessing frequency
+and determining root cause of failures which manifest in the gate queue.</p>
+<p>The step above will provide a quick outlook of where things stand. When the
+failure rate raises above 10% for a job in 24 hours, it’s time to be on alert.
+25% is amber alert. 33% is red alert. Anything above 50% means that probably
+somebody from the infra team has already a contract out on you. Whether you
+are relaxed, in alert mode, or freaking out because you see a red dot on your
+chest, it is always a good idea to check on daily bases the elastic-recheck
+pages.</p>
+<p>Under the
+<a class="reference external" href="http://status.openstack.org/elastic-recheck/gate.html">gate pipeline</a>
+tab, you can see gate failure rates for already known bugs. The bugs in this
+page are ordered by decreasing failure rates (for the past 24 hours). If one
+of the bugs affecting Neutron is among those on top of that list, you should
+check that the corresponding bug is already assigned and somebody is working
+on it. If not, and there is not a good reason for that, it should be ensured
+somebody gets a crack at it as soon as possible. The other part of the
+story is to check for <a class="reference external" href="http://status.openstack.org/elastic-recheck/data/uncategorized.html">uncategorized</a>
+failures. This is where failures for new (unknown) gate breaking bugs end up;
+on the other hand also infra error causing job failures end up here. It should
+be duty of the diligent Neutron developer to ensure the classification rate
+for neutron jobs is as close as possible to 100%. To this aim, the diligent
+Neutron developer should adopt the procedure outlined in the following
+sections.</p>
+</section>
+<section id="troubleshooting-tempest-jobs">
+<span id="id1"></span><h2>Troubleshooting Tempest jobs<a class="headerlink" href="#troubleshooting-tempest-jobs" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Open logs for failed jobs and look for logs/testr_results.html.gz.</p></li>
+<li><dl class="simple">
+<dt>If that file is missing, check console.html and see where the job failed.</dt><dd><ol class="arabic simple">
+<li><p>If there is a failure in devstack-gate-cleanup-host.txt it’s likely to
+be an infra issue.</p></li>
+<li><p>If the failure is in devstacklog.txt it could a devstack, neutron, or
+infra issue.</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><p>However, most of the time the failure is in one of the tempest tests. Take
+note of the error message and go to opensearch.</p></li>
+<li><p>On opensearch, search for occurrences of this error message, and try to
+identify the root cause for the failure (see below).</p></li>
+<li><p>File a bug for this failure, and push an
+<a class="reference internal" href="#elastic-recheck-query"><span class="std std-ref">Elastic Recheck Query</span></a> for it.</p></li>
+<li><p>If you are confident with the area of this bug, and you have time, assign
+it to yourself; otherwise look for an assignee or talk to the Neutron’s
+bug deputy to find an assignee.</p></li>
+</ol>
+</section>
+<section id="troubleshooting-functional-fullstack-job">
+<h2>Troubleshooting functional/fullstack job<a class="headerlink" href="#troubleshooting-functional-fullstack-job" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Go to the job link provided by Zuul CI.</p></li>
+<li><p>Look at logs/testr_results.html.gz for which particular test failed.</p></li>
+<li><p>More logs from a particular test are stored at
+logs/dsvm-functional-logs/&lt;path_of_the_test&gt; (or dsvm-fullstack-logs
+for fullstack job).</p></li>
+<li><p>Find the error in the logs and search for similar errors in existing
+launchpad bugs. If no bugs were reported, create a new bug report. Don’t
+forget to put a snippet of the trace into the new launchpad bug. If the
+log file for a particular job doesn’t contain any trace, pick the one
+from testr_results.html.gz.</p></li>
+<li><p>Create an <a class="reference internal" href="#elastic-recheck-query"><span class="std std-ref">Elastic Recheck Query</span></a></p></li>
+</ol>
+</section>
+<section id="troubleshooting-grenade-jobs">
+<span id="id2"></span><h2>Troubleshooting Grenade jobs<a class="headerlink" href="#troubleshooting-grenade-jobs" title="Link to this heading">¶</a></h2>
+<p>Grenade is used in the Neutron gate to test every patch proposed to Neutron to
+ensure it will not break the upgrade process.
+Upgrading from the N-1 to the N branch is constantly being tested. So if you
+send patch to the Neutron <code class="docutils literal notranslate"><span class="pre">master</span></code> branch Grenade jobs will first deploy
+Neutron from the last stable release and then upgrade it to the master branch
+with your patch.
+Details about how Grenade works are available in
+<a class="reference external" href="https://docs.openstack.org/grenade/latest/readme.html">the documentation</a>.</p>
+<p>In Neutron CI jobs that use Grenade are run in the multinode jobs configuration
+which means that we have deployed OpenStack on 2 VMs:</p>
+<ul class="simple">
+<li><p>one called <code class="docutils literal notranslate"><span class="pre">controller</span></code> which is in an “all in one”
+node so it runs neutron-server, as well as the neutron-ovs-agent and
+nova-compute services,</p></li>
+<li><p>one called <code class="docutils literal notranslate"><span class="pre">compute1</span></code> which runs only services like nova-compute and
+neutron-ovs-agent.</p></li>
+</ul>
+<p>Neutron supports that neutron-server in N version will always work with the
+agents which runs in N-1 version. To test such scenario all our Grenade jobs
+upgrade OpenStack services only on the <code class="docutils literal notranslate"><span class="pre">controller</span></code> node. Services which run
+on the <code class="docutils literal notranslate"><span class="pre">compute1</span></code> node are always run with the “old” release during that job.</p>
+<p>Debugging of failures in the Grenade job is very similar to debugging any
+other Tempest based job.
+The difference is that in the logs of the Grenade job, there is always
+“logs/old” and “logs/new” directories which contain Devstack logs from each run
+of the Devstack’s stack.sh script.
+In the “logs/grenade.sh_log.txt” file there is a full log of the grenade.sh run
+and you should always start checking failures from that file.
+Logs of the Neutron services for “old” and “new” versions are in the same
+files, like, for example, “logs/screen-q-svc.txt” for neutron-server logs.
+You will find in that log when the service was restarted - that is the moment
+when it was upgraded by Grenade and it is now running the new version.</p>
+</section>
+<section id="advanced-troubleshooting-of-gate-jobs">
+<h2>Advanced Troubleshooting of Gate Jobs<a class="headerlink" href="#advanced-troubleshooting-of-gate-jobs" title="Link to this heading">¶</a></h2>
+<p>As a first step of troubleshooting a failing gate job, you should always check
+the logs of the job as described above.
+Unfortunately, sometimes when a tempest/functional/fullstack job is
+failing, it might be hard to reproduce it in a local environment, and might
+also be hard to understand the reason of such a failure from only reading
+the logs of the failed job.  In such cases there are some additional ways
+to debug the job directly on the test node in a <code class="docutils literal notranslate"><span class="pre">live</span></code> setting.</p>
+<p>This can be done in two ways:</p>
+<ol class="arabic">
+<li><p>Using the <a class="reference external" href="https://pypi.org/project/remote-pdb">remote_pdb</a> python
+module and <code class="docutils literal notranslate"><span class="pre">telnet</span></code> to directly access the python debugger while in the
+failed test.</p>
+<p>To achieve this, you need to send a <code class="docutils literal notranslate"><span class="pre">Do</span> <span class="pre">not</span> <span class="pre">merge</span></code> patch to gerrit with
+changes as described below:</p>
+<ul>
+<li><p>Add an iptables rule to accept incoming telnet connections to remote_pdb.
+This can be done in one of the ansible roles used in the test job.
+Like for example in <code class="docutils literal notranslate"><span class="pre">neutron/roles/configure_functional_tests</span></code> file
+for functional tests:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">iptables</span> <span class="o">-</span><span class="n">I</span> <span class="n">openstack</span><span class="o">-</span><span class="n">INPUT</span> <span class="o">-</span><span class="n">p</span> <span class="n">tcp</span> <span class="o">-</span><span class="n">m</span> <span class="n">state</span> <span class="o">--</span><span class="n">state</span> <span class="n">NEW</span> <span class="o">-</span><span class="n">m</span> <span class="n">tcp</span> <span class="o">--</span><span class="n">dport</span> <span class="mi">44444</span> <span class="o">-</span><span class="n">j</span> <span class="n">ACCEPT</span>
+</pre></div>
+</div>
+</li>
+<li><p>Increase the <code class="docutils literal notranslate"><span class="pre">OS_TEST_TIMEOUT</span></code> value to make the test wait longer when
+remote_pdb is active to make debugging easier.  This change can also be
+done in the ansible role mentioned above:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">OS_TEST_TIMEOUT</span><span class="o">=</span><span class="mi">999999</span>
+</pre></div>
+</div>
+<p>Please note that the overall job will be limited by the job timeout,
+and that cannot be changed from within the job.</p>
+</li>
+<li><p>To make it easier to find the IP address of the test node, you should
+add to the ansible role so it prints the IPs configured on the test node.
+For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">hostname</span> <span class="o">-</span><span class="n">I</span>
+</pre></div>
+</div>
+</li>
+<li><p>Add the package <code class="docutils literal notranslate"><span class="pre">remote_pdb</span></code> to the <code class="docutils literal notranslate"><span class="pre">test-requirements.txt</span></code> file.
+That way it will be automatically installed in the venv of the test
+before it is run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ tail -1 test-requirements.txt
+remote_pdb
+</pre></div>
+</div>
+</li>
+<li><p>Finally, you need to import and call the remote_pdb module in the part
+of your test code where you want to start the debugger:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ diff --git a/neutron/tests/fullstack/test_connectivity.py b/neutron/tests/fullstack/test_connectivity.py
+index c8650b0..260207b 100644
+--- a/neutron/tests/fullstack/test_connectivity.py
++++ b/neutron/tests/fullstack/test_connectivity.py
+@@ -189,6 +189,8 @@ class
+TestLinuxBridgeConnectivitySameNetwork(BaseConnectivitySameNetworkTest):
+        ]
+
+     def test_connectivity(self):
++        import remote_pdb; remote_pdb.set_trace(&#39;0.0.0.0&#39;, port=44444)
++
+self._test_connectivity()
+</pre></div>
+</div>
+<p>Please note that discovery of public IP addresses is necessary because by
+default remote_pdb will only bind to the <code class="docutils literal notranslate"><span class="pre">127.0.0.1</span></code> IP address.
+Above is just an example of one of possible method, there could be other
+ways to do this as well.</p>
+</li>
+</ul>
+<p>When all the above changes are done, you must commit them and go to the
+<a class="reference external" href="https://zuul.openstack.org">Zuul status page</a> to find the status of the
+tests for your <code class="docutils literal notranslate"><span class="pre">Do</span> <span class="pre">not</span> <span class="pre">merge</span></code> patch.  Open the console log for your job
+and wait there until <code class="docutils literal notranslate"><span class="pre">remote_pdb</span></code> is started.
+You then need to find the IP address of the test node in the console log.
+This is necessary to connect via <code class="docutils literal notranslate"><span class="pre">telnet</span></code> and start debugging. It will be
+something like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">RemotePdb</span> <span class="n">session</span> <span class="nb">open</span> <span class="n">at</span> <span class="mf">172.99.68.50</span><span class="p">:</span><span class="mi">44444</span><span class="p">,</span> <span class="n">waiting</span> <span class="k">for</span> <span class="n">connection</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p>An example of such a <code class="docutils literal notranslate"><span class="pre">Do</span> <span class="pre">not</span> <span class="pre">merge</span></code> patch described above can be found at
+<a class="reference external" href="https://review.opendev.org/#/c/558259/">https://review.opendev.org/#/c/558259/</a>.</p>
+<p>Please note that after adding new packages to the <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> file,
+the <code class="docutils literal notranslate"><span class="pre">requirements-check</span></code> job for your test patch will fail, but it is not
+important for debugging.</p>
+</li>
+<li><p>If root access to the test node is necessary, for example, to check if VMs
+have really been spawned, or if router/dhcp namespaces have been configured
+properly, etc., you can ask a member of the infra-team to hold the
+job for troubleshooting.  You can ask someone to help with that on the
+<code class="docutils literal notranslate"><span class="pre">openstack-infra</span></code> IRC channel.  In that case, the infra-team will need to
+add your SSH key to the test node, and configure things so that if the job
+fails, the node will not be destroyed.  You will then be able to SSH to it
+and debug things further.  Please remember to tell the infra-team when you
+finish debugging so they can unlock and destroy the node being held.</p></li>
+</ol>
+<p>The above two solutions can be used together. For example, you should be
+able to connect to the test node with both methods:</p>
+<ul class="simple">
+<li><p>using <code class="docutils literal notranslate"><span class="pre">remote_pdb</span></code> to connect via <code class="docutils literal notranslate"><span class="pre">telnet</span></code>;</p></li>
+<li><p>using <code class="docutils literal notranslate"><span class="pre">SSH</span></code> to connect as a root to the test node.</p></li>
+</ul>
+<p>You can then ask the infra-team to add your key to the specific node on
+which you have already started your <code class="docutils literal notranslate"><span class="pre">remote_pdb</span></code> session.</p>
+</section>
+<section id="root-causing-a-gate-failure">
+<h2>Root Causing a Gate Failure<a class="headerlink" href="#root-causing-a-gate-failure" title="Link to this heading">¶</a></h2>
+<p>Time-based identification, i.e. find the naughty patch by log scavenging.</p>
+</section>
+<section id="filing-an-elastic-recheck-query">
+<span id="elastic-recheck-query"></span><h2>Filing An Elastic Recheck Query<a class="headerlink" href="#filing-an-elastic-recheck-query" title="Link to this heading">¶</a></h2>
+<p>The <a class="reference external" href="http://status.openstack.org/elastic-recheck/">elastic recheck</a> page has all the current open ER queries.
+To file one, please see the <a class="reference external" href="https://wiki.openstack.org/wiki/ElasticRecheck">ER Wiki</a>.</p>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="contributor-onboarding.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Contributor Onboarding"></i></a>
+          
+          
+            <a href="release-checklist.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Pre-release check list"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2024-08-23 12:03:12</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Contributor Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#basic-information">Basic Information</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#neutron-policies">Neutron Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#gerrit-rechecks">Gerrit Rechecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-stadium">Neutron Stadium</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-internals">Neutron Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#ovn-driver">OVN Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#dashboards">Dashboards</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Gate Failure Triage</a><ul>
+<li><a class="reference internal" href="#spotting-gate-failures">Spotting Gate Failures</a></li>
+<li><a class="reference internal" href="#troubleshooting-tempest-jobs">Troubleshooting Tempest jobs</a></li>
+<li><a class="reference internal" href="#troubleshooting-functional-fullstack-job">Troubleshooting functional/fullstack job</a></li>
+<li><a class="reference internal" href="#troubleshooting-grenade-jobs">Troubleshooting Grenade jobs</a></li>
+<li><a class="reference internal" href="#advanced-troubleshooting-of-gate-jobs">Advanced Troubleshooting of Gate Jobs</a></li>
+<li><a class="reference internal" href="#root-causing-a-gate-failure">Root Causing a Gate Failure</a></li>
+<li><a class="reference internal" href="#filing-an-elastic-recheck-query">Filing An Elastic Recheck Query</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "contributor/policies/gate-failure-triage" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Gate Failure Triage in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2024-08-23 12:03:12";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "contributor/policies/gate-failure-triage";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

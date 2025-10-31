@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Virtual Private Network-as-a-Service (VPNaaS) scenario &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/support-matrix.css?v=ac26a930" />
+    <script src="../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="OVN Driver Administration Guide" href="ovn/index.html" />
+    <link rel="prev" title="Disable libvirt networking" href="misc-libvirt.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/admin/vpnaas-scenario.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Virtual Private Network-as-a-Service (VPNaaS) scenario</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="misc-libvirt.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Disable libvirt networking"></i></a>
+    
+    
+    <a href="ovn/index.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: OVN Driver Administration Guide"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="virtual-private-network-as-a-service-vpnaas-scenario">
+<h1>Virtual Private Network-as-a-Service (VPNaaS) scenario<a class="headerlink" href="#virtual-private-network-as-a-service-vpnaas-scenario" title="Link to this heading">¶</a></h1>
+<section id="enabling-vpnaas">
+<h2>Enabling VPNaaS<a class="headerlink" href="#enabling-vpnaas" title="Link to this heading">¶</a></h2>
+<p>This section describes the setting for the reference implementation.
+Vendor plugins or drivers can have different setup procedure and perhaps
+they provide their version of manuals.</p>
+<ol class="arabic">
+<li><p>Enable the VPNaaS plug-in in the <code class="docutils literal notranslate"><span class="pre">/etc/neutron/neutron.conf</span></code> file
+by appending <code class="docutils literal notranslate"><span class="pre">vpnaas</span></code> to <code class="docutils literal notranslate"><span class="pre">service_plugins</span></code> in <code class="docutils literal notranslate"><span class="pre">[DEFAULT]</span></code>:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[DEFAULT]</span>
+<span class="c1"># ...</span>
+<span class="na">service_plugins</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">vpnaas</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">vpnaas</span></code> is just example of reference implementation.
+It depends on a plugin that you are going to use. Consider to
+set suitable plugin for your own deployment.</p>
+</div>
+</li>
+<li><p>Configure the VPNaaS service provider by creating the
+<code class="docutils literal notranslate"><span class="pre">/etc/neutron/neutron_vpnaas.conf</span></code> file as follows, <code class="docutils literal notranslate"><span class="pre">strongswan</span></code> used
+in Ubuntu distribution:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[service_providers]</span>
+<span class="na">service_provider</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">VPN:strongswan:neutron_vpnaas.services.vpn.service_drivers.ipsec.IPsecVPNDriver:default</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>There are several kinds of service drivers.
+Depending upon the Linux distribution, you may need to override this value.
+Select <code class="docutils literal notranslate"><span class="pre">libreswan</span></code> for RHEL/CentOS, the config will like this:
+<code class="docutils literal notranslate"><span class="pre">service_provider</span> <span class="pre">=</span> <span class="pre">VPN:openswan:neutron_vpnaas.services.vpn.service_drivers.ipsec.IPsecVPNDriver:default</span></code>.
+Consider to use the appropriate one for your deployment.</p>
+</div>
+</li>
+<li><p>Configure the VPNaaS plugin for the L3 agent by adding to
+<code class="docutils literal notranslate"><span class="pre">/etc/neutron/l3_agent.ini</span></code> the following section, <code class="docutils literal notranslate"><span class="pre">StrongSwanDriver</span></code>
+used in Ubuntu distribution:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[AGENT]</span>
+<span class="na">extensions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">vpnaas</span>
+
+<span class="k">[vpnagent]</span>
+<span class="na">vpn_device_driver</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">neutron_vpnaas.services.vpn.device_drivers.strongswan_ipsec.StrongSwanDriver</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>There are several kinds of device drivers.
+Depending upon the Linux distribution, you may need to override this value.
+Select <code class="docutils literal notranslate"><span class="pre">LibreSwanDriver</span></code> for RHEL/CentOS, the config will like this:
+<code class="docutils literal notranslate"><span class="pre">vpn_device_driver</span> <span class="pre">=</span> <span class="pre">neutron_vpnaas.services.vpn.device_drivers.libreswan_ipsec.LibreSwanDriver</span></code>.
+Consider to use the appropriate drivers for your deployment.</p>
+</div>
+</li>
+<li><p>Create the required tables in the database:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span>neutron-db-manage<span class="w"> </span>--subproject<span class="w"> </span>neutron-vpnaas<span class="w"> </span>upgrade<span class="w"> </span>head
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In order to run the above command, you need to have <a class="reference external" href="https://pypi.org/project/neutron-vpnaas">neutron-vpnaas</a>
+package installed on controller node.</p>
+</div>
+</li>
+<li><p>Restart the <code class="docutils literal notranslate"><span class="pre">neutron-server</span></code> in controller node to apply the settings.</p></li>
+<li><p>Restart the <code class="docutils literal notranslate"><span class="pre">neutron-l3-agent</span></code> in network node to apply the settings.</p></li>
+</ol>
+</section>
+<section id="using-vpnaas-with-endpoint-group-recommended">
+<h2>Using VPNaaS with endpoint group (recommended)<a class="headerlink" href="#using-vpnaas-with-endpoint-group-recommended" title="Link to this heading">¶</a></h2>
+<p>IPsec site-to-site connections will support multiple local subnets,
+in addition to the current multiple peer CIDRs. The multiple local subnet
+feature is triggered by not specifying a local subnet, when creating a VPN
+service. Backwards compatibility is maintained with single local subnets, by
+providing the subnet in the VPN service creation.</p>
+<p>To support multiple local subnets, a new capability called “End Point Groups”
+has been added. Each endpoint group will define one or more endpoints of
+a specific type, and can be used to specify both local and peer endpoints for
+IPsec connections. The endpoint groups separate the “what gets connected” from
+the “how to connect” for a VPN service, and can be used for different flavors
+of VPN, in the future.</p>
+<p>Refer <a class="reference external" href="https://docs.openstack.org/neutron-vpnaas/latest/contributor/multiple-local-subnets.html">Multiple Local Subnets</a> for more detail.</p>
+<p>Create the IKE policy, IPsec policy, VPN service,
+local endpoint group and peer endpoint group.
+Then, create an IPsec site connection that applies the
+above policies and service.</p>
+<ol class="arabic">
+<li><p>Create an IKE policy:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>vpn<span class="w"> </span>ike<span class="w"> </span>policy<span class="w"> </span>create<span class="w"> </span>ikepolicy
+<span class="go">  +-------------------------------+----------------------------------------+</span>
+<span class="go">  | Field                         | Value                                  |</span>
+<span class="go">  +-------------------------------+----------------------------------------+</span>
+<span class="go">  | Authentication Algorithm      | sha1                                   |</span>
+<span class="go">  | Description                   |                                        |</span>
+<span class="go">  | Encryption Algorithm          | aes-128                                |</span>
+<span class="go">  | ID                            | 735f4691-3670-43b2-b389-f4d81a60ed56   |</span>
+<span class="go">  | IKE Version                   | v1                                     |</span>
+<span class="go">  | Lifetime                      | {u&#39;units&#39;: u&#39;seconds&#39;, u&#39;value&#39;: 3600} |</span>
+<span class="go">  | Name                          | ikepolicy                              |</span>
+<span class="go">  | Perfect Forward Secrecy (PFS) | group5                                 |</span>
+<span class="go">  | Phase1 Negotiation Mode       | main                                   |</span>
+<span class="go">  | Project                       | 095247cb2e22455b9850c6efff407584       |</span>
+<span class="go">  | project_id                    | 095247cb2e22455b9850c6efff407584       |</span>
+<span class="go">  +-------------------------------+----------------------------------------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create an IPsec policy:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>vpn<span class="w"> </span>ipsec<span class="w"> </span>policy<span class="w"> </span>create<span class="w"> </span>ipsecpolicy
+<span class="go">  +-------------------------------+----------------------------------------+</span>
+<span class="go">  | Field                         | Value                                  |</span>
+<span class="go">  +-------------------------------+----------------------------------------+</span>
+<span class="go">  | Authentication Algorithm      | sha1                                   |</span>
+<span class="go">  | Description                   |                                        |</span>
+<span class="go">  | Encapsulation Mode            | tunnel                                 |</span>
+<span class="go">  | Encryption Algorithm          | aes-128                                |</span>
+<span class="go">  | ID                            | 4f3f46fc-f2dc-4811-a642-9601ebae310f   |</span>
+<span class="go">  | Lifetime                      | {u&#39;units&#39;: u&#39;seconds&#39;, u&#39;value&#39;: 3600} |</span>
+<span class="go">  | Name                          | ipsecpolicy                            |</span>
+<span class="go">  | Perfect Forward Secrecy (PFS) | group5                                 |</span>
+<span class="go">  | Project                       | 095247cb2e22455b9850c6efff407584       |</span>
+<span class="go">  | Transform Protocol            | esp                                    |</span>
+<span class="go">  | project_id                    | 095247cb2e22455b9850c6efff407584       |</span>
+<span class="go">  +-------------------------------+----------------------------------------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create a VPN service:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>vpn<span class="w"> </span>service<span class="w"> </span>create<span class="w"> </span>vpn<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--router<span class="w"> </span>9ff3f20c-314f-4dac-9392-defdbbb36a66
+<span class="go">  +----------------+--------------------------------------+</span>
+<span class="go">  | Field          | Value                                |</span>
+<span class="go">  +----------------+--------------------------------------+</span>
+<span class="go">  | Description    |                                      |</span>
+<span class="go">  | Flavor         | None                                 |</span>
+<span class="go">  | ID             | 9f499f9f-f672-4ceb-be3c-d5ff3858c680 |</span>
+<span class="go">  | Name           | vpn                                  |</span>
+<span class="go">  | Project        | 095247cb2e22455b9850c6efff407584     |</span>
+<span class="go">  | Router         | 9ff3f20c-314f-4dac-9392-defdbbb36a66 |</span>
+<span class="go">  | State          | True                                 |</span>
+<span class="go">  | Status         | PENDING_CREATE                       |</span>
+<span class="go">  | Subnet         | None                                 |</span>
+<span class="go">  | external_v4_ip | 192.168.20.7                         |</span>
+<span class="go">  | external_v6_ip | 2001:db8::7                          |</span>
+<span class="go">  | project_id     | 095247cb2e22455b9850c6efff407584     |</span>
+<span class="go">  +----------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Please do not specify <code class="docutils literal notranslate"><span class="pre">--subnet</span></code> option in this case.</p>
+<p>The Networking openstackclient requires a router (Name or ID) and name.</p>
+</div>
+</li>
+<li><p>Create local endpoint group:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>vpn<span class="w"> </span>endpoint<span class="w"> </span>group<span class="w"> </span>create<span class="w"> </span>ep_subnet<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--type<span class="w"> </span>subnet<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--value<span class="w"> </span>1f888dd0-2066-42a1-83d7-56518895e47d
+<span class="go">  +-------------+-------------------------------------------+</span>
+<span class="go">  | Field       | Value                                     |</span>
+<span class="go">  +-------------+-------------------------------------------+</span>
+<span class="go">  | Description |                                           |</span>
+<span class="go">  | Endpoints   | [u&#39;1f888dd0-2066-42a1-83d7-56518895e47d&#39;] |</span>
+<span class="go">  | ID          | 667296d0-67ca-4d0f-b676-7650cf96e7b1      |</span>
+<span class="go">  | Name        | ep_subnet                                 |</span>
+<span class="go">  | Project     | 095247cb2e22455b9850c6efff407584          |</span>
+<span class="go">  | Type        | subnet                                    |</span>
+<span class="go">  | project_id  | 095247cb2e22455b9850c6efff407584          |</span>
+<span class="go">  +-------------+-------------------------------------------+</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The type of a local endpoint group must be <code class="docutils literal notranslate"><span class="pre">subnet</span></code>.</p>
+</div>
+</li>
+<li><p>Create peer endpoint group:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>vpn<span class="w"> </span>endpoint<span class="w"> </span>group<span class="w"> </span>create<span class="w"> </span>ep_cidr<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--type<span class="w"> </span>cidr<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--value<span class="w"> </span><span class="m">192</span>.168.1.0/24
+<span class="go">  +-------------+--------------------------------------+</span>
+<span class="go">  | Field       | Value                                |</span>
+<span class="go">  +-------------+--------------------------------------+</span>
+<span class="go">  | Description |                                      |</span>
+<span class="go">  | Endpoints   | [u&#39;192.168.1.0/24&#39;]                  |</span>
+<span class="go">  | ID          | 5c3d7f2a-4a2a-446b-9fcf-9a2557cfc641 |</span>
+<span class="go">  | Name        | ep_cidr                              |</span>
+<span class="go">  | Project     | 095247cb2e22455b9850c6efff407584     |</span>
+<span class="go">  | Type        | cidr                                 |</span>
+<span class="go">  | project_id  | 095247cb2e22455b9850c6efff407584     |</span>
+<span class="go">  +-------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The type of a peer endpoint group must be <code class="docutils literal notranslate"><span class="pre">cidr</span></code>.</p>
+</div>
+</li>
+<li><p>Create an ipsec site connection:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>vpn<span class="w"> </span>ipsec<span class="w"> </span>site<span class="w"> </span>connection<span class="w"> </span>create<span class="w"> </span>conn<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--vpnservice<span class="w"> </span>vpn<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--ikepolicy<span class="w"> </span>ikepolicy<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--ipsecpolicy<span class="w"> </span>ipsecpolicy<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--peer-address<span class="w"> </span><span class="m">192</span>.168.20.9<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--peer-id<span class="w"> </span><span class="m">192</span>.168.20.9<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--psk<span class="w"> </span>secret<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--local-endpoint-group<span class="w"> </span>ep_subnet<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--peer-endpoint-group<span class="w"> </span>ep_cidr
+<span class="go">  +--------------------------+--------------------------------------------------------+</span>
+<span class="go">  | Field                    | Value                                                  |</span>
+<span class="go">  +--------------------------+--------------------------------------------------------+</span>
+<span class="go">  | Authentication Algorithm | psk                                                    |</span>
+<span class="go">  | Description              |                                                        |</span>
+<span class="go">  | ID                       | 07e400b7-9de3-4ea3-a9d0-90a185e5b00d                   |</span>
+<span class="go">  | IKE Policy               | 735f4691-3670-43b2-b389-f4d81a60ed56                   |</span>
+<span class="go">  | IPSec Policy             | 4f3f46fc-f2dc-4811-a642-9601ebae310f                   |</span>
+<span class="go">  | Initiator                | bi-directional                                         |</span>
+<span class="go">  | Local Endpoint Group ID  | 667296d0-67ca-4d0f-b676-7650cf96e7b1                   |</span>
+<span class="go">  | Local ID                 |                                                        |</span>
+<span class="go">  | MTU                      | 1500                                                   |</span>
+<span class="go">  | Name                     | conn                                                   |</span>
+<span class="go">  | Peer Address             | 192.168.20.9                                           |</span>
+<span class="go">  | Peer CIDRs               |                                                        |</span>
+<span class="go">  | Peer Endpoint Group ID   | 5c3d7f2a-4a2a-446b-9fcf-9a2557cfc641                   |</span>
+<span class="go">  | Peer ID                  | 192.168.20.9                                           |</span>
+<span class="go">  | Pre-shared Key           | secret                                                 |</span>
+<span class="go">  | Project                  | 095247cb2e22455b9850c6efff407584                       |</span>
+<span class="go">  | Route Mode               | static                                                 |</span>
+<span class="go">  | State                    | True                                                   |</span>
+<span class="go">  | Status                   | PENDING_CREATE                                         |</span>
+<span class="go">  | VPN Service              | 9f499f9f-f672-4ceb-be3c-d5ff3858c680                   |</span>
+<span class="go">  | dpd                      | {u&#39;action&#39;: u&#39;hold&#39;, u&#39;interval&#39;: 30, u&#39;timeout&#39;: 120} |</span>
+<span class="go">  | project_id               | 095247cb2e22455b9850c6efff407584                       |</span>
+<span class="go">  +--------------------------+--------------------------------------------------------+</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Please do not specify <code class="docutils literal notranslate"><span class="pre">--peer-cidr</span></code> option in this case. Peer CIDR(s) are provided
+by a peer endpoint group.</p>
+</div>
+</li>
+</ol>
+</section>
+<section id="configure-vpnaas-without-endpoint-group-the-legacy-way">
+<h2>Configure VPNaaS without endpoint group (the legacy way)<a class="headerlink" href="#configure-vpnaas-without-endpoint-group-the-legacy-way" title="Link to this heading">¶</a></h2>
+<p>Create the IKE policy, IPsec policy, VPN service.
+Then, create an ipsec site connection that applies the
+above policies and service.</p>
+<ol class="arabic">
+<li><p>Create an IKE policy:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>vpn<span class="w"> </span>ike<span class="w"> </span>policy<span class="w"> </span>create<span class="w"> </span>ikepolicy1
+<span class="go">  +-------------------------------+----------------------------------------+</span>
+<span class="go">  | Field                         | Value                                  |</span>
+<span class="go">  +-------------------------------+----------------------------------------+</span>
+<span class="go">  | Authentication Algorithm      | sha1                                   |</span>
+<span class="go">  | Description                   |                                        |</span>
+<span class="go">  | Encryption Algorithm          | aes-128                                |</span>
+<span class="go">  | ID                            | 99e4345d-8674-4d73-acb4-0e2524425e34   |</span>
+<span class="go">  | IKE Version                   | v1                                     |</span>
+<span class="go">  | Lifetime                      | {u&#39;units&#39;: u&#39;seconds&#39;, u&#39;value&#39;: 3600} |</span>
+<span class="go">  | Name                          | ikepolicy1                             |</span>
+<span class="go">  | Perfect Forward Secrecy (PFS) | group5                                 |</span>
+<span class="go">  | Phase1 Negotiation Mode       | main                                   |</span>
+<span class="go">  | Project                       | 095247cb2e22455b9850c6efff407584       |</span>
+<span class="go">  | project_id                    | 095247cb2e22455b9850c6efff407584       |</span>
+<span class="go">  +-------------------------------+----------------------------------------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create an IPsec policy:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>vpn<span class="w"> </span>ipsec<span class="w"> </span>policy<span class="w"> </span>create<span class="w"> </span>ipsecpolicy1
+<span class="go">  +-------------------------------+----------------------------------------+</span>
+<span class="go">  | Field                         | Value                                  |</span>
+<span class="go">  +-------------------------------+----------------------------------------+</span>
+<span class="go">  | Authentication Algorithm      | sha1                                   |</span>
+<span class="go">  | Description                   |                                        |</span>
+<span class="go">  | Encapsulation Mode            | tunnel                                 |</span>
+<span class="go">  | Encryption Algorithm          | aes-128                                |</span>
+<span class="go">  | ID                            | e6f547af-4a1d-4c28-b40b-b97cce746459   |</span>
+<span class="go">  | Lifetime                      | {u&#39;units&#39;: u&#39;seconds&#39;, u&#39;value&#39;: 3600} |</span>
+<span class="go">  | Name                          | ipsecpolicy1                           |</span>
+<span class="go">  | Perfect Forward Secrecy (PFS) | group5                                 |</span>
+<span class="go">  | Project                       | 095247cb2e22455b9850c6efff407584       |</span>
+<span class="go">  | Transform Protocol            | esp                                    |</span>
+<span class="go">  | project_id                    | 095247cb2e22455b9850c6efff407584       |</span>
+<span class="go">  +-------------------------------+----------------------------------------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create a VPN service:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>vpn<span class="w"> </span>service<span class="w"> </span>create<span class="w"> </span>vpn<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--router<span class="w"> </span>66ca673a-cbbd-48b7-9fb6-bfa7ee3ef724<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--subnet<span class="w"> </span>cdfb411e-e818-466a-837c-7f96fc41a6d9
+<span class="go">  +----------------+--------------------------------------+</span>
+<span class="go">  | Field          | Value                                |</span>
+<span class="go">  +----------------+--------------------------------------+</span>
+<span class="go">  | Description    |                                      |</span>
+<span class="go">  | Flavor         | None                                 |</span>
+<span class="go">  | ID             | 79ef6250-ddc3-428f-88c2-0ec8084f4e9a |</span>
+<span class="go">  | Name           | vpn                                  |</span>
+<span class="go">  | Project        | 095247cb2e22455b9850c6efff407584     |</span>
+<span class="go">  | Router         | 66ca673a-cbbd-48b7-9fb6-bfa7ee3ef724 |</span>
+<span class="go">  | State          | True                                 |</span>
+<span class="go">  | Status         | PENDING_CREATE                       |</span>
+<span class="go">  | Subnet         | cdfb411e-e818-466a-837c-7f96fc41a6d9 |</span>
+<span class="go">  | external_v4_ip | 192.168.20.2                         |</span>
+<span class="go">  | external_v6_ip | 2001:db8::d                          |</span>
+<span class="go">  | project_id     | 095247cb2e22455b9850c6efff407584     |</span>
+<span class="go">  +----------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">--subnet</span></code> option is required in this scenario.</p>
+</div>
+</li>
+<li><p>Create an ipsec site connection:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>vpn<span class="w"> </span>ipsec<span class="w"> </span>site<span class="w"> </span>connection<span class="w"> </span>create<span class="w"> </span>conn<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--vpnservice<span class="w"> </span>vpn<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--ikepolicy<span class="w"> </span>ikepolicy1<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--ipsecpolicy<span class="w"> </span>ipsecpolicy1<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--peer-address<span class="w"> </span><span class="m">192</span>.168.20.11<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--peer-id<span class="w"> </span><span class="m">192</span>.168.20.11<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--peer-cidr<span class="w"> </span><span class="m">192</span>.168.1.0/24<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--psk<span class="w"> </span>secret
+<span class="go">  +--------------------------+--------------------------------------------------------+</span>
+<span class="go">  | Field                    | Value                                                  |</span>
+<span class="go">  +--------------------------+--------------------------------------------------------+</span>
+<span class="go">  | Authentication Algorithm | psk                                                    |</span>
+<span class="go">  | Description              |                                                        |</span>
+<span class="go">  | ID                       | 5b2935e6-b2f0-423a-8156-07ed48703d13                   |</span>
+<span class="go">  | IKE Policy               | 99e4345d-8674-4d73-acb4-0e2524425e34                   |</span>
+<span class="go">  | IPSec Policy             | e6f547af-4a1d-4c28-b40b-b97cce746459                   |</span>
+<span class="go">  | Initiator                | bi-directional                                         |</span>
+<span class="go">  | Local Endpoint Group ID  | None                                                   |</span>
+<span class="go">  | Local ID                 |                                                        |</span>
+<span class="go">  | MTU                      | 1500                                                   |</span>
+<span class="go">  | Name                     | conn                                                   |</span>
+<span class="go">  | Peer Address             | 192.168.20.11                                          |</span>
+<span class="go">  | Peer CIDRs               | 192.168.1.0/24                                         |</span>
+<span class="go">  | Peer Endpoint Group ID   | None                                                   |</span>
+<span class="go">  | Peer ID                  | 192.168.20.11                                          |</span>
+<span class="go">  | Pre-shared Key           | secret                                                 |</span>
+<span class="go">  | Project                  | 095247cb2e22455b9850c6efff407584                       |</span>
+<span class="go">  | Route Mode               | static                                                 |</span>
+<span class="go">  | State                    | True                                                   |</span>
+<span class="go">  | Status                   | PENDING_CREATE                                         |</span>
+<span class="go">  | VPN Service              | 79ef6250-ddc3-428f-88c2-0ec8084f4e9a                   |</span>
+<span class="go">  | dpd                      | {u&#39;action&#39;: u&#39;hold&#39;, u&#39;interval&#39;: 30, u&#39;timeout&#39;: 120} |</span>
+<span class="go">  | project_id               | 095247cb2e22455b9850c6efff407584                       |</span>
+<span class="go">  +--------------------------+--------------------------------------------------------+</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Please do not specify <code class="docutils literal notranslate"><span class="pre">--local-endpoint-group</span></code> and <code class="docutils literal notranslate"><span class="pre">--peer-endpoint-group</span></code>
+options in this case.</p>
+</div>
+</li>
+</ol>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="misc-libvirt.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Disable libvirt networking"></i></a>
+          
+          
+            <a href="ovn/index.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: OVN Driver Administration Guide"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2024-08-23 12:03:12</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation Guide</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">OpenStack Networking Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deploy.html">Deployment examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ops.html">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">Migration</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="misc.html">Miscellaneous</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ovn/index.html">OVN Driver Administration Guide</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributor/index.html">Contributor Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Virtual Private Network-as-a-Service (VPNaaS) scenario</a><ul>
+<li><a class="reference internal" href="#enabling-vpnaas">Enabling VPNaaS</a></li>
+<li><a class="reference internal" href="#using-vpnaas-with-endpoint-group-recommended">Using VPNaaS with endpoint group (recommended)</a></li>
+<li><a class="reference internal" href="#configure-vpnaas-without-endpoint-group-the-legacy-way">Configure VPNaaS without endpoint group (the legacy way)</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "admin/vpnaas-scenario" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Virtual Private Network-as-a-Service (VPNaaS) scenario in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2024-08-23 12:03:12";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "admin/vpnaas-scenario";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

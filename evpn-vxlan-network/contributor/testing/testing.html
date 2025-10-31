@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Testing Neutron &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Full Stack Testing" href="fullstack.html" />
+    <link rel="prev" title="Testing" href="index.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/contributor/testing/testing.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Testing Neutron</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="index.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Testing"></i></a>
+    
+    
+    <a href="fullstack.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Full Stack Testing"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="testing-neutron">
+<span id="id1"></span><h1>Testing Neutron<a class="headerlink" href="#testing-neutron" title="Link to this heading">¶</a></h1>
+<section id="why-should-you-care">
+<h2>Why Should You Care<a class="headerlink" href="#why-should-you-care" title="Link to this heading">¶</a></h2>
+<p>There’s two ways to approach testing:</p>
+<ol class="arabic simple">
+<li><p>Write unit tests because they’re required to get your patch merged.
+This typically involves mock heavy tests that assert that your code is as
+written.</p></li>
+<li><p>Putting as much thought into your testing strategy as you do to the rest
+of your code. Use different layers of testing as appropriate to provide
+high <em>quality</em> coverage. Are you touching an agent? Test it against an
+actual system! Are you adding a new API? Test it for race conditions
+against a real database! Are you adding a new cross-cutting feature?
+Test that it does what it’s supposed to do when run on a real cloud!</p></li>
+</ol>
+<p>Do you feel the need to verify your change manually? If so, the next few
+sections attempt to guide you through Neutron’s different test infrastructures
+to help you make intelligent decisions and best exploit Neutron’s test
+offerings.</p>
+</section>
+<section id="definitions">
+<h2>Definitions<a class="headerlink" href="#definitions" title="Link to this heading">¶</a></h2>
+<p>We will talk about three classes of tests: unit, functional and integration.
+Each respective category typically targets a larger scope of code. Other than
+that broad categorization, here are a few more characteristic:</p>
+<ul class="simple">
+<li><p>Unit tests - Should be able to run on your laptop, directly following a
+‘git clone’ of the project. The underlying system must not be mutated,
+mocks can be used to achieve this. A unit test typically targets a function
+or class.</p></li>
+<li><p>Functional tests - Run against a pre-configured environment
+(tools/configure_for_func_testing.sh). Typically test a component
+such as an agent using no mocks.</p></li>
+<li><p>Integration tests - Run against a running cloud, often target the API level,
+but also ‘scenarios’, ‘user stories’ or ‘grenade’. You may find such tests
+under tests/fullstack, and in the Tempest, Rally, Grenade and
+neutron-tempest-plugin(neutron_tempest_plugin/api|scenario) projects.</p></li>
+</ul>
+<p>Tests in the Neutron tree are typically organized by the testing infrastructure
+used, and not by the scope of the test. For example, many tests under the
+‘unit’ directory invoke an API call and assert that the expected output was
+received. The scope of such a test is the entire Neutron server stack,
+and clearly not a specific function such as in a typical unit test.</p>
+</section>
+<section id="testing-frameworks">
+<h2>Testing Frameworks<a class="headerlink" href="#testing-frameworks" title="Link to this heading">¶</a></h2>
+<p>The different frameworks are listed below. The intent is to list the
+capabilities of each testing framework as to help the reader understand when
+should each tool be used. Remember that when adding code that touches many
+areas of Neutron, each area should be tested with the appropriate framework.
+Overlap between different test layers is often desirable and encouraged.</p>
+<section id="unit-tests">
+<h3>Unit Tests<a class="headerlink" href="#unit-tests" title="Link to this heading">¶</a></h3>
+<p>Unit tests (neutron/tests/unit/) are meant to cover as much code as
+possible. They are designed to test the various pieces of the Neutron tree to
+make sure any new changes don’t break existing functionality. Unit tests have
+no requirements nor make changes to the system they are running on. They use
+an in-memory sqlite database to test DB interaction.</p>
+<p>At the start of each test run:</p>
+<ul class="simple">
+<li><p>RPC listeners are mocked away.</p></li>
+<li><p>The fake Oslo messaging driver is used.</p></li>
+</ul>
+<p>At the end of each test run:</p>
+<ul class="simple">
+<li><p>Mocks are automatically reverted.</p></li>
+<li><p>The in-memory database is cleared of content, but its schema is maintained.</p></li>
+<li><p>The global Oslo configuration object is reset.</p></li>
+</ul>
+<p>The unit testing framework can be used to effectively test database
+interaction, for example, distributed routers allocate a MAC address for
+every host running an OVS agent. One of DVR’s DB mixins implements a method
+that lists all host MAC addresses. Its test looks like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">test_get_dvr_mac_address_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_create_dvr_mac_entry</span><span class="p">(</span><span class="s1">&#39;host_1&#39;</span><span class="p">,</span> <span class="s1">&#39;mac_1&#39;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_create_dvr_mac_entry</span><span class="p">(</span><span class="s1">&#39;host_2&#39;</span><span class="p">,</span> <span class="s1">&#39;mac_2&#39;</span><span class="p">)</span>
+    <span class="n">mac_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixin</span><span class="o">.</span><span class="n">get_dvr_mac_address_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ctx</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">mac_list</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>It inserts two new host MAC address, invokes the method under test and asserts
+its output. The test has many things going for it:</p>
+<ul class="simple">
+<li><p>It targets the method under test correctly, not taking on a larger scope
+than is necessary.</p></li>
+<li><p>It does not use mocks to assert that methods were called, it simply
+invokes the method and asserts its output (In this case, that the list
+method returns two records).</p></li>
+</ul>
+<p>This is allowed by the fact that the method was built to be testable -
+The method has clear input and output with no side effects.</p>
+<p>You can get oslo.db to generate a file-based sqlite database by setting
+OS_TEST_DBAPI_ADMIN_CONNECTION to a file based URL as described in <a class="reference external" href="http://lists.openstack.org/pipermail/openstack-dev/2016-July/099861.html">this
+mailing list post</a>. This file will be created but (confusingly) won’t be the
+actual file used for the database. To find the actual file, set a break point
+in your test method and inspect self.engine.url.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nv">OS_TEST_DBAPI_ADMIN_CONNECTION</span><span class="o">=</span>sqlite:///sqlite.db<span class="w"> </span>.tox/py38/bin/python<span class="w"> </span>-m<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>testtools.run<span class="w"> </span>neutron.tests.unit...
+...
+<span class="o">(</span>Pdb<span class="o">)</span><span class="w"> </span>self.engine.url
+sqlite:////tmp/iwbgvhbshp.db
+</pre></div>
+</div>
+<p>Now, you can inspect this file using sqlite3.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>sqlite3<span class="w"> </span>/tmp/iwbgvhbshp.db
+</pre></div>
+</div>
+</section>
+<section id="functional-tests">
+<h3>Functional Tests<a class="headerlink" href="#functional-tests" title="Link to this heading">¶</a></h3>
+<p>Functional tests (neutron/tests/functional/) are intended to
+validate actual system interaction. Mocks should be used sparingly,
+if at all. Care should be taken to ensure that existing system
+resources are not modified and that resources created in tests are
+properly cleaned up both on test success and failure.</p>
+<p>Let’s examine the benefits of the functional testing framework.
+Neutron offers a library called ‘ip_lib’ that wraps around the ‘ip’ binary.
+One of its methods is called ‘device_exists’ which accepts a device name
+and a namespace and returns True if the device exists in the given namespace.
+It’s easy building a test that targets the method directly, and such a test
+would be considered a ‘unit’ test. However, what framework should such a test
+use? A test using the unit tests framework could not mutate state on the
+system, and so could not actually create a device and assert that it now
+exists. Such a test would look roughly like this:</p>
+<ul class="simple">
+<li><p>It would mock ‘execute’, a method that executes shell commands against the
+system to return an IP device named ‘foo’.</p></li>
+<li><p>It would then assert that when ‘device_exists’ is called with ‘foo’, it
+returns True, but when called with a different device name it returns False.</p></li>
+<li><p>It would most likely assert that ‘execute’ was called using something like:
+‘ip link show foo’.</p></li>
+</ul>
+<p>The value of such a test is arguable. Remember that new tests are not free,
+they need to be maintained. Code is often refactored, reimplemented and
+optimized.</p>
+<ul class="simple">
+<li><p>There are other ways to find out if a device exists (Such as
+by looking at ‘/sys/class/net’), and in such a case the test would have
+to be updated.</p></li>
+<li><p>Methods are mocked using their name. When methods are renamed, moved or
+removed, their mocks must be updated. This slows down development for
+avoidable reasons.</p></li>
+<li><p>Most importantly, the test does not assert the behavior of the method. It
+merely asserts that the code is as written.</p></li>
+</ul>
+<p>When adding a functional test for ‘device_exists’, several framework level
+methods were added. These methods may now be used by other tests as well.
+One such method creates a virtual device in a namespace,
+and ensures that both the namespace and the device are cleaned up at the
+end of the test run regardless of success or failure using the ‘addCleanup’
+method. The test generates details for a temporary device, asserts that
+a device by that name does not exist, creates that device, asserts that
+it now exists, deletes it, and asserts that it no longer exists.
+Such a test avoids all three issues mentioned above if it were written
+using the unit testing framework.</p>
+<p>Functional tests are also used to target larger scope, such as agents.
+Many good examples exist: See the OVS, L3 and DHCP agents functional tests.
+Such tests target a top level agent method and assert that the system
+interaction that was supposed to be performed was indeed performed.
+For example, to test the DHCP agent’s top level method that accepts network
+attributes and configures dnsmasq for that network, the test:</p>
+<ul class="simple">
+<li><p>Instantiates an instance of the DHCP agent class (But does not start its
+process).</p></li>
+<li><p>Calls its top level function with prepared data.</p></li>
+<li><p>Creates a temporary namespace and device, and calls ‘dhclient’ from that
+namespace.</p></li>
+<li><p>Assert that the device successfully obtained the expected IP address.</p></li>
+</ul>
+<section id="test-exceptions">
+<h4>Test exceptions<a class="headerlink" href="#test-exceptions" title="Link to this heading">¶</a></h4>
+<p>Test neutron.tests.functional.agent.test_ovs_flows.OVSFlowTestCase.test_install_flood_to_tun is currently skipped if openvswitch version is less
+than 2.5.1. This version contains bug where appctl command prints wrong output
+for Final flow. It’s been fixed in openvswitch
+2.5.1 in <a class="reference external" href="https://github.com/openvswitch/ovs/commit/8c0b419a0b9ac0141d6973dcc80306dfc6a83d31">this commit</a>.
+If openvswitch version meets the test requirement then the test is triggered
+normally.</p>
+</section>
+</section>
+<section id="fullstack-tests">
+<h3>Fullstack Tests<a class="headerlink" href="#fullstack-tests" title="Link to this heading">¶</a></h3>
+<section id="why">
+<h4>Why?<a class="headerlink" href="#why" title="Link to this heading">¶</a></h4>
+<p>The idea behind “fullstack” testing is to fill a gap between unit + functional
+tests and Tempest. Tempest tests are expensive to run, and target black box API
+tests exclusively. Tempest requires an OpenStack deployment to be run against,
+which can be difficult to configure and setup. Full stack testing addresses
+these issues by taking care of the deployment itself, according to the topology
+that the test requires. Developers further benefit from full stack testing as
+it can sufficiently simulate a real environment and provide a rapidly
+reproducible way to verify code while you’re still writing it.</p>
+<p>More details can be found in <a class="reference internal" href="fullstack.html#fullstack-testing"><span class="std std-ref">FullStack Testing</span></a> guide.</p>
+</section>
+</section>
+<section id="integration-tempest-tests">
+<h3>Integration - tempest tests<a class="headerlink" href="#integration-tempest-tests" title="Link to this heading">¶</a></h3>
+<p>Tempest is the integration test suit of Openstack, more details can be found in
+<a class="reference internal" href="tempest.html#tempest-testing"><span class="std std-ref">Tempest testing</span></a></p>
+</section>
+<section id="api-tests">
+<h3>API Tests<a class="headerlink" href="#api-tests" title="Link to this heading">¶</a></h3>
+<p>API tests (neutron-tempest-plugin/neutron_tempest_plugin/api/) are
+intended to ensure the function
+and stability of the Neutron API. As much as possible, changes to
+this path should not be made at the same time as changes to the code
+to limit the potential for introducing backwards-incompatible changes,
+although the same patch that introduces a new API should include an API
+test.</p>
+<p>Since API tests target a deployed Neutron daemon that is not test-managed,
+they should not depend on controlling the runtime configuration
+of the target daemon. API tests should be black-box - no assumptions should
+be made about implementation. Only the contract defined by Neutron’s REST API
+should be validated, and all interaction with the daemon should be via
+a REST client.</p>
+<p>The neutron-tempest-plugin/neutron_tempest_plugin directory was copied from the
+Tempest project around the Kilo timeframe. At the time, there was an overlap of
+tests between the Tempest and Neutron repositories. This overlap was then
+eliminated by carving out a subset of resources that belong to Tempest, with
+the rest in Neutron.</p>
+<p>API tests that belong to Tempest deal with a subset of Neutron’s resources:</p>
+<ul class="simple">
+<li><p>Port</p></li>
+<li><p>Network</p></li>
+<li><p>Subnet</p></li>
+<li><p>Security Group</p></li>
+<li><p>Router</p></li>
+<li><p>Floating IP</p></li>
+</ul>
+<p>These resources were chosen for their ubiquity. They are found in most
+Neutron deployments regardless of plugin, and are directly involved in the
+networking and security of an instance. Together, they form the bare minimum
+needed by Neutron.</p>
+<p>This is excluding extensions to these resources (For example: Extra DHCP
+options to subnets, or snat_gateway mode to routers) that are not mandatory
+in the majority of cases.</p>
+<p>Tests for other resources should be contributed to the Neutron repository.
+Scenario tests should be similarly split up between Tempest and Neutron
+according to the API they’re targeting.</p>
+<p>To create an API test, the testing class must at least inherit from
+neutron_tempest_plugin.api.base.BaseNetworkTest base class. As some of tests
+may require certain extensions to be enabled, the base class provides
+<code class="docutils literal notranslate"><span class="pre">required_extensions</span></code> class attribute which can be used by subclasses to
+define a list of required extensions for particular test class.</p>
+</section>
+<section id="scenario-tests">
+<h3>Scenario Tests<a class="headerlink" href="#scenario-tests" title="Link to this heading">¶</a></h3>
+<p>Scenario tests (neutron-tempest-plugin/neutron_tempest_plugin/scenario), like
+API tests, use the Tempest test infrastructure and have the same requirements.
+Guidelines for writing a good scenario test may be found at the Tempest
+developer guide:
+<a class="reference external" href="https://docs.openstack.org/tempest/latest/field_guide/scenario.html">https://docs.openstack.org/tempest/latest/field_guide/scenario.html</a></p>
+<p>Scenario tests, like API tests, are split between the Tempest and Neutron
+repositories according to the Neutron API the test is targeting.</p>
+<p>Some scenario tests require advanced <code class="docutils literal notranslate"><span class="pre">Glance</span></code> images (for example, <code class="docutils literal notranslate"><span class="pre">Ubuntu</span></code>
+or <code class="docutils literal notranslate"><span class="pre">CentOS</span></code>) in order to pass. Those tests are skipped by default. To enable
+them, include the following in <code class="docutils literal notranslate"><span class="pre">tempest.conf</span></code>:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[compute]</span>
+<span class="na">image_ref</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&lt;uuid of advanced image&gt;</span>
+<span class="k">[neutron_plugin_options]</span>
+<span class="na">image_is_advanced</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</pre></div>
+</div>
+<p>Specific test requirements for advanced images are:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">test_trunk</span></code> requires <code class="docutils literal notranslate"><span class="pre">802.11q</span></code> kernel module loaded.</p></li>
+</ol>
+</section>
+<section id="rally-tests">
+<h3>Rally Tests<a class="headerlink" href="#rally-tests" title="Link to this heading">¶</a></h3>
+<p>Rally tests (rally-jobs/plugins) use the
+<a class="reference external" href="http://rally.readthedocs.io/">rally</a> infrastructure to exercise a neutron
+deployment. Guidelines for writing a good rally test can be found in the
+<a class="reference external" href="http://rally.readthedocs.io/en/latest/plugins/">rally plugin documentation</a>.
+There are also some examples in tree; the process for adding rally plugins to
+neutron requires three steps:
+1) write a plugin and place it under rally-jobs/plugins/. This is your rally
+scenario;
+2) (optional) add a setup file under rally-jobs/extra/. This is any devstack
+configuration required to make sure your environment can successfully process
+your scenario requests;
+3) edit neutron-neutron.yaml. This is your scenario ‘contract’ or SLA.</p>
+</section>
+<section id="grenade-tests">
+<h3>Grenade Tests<a class="headerlink" href="#grenade-tests" title="Link to this heading">¶</a></h3>
+<p>Grenade is a tool to test upgrade process between OpenStack releases. It
+actually not introduces any new tests but it is a tool which uses Tempest tests
+to verify upgrade process between releases.
+Neutron runs couple of Grenade jobs in check and gate queue - see
+<a class="reference internal" href="ci_jobs.html#ci-jobs"><span class="std std-ref">CI Testing</span></a> summary.</p>
+<p>You can run Grenade tests locally on the virtual machine(s). It is pretty
+similar to deploying OpenStack using Devstack. All is described in the
+<a class="reference external" href="https://wiki.openstack.org/wiki/Grenade">Project’s wiki</a> and <a class="reference external" href="https://opendev.org/openstack/grenade/src/branch/master/README.rst">documentation</a>.</p>
+<p>More info about how to troubleshoot Grenade failures in the CI jobs can be
+found in the <a class="reference internal" href="../policies/gate-failure-triage.html#troubleshooting-grenade-jobs"><span class="std std-ref">Troubleshooting Grenade jobs</span></a>
+document.</p>
+</section>
+</section>
+<section id="development-process">
+<h2>Development Process<a class="headerlink" href="#development-process" title="Link to this heading">¶</a></h2>
+<p>It is expected that any new changes that are proposed for merge
+come with tests for that feature or code area. Any bugs
+fixes that are submitted must also have tests to prove that they stay
+fixed! In addition, before proposing for merge, all of the
+current tests should be passing.</p>
+<section id="structure-of-the-unit-test-tree">
+<h3>Structure of the Unit Test Tree<a class="headerlink" href="#structure-of-the-unit-test-tree" title="Link to this heading">¶</a></h3>
+<p>The structure of the unit test tree should match the structure of the
+code tree, e.g.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="n">target</span> <span class="n">module</span><span class="p">:</span> <span class="n">neutron</span><span class="o">.</span><span class="n">agent</span><span class="o">.</span><span class="n">utils</span>
+
+<span class="o">-</span> <span class="n">test</span> <span class="n">module</span><span class="p">:</span> <span class="n">neutron</span><span class="o">.</span><span class="n">tests</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">agent</span><span class="o">.</span><span class="n">test_utils</span>
+</pre></div>
+</div>
+<p>Unit test modules should have the same path under neutron/tests/unit/
+as the module they target has under neutron/, and their name should be
+the name of the target module prefixed by <cite>test_</cite>. This requirement
+is intended to make it easier for developers to find the unit tests
+for a given module.</p>
+<p>Similarly, when a test module targets a package, that module’s name
+should be the name of the package prefixed by <cite>test_</cite> with the same
+path as when a test targets a module, e.g.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="n">target</span> <span class="n">package</span><span class="p">:</span> <span class="n">neutron</span><span class="o">.</span><span class="n">ipam</span>
+
+<span class="o">-</span> <span class="n">test</span> <span class="n">module</span><span class="p">:</span> <span class="n">neutron</span><span class="o">.</span><span class="n">tests</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">test_ipam</span>
+</pre></div>
+</div>
+<p>The following command can be used to validate whether the unit test
+tree is structured according to the above requirements:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">tools</span><span class="o">/</span><span class="n">check_unit_test_structure</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+<p>Where appropriate, exceptions can be added to the above script. If
+code is not part of the Neutron namespace, for example, it’s probably
+reasonable to exclude their unit tests from the check.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>At no time should the production code import anything from testing subtree
+(neutron.tests). There are distributions that split out neutron.tests
+modules in a separate package that is not installed by default, making any
+code that relies on presence of the modules to fail. For example, RDO is one
+of those distributions.</p>
+</div>
+</section>
+</section>
+<section id="running-tests">
+<h2>Running Tests<a class="headerlink" href="#running-tests" title="Link to this heading">¶</a></h2>
+<p>Before submitting a patch for review you should always ensure all tests pass; a
+tox run is triggered by the zuul jobs executed on gerrit for each patch
+pushed for review.</p>
+<p>Neutron, like other OpenStack projects, uses <a class="reference external" href="http://tox.readthedocs.org/en/latest/">tox</a> for managing the virtual
+environments for running test cases. It uses <a class="reference external" href="https://wiki.openstack.org/wiki/Testr">Testr</a> for managing the running
+of the test cases.</p>
+<p>Tox handles the creation of a series of <a class="reference external" href="https://pypi.org/project/virtualenv">virtualenvs</a> that target specific
+versions of Python.</p>
+<p>Testr handles the parallel execution of series of test cases as well as
+the tracking of long-running tests and other things.</p>
+<p>For more information on the standard Tox-based test infrastructure used by
+OpenStack and how to do some common test/debugging procedures with Testr,
+see this wiki page: <a class="reference external" href="https://wiki.openstack.org/wiki/Testr">https://wiki.openstack.org/wiki/Testr</a></p>
+<section id="pep8-and-unit-tests">
+<h3>PEP8 and Unit Tests<a class="headerlink" href="#pep8-and-unit-tests" title="Link to this heading">¶</a></h3>
+<p>Running pep8 and unit tests is as easy as executing this in the root
+directory of the Neutron source code:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tox</span>
+</pre></div>
+</div>
+<p>To run only pep8:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tox</span> <span class="o">-</span><span class="n">e</span> <span class="n">pep8</span>
+</pre></div>
+</div>
+<p>Since pep8 includes running pylint on all files, it can take quite some time
+to run.</p>
+<p>To restrict the pylint check to only the files altered by the latest patch
+changes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tox</span> <span class="o">-</span><span class="n">e</span> <span class="n">pep8</span> <span class="o">--</span> <span class="n">HEAD</span><span class="o">~</span><span class="mi">1</span>
+</pre></div>
+</div>
+<p>To run only the unit tests:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tox</span> <span class="o">-</span><span class="n">e</span> <span class="n">py38</span>
+</pre></div>
+</div>
+<p>Many changes span across both the neutron and neutron-lib repos, and tox
+will always build the test environment using the published module versions
+specified in requirements.txt. To run tox tests against a different version
+of neutron-lib, use the TOX_ENV_SRC_MODULES environment variable to point
+at a local package repo.</p>
+<p>For example, to run against the ‘master’ branch of neutron-lib:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>cd $SRC
+git clone https://opendev.org/openstack/neutron-lib
+cd $NEUTRON_DIR
+env TOX_ENV_SRC_MODULES=$SRC/neutron-lib tox -r -e py38
+</pre></div>
+</div>
+<p>To run against a change of your own, repeat the same steps, but use the
+directory with your changes, not a fresh clone.</p>
+<p>To run against a particular gerrit change of the lib (substituting the
+desired gerrit refs for this example):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>cd $SRC
+git clone https://opendev.org/openstack/neutron-lib
+cd neutron-lib
+git fetch https://opendev.org/openstack/neutron-lib refs/changes/13/635313/6 &amp;&amp; git checkout FETCH_HEAD
+cd $NEUTRON_DIR
+env TOX_ENV_SRC_MODULES=$SRC/neutron-lib tox -r -e py38
+</pre></div>
+</div>
+<p>Note that the ‘-r’ is needed to re-create the tox virtual envs, and will also
+be needed to restore them to standard when not using this method.</p>
+<p>Any pip installable package can be overriden with this environment variable,
+not just neutron-lib. To specify multiple packages to override, specify them
+as a space separated list to TOX_ENV_SRC_MODULES. Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">env</span> <span class="n">TOX_ENV_SRC_MODULES</span><span class="o">=</span><span class="s2">&quot;$SRC/neutron-lib $SRC/oslo.db&quot;</span> <span class="n">tox</span> <span class="o">-</span><span class="n">r</span> <span class="o">-</span><span class="n">e</span> <span class="n">py38</span>
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h3>Functional Tests<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<p>To run functional tests that do not require sudo privileges or
+specific-system dependencies:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tox</span> <span class="o">-</span><span class="n">e</span> <span class="n">functional</span>
+</pre></div>
+</div>
+<p>To run all the functional tests, including those requiring sudo
+privileges and system-specific dependencies, the procedure defined by
+tools/configure_for_func_testing.sh should be followed.</p>
+<p>IMPORTANT: configure_for_func_testing.sh relies on DevStack to perform
+extensive modification to the underlying host. Execution of the
+script requires sudo privileges and it is recommended that the
+following commands be invoked only on a clean and disposable VM.
+A VM that has had DevStack previously installed on it is also fine.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">opendev</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">openstack</span><span class="o">/</span><span class="n">devstack</span> <span class="o">../</span><span class="n">devstack</span>
+<span class="o">./</span><span class="n">tools</span><span class="o">/</span><span class="n">configure_for_func_testing</span><span class="o">.</span><span class="n">sh</span> <span class="o">../</span><span class="n">devstack</span> <span class="o">-</span><span class="n">i</span>
+<span class="n">tox</span> <span class="o">-</span><span class="n">e</span> <span class="n">dsvm</span><span class="o">-</span><span class="n">functional</span>
+</pre></div>
+</div>
+<p>The ‘-i’ option is optional and instructs the script to use DevStack
+to install and configure all of Neutron’s package dependencies. It is
+not necessary to provide this option if DevStack has already been used
+to deploy Neutron to the target host.</p>
+</section>
+<section id="id4">
+<h3>Fullstack Tests<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<p>See <a class="reference internal" href="fullstack.html#fullstack-testing"><span class="std std-ref">FullStack Testing</span></a> guide.</p>
+</section>
+<section id="api-scenario-tests">
+<h3>API &amp; Scenario Tests<a class="headerlink" href="#api-scenario-tests" title="Link to this heading">¶</a></h3>
+<p>To run the api or scenario tests, deploy Tempest, neutron-tempest-plugin
+and Neutron with DevStack and then run the following command,
+from the tempest directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ export DEVSTACK_GATE_TEMPEST_REGEX=&quot;neutron&quot;
+$ tox -e venv-tempest -- pip install (path to the neutron-tempest-plugin directory)
+$ tox -e all -- $DEVSTACK_GATE_TEMPEST_REGEX
+</pre></div>
+</div>
+<p>If you want to limit the amount of tests, or run an individual test,
+you can do, for instance:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ tox -e all -- neutron_tempest_plugin.api.admin.test_routers_ha
+$ tox -e all -- neutron_tempest_plugin.api.test_qos.QosTestJSON.test_create_policy
+</pre></div>
+</div>
+<p>If you want to use special config for Neutron, like use advanced images (Ubuntu
+or CentOS) testing advanced features, you may need to add config
+in tempest/etc/tempest.conf:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[neutron_plugin_options]</span>
+<span class="na">image_is_advanced</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</pre></div>
+</div>
+<p>The Neutron tempest plugin configs are under <code class="docutils literal notranslate"><span class="pre">neutron_plugin_options</span></code> scope
+of <code class="docutils literal notranslate"><span class="pre">tempest.conf</span></code>.</p>
+</section>
+<section id="running-individual-tests">
+<h3>Running Individual Tests<a class="headerlink" href="#running-individual-tests" title="Link to this heading">¶</a></h3>
+<p>For running individual test modules, cases or tests, you just need to pass
+the dot-separated path you want as an argument to it.</p>
+<p>For example, the following would run only a single test or test case:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ tox -e py38 neutron.tests.unit.test_manager
+$ tox -e py38 neutron.tests.unit.test_manager.NeutronManagerTestCase
+$ tox -e py38 neutron.tests.unit.test_manager.NeutronManagerTestCase.test_service_plugin_is_loaded
+</pre></div>
+</div>
+<p>If you want to pass other arguments to stestr, you can do the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ tox -e py38 -- neutron.tests.unit.test_manager --serial
+</pre></div>
+</div>
+</section>
+</section>
+<section id="coverage">
+<h2>Coverage<a class="headerlink" href="#coverage" title="Link to this heading">¶</a></h2>
+<p>Neutron has a fast growing code base and there are plenty of areas that
+need better coverage.</p>
+<p>To get a grasp of the areas where tests are needed, you can check
+current unit tests coverage by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ tox -ecover
+</pre></div>
+</div>
+<p>Since the coverage command can only show unit test coverage, a coverage
+document is maintained that shows test coverage per area of code in:
+doc/source/devref/testing_coverage.rst. You could also rely on Zuul
+logs, that are generated post-merge (not every project builds coverage
+results). To access them, do the following:</p>
+<ul class="simple">
+<li><p>Check out the latest <a class="reference external" href="https://review.opendev.org/#/q/project:openstack/neutron+status:merged">merge commit</a></p></li>
+<li><p>Go to: <a class="reference external" href="http://logs.openstack.org">http://logs.openstack.org</a>/&lt;first-2-digits-of-sha1&gt;/&lt;sha1&gt;/post/neutron-coverage/.</p></li>
+<li><p><a class="reference external" href="https://review.opendev.org/#/c/221494/">Spec</a> is a work in progress to
+provide a better landing page.</p></li>
+</ul>
+</section>
+<section id="debugging">
+<h2>Debugging<a class="headerlink" href="#debugging" title="Link to this heading">¶</a></h2>
+<p>By default, calls to pdb.set_trace() will be ignored when tests
+are run. For pdb statements to work, invoke tox as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ tox -e venv -- python -m testtools.run [test module path]
+</pre></div>
+</div>
+<p>Tox-created virtual environments (venv’s) can also be activated
+after a tox run and reused for debugging:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ tox -e venv
+$ . .tox/venv/bin/activate
+$ python -m testtools.run [test module path]
+</pre></div>
+</div>
+<p>Tox packages and installs the Neutron source tree in a given venv
+on every invocation, but if modifications need to be made between
+invocation (e.g. adding more pdb statements), it is recommended
+that the source tree be installed in the venv in editable mode:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># run this only after activating the venv
+$ pip install --editable .
+</pre></div>
+</div>
+<p>Editable mode ensures that changes made to the source tree are
+automatically reflected in the venv, and that such changes are not
+overwritten during the next tox run.</p>
+<section id="post-mortem-debugging">
+<h3>Post-mortem Debugging<a class="headerlink" href="#post-mortem-debugging" title="Link to this heading">¶</a></h3>
+<p>TBD: how to do this with tox.</p>
+</section>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h3>
+</section>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="index.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Testing"></i></a>
+          
+          
+            <a href="fullstack.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Full Stack Testing"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2017-07-06 06:31:21</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Contributor Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#basic-information">Basic Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-policies">Neutron Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#gerrit-rechecks">Gerrit Rechecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-stadium">Neutron Stadium</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-internals">Neutron Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#ovn-driver">OVN Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#dashboards">Dashboards</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Testing Neutron</a><ul>
+<li><a class="reference internal" href="#why-should-you-care">Why Should You Care</a></li>
+<li><a class="reference internal" href="#definitions">Definitions</a></li>
+<li><a class="reference internal" href="#testing-frameworks">Testing Frameworks</a><ul>
+<li><a class="reference internal" href="#unit-tests">Unit Tests</a></li>
+<li><a class="reference internal" href="#functional-tests">Functional Tests</a><ul>
+<li><a class="reference internal" href="#test-exceptions">Test exceptions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#fullstack-tests">Fullstack Tests</a><ul>
+<li><a class="reference internal" href="#why">Why?</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#integration-tempest-tests">Integration - tempest tests</a></li>
+<li><a class="reference internal" href="#api-tests">API Tests</a></li>
+<li><a class="reference internal" href="#scenario-tests">Scenario Tests</a></li>
+<li><a class="reference internal" href="#rally-tests">Rally Tests</a></li>
+<li><a class="reference internal" href="#grenade-tests">Grenade Tests</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#development-process">Development Process</a><ul>
+<li><a class="reference internal" href="#structure-of-the-unit-test-tree">Structure of the Unit Test Tree</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#running-tests">Running Tests</a><ul>
+<li><a class="reference internal" href="#pep8-and-unit-tests">PEP8 and Unit Tests</a></li>
+<li><a class="reference internal" href="#id3">Functional Tests</a></li>
+<li><a class="reference internal" href="#id4">Fullstack Tests</a></li>
+<li><a class="reference internal" href="#api-scenario-tests">API &amp; Scenario Tests</a></li>
+<li><a class="reference internal" href="#running-individual-tests">Running Individual Tests</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#coverage">Coverage</a></li>
+<li><a class="reference internal" href="#debugging">Debugging</a><ul>
+<li><a class="reference internal" href="#post-mortem-debugging">Post-mortem Debugging</a></li>
+<li><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "contributor/testing/testing" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Testing Neutron in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2017-07-06 06:31:21";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "contributor/testing/testing";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

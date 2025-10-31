@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Upgrade strategy &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Module Reference" href="../modules.html" />
+    <link rel="prev" title="Tags in Neutron Resources" href="tag.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/contributor/internals/upgrade.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Upgrade strategy</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="tag.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Tags in Neutron Resources"></i></a>
+    
+    
+    <a href="../modules.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Module Reference"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Much of this document discusses upgrade considerations for the Neutron
+reference implementation using Neutron’s agents. It’s expected that each
+Neutron plugin provides its own documentation that discusses upgrade
+considerations specific to that choice of backend. For example, OVN does
+not use Neutron agents, but does have a local controller that runs on each
+compute node. OVN supports rolling upgrades, but information about how that
+works should be covered in the documentation for the OVN Neutron plugin.</p>
+</div>
+<section id="upgrade-strategy">
+<h1>Upgrade strategy<a class="headerlink" href="#upgrade-strategy" title="Link to this heading">¶</a></h1>
+<p>There are two general upgrade scenarios supported by Neutron:</p>
+<ol class="arabic simple">
+<li><p>All services are shut down, code upgraded, then all services are started
+again.</p></li>
+<li><p>Services are upgraded gradually, based on operator service windows.</p></li>
+</ol>
+<p>The latter is the preferred way to upgrade an OpenStack cloud, since it allows
+for more granularity and less service downtime. This scenario is usually called
+‘rolling upgrade’.</p>
+<section id="rolling-upgrade">
+<h2>Rolling upgrade<a class="headerlink" href="#rolling-upgrade" title="Link to this heading">¶</a></h2>
+<p>Rolling upgrades imply that during some interval of time there will be services
+of different code versions running and interacting in the same cloud. It puts
+multiple constraints onto the software.</p>
+<ol class="arabic simple">
+<li><p>older services should be able to talk with newer services.</p></li>
+<li><p>older services should not require the database to have older schema
+(otherwise newer services that require the newer schema would not work).</p></li>
+</ol>
+<p><a class="reference external" href="https://governance.openstack.org/tc/reference/tags/assert_supports-rolling-upgrade.html">More info on rolling upgrades in OpenStack</a>.</p>
+<p>Those requirements are achieved in Neutron by:</p>
+<ol class="arabic simple">
+<li><p>If the Neutron backend makes use of Neutron agents, the Neutron server have
+backwards compatibility code to deal with older messaging payloads.</p></li>
+<li><p>isolating a single service that accesses database (neutron-server).</p></li>
+</ol>
+<p>To simplify the matter, it’s always assumed that the order of service upgrades
+is as following:</p>
+<ol class="arabic simple">
+<li><p>first, all neutron-servers are upgraded.</p></li>
+<li><p>then, if applicable, neutron agents are upgraded.</p></li>
+</ol>
+<p>This approach allows us to avoid backwards compatibility code on agent side and
+is in line with other OpenStack projects that support rolling upgrades
+(specifically, nova).</p>
+<section id="server-upgrade">
+<h3>Server upgrade<a class="headerlink" href="#server-upgrade" title="Link to this heading">¶</a></h3>
+<p>Neutron-server is the very first component that should be upgraded to the new
+code. It’s also the only component that relies on new database schema to be
+present, other components communicate with the cloud through AMQP and hence do
+not depend on particular database state.</p>
+<p>Database upgrades are implemented with alembic migration chains.</p>
+<p>Database upgrade is split into two parts:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">neutron-db-manage</span> <span class="pre">upgrade</span> <span class="pre">--expand</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">neutron-db-manage</span> <span class="pre">upgrade</span> <span class="pre">--contract</span></code></p></li>
+</ol>
+<p>Each part represents a separate alembic branch.</p>
+<p>The former step can be executed while old neutron-server code is running. The
+latter step requires <em>all</em> neutron-server instances to be shut down. Once it’s
+complete, neutron-servers can be started again.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Full shutdown of neutron-server instances can be skipped depending on
+whether there are pending contract scripts not applied to the database:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ neutron-db-manage has_offline_migrations
+Command will return a message if there are pending contract scripts.
+</pre></div>
+</div>
+</div>
+<p><a class="reference internal" href="../alembic_migrations.html#alembic-migrations"><span class="std std-ref">More info on alembic scripts</span></a>.</p>
+</section>
+<section id="agents-upgrade">
+<h3>Agents upgrade<a class="headerlink" href="#agents-upgrade" title="Link to this heading">¶</a></h3>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This section does not apply when the cloud does not use AMQP agents to
+provide networking services to instances. In that case, other backend
+specific upgrade instructions may also apply.</p>
+</div>
+<p>Once neutron-server services are restarted with the new database schema and the
+new code, it’s time to upgrade Neutron agents.</p>
+<p>Note that in the meantime, neutron-server should be able to serve AMQP messages
+sent by older versions of agents which are part of the cloud.</p>
+<p>The recommended order of agent upgrade (per node) is:</p>
+<ol class="arabic simple">
+<li><p>first, L2 agents (openvswitch, sr-iov).</p></li>
+<li><p>then, all other agents (L3, DHCP, Metadata, …).</p></li>
+</ol>
+<p>The rationale of the agent upgrade order is that L2 agent is usually
+responsible for wiring ports for other agents to use, so it’s better to allow
+it to do its job first and then proceed with other agents that will use the
+already configured ports for their needs.</p>
+<p>Each network/compute node can have its own upgrade schedule that is independent
+of other nodes.</p>
+<section id="amqp-considerations">
+<h4>AMQP considerations<a class="headerlink" href="#amqp-considerations" title="Link to this heading">¶</a></h4>
+<p>Since it’s always assumed that neutron-server component is upgraded before
+agents, only the former should handle both old and new RPC versions.</p>
+<p>The implication of that is that no code that handles UnsupportedVersion
+oslo.messaging exceptions belongs to agent code.</p>
+<section id="notifications">
+<h5>Notifications<a class="headerlink" href="#notifications" title="Link to this heading">¶</a></h5>
+<p>For notifications that are issued by neutron-server to listening agents,
+special consideration is needed to support rolling upgrades. In this case, a
+newer controller sends newer payload to older agents.</p>
+<p>Until we have proper RPC version pinning feature to enforce older payload
+format during upgrade (as it’s implemented in other projects like nova), we
+leave our agents resistant against unknown arguments sent as part of server
+notifications. This is achieved by consistently capturing those unknown
+arguments with keyword arguments and ignoring them on agent side; and by not
+enforcing newer RPC entry point versions on server side.</p>
+<p>This approach is not ideal, because it makes RPC API less strict. That’s why
+other approaches should be considered for notifications in the future.</p>
+<p><a class="reference internal" href="rpc_api.html#rpc-versioning"><span class="std std-ref">More information about RPC versioning</span></a>.</p>
+</section>
+<section id="interface-signature">
+<h5>Interface signature<a class="headerlink" href="#interface-signature" title="Link to this heading">¶</a></h5>
+<p>An RPC interface is defined by its name, version, and (named) arguments that
+it accepts. There are no strict guarantees that arguments will have expected
+types or meaning, as long as they are serializable.</p>
+</section>
+<section id="message-content-versioning">
+<h5>Message content versioning<a class="headerlink" href="#message-content-versioning" title="Link to this heading">¶</a></h5>
+<p>To provide better compatibility guarantees for rolling upgrades, RPC interfaces
+could also define specific format for arguments they accept. In OpenStack
+world, it’s usually implemented using oslo.versionedobjects library, and
+relying on the library to define serialized form for arguments that are passed
+through AMQP wire.</p>
+<p>Note that Neutron has <em>not</em> adopted oslo.versionedobjects library for its RPC
+interfaces yet (except for QoS feature).</p>
+<p><a class="reference internal" href="rpc_callbacks.html#rpc-callbacks"><span class="std std-ref">More information about RPC callbacks used for QoS</span></a>.</p>
+</section>
+</section>
+</section>
+<section id="networking-backends">
+<h3>Networking backends<a class="headerlink" href="#networking-backends" title="Link to this heading">¶</a></h3>
+<p>Backend software upgrade should not result in any data plane disruptions.
+Meaning, e.g. Open vSwitch L2 agent should not reset flows or rewire ports;
+Neutron L3 agent should not delete namespaces left by older version of the
+agent; Neutron DHCP agent should not require immediate DHCP lease renewal; etc.</p>
+<p>The same considerations apply to setups that do not rely on agents. Meaning,
+f.e. OpenDaylight or OVN controller should not break data plane connectivity
+during its upgrade process.</p>
+</section>
+</section>
+<section id="upgrade-testing">
+<h2>Upgrade testing<a class="headerlink" href="#upgrade-testing" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://github.com/openstack-dev/grenade">Grenade</a> is the OpenStack project
+that is designed to validate upgrade scenarios.</p>
+<p>Currently, only offline (non-rolling) upgrade scenario is validated in Neutron
+gate. The upgrade scenario follows the following steps:</p>
+<ol class="arabic simple">
+<li><p>the ‘old’ cloud is set up using latest stable release code</p></li>
+<li><p>all services are stopped</p></li>
+<li><p>code is updated to the patch under review</p></li>
+<li><p>new database migration scripts are applied, if needed</p></li>
+<li><p>all services are started</p></li>
+<li><p>the ‘new’ cloud is validated with a subset of tempest tests</p></li>
+</ol>
+<p>The scenario validates that no configuration option names are changed in one
+cycle. More generally, it validates that the ‘new’ cloud is capable of running
+using the ‘old’ configuration files. It also validates that database migration
+scripts can be executed.</p>
+<p>The scenario does <em>not</em> validate AMQP versioning compatibility.</p>
+<p>Other projects (for example Nova) have so called ‘partial’ grenade jobs where
+some services are left running using the old version of code. Such a job would
+be needed in Neutron gate to validate rolling upgrades for the project. Till
+that time, it’s all up to reviewers to catch compatibility issues in patches on
+review.</p>
+<p>Another hole in testing belongs to split migration script branches. It’s
+assumed that an ‘old’ cloud can successfully run after ‘expand’ migration
+scripts from the ‘new’ cloud are applied to its database; but it’s not
+validated in gate.</p>
+</section>
+<section id="review-guidelines">
+<span id="upgrade-review-guidelines"></span><h2>Review guidelines<a class="headerlink" href="#review-guidelines" title="Link to this heading">¶</a></h2>
+<p>There are several upgrade related gotchas that should be tracked by reviewers.</p>
+<p>First things first, a general advice to reviewers: make sure new code does not
+violate requirements set by <a class="reference external" href="https://governance.openstack.org/tc/reference/tags/assert_follows-standard-deprecation.html">global OpenStack deprecation policy</a>.</p>
+<p>Now to specifics:</p>
+<ol class="arabic simple">
+<li><p>Configuration options:</p>
+<ul class="simple">
+<li><p>options should not be dropped from the tree without waiting for
+deprecation period (currently it’s one development cycle long) and a
+deprecation message issued if the deprecated option is used.</p></li>
+<li><p>option values should not change their meaning between releases.</p></li>
+</ul>
+</li>
+<li><p>Data plane:</p>
+<ul class="simple">
+<li><p>agent restart should not result in data plane disruption (no Open vSwitch
+ports reset; no network namespaces deleted; no device names changed).</p></li>
+</ul>
+</li>
+<li><p>RPC versioning:</p>
+<ul class="simple">
+<li><p>no RPC version major number should be bumped before all agents had a
+chance to upgrade (meaning, at least one release cycle is needed before
+compatibility code to handle old clients is stripped from the tree).</p></li>
+<li><p>no compatibility code should be added to agent side of AMQP interfaces.</p></li>
+<li><p>server code should be able to handle all previous versions of agents,
+unless the major version of an interface is bumped.</p></li>
+<li><p>no RPC interface arguments should change their meaning, or names.</p></li>
+<li><p>new arguments added to RPC interfaces should not be mandatory. It means
+that server should be able to handle old requests, without the new
+argument specified. Also, if the argument is not passed, the old behaviour
+before the addition of the argument should be retained.</p></li>
+<li><p>minimal client version must not be bumped for server initiated
+notification changes for at least one cycle.</p></li>
+</ul>
+</li>
+<li><p>Database migrations:</p>
+<ul class="simple">
+<li><p>migration code should be split into two branches (contract, expand) as
+needed. No code that is unsafe to execute while neutron-server is running
+should be added to expand branch.</p></li>
+<li><p>if possible, contract migrations should be minimized or avoided to reduce
+the time when API endpoints must be down during database upgrade.</p></li>
+</ul>
+</li>
+</ol>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="tag.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Tags in Neutron Resources"></i></a>
+          
+          
+            <a href="../modules.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Module Reference"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2024-08-26 17:49:17</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Contributor Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#basic-information">Basic Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-policies">Neutron Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#gerrit-rechecks">Gerrit Rechecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-stadium">Neutron Stadium</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#neutron-internals">Neutron Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#ovn-driver">OVN Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#dashboards">Dashboards</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Upgrade strategy</a><ul>
+<li><a class="reference internal" href="#rolling-upgrade">Rolling upgrade</a><ul>
+<li><a class="reference internal" href="#server-upgrade">Server upgrade</a></li>
+<li><a class="reference internal" href="#agents-upgrade">Agents upgrade</a><ul>
+<li><a class="reference internal" href="#amqp-considerations">AMQP considerations</a><ul>
+<li><a class="reference internal" href="#notifications">Notifications</a></li>
+<li><a class="reference internal" href="#interface-signature">Interface signature</a></li>
+<li><a class="reference internal" href="#message-content-versioning">Message content versioning</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#networking-backends">Networking backends</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#upgrade-testing">Upgrade testing</a></li>
+<li><a class="reference internal" href="#review-guidelines">Review guidelines</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "contributor/internals/upgrade" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Upgrade strategy in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2024-08-26 17:49:17";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "contributor/internals/upgrade";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

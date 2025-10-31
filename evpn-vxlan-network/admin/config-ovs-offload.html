@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Open vSwitch Hardware Offloading &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/support-matrix.css?v=ac26a930" />
+    <script src="../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Open vSwitch Native Firewall Driver" href="config-ovsfwdriver.html" />
+    <link rel="prev" title="Open vSwitch with DPDK Datapath" href="config-ovs-dpdk.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/admin/config-ovs-offload.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Open vSwitch Hardware Offloading</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="config-ovs-dpdk.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Open vSwitch with DPDK Datapath"></i></a>
+    
+    
+    <a href="config-ovsfwdriver.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Open vSwitch Native Firewall Driver"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="open-vswitch-hardware-offloading">
+<span id="config-ovs-offload"></span><h1>Open vSwitch Hardware Offloading<a class="headerlink" href="#open-vswitch-hardware-offloading" title="Link to this heading">¶</a></h1>
+<p>The purpose of this page is to describe how to enable Open vSwitch hardware
+offloading functionality available in OpenStack (using OpenStack Networking).
+This functionality was first introduced in the OpenStack Pike release.
+This page intends to serve as a guide for how to configure OpenStack Networking
+and OpenStack Compute to enable Open vSwitch hardware offloading.</p>
+<section id="the-basics">
+<h2>The basics<a class="headerlink" href="#the-basics" title="Link to this heading">¶</a></h2>
+<p>Open vSwitch is a production quality, multilayer virtual switch licensed under
+the open source Apache 2.0 license.  It is designed to enable massive network
+automation through programmatic extension, while still supporting standard
+management interfaces and protocols. Open vSwitch (OVS) allows Virtual Machines
+(VM) to communicate with each other and with the outside world.
+The OVS software based solution is CPU intensive, affecting system performance
+and preventing fully utilizing available bandwidth.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 75.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Term</p></th>
+<th class="head"><p>Definition</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>PF</p></td>
+<td><p>Physical Function. The physical Ethernet controller that supports
+SR-IOV.</p></td>
+</tr>
+<tr class="row-odd"><td><p>VF</p></td>
+<td><p>Virtual Function. The virtual PCIe device created from a physical
+Ethernet controller.</p></td>
+</tr>
+<tr class="row-even"><td><p>Representor Port</p></td>
+<td><p>Virtual network interface similar to SR-IOV port that represents
+Nova instance.</p></td>
+</tr>
+<tr class="row-odd"><td><p>First Compute Node</p></td>
+<td><p>OpenStack Compute Node that can host Compute instances (Virtual Machines).</p></td>
+</tr>
+<tr class="row-even"><td><p>Second Compute Node</p></td>
+<td><p>OpenStack Compute Node that can host Compute instances (Virtual Machines).</p></td>
+</tr>
+</tbody>
+</table>
+<section id="supported-ethernet-controllers">
+<h3>Supported Ethernet controllers<a class="headerlink" href="#supported-ethernet-controllers" title="Link to this heading">¶</a></h3>
+<p>The following manufacturers are known to work:</p>
+<ul class="simple">
+<li><p>Mellanox ConnectX-4 NIC (VLAN Offload)</p></li>
+<li><p>Mellanox ConnectX-4 Lx/ConnectX-5 NICs (VLAN/VXLAN Offload)</p></li>
+<li><p>Broadcom NetXtreme-S series NICs</p></li>
+<li><p>Broadcom NetXtreme-E series NICs</p></li>
+</ul>
+<p>For information on <strong>Mellanox Ethernet Cards</strong>, see
+<a class="reference external" href="http://www.mellanox.com/page/ethernet_cards_overview">Mellanox: Ethernet Cards - Overview</a>.</p>
+</section>
+<section id="prerequisites">
+<h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">¶</a></h3>
+<ul>
+<li><p>Linux Kernel &gt;= 4.13</p></li>
+<li><p>Open vSwitch &gt;= 2.8</p></li>
+<li><p>iproute &gt;= 4.12</p></li>
+<li><p>Mellanox or Broadcom NIC</p>
+<blockquote>
+<div><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Mellanox NIC FW that supports Open vSwitch hardware offloading:</p>
+<p>ConnectX-5    &gt;= 16.21.0338</p>
+<p>ConnectX-4    &gt;= 12.18.2000</p>
+<p>ConnectX-4 Lx &gt;= 14.21.0338</p>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</section>
+</section>
+<section id="using-open-vswitch-hardware-offloading">
+<h2>Using Open vSwitch hardware offloading<a class="headerlink" href="#using-open-vswitch-hardware-offloading" title="Link to this heading">¶</a></h2>
+<p>In order to enable Open vSwitch hardware offloading, the following steps are
+required:</p>
+<ol class="arabic simple">
+<li><p>Enable SR-IOV</p></li>
+<li><p>Configure NIC to switchdev mode (relevant Nodes)</p></li>
+<li><p>Enable Open vSwitch hardware offloading</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Throughout this guide, <code class="docutils literal notranslate"><span class="pre">enp3s0f0</span></code> is used as the PF and <code class="docutils literal notranslate"><span class="pre">eth3</span></code> is used
+as the representor port. These ports may vary in different environments.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Throughout this guide, we use <code class="docutils literal notranslate"><span class="pre">systemctl</span></code> to restart OpenStack services.
+This is correct for <code class="docutils literal notranslate"><span class="pre">systemd</span></code> OS. Other methods to restart services should be
+used in other environments.</p>
+</div>
+<section id="create-compute-virtual-functions">
+<h3>Create Compute virtual functions<a class="headerlink" href="#create-compute-virtual-functions" title="Link to this heading">¶</a></h3>
+<p>Create the VFs for the network interface that will be used for SR-IOV. We use
+<code class="docutils literal notranslate"><span class="pre">enp3s0f0</span></code> as PF, which is also used as the interface for the VLAN provider
+network and has access to the private networks of all nodes.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The following steps detail how to create VFs using Mellanox ConnectX-4 and
+SR-IOV Ethernet cards on an Intel system. Steps may be different for the
+hardware of your choice.</p>
+</div>
+<ol class="arabic">
+<li><p>Ensure SR-IOV and VT-d are enabled on the system.
+Enable IOMMU in Linux by adding <code class="docutils literal notranslate"><span class="pre">intel_iommu=on</span></code> to kernel parameters,
+for example, using GRUB.</p></li>
+<li><p>On each Compute node, create the VFs:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># echo &#39;4&#39; &gt; /sys/class/net/enp3s0f0/device/sriov_numvfs</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A network interface can be used both for PCI passthrough, using the PF,
+and SR-IOV, using the VFs. If the PF is used, the VF number stored in
+the <code class="docutils literal notranslate"><span class="pre">sriov_numvfs</span></code> file is lost. If the PF is attached again to the
+operating system, the number of VFs assigned to this interface will be
+zero. To keep the number of VFs always assigned to this interface,
+update a relevant file according to your OS.
+See some examples below:</p>
+<p>In Ubuntu, modifying the <code class="docutils literal notranslate"><span class="pre">/etc/network/interfaces</span></code> file:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">auto enp3s0f0</span>
+<span class="na">iface enp3s0f0 inet dhcp</span>
+<span class="na">pre-up echo &#39;4&#39; &gt; /sys/class/net/enp3s0f0/device/sriov_numvfs</span>
+</pre></div>
+</div>
+<p>In Red Hat, modifying the <code class="docutils literal notranslate"><span class="pre">/sbin/ifup-local</span></code> file:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/sh</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;enp3s0f0&quot;</span><span class="w"> </span><span class="o">]]</span>
+<span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;4&#39;</span><span class="w"> </span>&gt;<span class="w"> </span>/sys/class/net/enp3s0f0/device/sriov_numvfs
+<span class="k">fi</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Alternatively, you can create VFs by passing the <code class="docutils literal notranslate"><span class="pre">max_vfs</span></code> to the
+kernel module of your network interface. However, the <code class="docutils literal notranslate"><span class="pre">max_vfs</span></code>
+parameter has been deprecated, so the PCI /sys interface is the preferred
+method.</p>
+</div>
+<p>You can determine the maximum number of VFs a PF can support:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># cat /sys/class/net/enp3s0f0/device/sriov_totalvfs</span>
+<span class="m">8</span>
+</pre></div>
+</div>
+</li>
+<li><p>Verify that the VFs have been created and are in <code class="docutils literal notranslate"><span class="pre">up</span></code> state:</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The PCI bus number of the PF (03:00.0) and VFs (03:00.2 .. 03:00.5)
+will be used later.</p>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># lspci | grep Ethernet</span>
+<span class="m">03</span>:00.0<span class="w"> </span>Ethernet<span class="w"> </span>controller:<span class="w"> </span>Mellanox<span class="w"> </span>Technologies<span class="w"> </span>MT27800<span class="w"> </span>Family<span class="w"> </span><span class="o">[</span>ConnectX-5<span class="o">]</span>
+<span class="m">03</span>:00.1<span class="w"> </span>Ethernet<span class="w"> </span>controller:<span class="w"> </span>Mellanox<span class="w"> </span>Technologies<span class="w"> </span>MT27800<span class="w"> </span>Family<span class="w"> </span><span class="o">[</span>ConnectX-5<span class="o">]</span>
+<span class="m">03</span>:00.2<span class="w"> </span>Ethernet<span class="w"> </span>controller:<span class="w"> </span>Mellanox<span class="w"> </span>Technologies<span class="w"> </span>MT27800<span class="w"> </span>Family<span class="w"> </span><span class="o">[</span>ConnectX-5<span class="w"> </span>Virtual<span class="w"> </span>Function<span class="o">]</span>
+<span class="m">03</span>:00.3<span class="w"> </span>Ethernet<span class="w"> </span>controller:<span class="w"> </span>Mellanox<span class="w"> </span>Technologies<span class="w"> </span>MT27800<span class="w"> </span>Family<span class="w"> </span><span class="o">[</span>ConnectX-5<span class="w"> </span>Virtual<span class="w"> </span>Function<span class="o">]</span>
+<span class="m">03</span>:00.4<span class="w"> </span>Ethernet<span class="w"> </span>controller:<span class="w"> </span>Mellanox<span class="w"> </span>Technologies<span class="w"> </span>MT27800<span class="w"> </span>Family<span class="w"> </span><span class="o">[</span>ConnectX-5<span class="w"> </span>Virtual<span class="w"> </span>Function<span class="o">]</span>
+<span class="m">03</span>:00.5<span class="w"> </span>Ethernet<span class="w"> </span>controller:<span class="w"> </span>Mellanox<span class="w"> </span>Technologies<span class="w"> </span>MT27800<span class="w"> </span>Family<span class="w"> </span><span class="o">[</span>ConnectX-5<span class="w"> </span>Virtual<span class="w"> </span>Function<span class="o">]</span>
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># ip link show enp3s0f0</span>
+<span class="m">8</span>:<span class="w"> </span>enp3s0f0:<span class="w"> </span>&lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt;<span class="w"> </span>mtu<span class="w"> </span><span class="m">1500</span><span class="w"> </span>qdisc<span class="w"> </span>mq<span class="w"> </span>state<span class="w"> </span>UP<span class="w"> </span>mode<span class="w"> </span>DEFAULT<span class="w"> </span>qlen<span class="w"> </span><span class="m">1000</span>
+<span class="w">   </span>link/ether<span class="w"> </span>a0:36:9f:8f:3f:b8<span class="w"> </span>brd<span class="w"> </span>ff:ff:ff:ff:ff:ff
+<span class="w">   </span>vf<span class="w"> </span><span class="m">0</span><span class="w"> </span>MAC<span class="w"> </span><span class="m">00</span>:00:00:00:00:00,<span class="w"> </span>spoof<span class="w"> </span>checking<span class="w"> </span>on,<span class="w"> </span>link-state<span class="w"> </span>auto
+<span class="w">   </span>vf<span class="w"> </span><span class="m">1</span><span class="w"> </span>MAC<span class="w"> </span><span class="m">00</span>:00:00:00:00:00,<span class="w"> </span>spoof<span class="w"> </span>checking<span class="w"> </span>on,<span class="w"> </span>link-state<span class="w"> </span>auto
+<span class="w">   </span>vf<span class="w"> </span><span class="m">2</span><span class="w"> </span>MAC<span class="w"> </span><span class="m">00</span>:00:00:00:00:00,<span class="w"> </span>spoof<span class="w"> </span>checking<span class="w"> </span>on,<span class="w"> </span>link-state<span class="w"> </span>auto
+<span class="w">   </span>vf<span class="w"> </span><span class="m">3</span><span class="w"> </span>MAC<span class="w"> </span><span class="m">00</span>:00:00:00:00:00,<span class="w"> </span>spoof<span class="w"> </span>checking<span class="w"> </span>on,<span class="w"> </span>link-state<span class="w"> </span>auto
+</pre></div>
+</div>
+<p>If the interfaces are down, set them to <code class="docutils literal notranslate"><span class="pre">up</span></code> before launching a guest,
+otherwise the instance will fail to spawn:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># ip link set enp3s0f0 up</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="configure-open-vswitch-hardware-offloading">
+<h3>Configure Open vSwitch hardware offloading<a class="headerlink" href="#configure-open-vswitch-hardware-offloading" title="Link to this heading">¶</a></h3>
+<ol class="arabic">
+<li><p>Change the e-switch mode from legacy to switchdev on the PF device.
+This will also create the VF representor network devices in the host OS.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># echo 0000:03:00.2 &gt; /sys/bus/pci/drivers/mlx5_core/unbind</span>
+</pre></div>
+</div>
+<p>This tells the driver to unbind VF 03:00.2</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This should be done for all relevant VFs
+(in this example 0000:03:00.2 .. 0000:03:00.5)</p>
+</div>
+</li>
+<li><p>Enable Open vSwitch hardware offloading,
+set PF to switchdev mode and bind VFs back.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># sudo devlink dev eswitch set pci/0000:03:00.0 mode switchdev</span>
+<span class="c1"># sudo ethtool -K enp3s0f0 hw-tc-offload on</span>
+<span class="c1"># echo 0000:03:00.2 &gt; /sys/bus/pci/drivers/mlx5_core/bind</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This should be done for all relevant VFs
+(in this example 0000:03:00.2 .. 0000:03:00.5)</p>
+</div>
+</li>
+<li><p>Restart Open vSwitch</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># sudo systemctl enable openvswitch.service</span>
+<span class="c1"># sudo ovs-vsctl set Open_vSwitch . other_config:hw-offload=true</span>
+<span class="c1"># sudo systemctl restart openvswitch.service</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The given aging of OVS is given in milliseconds and can be controlled with:</p>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># ovs-vsctl set Open_vSwitch . other_config:max-idle=30000</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="configure-nodes-vlan-configuration">
+<h3>Configure Nodes (VLAN Configuration)<a class="headerlink" href="#configure-nodes-vlan-configuration" title="Link to this heading">¶</a></h3>
+<ol class="arabic">
+<li><p>Update <code class="docutils literal notranslate"><span class="pre">/etc/neutron/plugins/ml2/ml2_conf.ini</span></code> on Controller nodes</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[ml2]</span>
+<span class="na">tenant_network_types</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">vlan</span>
+<span class="na">type_drivers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">vlan</span>
+<span class="na">mechanism_drivers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">openvswitch</span>
+</pre></div>
+</div>
+</li>
+<li><p>Update <code class="docutils literal notranslate"><span class="pre">/etc/neutron/neutron.conf</span></code> on Controller nodes</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[DEFAULT]</span>
+<span class="na">core_plugin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">ml2</span>
+</pre></div>
+</div>
+</li>
+<li><p>Update <code class="docutils literal notranslate"><span class="pre">/etc/nova/nova.conf</span></code> on Controller nodes</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[filter_scheduler]</span>
+<span class="na">enabled_filters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">PciPassthroughFilter</span>
+</pre></div>
+</div>
+</li>
+<li><p>Update <code class="docutils literal notranslate"><span class="pre">/etc/nova/nova.conf</span></code> on Compute nodes</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[pci]</span>
+<span class="c1">#VLAN Configuration passthrough_whitelist example</span>
+<span class="na">passthrough_whitelist ={&quot;&#39;&quot;address&quot;&#39;&quot;</span><span class="o">:</span><span class="s">&quot;&#39;</span><span class="na">&quot;*</span><span class="o">:</span><span class="s">&#39;&quot;</span><span class="na">03:00&quot;&#39;.*&quot;&#39;&quot;,&quot;&#39;&quot;physical_network&quot;&#39;&quot;</span><span class="o">:</span><span class="s">&quot;&#39;</span><span class="na">&quot;physnet2&quot;&#39;&quot;}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="configure-nodes-vxlan-configuration">
+<h3>Configure Nodes (VXLAN Configuration)<a class="headerlink" href="#configure-nodes-vxlan-configuration" title="Link to this heading">¶</a></h3>
+<ol class="arabic">
+<li><p>Update <code class="docutils literal notranslate"><span class="pre">/etc/neutron/plugins/ml2/ml2_conf.ini</span></code> on Controller nodes</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[ml2]</span>
+<span class="na">tenant_network_types</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">vxlan</span>
+<span class="na">type_drivers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">vxlan</span>
+<span class="na">mechanism_drivers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">openvswitch</span>
+</pre></div>
+</div>
+</li>
+<li><p>Update <code class="docutils literal notranslate"><span class="pre">/etc/neutron/neutron.conf</span></code> on Controller nodes</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[DEFAULT]</span>
+<span class="na">core_plugin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">ml2</span>
+</pre></div>
+</div>
+</li>
+<li><p>Update <code class="docutils literal notranslate"><span class="pre">/etc/nova/nova.conf</span></code> on Controller nodes</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[filter_scheduler]</span>
+<span class="na">enabled_filters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">PciPassthroughFilter</span>
+</pre></div>
+</div>
+</li>
+<li><p>Update <code class="docutils literal notranslate"><span class="pre">/etc/nova/nova.conf</span></code> on Compute nodes</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>VXLAN configuration requires physical_network to be null.</p>
+</div>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[pci]</span>
+<span class="c1">#VLAN Configuration passthrough_whitelist example</span>
+<span class="na">passthrough_whitelist ={&quot;&#39;&quot;address&quot;&#39;&quot;</span><span class="o">:</span><span class="s">&quot;&#39;</span><span class="na">&quot;*</span><span class="o">:</span><span class="s">&#39;&quot;</span><span class="na">03</span><span class="o">:</span><span class="s">00&quot;&#39;.*&quot;&#39;&quot;,&quot;&#39;&quot;physical_network&quot;&#39;&quot;:null}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Restart nova and neutron services</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># sudo systemctl restart openstack-nova-compute.service</span>
+<span class="c1"># sudo systemctl restart openstack-nova-scheduler.service</span>
+<span class="c1"># sudo systemctl restart neutron-server.service</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="validate-open-vswitch-hardware-offloading">
+<h3>Validate Open vSwitch hardware offloading<a class="headerlink" href="#validate-open-vswitch-hardware-offloading" title="Link to this heading">¶</a></h3>
+<blockquote>
+<div><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In this example we will bring up two instances on different Compute nodes and
+send ICMP echo packets between them. Then we will check TCP packets on
+a representor port and we will see that only the first packet will be
+shown there. All the rest will be offloaded.</p>
+</div>
+</div></blockquote>
+<ol class="arabic">
+<li><p>Create a port <code class="docutils literal notranslate"><span class="pre">direct</span></code> on <code class="docutils literal notranslate"><span class="pre">private</span></code> network</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># openstack port create --network private --vnic-type=direct direct_port1</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create an instance using the direct port on ‘First Compute Node’</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># openstack server create --flavor m1.small --image cloud_image --nic port-id=direct_port1 vm1</span>
+</pre></div>
+</div>
+</li>
+<li><p>Repeat steps above and create a second instance on ‘Second Compute Node’</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># openstack port create --network private --vnic-type=direct direct_port2</span>
+<span class="c1"># openstack server create --flavor m1.small --image mellanox_fedora --nic port-id=direct_port2 vm2</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can use  –availability-zone nova:compute_node_1 option
+to set the desired Compute Node</p>
+</div>
+</li>
+<li><p>Connect to instance1 and send ICMP Echo Request packets to instance2</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># vncviewer localhost:5900</span>
+vm_1#<span class="w"> </span>ping<span class="w"> </span>vm2
+</pre></div>
+</div>
+</li>
+<li><p>Connect to ‘Second Compute Node’ and find representor port of the instance</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Find a representor port first, in our case it’s eth3</p>
+</div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">compute_node2# ip link show enp3s0f0</span>
+<span class="go">6: enp3s0f0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc mq master ovs-system state UP mode DEFAULT group default qlen 1000</span>
+<span class="go">   link/ether ec:0d:9a:46:9e:84 brd ff:ff:ff:ff:ff:ff</span>
+<span class="go">   vf 0 MAC 00:00:00:00:00:00, spoof checking off, link-state enable, trust off, query_rss off</span>
+<span class="go">   vf 1 MAC 00:00:00:00:00:00, spoof checking off, link-state enable, trust off, query_rss off</span>
+<span class="go">   vf 2 MAC 00:00:00:00:00:00, spoof checking off, link-state enable, trust off, query_rss off</span>
+<span class="go">   vf 3 MAC fa:16:3e:b9:b8:ce, vlan 57, spoof checking on, link-state enable, trust off, query_rss off</span>
+
+<span class="go">compute_node2# ls -l /sys/class/net/</span>
+<span class="go">lrwxrwxrwx 1 root root 0 Sep 11 10:54 eth0 -&gt; ../../devices/virtual/net/eth0</span>
+<span class="go">lrwxrwxrwx 1 root root 0 Sep 11 10:54 eth1 -&gt; ../../devices/virtual/net/eth1</span>
+<span class="go">lrwxrwxrwx 1 root root 0 Sep 11 10:54 eth2 -&gt; ../../devices/virtual/net/eth2</span>
+<span class="go">lrwxrwxrwx 1 root root 0 Sep 11 10:54 eth3 -&gt; ../../devices/virtual/net/eth3</span>
+
+<span class="go">compute_node2# sudo ovs-dpctl show</span>
+<span class="go">system@ovs-system:</span>
+<span class="go">  lookups: hit:1684 missed:1465 lost:0</span>
+<span class="go">  flows: 0</span>
+<span class="go">  masks: hit:8420 total:1 hit/pkt:2.67</span>
+<span class="go">  port 0: ovs-system (internal)</span>
+<span class="go">  port 1: br-enp3s0f0 (internal)</span>
+<span class="go">  port 2: br-int (internal)</span>
+<span class="go">  port 3: br-ex (internal)</span>
+<span class="go">  port 4: enp3s0f0</span>
+<span class="go">  port 5: tapfdc744bb-61 (internal)</span>
+<span class="go">  port 6: qr-a7b1e843-4f (internal)</span>
+<span class="go">  port 7: qg-79a77e6d-8f (internal)</span>
+<span class="go">  port 8: qr-f55e4c5f-f3 (internal)</span>
+<span class="go">  port 9: eth3</span>
+</pre></div>
+</div>
+</li>
+<li><p>Check traffic on the representor port. Verify that only the first ICMP
+packet appears.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">compute_node2# tcpdump -nnn -i eth3</span>
+
+<span class="go">tcpdump: verbose output suppressed, use -v or -vv for full protocol decode</span>
+<span class="go">listening on eth3, link-type EN10MB (Ethernet), capture size 262144 bytes</span>
+<span class="go">17:12:41.220447 ARP, Request who-has 172.0.0.10 tell 172.0.0.13, length 46</span>
+<span class="go">17:12:41.220684 ARP, Reply 172.0.0.10 is-at fa:16:3e:f2:8b:23, length 42</span>
+<span class="go">17:12:41.260487 IP 172.0.0.13 &gt; 172.0.0.10: ICMP echo request, id 1263, seq 1, length 64</span>
+<span class="go">17:12:41.260778 IP 172.0.0.10 &gt; 172.0.0.13: ICMP echo reply, id 1263, seq 1, length 64</span>
+<span class="go">17:12:46.268951 ARP, Request who-has 172.0.0.13 tell 172.0.0.10, length 42</span>
+<span class="go">17:12:46.271771 ARP, Reply 172.0.0.13 is-at fa:16:3e:1a:10:05, length 46</span>
+<span class="go">17:12:55.354737 IP6 fe80::f816:3eff:fe29:8118 &gt; ff02::1: ICMP6, router advertisement, length 64</span>
+<span class="go">17:12:56.106705 IP 0.0.0.0.68 &gt; 255.255.255.255.67: BOOTP/DHCP, Request from 62:21:f0:89:40:73, length 300</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="config-ovs-dpdk.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Open vSwitch with DPDK Datapath"></i></a>
+          
+          
+            <a href="config-ovsfwdriver.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Open vSwitch Native Firewall Driver"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2024-08-23 12:03:12</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation Guide</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">OpenStack Networking Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deploy.html">Deployment examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ops.html">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">Migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ovn/index.html">OVN Driver Administration Guide</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributor/index.html">Contributor Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Open vSwitch Hardware Offloading</a><ul>
+<li><a class="reference internal" href="#the-basics">The basics</a><ul>
+<li><a class="reference internal" href="#supported-ethernet-controllers">Supported Ethernet controllers</a></li>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-open-vswitch-hardware-offloading">Using Open vSwitch hardware offloading</a><ul>
+<li><a class="reference internal" href="#create-compute-virtual-functions">Create Compute virtual functions</a></li>
+<li><a class="reference internal" href="#configure-open-vswitch-hardware-offloading">Configure Open vSwitch hardware offloading</a></li>
+<li><a class="reference internal" href="#configure-nodes-vlan-configuration">Configure Nodes (VLAN Configuration)</a></li>
+<li><a class="reference internal" href="#configure-nodes-vxlan-configuration">Configure Nodes (VXLAN Configuration)</a></li>
+<li><a class="reference internal" href="#validate-open-vswitch-hardware-offloading">Validate Open vSwitch hardware offloading</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "admin/config-ovs-offload" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Open vSwitch Hardware Offloading in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2024-08-23 12:03:12";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "admin/config-ovs-offload";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

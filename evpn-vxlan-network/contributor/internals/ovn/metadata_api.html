@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>OpenStack Metadata API and OVN &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Neutron/OVN Database consistency" href="database_consistency.html" />
+    <link rel="prev" title="OVN Neutron Worker and Port status handling" href="ovn_worker.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/contributor/internals/ovn/metadata_api.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>OpenStack Metadata API and OVN</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="ovn_worker.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: OVN Neutron Worker and Port status handling"></i></a>
+    
+    
+    <a href="database_consistency.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Neutron/OVN Database consistency"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="openstack-metadata-api-and-ovn">
+<span id="metadata-api"></span><h1>OpenStack Metadata API and OVN<a class="headerlink" href="#openstack-metadata-api-and-ovn" title="Link to this heading">¶</a></h1>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
+<p>OpenStack Nova presents a metadata API to VMs similar to what is available on
+Amazon EC2.  Neutron is involved in this process because the source IP address
+is not enough to uniquely identify the source of a metadata request since
+networks can have overlapping IP addresses.  Neutron is responsible for
+intercepting metadata API requests and adding HTTP headers which uniquely
+identify the source of the request before forwarding it to the metadata API
+server.</p>
+<p>The purpose of this document is to propose a design for how to enable this
+functionality when OVN is used as the backend for OpenStack Neutron.</p>
+</section>
+<section id="neutron-and-metadata-today">
+<h2>Neutron and Metadata Today<a class="headerlink" href="#neutron-and-metadata-today" title="Link to this heading">¶</a></h2>
+<p>The following blog post describes how VMs access the metadata API through
+Neutron today.</p>
+<p><a class="reference external" href="https://www.suse.com/c/vms-get-access-metadata-neutron/">https://www.suse.com/c/vms-get-access-metadata-neutron/</a></p>
+<p>In summary, we run a metadata proxy in either the router namespace or DHCP
+namespace.  The DHCP namespace can be used when there’s no router connected to
+the network.  The one downside to the DHCP namespace approach is that it
+requires pushing a static route to the VM through DHCP so that it knows to
+route metadata requests to the DHCP server IP address.</p>
+<ul class="simple">
+<li><p>Instance sends a HTTP request for metadata to 169.254.169.254</p></li>
+<li><p>This request either hits the router or DHCP namespace depending on the route
+in the instance</p></li>
+<li><p>The metadata proxy service in the namespace adds the following info to the
+request:</p>
+<ul>
+<li><p>Instance IP (X-Forwarded-For header)</p></li>
+<li><p>Router or Network-ID (X-Neutron-Network-Id or X-Neutron-Router-Id header)</p></li>
+</ul>
+</li>
+<li><p>The metadata proxy service sends this request to the metadata agent (outside
+the namespace) via a UNIX domain socket.</p></li>
+<li><p>The neutron-metadata-agent service forwards the request to the Nova metadata
+API service by adding some new headers (instance ID and Tenant ID) to the
+request [0].</p></li>
+</ul>
+<p>For proper operation, Neutron and Nova must be configured to communicate
+together with a shared secret. Neutron uses this secret to sign the Instance-ID
+header of the metadata request to prevent spoofing. This secret is configured
+through metadata_proxy_shared_secret on both nova and neutron configuration
+files (optional).</p>
+<p>[0] <a class="reference external" href="https://opendev.org/openstack/neutron/src/commit/f73f39f2cfcd4eace2bda14c99ead9a8cc8560f4/neutron/agent/metadata/agent.py#L175">https://opendev.org/openstack/neutron/src/commit/f73f39f2cfcd4eace2bda14c99ead9a8cc8560f4/neutron/agent/metadata/agent.py#L175</a></p>
+</section>
+<section id="neutron-and-metadata-with-ovn">
+<h2>Neutron and Metadata with OVN<a class="headerlink" href="#neutron-and-metadata-with-ovn" title="Link to this heading">¶</a></h2>
+<p>The current metadata API approach does not translate directly to OVN.  There
+are no Neutron agents in use with OVN.  Further, OVN makes no use of its own
+network namespaces that we could take advantage of like the original
+implementation makes use of the router and dhcp namespaces.</p>
+<p>We must use a modified approach that fits the OVN model.  This section details
+a proposed approach.</p>
+<section id="overview-of-proposed-approach">
+<h3>Overview of Proposed Approach<a class="headerlink" href="#overview-of-proposed-approach" title="Link to this heading">¶</a></h3>
+<p>The proposed approach would be similar to the <em>isolated network</em> case in the
+current ML2+OVS implementation. Therefore, we would be running a metadata
+proxy (haproxy) instance on every hypervisor for each network a VM on that
+host is connected to.</p>
+<p>The downside of this approach is that we’ll be running more metadata proxies
+than we’re doing now in case of routed networks (one per virtual router) but
+since haproxy is very lightweight and they will be idling most of the time,
+it shouldn’t be a big issue overall. However, the major benefit of this
+approach is that we don’t have to implement any scheduling logic to distribute
+metadata proxies across the nodes, nor any HA logic. This, however, can be
+evolved in the future as explained below in this document.</p>
+<p>Also, this approach relies on a new feature in OVN that we must implement
+first so that an OVN port can be present on <em>every</em> chassis (similar to
+<em>localnet</em> ports). This new type of logical port would be <em>localport</em> and we
+will never forward packets over a tunnel for these ports. We would only send
+packets to the local instance of a <em>localport</em>.</p>
+<p><strong>Step 1</strong> - Create a port for the metadata proxy</p>
+<p>When using the DHCP agent today, Neutron automatically creates a port for the
+DHCP agent to use.  We could do the same thing for use with the metadata proxy
+(haproxy). We’ll create an OVN <em>localport</em> which will be present on every
+chassis and this port will have the same MAC/IP address on every host.
+Eventually, we can share the same neutron port for both DHCP and metadata.</p>
+<p><strong>Step 2</strong> - Routing metadata API requests to the correct Neutron port</p>
+<p>This works similarly to the current approach.</p>
+<p>We would program OVN to include a static route in DHCP responses that routes
+metadata API requests to the <em>localport</em> that is hosting the metadata API
+proxy.</p>
+<p>Also, in case DHCP isn’t enabled or the client ignores the route info, we
+will program a static route in the OVN logical router which will still get
+metadata requests directed to the right place.</p>
+<p>If the DHCP route does not work and the network is isolated, VMs won’t get
+metadata, but this already happens with the current implementation so this
+approach doesn’t introduce a regression.</p>
+<p><strong>Step 3</strong> - Management of the namespaces and haproxy instances</p>
+<p>We propose a new agent called <code class="docutils literal notranslate"><span class="pre">neutron-ovn-metadata-agent</span></code>.
+We will run this agent on every hypervisor and it will be responsible for
+spawning the haproxy instances for managing the OVS interfaces, network
+namespaces and haproxy processes used to proxy metadata API requests.</p>
+<p><strong>Step 4</strong> - Metadata API request processing</p>
+<p>Similar to the existing neutron metadata agent, <code class="docutils literal notranslate"><span class="pre">neutron-ovn-metadata-agent</span></code>
+must act as an intermediary between haproxy and the Nova metadata API service.
+<code class="docutils literal notranslate"><span class="pre">neutron-ovn-metadata-agent</span></code> is the process that will have access to the
+host networks where the Nova metadata API exists.  Each haproxy will be in a
+network namespace not able to reach the appropriate host network.  Haproxy
+will add the necessary headers to the metadata API request and then forward it
+to <code class="docutils literal notranslate"><span class="pre">neutron-ovn-metadata-agent</span></code> over a UNIX domain socket, which matches the
+behavior of the current metadata agent.</p>
+</section>
+<section id="metadata-proxy-management-logic">
+<h3>Metadata Proxy Management Logic<a class="headerlink" href="#metadata-proxy-management-logic" title="Link to this heading">¶</a></h3>
+<p>In neutron-ovn-metadata-agent.</p>
+<ul class="simple">
+<li><p>On startup:</p>
+<ul>
+<li><p>Do a full sync. Ensure we have all the required metadata proxies running.
+For that, the agent would watch the <code class="docutils literal notranslate"><span class="pre">Port_Binding</span></code> table of the OVN
+Southbound database and look for all rows with the <code class="docutils literal notranslate"><span class="pre">chassis</span></code> column set
+to the host the agent is running on. For all those entries, make sure a
+metadata proxy instance is spawned for every <code class="docutils literal notranslate"><span class="pre">datapath</span></code> (Neutron
+network) those ports are attached to. Ensure any running metadata proxies
+no longer needed are torn down.</p></li>
+</ul>
+</li>
+<li><p>Open and maintain a connection to the OVN Northbound database (using the
+ovsdbapp library).  On first connection, and anytime a reconnect happens:</p>
+<ul>
+<li><p>Do a full sync.</p></li>
+</ul>
+</li>
+<li><p>Register a callback for creates/updates/deletes to Logical_Switch_Port rows
+to detect when metadata proxies should be started or torn down.
+<code class="docutils literal notranslate"><span class="pre">neutron-ovn-metadata-agent</span></code> will watch OVN Southbound database
+(<code class="docutils literal notranslate"><span class="pre">Port_Binding</span></code> table) to detect when a port gets bound to its chassis. At
+that point, the agent will make sure that there’s a metadata proxy
+attached to the OVN <em>localport</em> for the network which this port is connected
+to.</p></li>
+<li><p>When a new network is created, we must create an OVN <em>localport</em> for use
+as a metadata proxy. This port will be owned by <code class="docutils literal notranslate"><span class="pre">network:dhcp</span></code> so that it
+gets auto deleted upon the removal of the network and it will remain <code class="docutils literal notranslate"><span class="pre">DOWN</span></code>
+and not bound to any chassis. The metadata port will be created regardless of
+the DHCP setting of the subnets within the network as long as the metadata
+service is enabled.</p></li>
+<li><p>When a network is deleted, we must tear down the metadata proxy instance (if
+present) on the host and delete the corresponding OVN <em>localport</em> (which will
+happen automatically as it’s owned by <code class="docutils literal notranslate"><span class="pre">network:dhcp</span></code>).</p></li>
+</ul>
+<p>Launching a metadata proxy includes:</p>
+<ul>
+<li><p>Creating a network namespace:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo ip netns add &lt;ns-name&gt;
+</pre></div>
+</div>
+</li>
+<li><p>Creating a VETH pair (OVS upgrades that upgrade the kernel module will make
+internal ports go away and then brought back by OVS scripts. This may cause
+some disruption. Therefore, veth pairs are preferred over internal ports):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo ip link add &lt;iface-name&gt;0 type veth peer name &lt;iface-name&gt;1
+</pre></div>
+</div>
+</li>
+<li><p>Creating an OVS interface and placing one end in that namespace:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo ovs-vsctl add-port br-int &lt;iface-name&gt;0
+$ sudo ip link set &lt;iface-name&gt;1 netns &lt;ns-name&gt;
+</pre></div>
+</div>
+</li>
+<li><p>Setting the IP and MAC addresses on that interface:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo ip netns exec &lt;ns-name&gt; \
+&gt; ip link set &lt;iface-name&gt;1 address &lt;neutron-port-mac&gt;
+$ sudo ip netns exec &lt;ns-name&gt; \
+&gt; ip addr add &lt;neutron-port-ip&gt;/&lt;netmask&gt; dev &lt;iface-name&gt;1
+</pre></div>
+</div>
+</li>
+<li><p>Bringing the VETH pair up:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo ip netns exec &lt;ns-name&gt; ip link set &lt;iface-name&gt;1 up
+$ sudo ip link set &lt;iface-name&gt;0 up
+</pre></div>
+</div>
+</li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">external-ids:iface-id=NEUTRON_PORT_UUID</span></code> on the OVS interface so that
+OVN is able to correlate this new OVS interface with the correct OVN logical
+port:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo ovs-vsctl set Interface &lt;iface-name&gt;0 external_ids:iface-id=&lt;neutron-port-uuid&gt;
+</pre></div>
+</div>
+</li>
+<li><p>Starting haproxy in this network namespace.</p></li>
+</ul>
+<p>Tearing down a metadata proxy includes:</p>
+<ul class="simple">
+<li><p>Removing the network UUID from our chassis.</p></li>
+<li><p>Stopping haproxy.</p></li>
+<li><p>Deleting the OVS interface.</p></li>
+<li><p>Deleting the network namespace.</p></li>
+</ul>
+<p><strong>Other considerations</strong></p>
+<p>This feature will be enabled by default when using <code class="docutils literal notranslate"><span class="pre">ovn</span></code> driver, but there
+should be a way to disable it in case operators who don’t need metadata don’t
+have to deal with the complexity of it (haproxy instances, network namespaces,
+etcetera). In this case, the agent would not create the neutron ports needed
+for metadata.</p>
+<p>Right now, the <code class="docutils literal notranslate"><span class="pre">vif-plugged</span></code> event to Nova is sent out when the up column
+in the OVN Northbound database’s Logical_Switch_Port table changes to True,
+indicating that the VIF is now up. There could be a race condition when the
+first VM for a certain network boots on a hypervisor if it does so before the
+metadata proxy instance has been spawned. Fortunately, retries on cloud-init
+should eventually fetch metadata even when this might happen.</p>
+</section>
+</section>
+<section id="alternatives-considered">
+<h2>Alternatives Considered<a class="headerlink" href="#alternatives-considered" title="Link to this heading">¶</a></h2>
+<section id="alternative-1-build-metadata-support-into-ovn-controller">
+<h3>Alternative 1: Build metadata support into ovn-controller<a class="headerlink" href="#alternative-1-build-metadata-support-into-ovn-controller" title="Link to this heading">¶</a></h3>
+<p>We’ve been building some features useful to OpenStack directly into OVN. DHCP
+and DNS are key examples of things we’ve replaced by building them into
+ovn-controller.  The metadata API case has some key differences that make this
+a less attractive solution:</p>
+<p>The metadata API is an OpenStack specific feature.  DHCP and DNS by contrast
+are more clearly useful outside of OpenStack. Building metadata API proxy
+support into ovn-controller means embedding an HTTP and TCP stack into
+ovn-controller.  This is a significant degree of undesired complexity.</p>
+<p>This option has been ruled out for these reasons.</p>
+</section>
+<section id="alternative-2-distributed-metadata-and-high-availability">
+<h3>Alternative 2: Distributed metadata and High Availability<a class="headerlink" href="#alternative-2-distributed-metadata-and-high-availability" title="Link to this heading">¶</a></h3>
+<p>In this approach, we would spawn a metadata proxy per virtual router or per
+network (if isolated), thus, improving the number of metadata proxy instances
+running in the cloud. However, scheduling and HA have to be considered. Also,
+we wouldn’t need the OVN <em>localport</em> implementation.</p>
+<p><code class="docutils literal notranslate"><span class="pre">neutron-ovn-metadata-agent</span></code> would run on any host that we wish to be able
+to host metadata API proxies.  These hosts must also be running ovn-controller.</p>
+<p>Each of these hosts will have a Chassis record in the OVN southbound database
+created by ovn-controller.  The Chassis table has a column called
+<code class="docutils literal notranslate"><span class="pre">external_ids</span></code> which can be used for general metadata however we see fit.
+<code class="docutils literal notranslate"><span class="pre">neutron-ovn-metadata-agent</span></code> will update its corresponding Chassis record
+with an external-id of <code class="docutils literal notranslate"><span class="pre">neutron-metadata-proxy-host=true</span></code> to indicate that
+this OVN chassis is one capable of hosting metadata proxy instances.</p>
+<p>Once we have a way to determine hosts capable of hosting metadata API proxies,
+we can add logic to the ovn ML2 driver that schedules metadata API
+proxies.  This would be triggered by Neutron API requests.</p>
+<p>The output of the scheduling process would be setting an <code class="docutils literal notranslate"><span class="pre">external_ids</span></code> key
+on a Logical_Switch_Port in the OVN northbound database that corresponds with
+a metadata proxy.  The key could be something like
+<code class="docutils literal notranslate"><span class="pre">neutron-metadata-proxy-chassis=CHASSIS_HOSTNAME</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">neutron-ovn-metadata-agent</span></code> on each host would also be watching for updates
+to these Logical_Switch_Port rows.  When it detects that a metadata proxy has
+been scheduled locally, it will kick off the process to spawn the local
+haproxy instance and get it plugged into OVN.</p>
+<p>HA must also be considered.  We must know when a host goes down so that all
+metadata proxies scheduled to that host can be rescheduled.  This is almost
+the exact same problem we have with L3 HA.  When a host goes down, we need to
+trigger rescheduling gateways to other hosts.  We should ensure that the
+approach used for rescheduling L3 gateways can be utilized for rescheduling
+metadata proxies, as well.</p>
+<p>In neutron-server (ovn mechanism driver) .</p>
+<p>Introduce a new ovn driver configuration option:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[ovn]</span> <span class="pre">isolated_metadata=[True|False]</span></code></p></li>
+</ul>
+<p>Events that trigger scheduling a new metadata proxy:</p>
+<ul class="simple">
+<li><p>If isolated_metadata is True</p>
+<ul>
+<li><p>When a new network is created, we must create an OVN logical port for use
+as a metadata proxy and then schedule this to one of the
+<code class="docutils literal notranslate"><span class="pre">neutron-ovn-metadata-agent</span></code> instances.</p></li>
+</ul>
+</li>
+<li><p>If isolated_metadata is False</p>
+<ul>
+<li><p>When a network is attached to or removed from a logical router, ensure
+that at least one of the networks has a metadata proxy port already
+created. If not, pick a network and create a metadata proxy port and then
+schedule it to an agent. At this point, we need to update the static route
+for metadata API.</p></li>
+</ul>
+</li>
+</ul>
+<p>Events that trigger unscheduling an existing metadata proxy:</p>
+<ul class="simple">
+<li><p>When a network is deleted, delete the metadata proxy port if it exists and
+unschedule it from a <code class="docutils literal notranslate"><span class="pre">neutron-ovn-metadata-agent</span></code>.</p></li>
+</ul>
+<p>To schedule a new metadata proxy:</p>
+<ul class="simple">
+<li><p>Determine the list of available OVN Chassis that can host metadata proxies
+by reading the <code class="docutils literal notranslate"><span class="pre">Chassis</span></code> table of the OVN Southbound database.  Look for
+chassis that have an external-id of <code class="docutils literal notranslate"><span class="pre">neutron-metadata-proxy-host=true</span></code>.</p></li>
+<li><p>Of the available OVN chassis, choose the one “least loaded”, or currently
+hosting the fewest number of metadata proxies.</p></li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">neutron-metadata-proxy-chassis=CHASSIS_HOSTNAME</span></code> as an external-id on
+the Logical_Switch_Port in the OVN Northbound database that corresponds to
+the neutron port used for this metadata proxy.  <code class="docutils literal notranslate"><span class="pre">CHASSIS_HOSTNAME</span></code> maps to
+the hostname row of a Chassis record in the OVN Southbound database.</p></li>
+</ul>
+<p>This approach has been ruled out for its complexity although we have analyzed
+the details deeply because, eventually, and depending on the implementation of
+L3 HA, we will want to evolve to it.</p>
+</section>
+</section>
+<section id="other-references">
+<h2>Other References<a class="headerlink" href="#other-references" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>HAProxy config –
+<a class="reference external" href="https://review.openstack.org/#/c/431691/34/neutron/agent/metadata/driver.py">https://review.openstack.org/#/c/431691/34/neutron/agent/metadata/driver.py</a></p></li>
+<li><p><a class="reference external" href="https://engineeringblog.yelp.com/2015/04/true-zero-downtime-haproxy-reloads.html">https://engineeringblog.yelp.com/2015/04/true-zero-downtime-haproxy-reloads.html</a></p></li>
+</ul>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="ovn_worker.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: OVN Neutron Worker and Port status handling"></i></a>
+          
+          
+            <a href="database_consistency.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Neutron/OVN Database consistency"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2025-05-19 21:22:43</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Contributor Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#basic-information">Basic Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#neutron-policies">Neutron Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#gerrit-rechecks">Gerrit Rechecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#neutron-stadium">Neutron Stadium</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html#neutron-internals">Neutron Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#ovn-driver">OVN Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#dashboards">Dashboards</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">OpenStack Metadata API and OVN</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#neutron-and-metadata-today">Neutron and Metadata Today</a></li>
+<li><a class="reference internal" href="#neutron-and-metadata-with-ovn">Neutron and Metadata with OVN</a><ul>
+<li><a class="reference internal" href="#overview-of-proposed-approach">Overview of Proposed Approach</a></li>
+<li><a class="reference internal" href="#metadata-proxy-management-logic">Metadata Proxy Management Logic</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#alternatives-considered">Alternatives Considered</a><ul>
+<li><a class="reference internal" href="#alternative-1-build-metadata-support-into-ovn-controller">Alternative 1: Build metadata support into ovn-controller</a></li>
+<li><a class="reference internal" href="#alternative-2-distributed-metadata-and-high-availability">Alternative 2: Distributed metadata and High Availability</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#other-references">Other References</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "contributor/internals/ovn/metadata_api" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "OpenStack Metadata API and OVN in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2025-05-19 21:22:43";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "contributor/internals/ovn/metadata_api";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

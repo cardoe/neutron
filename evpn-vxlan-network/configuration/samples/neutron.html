@@ -1,0 +1,2987 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Sample neutron.conf &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Sample ml2_conf.ini" href="ml2-conf.html" />
+    <link rel="prev" title="Sample Configuration Files" href="../config-samples.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/configuration/samples/neutron.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Sample neutron.conf</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="../config-samples.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Sample Configuration Files"></i></a>
+    
+    
+    <a href="ml2-conf.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Sample ml2_conf.ini"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="sample-neutron-conf">
+<h1>Sample neutron.conf<a class="headerlink" href="#sample-neutron-conf" title="Link to this heading">¶</a></h1>
+<p>This sample configuration can also be viewed in <a class="reference external" href="../../_static/config-samples/neutron.conf.sample">the raw format</a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">DEFAULT</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From neutron</span>
+<span class="c1">#</span>
+
+<span class="c1"># Where to store Neutron state files. This directory must be writable by the</span>
+<span class="c1"># agent. (string value)</span>
+<span class="c1">#state_path = /var/lib/neutron</span>
+
+<span class="c1"># The host IP to bind to. (host address value)</span>
+<span class="c1">#bind_host = 0.0.0.0</span>
+
+<span class="c1"># The port to bind to (port value)</span>
+<span class="c1"># Minimum value: 0</span>
+<span class="c1"># Maximum value: 65535</span>
+<span class="c1">#bind_port = 9696</span>
+
+<span class="c1"># The path for API extensions. Note that this can be a colon-separated list of</span>
+<span class="c1"># paths. For example: api_extensions_path =</span>
+<span class="c1"># extensions:/path/to/more/exts:/even/more/exts. The __path__ of</span>
+<span class="c1"># neutron.extensions is appended to this, so if your extensions are in there</span>
+<span class="c1"># you do not need to specify them here. (string value)</span>
+<span class="c1">#api_extensions_path =</span>
+
+<span class="c1"># The type of authentication to use (string value)</span>
+<span class="c1">#auth_strategy = keystone</span>
+
+<span class="c1"># The core plugin Neutron will use (string value)</span>
+<span class="c1">#core_plugin = &lt;None&gt;</span>
+
+<span class="c1"># The service plugins Neutron will use (list value)</span>
+<span class="c1">#service_plugins =</span>
+
+<span class="c1"># The base MAC address Neutron will use for VIFs. The first 3 octets will</span>
+<span class="c1"># remain unchanged. If the 4th octet is not 00, it will also be used. The</span>
+<span class="c1"># others will be randomly generated. (string value)</span>
+<span class="c1">#base_mac = fa:16:3e:00:00:00</span>
+
+<span class="c1"># Allow the usage of the bulk API (boolean value)</span>
+<span class="c1">#allow_bulk = true</span>
+
+<span class="c1"># The maximum number of items returned in a single response, value of</span>
+<span class="c1"># &#39;infinite&#39; or negative integer means no limit (string value)</span>
+<span class="c1">#pagination_max_limit = -1</span>
+
+<span class="c1"># Default value of availability zone hints. The availability zone aware</span>
+<span class="c1"># schedulers use this when the resources availability_zone_hints is empty.</span>
+<span class="c1"># Multiple availability zones can be specified by a comma separated string.</span>
+<span class="c1"># This value can be empty. In this case, even if availability_zone_hints for a</span>
+<span class="c1"># resource is empty, availability zone is considered for high availability</span>
+<span class="c1"># while scheduling the resource. (list value)</span>
+<span class="c1">#default_availability_zones =</span>
+
+<span class="c1"># Maximum number of DNS nameservers per subnet (integer value)</span>
+<span class="c1">#max_dns_nameservers = 5</span>
+
+<span class="c1"># Maximum number of host routes per subnet (integer value)</span>
+<span class="c1">#max_subnet_host_routes = 20</span>
+
+<span class="c1"># DEPRECATED: Warning: This feature is experimental with low test coverage.</span>
+<span class="c1"># Enables IPv6 Prefix Delegation for automatic subnet CIDR allocation. Set to</span>
+<span class="c1"># True to enable IPv6 Prefix Delegation for subnet allocation in a PD-capable</span>
+<span class="c1"># environment. Users making subnet creation requests for IPv6 subnets without</span>
+<span class="c1"># providing a CIDR or subnetpool ID will be given a CIDR via the Prefix</span>
+<span class="c1"># Delegation mechanism. Note that enabling PD will override the behavior of the</span>
+<span class="c1"># default IPv6 subnetpool. (boolean value)</span>
+<span class="c1"># This option is deprecated for removal since 2023.2.</span>
+<span class="c1"># Its value may be silently ignored in the future.</span>
+<span class="c1"># Reason: There is no reference implementation for the feature for any of in-</span>
+<span class="c1"># tree drivers.</span>
+<span class="c1">#ipv6_pd_enabled = false</span>
+
+<span class="c1"># DHCP lease duration (in seconds). Use -1 to tell dnsmasq to use infinite</span>
+<span class="c1"># lease times. (integer value)</span>
+<span class="c1">#dhcp_lease_duration = 86400</span>
+
+<span class="c1"># Domain to use for building the hostnames (string value)</span>
+<span class="c1">#dns_domain = openstacklocal</span>
+
+<span class="c1"># Driver for external DNS integration. (string value)</span>
+<span class="c1">#external_dns_driver = &lt;None&gt;</span>
+
+<span class="c1"># Allow sending resource operation notification to DHCP agent (boolean value)</span>
+<span class="c1">#dhcp_agent_notification = true</span>
+
+<span class="c1"># Hostname to be used by the Neutron server, agents and services running on</span>
+<span class="c1"># this machine. All the agents and services running on this machine must use</span>
+<span class="c1"># the same host value. (host address value)</span>
+<span class="c1">#</span>
+<span class="c1"># This option has a sample default set, which means that</span>
+<span class="c1"># its actual default value may vary from the one documented</span>
+<span class="c1"># below.</span>
+<span class="c1">#host = example.domain</span>
+
+<span class="c1"># This string is prepended to the normal URL that is returned in links to the</span>
+<span class="c1"># OpenStack Network API. If it is empty (the default), the URLs are returned</span>
+<span class="c1"># unchanged. (string value)</span>
+<span class="c1">#network_link_prefix = &lt;None&gt;</span>
+
+<span class="c1"># Send notification to Nova when port status changes (boolean value)</span>
+<span class="c1">#notify_nova_on_port_status_changes = true</span>
+
+<span class="c1"># Send notification to Nova when port data (fixed_ips/floatingip) changes so</span>
+<span class="c1"># Nova can update its cache. (boolean value)</span>
+<span class="c1">#notify_nova_on_port_data_changes = true</span>
+
+<span class="c1"># Number of seconds between sending events to Nova if there are any events to</span>
+<span class="c1"># send. (integer value)</span>
+<span class="c1">#send_events_interval = 2</span>
+
+<span class="c1"># Set process name to match child worker role. Available options are: &#39;off&#39; -</span>
+<span class="c1"># retains the previous behavior; &#39;on&#39; - renames processes to &#39;neutron-server:</span>
+<span class="c1"># role (original string)&#39;; &#39;brief&#39; - renames the same as &#39;on&#39;, but without the</span>
+<span class="c1"># original string, such as &#39;neutron-server: role&#39;. (string value)</span>
+<span class="c1">#setproctitle = on</span>
+
+<span class="c1"># Neutron IPAM (IP address management) driver to use. By default, the reference</span>
+<span class="c1"># implementation of the Neutron IPAM driver is used. (string value)</span>
+<span class="c1">#ipam_driver = internal</span>
+
+<span class="c1"># DEPRECATED: If True, then allow plugins that support it to create VLAN</span>
+<span class="c1"># transparent networks. (boolean value)</span>
+<span class="c1"># This option is deprecated for removal since 2025.2.</span>
+<span class="c1"># Its value may be silently ignored in the future.</span>
+<span class="c1"># Reason: This option is going to be removed as availability of the</span>
+<span class="c1"># `vlan_transparency` in the deployment is now calculated automatically based</span>
+<span class="c1"># on the loaded mechanism drivers.</span>
+<span class="c1">#vlan_transparent = &lt;None&gt;</span>
+
+<span class="c1"># DEPRECATED: If True, then allow plugins that support it to create VLAN</span>
+<span class="c1"># transparent networks using 0x8a88 ethertype. (boolean value)</span>
+<span class="c1"># This option is deprecated for removal since 2025.2.</span>
+<span class="c1"># Its value may be silently ignored in the future.</span>
+<span class="c1"># Reason: This option is going to be removed as availability of the `vlan_qinq`</span>
+<span class="c1"># in the deployment is now calculated automatically based on the loaded</span>
+<span class="c1"># mechanism drivers.</span>
+<span class="c1">#vlan_qinq = &lt;None&gt;</span>
+
+<span class="c1"># If True, then allow plugins to decide whether to perform validations on</span>
+<span class="c1"># filter parameters. Filter validation is enabled if this config is turned on</span>
+<span class="c1"># and it is supported by all plugins (boolean value)</span>
+<span class="c1">#filter_validation = true</span>
+
+<span class="c1"># MTU of the underlying physical network. Neutron uses this value to calculate</span>
+<span class="c1"># MTU for all virtual network components. For flat and VLAN networks, neutron</span>
+<span class="c1"># uses this value without modification. For overlay networks such as VXLAN,</span>
+<span class="c1"># neutron automatically subtracts the overlay protocol overhead from this</span>
+<span class="c1"># value. Defaults to 1500, the standard value for Ethernet. (integer value)</span>
+<span class="c1">#global_physnet_mtu = 1500</span>
+
+<span class="c1"># Number of times client connections (Nova, Ironic) should be retried on a</span>
+<span class="c1"># failed HTTP call. 0 (zero) means connection is attempted only once (not</span>
+<span class="c1"># retried). Setting to any positive integer means that on failure the</span>
+<span class="c1"># connection is retried that many times. For example, setting to 3 means total</span>
+<span class="c1"># attempts to connect will be 4. (integer value)</span>
+<span class="c1"># Minimum value: 0</span>
+<span class="c1">#http_retries = 3</span>
+
+<span class="c1"># If False, neutron-server will disable the following DHCP-agent related</span>
+<span class="c1"># functions: 1. DHCP provisioning block 2. DHCP scheduler API extension 3.</span>
+<span class="c1"># Network scheduling mechanism 4. DHCP RPC/notification (boolean value)</span>
+<span class="c1">#enable_traditional_dhcp = true</span>
+
+<span class="c1"># IPv4 address of this host. If no address is provided and one cannot be</span>
+<span class="c1"># determined, 127.0.0.1 will be used. (string value)</span>
+<span class="c1">#my_ip = 172.22.0.123</span>
+
+<span class="c1"># IPv6 address of this host. If no address is provided and one cannot be</span>
+<span class="c1"># determined, ::1 will be used. (string value)</span>
+<span class="c1">#my_ipv6 = 2600:1700:7b90:52f8:5541:2be5:3ca5:9dd</span>
+
+<span class="c1"># If False, neutron-server will not listen for signals like SIGINT or SIGTERM.</span>
+<span class="c1"># This is useful when running behind a WSGI server like apache/mod_wsgi.</span>
+<span class="c1"># (boolean value)</span>
+<span class="c1">#enable_signals = true</span>
+
+<span class="c1"># Number of backlog requests to configure the socket with (integer value)</span>
+<span class="c1">#backlog = 4096</span>
+
+<span class="c1"># Number of seconds to keep retrying to listen (integer value)</span>
+<span class="c1">#retry_until_window = 30</span>
+
+<span class="c1"># Enable SSL on the API server (boolean value)</span>
+<span class="c1">#use_ssl = false</span>
+
+<span class="c1"># Seconds between running periodic tasks. (integer value)</span>
+<span class="c1">#periodic_interval = 40</span>
+
+<span class="c1"># Number of separate API worker processes for service. If not specified, the</span>
+<span class="c1"># default is equal to the number of CPUs available for best performance, capped</span>
+<span class="c1"># by potential RAM usage. (integer value)</span>
+<span class="c1"># Minimum value: 1</span>
+<span class="c1">#api_workers = &lt;None&gt;</span>
+
+<span class="c1"># Number of RPC worker processes for service. If not specified, the default is</span>
+<span class="c1"># equal to half the number of API workers. If set to 0, no RPC worker is</span>
+<span class="c1"># launched. (integer value)</span>
+<span class="c1"># Minimum value: 0</span>
+<span class="c1">#rpc_workers = &lt;None&gt;</span>
+
+<span class="c1"># Number of RPC worker processes dedicated to the state reports queue. If set</span>
+<span class="c1"># to 0, no dedicated RPC worker for state reports queue is launched. (integer</span>
+<span class="c1"># value)</span>
+<span class="c1"># Minimum value: 0</span>
+<span class="c1">#rpc_state_report_workers = 1</span>
+
+<span class="c1"># Range of seconds to randomly delay when starting the periodic task scheduler</span>
+<span class="c1"># to reduce stampeding. (Disable by setting to 0) (integer value)</span>
+<span class="c1">#periodic_fuzzy_delay = 5</span>
+
+<span class="c1"># Maximum seconds to wait for a response from an RPC call. (integer value)</span>
+<span class="c1">#rpc_response_max_timeout = 600</span>
+
+<span class="c1">#</span>
+<span class="c1"># From neutron.agent</span>
+<span class="c1">#</span>
+
+<span class="c1"># The driver used to manage virtual interfaces. (string value)</span>
+<span class="c1">#interface_driver = openvswitch</span>
+
+<span class="c1"># Location for Metadata Proxy UNIX domain socket. (string value)</span>
+<span class="c1">#metadata_proxy_socket = $state_path/metadata_proxy</span>
+
+<span class="c1"># User (uid or name) running metadata proxy after its initialization (if empty:</span>
+<span class="c1"># agent effective user). (string value)</span>
+<span class="c1">#metadata_proxy_user =</span>
+
+<span class="c1"># Group (gid or name) running metadata proxy after its initialization (if</span>
+<span class="c1"># empty: agent effective group). (string value)</span>
+<span class="c1">#metadata_proxy_group =</span>
+
+<span class="c1">#</span>
+<span class="c1"># From neutron.db</span>
+<span class="c1">#</span>
+
+<span class="c1"># Seconds to regard the agent as down; should be at least twice</span>
+<span class="c1"># report_interval, to be sure the agent is down for good. (integer value)</span>
+<span class="c1"># Maximum value: 2147483.0</span>
+<span class="c1">#agent_down_time = 75</span>
+
+<span class="c1"># Representing the resource type whose load is being reported by the agent.</span>
+<span class="c1"># This can be &quot;networks&quot;, &quot;subnets&quot; or &quot;ports&quot;. When specified (Default is</span>
+<span class="c1"># networks), the server will extract particular load sent as part of its agent</span>
+<span class="c1"># configuration object from the agent report state, which is the number of</span>
+<span class="c1"># resources being consumed, at every report_interval. dhcp_load_type can be</span>
+<span class="c1"># used in combination with network_scheduler_driver =</span>
+<span class="c1"># neutron.scheduler.dhcp_agent_scheduler.WeightScheduler When the</span>
+<span class="c1"># network_scheduler_driver is WeightScheduler, dhcp_load_type can be configured</span>
+<span class="c1"># to represent the choice for the resource being balanced. Example:</span>
+<span class="c1"># dhcp_load_type=networks (string value)</span>
+<span class="c1"># Possible values:</span>
+<span class="c1"># networks - &lt;No description provided&gt;</span>
+<span class="c1"># subnets - &lt;No description provided&gt;</span>
+<span class="c1"># ports - &lt;No description provided&gt;</span>
+<span class="c1">#dhcp_load_type = networks</span>
+
+<span class="c1"># Agents start with admin_state_up=False when enable_new_agents=False. In this</span>
+<span class="c1"># case, a user&#39;s resources will not be scheduled automatically to an agent</span>
+<span class="c1"># until an admin sets admin_state_up to True. (boolean value)</span>
+<span class="c1">#enable_new_agents = true</span>
+
+<span class="c1"># Number of resources for neutron to divide a large RPC call into data sets. It</span>
+<span class="c1"># can be reduced if RPC timeouts occur. The best value should be determined</span>
+<span class="c1"># empirically in your environment. (integer value)</span>
+<span class="c1"># Minimum value: 1</span>
+<span class="c1">#rpc_resources_processing_step = 20</span>
+
+<span class="c1"># Maximum number of routes per router (integer value)</span>
+<span class="c1">#max_routes = 30</span>
+
+<span class="c1"># Define the default value of enable_snat if not provided in</span>
+<span class="c1"># external_gateway_info. (boolean value)</span>
+<span class="c1">#enable_snat_by_default = true</span>
+
+<span class="c1"># Driver to use for scheduling networks to a DHCP agent (string value)</span>
+<span class="c1">#network_scheduler_driver = neutron.scheduler.dhcp_agent_scheduler.WeightScheduler</span>
+
+<span class="c1"># Allow auto scheduling networks to a DHCP agent. (boolean value)</span>
+<span class="c1">#network_auto_schedule = true</span>
+
+<span class="c1"># Automatically remove networks from offline DHCP agents. (boolean value)</span>
+<span class="c1">#allow_automatic_dhcp_failover = true</span>
+
+<span class="c1"># Number of DHCP agents scheduled to host a tenant network. If this number is</span>
+<span class="c1"># greater than 1, the scheduler automatically assigns multiple DHCP agents for</span>
+<span class="c1"># a given tenant network, providing high availability for the DHCP service.</span>
+<span class="c1"># However this does not provide high availability for the IPv6 metadata service</span>
+<span class="c1"># in isolated networks. (integer value)</span>
+<span class="c1"># Minimum value: 1</span>
+<span class="c1">#dhcp_agents_per_network = 1</span>
+
+<span class="c1"># Enable services on an agent with admin_state_up False. If this option is</span>
+<span class="c1"># False, when admin_state_up of an agent is turned False, services on it will</span>
+<span class="c1"># be disabled. Agents with admin_state_up False are not selected for automatic</span>
+<span class="c1"># scheduling regardless of this option. But manual scheduling to such agents is</span>
+<span class="c1"># available if this option is True. (boolean value)</span>
+<span class="c1">#enable_services_on_agents_with_admin_state_down = false</span>
+
+<span class="c1"># The base MAC address used for unique DVR instances by Neutron. The first 3</span>
+<span class="c1"># octets will remain unchanged. If the 4th octet is not 00, it will also be</span>
+<span class="c1"># used. The others will be randomly generated. The &#39;dvr_base_mac&#39; *must* be</span>
+<span class="c1"># different from &#39;base_mac&#39; to avoid mixing it up with MAC&#39;s allocated for</span>
+<span class="c1"># tenant ports. A 4-octet example would be dvr_base_mac = fa:16:3f:4f:00:00.</span>
+<span class="c1"># The default is 3 octets (string value)</span>
+<span class="c1">#dvr_base_mac = fa:16:3f:00:00:00</span>
+
+<span class="c1"># System-wide flag to determine the type of router that tenants can create.</span>
+<span class="c1"># Only admin can override. (boolean value)</span>
+<span class="c1">#router_distributed = false</span>
+
+<span class="c1"># Determine if setup is configured for DVR. If False, the DVR API extension</span>
+<span class="c1"># will be disabled. (boolean value)</span>
+<span class="c1">#enable_dvr = true</span>
+
+<span class="c1"># Flag to determine if hosting a DVR local router to the DHCP agent is desired.</span>
+<span class="c1"># If False, any L3 function supported by the DHCP agent instance will not be</span>
+<span class="c1"># possible, for instance: DNS. (boolean value)</span>
+<span class="c1">#host_dvr_for_dhcp = true</span>
+
+<span class="c1"># Driver to use for scheduling a router to a default L3 agent (string value)</span>
+<span class="c1">#router_scheduler_driver = neutron.scheduler.l3_agent_scheduler.LeastRoutersScheduler</span>
+
+<span class="c1"># Allow auto scheduling of routers to L3 agents. (boolean value)</span>
+<span class="c1">#router_auto_schedule = true</span>
+
+<span class="c1"># Automatically reschedule routers from offline L3 agents to online L3 agents.</span>
+<span class="c1"># (boolean value)</span>
+<span class="c1">#allow_automatic_l3agent_failover = false</span>
+
+<span class="c1"># Enable HA mode for virtual routers. (boolean value)</span>
+<span class="c1">#l3_ha = false</span>
+
+<span class="c1"># Maximum number of L3 agents which a HA router will be scheduled on. If it is</span>
+<span class="c1"># set to 0 then the router will be scheduled on every agent. (integer value)</span>
+<span class="c1">#max_l3_agents_per_router = 3</span>
+
+<span class="c1"># Subnet used for the L3 HA admin network. (string value)</span>
+<span class="c1">#l3_ha_net_cidr = 169.254.192.0/18</span>
+
+<span class="c1"># The network type to use when creating the L3 HA network for an HA router. By</span>
+<span class="c1"># default, or if empty, the first &#39;tenant_network_types&#39; value is used. This is</span>
+<span class="c1"># helpful when the VRRP traffic should use a specific network which is not the</span>
+<span class="c1"># default one. (string value)</span>
+<span class="c1">#l3_ha_network_type =</span>
+
+<span class="c1"># The physical network name with which the L3 HA network should be created.</span>
+<span class="c1"># (string value)</span>
+<span class="c1">#l3_ha_network_physical_name =</span>
+
+<span class="c1"># Define the default value for enable_default_route_ecmp if not specified on</span>
+<span class="c1"># the router. (boolean value)</span>
+<span class="c1">#enable_default_route_ecmp = false</span>
+
+<span class="c1"># Define the default value for enable_default_route_bfd if not specified on the</span>
+<span class="c1"># router. (boolean value)</span>
+<span class="c1">#enable_default_route_bfd = false</span>
+
+<span class="c1">#</span>
+<span class="c1"># From neutron.extensions</span>
+<span class="c1">#</span>
+
+<span class="c1"># Maximum number of allowed address pairs (integer value)</span>
+<span class="c1">#max_allowed_address_pair = 10</span>
+
+<span class="c1"># Defines the allowed conntrack helpers, and conntrack helper module protocol</span>
+<span class="c1"># constraints. (list value)</span>
+<span class="c1">#</span>
+<span class="c1"># This option has a sample default set, which means that</span>
+<span class="c1"># its actual default value may vary from the one documented</span>
+<span class="c1"># below.</span>
+<span class="c1">#allowed_conntrack_helpers = tftp:udp,ftp:tcp,sip:tcp,sip:udp</span>
+
+<span class="c1">#</span>
+<span class="c1"># From oslo.log</span>
+<span class="c1">#</span>
+
+<span class="c1"># If set to true, the logging level will be set to DEBUG instead of the default</span>
+<span class="c1"># INFO level. (boolean value)</span>
+<span class="c1"># Note: This option can be changed without restarting.</span>
+<span class="c1">#debug = false</span>
+
+<span class="c1"># The name of a logging configuration file. This file is appended to any</span>
+<span class="c1"># existing logging configuration files. For details about logging configuration</span>
+<span class="c1"># files, see the Python logging module documentation. Note that when logging</span>
+<span class="c1"># configuration files are used then all logging configuration is set in the</span>
+<span class="c1"># configuration file and other logging configuration options are ignored (for</span>
+<span class="c1"># example, log-date-format). (string value)</span>
+<span class="c1"># Note: This option can be changed without restarting.</span>
+<span class="c1"># Deprecated group/name - [DEFAULT]/log_config</span>
+<span class="c1">#log_config_append = &lt;None&gt;</span>
+
+<span class="c1"># Defines the format string for %%(asctime)s in log records. Default:</span>
+<span class="c1"># %(default)s . This option is ignored if log_config_append is set. (string</span>
+<span class="c1"># value)</span>
+<span class="c1">#log_date_format = %Y-%m-%d %H:%M:%S</span>
+
+<span class="c1"># (Optional) Name of log file to send logging output to. If no default is set,</span>
+<span class="c1"># logging will go to stderr as defined by use_stderr. This option is ignored if</span>
+<span class="c1"># log_config_append is set. (string value)</span>
+<span class="c1"># Deprecated group/name - [DEFAULT]/logfile</span>
+<span class="c1">#log_file = &lt;None&gt;</span>
+
+<span class="c1"># (Optional) The base directory used for relative log_file  paths. This option</span>
+<span class="c1"># is ignored if log_config_append is set. (string value)</span>
+<span class="c1"># Deprecated group/name - [DEFAULT]/logdir</span>
+<span class="c1">#log_dir = &lt;None&gt;</span>
+
+<span class="c1"># DEPRECATED: Uses logging handler designed to watch file system. When log file</span>
+<span class="c1"># is moved or removed this handler will open a new log file with specified path</span>
+<span class="c1"># instantaneously. It makes sense only if log_file option is specified and</span>
+<span class="c1"># Linux platform is used. This option is ignored if log_config_append is set.</span>
+<span class="c1"># (boolean value)</span>
+<span class="c1"># This option is deprecated for removal.</span>
+<span class="c1"># Its value may be silently ignored in the future.</span>
+<span class="c1"># Reason: This function is known to have bene broken for long time, and depends</span>
+<span class="c1"># on the unmaintained library</span>
+<span class="c1">#watch_log_file = false</span>
+
+<span class="c1"># Use syslog for logging. Existing syslog format is DEPRECATED and will be</span>
+<span class="c1"># changed later to honor RFC5424. This option is ignored if log_config_append</span>
+<span class="c1"># is set. (boolean value)</span>
+<span class="c1">#use_syslog = false</span>
+
+<span class="c1"># Enable journald for logging. If running in a systemd environment you may wish</span>
+<span class="c1"># to enable journal support. Doing so will use the journal native protocol</span>
+<span class="c1"># which includes structured metadata in addition to log messages.This option is</span>
+<span class="c1"># ignored if log_config_append is set. (boolean value)</span>
+<span class="c1">#use_journal = false</span>
+
+<span class="c1"># Syslog facility to receive log lines. This option is ignored if</span>
+<span class="c1"># log_config_append is set. (string value)</span>
+<span class="c1">#syslog_log_facility = LOG_USER</span>
+
+<span class="c1"># Use JSON formatting for logging. This option is ignored if log_config_append</span>
+<span class="c1"># is set. (boolean value)</span>
+<span class="c1">#use_json = false</span>
+
+<span class="c1"># Log output to standard error. This option is ignored if log_config_append is</span>
+<span class="c1"># set. (boolean value)</span>
+<span class="c1">#use_stderr = false</span>
+
+<span class="c1"># (Optional) Set the &#39;color&#39; key according to log levels. This option takes</span>
+<span class="c1"># effect only when logging to stderr or stdout is used. This option is ignored</span>
+<span class="c1"># if log_config_append is set. (boolean value)</span>
+<span class="c1">#log_color = false</span>
+
+<span class="c1"># The amount of time before the log files are rotated. This option is ignored</span>
+<span class="c1"># unless log_rotation_type is set to &quot;interval&quot;. (integer value)</span>
+<span class="c1">#log_rotate_interval = 1</span>
+
+<span class="c1"># Rotation interval type. The time of the last file change (or the time when</span>
+<span class="c1"># the service was started) is used when scheduling the next rotation. (string</span>
+<span class="c1"># value)</span>
+<span class="c1"># Possible values:</span>
+<span class="c1"># Seconds - &lt;No description provided&gt;</span>
+<span class="c1"># Minutes - &lt;No description provided&gt;</span>
+<span class="c1"># Hours - &lt;No description provided&gt;</span>
+<span class="c1"># Days - &lt;No description provided&gt;</span>
+<span class="c1"># Weekday - &lt;No description provided&gt;</span>
+<span class="c1"># Midnight - &lt;No description provided&gt;</span>
+<span class="c1">#log_rotate_interval_type = days</span>
+
+<span class="c1"># Maximum number of rotated log files. (integer value)</span>
+<span class="c1">#max_logfile_count = 30</span>
+
+<span class="c1"># Log file maximum size in MB. This option is ignored if &quot;log_rotation_type&quot; is</span>
+<span class="c1"># not set to &quot;size&quot;. (integer value)</span>
+<span class="c1">#max_logfile_size_mb = 200</span>
+
+<span class="c1"># Log rotation type. (string value)</span>
+<span class="c1"># Possible values:</span>
+<span class="c1"># interval - Rotate logs at predefined time intervals.</span>
+<span class="c1"># size - Rotate logs once they reach a predefined size.</span>
+<span class="c1"># none - Do not rotate log files.</span>
+<span class="c1">#log_rotation_type = none</span>
+
+<span class="c1"># Format string to use for log messages with context. Used by</span>
+<span class="c1"># oslo_log.formatters.ContextFormatter (string value)</span>
+<span class="c1">#logging_context_format_string = %(asctime)s.%(msecs)03d %(process)d %(levelname)s %(name)s [%(global_request_id)s %(request_id)s %(user_identity)s] %(instance)s%(message)s</span>
+
+<span class="c1"># Format string to use for log messages when context is undefined. Used by</span>
+<span class="c1"># oslo_log.formatters.ContextFormatter (string value)</span>
+<span class="c1">#logging_default_format_string = %(asctime)s.%(msecs)03d %(process)d %(levelname)s %(name)s [-] %(instance)s%(message)s</span>
+
+<span class="c1"># Additional data to append to log message when logging level for the message</span>
+<span class="c1"># is DEBUG. Used by oslo_log.formatters.ContextFormatter (string value)</span>
+<span class="c1">#logging_debug_format_suffix = %(funcName)s %(pathname)s:%(lineno)d</span>
+
+<span class="c1"># Prefix each line of exception output with this format. Used by</span>
+<span class="c1"># oslo_log.formatters.ContextFormatter (string value)</span>
+<span class="c1">#logging_exception_prefix = %(asctime)s.%(msecs)03d %(process)d ERROR %(name)s %(instance)s</span>
+
+<span class="c1"># Defines the format string for %(user_identity)s that is used in</span>
+<span class="c1"># logging_context_format_string. Used by oslo_log.formatters.ContextFormatter</span>
+<span class="c1"># (string value)</span>
+<span class="c1">#logging_user_identity_format = %(user)s %(project)s %(domain)s %(system_scope)s %(user_domain)s %(project_domain)s</span>
+
+<span class="c1"># List of package logging levels in logger=LEVEL pairs. This option is ignored</span>
+<span class="c1"># if log_config_append is set. (list value)</span>
+<span class="c1">#default_log_levels = amqp=WARN,amqplib=WARN,boto=WARN,qpid=WARN,sqlalchemy=WARN,suds=INFO,oslo.messaging=INFO,oslo_messaging=INFO,iso8601=WARN,requests.packages.urllib3.connectionpool=WARN,urllib3.connectionpool=WARN,websocket=WARN,requests.packages.urllib3.util.retry=WARN,urllib3.util.retry=WARN,keystonemiddleware=WARN,routes.middleware=WARN,stevedore=WARN,taskflow=WARN,keystoneauth=WARN,oslo.cache=INFO,oslo_policy=INFO,dogpile.core.dogpile=INFO</span>
+
+<span class="c1"># Enables or disables publication of error events. (boolean value)</span>
+<span class="c1">#publish_errors = false</span>
+
+<span class="c1"># The format for an instance that is passed with the log message. (string</span>
+<span class="c1"># value)</span>
+<span class="c1">#instance_format = &quot;[instance: %(uuid)s] &quot;</span>
+
+<span class="c1"># The format for an instance UUID that is passed with the log message. (string</span>
+<span class="c1"># value)</span>
+<span class="c1">#instance_uuid_format = &quot;[instance: %(uuid)s] &quot;</span>
+
+<span class="c1"># Interval, number of seconds, of log rate limiting. (integer value)</span>
+<span class="c1">#rate_limit_interval = 0</span>
+
+<span class="c1"># Maximum number of logged messages per rate_limit_interval. (integer value)</span>
+<span class="c1">#rate_limit_burst = 0</span>
+
+<span class="c1"># Log level name used by rate limiting. Logs with level greater or equal to</span>
+<span class="c1"># rate_limit_except_level are not filtered. An empty string means that all</span>
+<span class="c1"># levels are filtered. (string value)</span>
+<span class="c1"># Possible values:</span>
+<span class="c1"># CRITICAL - &lt;No description provided&gt;</span>
+<span class="c1"># ERROR - &lt;No description provided&gt;</span>
+<span class="c1"># INFO - &lt;No description provided&gt;</span>
+<span class="c1"># WARNING - &lt;No description provided&gt;</span>
+<span class="c1"># DEBUG - &lt;No description provided&gt;</span>
+<span class="c1"># &#39;&#39; - &lt;No description provided&gt;</span>
+<span class="c1">#rate_limit_except_level = CRITICAL</span>
+
+<span class="c1"># Enables or disables fatal status of deprecations. (boolean value)</span>
+<span class="c1">#fatal_deprecations = false</span>
+
+<span class="c1">#</span>
+<span class="c1"># From oslo.messaging</span>
+<span class="c1">#</span>
+
+<span class="c1"># Size of executor thread pool when executor is threading or eventlet. (integer</span>
+<span class="c1"># value)</span>
+<span class="c1"># Deprecated group/name - [DEFAULT]/rpc_thread_pool_size</span>
+<span class="c1">#executor_thread_pool_size = 64</span>
+
+<span class="c1"># Seconds to wait for a response from a call. (integer value)</span>
+<span class="c1">#rpc_response_timeout = 60</span>
+
+<span class="c1"># The network address and optional user credentials for connecting to the</span>
+<span class="c1"># messaging backend, in URL format. The expected format is:</span>
+<span class="c1">#</span>
+<span class="c1"># driver://[user:pass@]host:port[,[userN:passN@]hostN:portN]/virtual_host?query</span>
+<span class="c1">#</span>
+<span class="c1"># Example: rabbit://rabbitmq:password@127.0.0.1:5672//</span>
+<span class="c1">#</span>
+<span class="c1"># For full details on the fields in the URL see the documentation of</span>
+<span class="c1"># oslo_messaging.TransportURL at</span>
+<span class="c1"># https://docs.openstack.org/oslo.messaging/latest/reference/transport.html</span>
+<span class="c1"># (string value)</span>
+<span class="c1">#transport_url = rabbit://</span>
+
+<span class="c1"># The default exchange under which topics are scoped. May be overridden by an</span>
+<span class="c1"># exchange name specified in the transport_url option. (string value)</span>
+<span class="c1">#control_exchange = openstack</span>
+
+<span class="c1"># Add an endpoint to answer to ping calls. Endpoint is named</span>
+<span class="c1"># oslo_rpc_server_ping (boolean value)</span>
+<span class="c1">#rpc_ping_enabled = false</span>
+
+<span class="c1">#</span>
+<span class="c1"># From oslo.service.periodic_task</span>
+<span class="c1">#</span>
+
+<span class="c1"># Some periodic tasks can be run in a separate process. Should we run them</span>
+<span class="c1"># here? (boolean value)</span>
+<span class="c1">#run_external_periodic_tasks = true</span>
+
+<span class="c1">#</span>
+<span class="c1"># From oslo.service.service</span>
+<span class="c1">#</span>
+
+<span class="c1"># DEPRECATED: Enable eventlet backdoor.  Acceptable values are 0, &lt;port&gt;, and</span>
+<span class="c1"># &lt;start&gt;:&lt;end&gt;, where 0 results in listening on a random tcp port number;</span>
+<span class="c1"># &lt;port&gt; results in listening on the specified port number (and not enabling</span>
+<span class="c1"># backdoor if that port is in use); and &lt;start&gt;:&lt;end&gt; results in listening on</span>
+<span class="c1"># the smallest unused port number within the specified range of port numbers.</span>
+<span class="c1"># The chosen port is displayed in the service&#39;s log file. (string value)</span>
+<span class="c1"># This option is deprecated for removal.</span>
+<span class="c1"># Its value may be silently ignored in the future.</span>
+<span class="c1"># Reason: The &#39;backdoor_port&#39; option is deprecated and will be removed in a</span>
+<span class="c1"># future release.</span>
+<span class="c1">#backdoor_port = &lt;None&gt;</span>
+
+<span class="c1"># DEPRECATED: Enable eventlet backdoor, using the provided path as a unix</span>
+<span class="c1"># socket that can receive connections. This option is mutually exclusive with</span>
+<span class="c1"># &#39;backdoor_port&#39; in that only one should be provided. If both are provided</span>
+<span class="c1"># then the existence of this option overrides the usage of that option. Inside</span>
+<span class="c1"># the path {pid} will be replaced with the PID of the current process. (string</span>
+<span class="c1"># value)</span>
+<span class="c1"># This option is deprecated for removal.</span>
+<span class="c1"># Its value may be silently ignored in the future.</span>
+<span class="c1"># Reason: The &#39;backdoor_socket&#39; option is deprecated and will be removed in a</span>
+<span class="c1"># future release.</span>
+<span class="c1">#backdoor_socket = &lt;None&gt;</span>
+
+<span class="c1"># Enables or disables logging values of all registered options when starting a</span>
+<span class="c1"># service (at DEBUG level). (boolean value)</span>
+<span class="c1">#log_options = true</span>
+
+<span class="c1"># Specify a timeout after which a gracefully shutdown server will exit. Zero</span>
+<span class="c1"># value means endless wait. (integer value)</span>
+<span class="c1">#graceful_shutdown_timeout = 60</span>
+
+<span class="c1">#</span>
+<span class="c1"># From oslo.service.wsgi</span>
+<span class="c1">#</span>
+
+<span class="c1"># DEPRECATED: File name for the paste.deploy config for api service (string</span>
+<span class="c1"># value)</span>
+<span class="c1"># This option is deprecated for removal.</span>
+<span class="c1"># Its value may be silently ignored in the future.</span>
+<span class="c1"># Reason: The &#39;api_paste_config&#39; option is deprecated and will be removed in a</span>
+<span class="c1"># future release.</span>
+<span class="c1">#api_paste_config = api-paste.ini</span>
+
+<span class="c1"># DEPRECATED: A python format string that is used as the template to generate</span>
+<span class="c1"># log lines. The following values can beformatted into it: client_ip,</span>
+<span class="c1"># date_time, request_line, status_code, body_length, wall_seconds. (string</span>
+<span class="c1"># value)</span>
+<span class="c1"># This option is deprecated for removal.</span>
+<span class="c1"># Its value may be silently ignored in the future.</span>
+<span class="c1"># Reason: The &#39;wsgi_log_format&#39; option is deprecated and will be removed in a</span>
+<span class="c1"># future release.</span>
+<span class="c1">#wsgi_log_format = %(client_ip)s &quot;%(request_line)s&quot; status: %(status_code)s  len: %(body_length)s time: %(wall_seconds).7f</span>
+
+<span class="c1"># DEPRECATED: Sets the value of TCP_KEEPIDLE in seconds for each server socket.</span>
+<span class="c1"># Not supported on OS X. (integer value)</span>
+<span class="c1"># This option is deprecated for removal.</span>
+<span class="c1"># Its value may be silently ignored in the future.</span>
+<span class="c1"># Reason: The &#39;tcp_keepidle&#39; option is deprecated and will be removed in a</span>
+<span class="c1"># future release.</span>
+<span class="c1">#tcp_keepidle = 600</span>
+
+<span class="c1"># DEPRECATED: Size of the pool of greenthreads used by wsgi (integer value)</span>
+<span class="c1"># This option is deprecated for removal.</span>
+<span class="c1"># Its value may be silently ignored in the future.</span>
+<span class="c1"># Reason: The &#39;wsgi_default_pool_size&#39; option is deprecated and will be removed</span>
+<span class="c1"># in a future release.</span>
+<span class="c1">#wsgi_default_pool_size = 100</span>
+
+<span class="c1"># DEPRECATED: Maximum line size of message headers to be accepted.</span>
+<span class="c1"># max_header_line may need to be increased when using large tokens (typically</span>
+<span class="c1"># those generated when keystone is configured to use PKI tokens with big</span>
+<span class="c1"># service catalogs). (integer value)</span>
+<span class="c1"># This option is deprecated for removal.</span>
+<span class="c1"># Its value may be silently ignored in the future.</span>
+<span class="c1"># Reason: The &#39;max_header_line&#39; option is deprecated and will be removed in a</span>
+<span class="c1"># future release.</span>
+<span class="c1">#max_header_line = 16384</span>
+
+<span class="c1"># DEPRECATED: If False, closes the client socket connection explicitly.</span>
+<span class="c1"># (boolean value)</span>
+<span class="c1"># This option is deprecated for removal.</span>
+<span class="c1"># Its value may be silently ignored in the future.</span>
+<span class="c1"># Reason: The &#39;wsgi_keep_alive&#39; option is deprecated and will be removed in a</span>
+<span class="c1"># future release.</span>
+<span class="c1">#wsgi_keep_alive = true</span>
+
+<span class="c1"># DEPRECATED: Timeout for client connections&#39; socket operations. If an incoming</span>
+<span class="c1"># connection is idle for this number of seconds it will be closed. A value of</span>
+<span class="c1"># &#39;0&#39; means wait forever. (integer value)</span>
+<span class="c1"># This option is deprecated for removal.</span>
+<span class="c1"># Its value may be silently ignored in the future.</span>
+<span class="c1"># Reason: The &#39;client_socket_timeout&#39; option is deprecated and will be removed</span>
+<span class="c1"># in a future release.</span>
+<span class="c1">#client_socket_timeout = 900</span>
+
+<span class="c1"># DEPRECATED: True if the server should send exception tracebacks to the</span>
+<span class="c1"># clients on 500 errors. If False, the server will respond with empty bodies.</span>
+<span class="c1"># (boolean value)</span>
+<span class="c1"># This option is deprecated for removal.</span>
+<span class="c1"># Its value may be silently ignored in the future.</span>
+<span class="c1"># Reason: The &#39;wsgi_server_debug&#39; option is deprecated and will be removed in a</span>
+<span class="c1"># future release.</span>
+<span class="c1">#wsgi_server_debug = false</span>
+
+
+<span class="p">[</span><span class="n">agent</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From neutron.agent</span>
+<span class="c1">#</span>
+
+<span class="c1"># Root helper application. Use &#39;sudo neutron-rootwrap</span>
+<span class="c1"># /etc/neutron/rootwrap.conf&#39; to use the real root filter facility. Change to</span>
+<span class="c1"># &#39;sudo&#39; to skip the filtering and just run the command directly. (string</span>
+<span class="c1"># value)</span>
+<span class="c1">#root_helper = sudo</span>
+
+<span class="c1"># Use the root helper when listing the namespaces on a system. This may not be</span>
+<span class="c1"># required depending on the security configuration. If the root helper is not</span>
+<span class="c1"># required, set this to False for a performance improvement. (boolean value)</span>
+<span class="c1">#use_helper_for_ns_read = true</span>
+
+<span class="c1">#</span>
+<span class="c1"># Root helper daemon application to use when possible.</span>
+<span class="c1">#</span>
+<span class="c1"># Use &#39;sudo neutron-rootwrap-daemon /etc/neutron/rootwrap.conf&#39; to run rootwrap</span>
+<span class="c1"># in &quot;daemon mode&quot; which has been reported to improve performance at scale. For</span>
+<span class="c1"># more information on running rootwrap in &quot;daemon mode&quot;, see:</span>
+<span class="c1">#</span>
+<span class="c1"># https://docs.openstack.org/oslo.rootwrap/latest/user/usage.html#daemon-mode</span>
+<span class="c1">#  (string value)</span>
+<span class="c1">#root_helper_daemon = &lt;None&gt;</span>
+
+<span class="c1"># Seconds between nodes reporting state to server; should be less than</span>
+<span class="c1"># agent_down_time, best if it is half or less than agent_down_time. (floating</span>
+<span class="c1"># point value)</span>
+<span class="c1">#report_interval = 30</span>
+
+<span class="c1"># Log agent heartbeats (boolean value)</span>
+<span class="c1">#log_agent_heartbeats = false</span>
+
+<span class="c1"># Add comments to iptables rules. Set to false to disallow the addition of</span>
+<span class="c1"># comments to generated iptables rules that describe each rule&#39;s purpose.</span>
+<span class="c1"># System must support the iptables comments module for addition of comments.</span>
+<span class="c1"># (boolean value)</span>
+<span class="c1">#comment_iptables_rules = true</span>
+
+<span class="c1"># Duplicate every iptables difference calculation to ensure the format being</span>
+<span class="c1"># generated matches the format of iptables-save. This option should not be</span>
+<span class="c1"># turned on for production systems because it imposes a performance penalty.</span>
+<span class="c1"># (boolean value)</span>
+<span class="c1">#debug_iptables_rules = false</span>
+
+<span class="c1"># Use random-fully in SNAT masquerade rules. (boolean value)</span>
+<span class="c1">#use_random_fully = true</span>
+
+<span class="c1"># Action to be executed when a child process dies (string value)</span>
+<span class="c1"># Possible values:</span>
+<span class="c1"># respawn - &lt;No description provided&gt;</span>
+<span class="c1"># exit - &lt;No description provided&gt;</span>
+<span class="c1">#check_child_processes_action = respawn</span>
+
+<span class="c1"># Interval between checks of child process liveness, in seconds, use 0 to</span>
+<span class="c1"># disable (integer value)</span>
+<span class="c1">#check_child_processes_interval = 60</span>
+
+<span class="c1"># Location of scripts used to kill external processes. Names of scripts here</span>
+<span class="c1"># must follow the pattern: &quot;&lt;process-name&gt;-kill&quot; where &lt;process-name&gt; is name</span>
+<span class="c1"># of the process which should be killed using this script. For example, kill</span>
+<span class="c1"># script for dnsmasq process should be named &quot;dnsmasq-kill&quot;. If path is set to</span>
+<span class="c1"># None, then default &quot;kill&quot; command will be used to stop processes. (string</span>
+<span class="c1"># value)</span>
+<span class="c1">#kill_scripts_path = /etc/neutron/kill_scripts/</span>
+
+<span class="c1"># Availability zone of this node (string value)</span>
+<span class="c1">#availability_zone = nova</span>
+
+
+<span class="p">[</span><span class="n">cache</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From oslo.cache</span>
+<span class="c1">#</span>
+
+<span class="c1"># Prefix for building the configuration dictionary for the cache region. This</span>
+<span class="c1"># should not need to be changed unless there is another dogpile.cache region</span>
+<span class="c1"># with the same configuration name. (string value)</span>
+<span class="c1">#config_prefix = cache.oslo</span>
+
+<span class="c1"># Default TTL, in seconds, for any cached item in the dogpile.cache region.</span>
+<span class="c1"># This applies to any cached method that doesn&#39;t have an explicit cache</span>
+<span class="c1"># expiration time defined for it. (integer value)</span>
+<span class="c1"># Minimum value: 1</span>
+<span class="c1">#expiration_time = 600</span>
+
+<span class="c1"># Expiration time in cache backend to purge expired records automatically. This</span>
+<span class="c1"># should be greater than expiration_time and all cache_time options (integer</span>
+<span class="c1"># value)</span>
+<span class="c1"># Minimum value: 1</span>
+<span class="c1">#backend_expiration_time = &lt;None&gt;</span>
+
+<span class="c1"># Cache backend module. For eventlet-based or environments with hundreds of</span>
+<span class="c1"># threaded servers, Memcache with pooling (oslo_cache.memcache_pool) is</span>
+<span class="c1"># recommended. For environments with less than 100 threaded servers, Memcached</span>
+<span class="c1"># (dogpile.cache.memcached) or Redis (dogpile.cache.redis) is recommended. Test</span>
+<span class="c1"># environments with a single instance of the server can use the</span>
+<span class="c1"># dogpile.cache.memory backend. (string value)</span>
+<span class="c1"># Possible values:</span>
+<span class="c1"># oslo_cache.memcache_pool - &lt;No description provided&gt;</span>
+<span class="c1"># oslo_cache.dict - &lt;No description provided&gt;</span>
+<span class="c1"># oslo_cache.mongo - &lt;No description provided&gt;</span>
+<span class="c1"># oslo_cache.etcd3gw - &lt;No description provided&gt;</span>
+<span class="c1"># dogpile.cache.pymemcache - &lt;No description provided&gt;</span>
+<span class="c1"># dogpile.cache.memcached - &lt;No description provided&gt;</span>
+<span class="c1"># dogpile.cache.pylibmc - &lt;No description provided&gt;</span>
+<span class="c1"># dogpile.cache.bmemcached - &lt;No description provided&gt;</span>
+<span class="c1"># dogpile.cache.dbm - &lt;No description provided&gt;</span>
+<span class="c1"># dogpile.cache.redis - &lt;No description provided&gt;</span>
+<span class="c1"># dogpile.cache.redis_sentinel - &lt;No description provided&gt;</span>
+<span class="c1"># dogpile.cache.memory - &lt;No description provided&gt;</span>
+<span class="c1"># dogpile.cache.memory_pickle - &lt;No description provided&gt;</span>
+<span class="c1"># dogpile.cache.null - &lt;No description provided&gt;</span>
+<span class="c1">#backend = dogpile.cache.null</span>
+
+<span class="c1"># Arguments supplied to the backend module. Specify this option once per</span>
+<span class="c1"># argument to be passed to the dogpile.cache backend. Example format:</span>
+<span class="c1"># &quot;&lt;argname&gt;:&lt;value&gt;&quot;. (multi valued)</span>
+<span class="c1">#backend_argument =</span>
+
+<span class="c1"># Proxy classes to import that will affect the way the dogpile.cache backend</span>
+<span class="c1"># functions. See the dogpile.cache documentation on changing-backend-behavior.</span>
+<span class="c1"># (list value)</span>
+<span class="c1">#proxies =</span>
+
+<span class="c1"># Global toggle for caching. (boolean value)</span>
+<span class="c1">#enabled = false</span>
+
+<span class="c1"># Extra debugging from the cache backend (cache keys, get/set/delete/etc</span>
+<span class="c1"># calls). This is only really useful if you need to see the specific cache-</span>
+<span class="c1"># backend get/set/delete calls with the keys/values.  Typically this should be</span>
+<span class="c1"># left set to false. (boolean value)</span>
+<span class="c1">#debug_cache_backend = false</span>
+
+<span class="c1"># Memcache servers in the format of &quot;host:port&quot;. This is used by backends</span>
+<span class="c1"># dependent on Memcached.If ``dogpile.cache.memcached`` or</span>
+<span class="c1"># ``oslo_cache.memcache_pool`` is used and a given host refer to an IPv6 or a</span>
+<span class="c1"># given domain refer to IPv6 then you should prefix the given address with the</span>
+<span class="c1"># address family (``inet6``) (e.g ``inet6:[::1]:11211``,</span>
+<span class="c1"># ``inet6:[fd12:3456:789a:1::1]:11211``,</span>
+<span class="c1"># ``inet6:[controller-0.internalapi]:11211``). If the address family is not</span>
+<span class="c1"># given then these backends will use the default ``inet`` address family which</span>
+<span class="c1"># corresponds to IPv4 (list value)</span>
+<span class="c1">#memcache_servers = localhost:11211</span>
+
+<span class="c1"># Number of seconds memcached server is considered dead before it is tried</span>
+<span class="c1"># again. (dogpile.cache.memcache and oslo_cache.memcache_pool backends only).</span>
+<span class="c1"># (integer value)</span>
+<span class="c1">#memcache_dead_retry = 300</span>
+
+<span class="c1"># Timeout in seconds for every call to a server. (dogpile.cache.memcache and</span>
+<span class="c1"># oslo_cache.memcache_pool backends only). (floating point value)</span>
+<span class="c1">#memcache_socket_timeout = 1.0</span>
+
+<span class="c1"># Max total number of open connections to every memcached server.</span>
+<span class="c1"># (oslo_cache.memcache_pool backend only). (integer value)</span>
+<span class="c1">#memcache_pool_maxsize = 10</span>
+
+<span class="c1"># Number of seconds a connection to memcached is held unused in the pool before</span>
+<span class="c1"># it is closed. (oslo_cache.memcache_pool backend only). (integer value)</span>
+<span class="c1">#memcache_pool_unused_timeout = 60</span>
+
+<span class="c1"># Number of seconds that an operation will wait to get a memcache client</span>
+<span class="c1"># connection. (integer value)</span>
+<span class="c1">#memcache_pool_connection_get_timeout = 10</span>
+
+<span class="c1"># Global toggle if memcache will be flushed on reconnect.</span>
+<span class="c1"># (oslo_cache.memcache_pool backend only). (boolean value)</span>
+<span class="c1">#memcache_pool_flush_on_reconnect = false</span>
+
+<span class="c1"># Enable the SASL(Simple Authentication and SecurityLayer) if the SASL_enable</span>
+<span class="c1"># is true, else disable. (boolean value)</span>
+<span class="c1">#memcache_sasl_enabled = false</span>
+
+<span class="c1"># the user name for the memcached which SASL enabled (string value)</span>
+<span class="c1">#memcache_username = &lt;None&gt;</span>
+
+<span class="c1"># the password for the memcached which SASL enabled (string value)</span>
+<span class="c1">#memcache_password = &lt;None&gt;</span>
+
+<span class="c1"># Redis server in the format of &quot;host:port&quot; (string value)</span>
+<span class="c1">#redis_server = localhost:6379</span>
+
+<span class="c1"># Database id in Redis server (integer value)</span>
+<span class="c1"># Minimum value: 0</span>
+<span class="c1">#redis_db = 0</span>
+
+<span class="c1"># the user name for redis (string value)</span>
+<span class="c1">#redis_username = &lt;None&gt;</span>
+
+<span class="c1"># the password for redis (string value)</span>
+<span class="c1">#redis_password = &lt;None&gt;</span>
+
+<span class="c1"># Redis sentinel servers in the format of &quot;host:port&quot; (list value)</span>
+<span class="c1">#redis_sentinels = localhost:26379</span>
+
+<span class="c1"># Timeout in seconds for every call to a server. (dogpile.cache.redis and</span>
+<span class="c1"># dogpile.cache.redis_sentinel backends only). (floating point value)</span>
+<span class="c1">#redis_socket_timeout = 1.0</span>
+
+<span class="c1"># Service name of the redis sentinel cluster. (string value)</span>
+<span class="c1">#redis_sentinel_service_name = mymaster</span>
+
+<span class="c1"># Global toggle for TLS usage when communicating with the caching servers.</span>
+<span class="c1"># Currently supported by ``dogpile.cache.bmemcache``,</span>
+<span class="c1"># ``dogpile.cache.pymemcache``, ``oslo_cache.memcache_pool``,</span>
+<span class="c1"># ``dogpile.cache.redis`` and ``dogpile.cache.redis_sentinel``. (boolean value)</span>
+<span class="c1">#tls_enabled = false</span>
+
+<span class="c1"># Path to a file of concatenated CA certificates in PEM format necessary to</span>
+<span class="c1"># establish the caching servers&#39; authenticity. If tls_enabled is False, this</span>
+<span class="c1"># option is ignored. (string value)</span>
+<span class="c1">#tls_cafile = &lt;None&gt;</span>
+
+<span class="c1"># Path to a single file in PEM format containing the client&#39;s certificate as</span>
+<span class="c1"># well as any number of CA certificates needed to establish the certificate&#39;s</span>
+<span class="c1"># authenticity. This file is only required when client side authentication is</span>
+<span class="c1"># necessary. If tls_enabled is False, this option is ignored. (string value)</span>
+<span class="c1">#tls_certfile = &lt;None&gt;</span>
+
+<span class="c1"># Path to a single file containing the client&#39;s private key in. Otherwise the</span>
+<span class="c1"># private key will be taken from the file specified in tls_certfile. If</span>
+<span class="c1"># tls_enabled is False, this option is ignored. (string value)</span>
+<span class="c1">#tls_keyfile = &lt;None&gt;</span>
+
+<span class="c1"># Set the available ciphers for sockets created with the TLS context. It should</span>
+<span class="c1"># be a string in the OpenSSL cipher list format. If not specified, all OpenSSL</span>
+<span class="c1"># enabled ciphers will be available. Currently supported by</span>
+<span class="c1"># ``dogpile.cache.bmemcache``, ``dogpile.cache.pymemcache`` and</span>
+<span class="c1"># ``oslo_cache.memcache_pool``. (string value)</span>
+<span class="c1">#tls_allowed_ciphers = &lt;None&gt;</span>
+
+<span class="c1"># Global toggle for the socket keepalive of dogpile&#39;s pymemcache backend</span>
+<span class="c1"># (boolean value)</span>
+<span class="c1">#enable_socket_keepalive = false</span>
+
+<span class="c1"># The time (in seconds) the connection needs to remain idle before TCP starts</span>
+<span class="c1"># sending keepalive probes. Should be a positive integer most greater than</span>
+<span class="c1"># zero. (integer value)</span>
+<span class="c1"># Minimum value: 0</span>
+<span class="c1">#socket_keepalive_idle = 1</span>
+
+<span class="c1"># The time (in seconds) between individual keepalive probes. Should be a</span>
+<span class="c1"># positive integer greater than zero. (integer value)</span>
+<span class="c1"># Minimum value: 0</span>
+<span class="c1">#socket_keepalive_interval = 1</span>
+
+<span class="c1"># The maximum number of keepalive probes TCP should send before dropping the</span>
+<span class="c1"># connection. Should be a positive integer greater than zero. (integer value)</span>
+<span class="c1"># Minimum value: 0</span>
+<span class="c1">#socket_keepalive_count = 1</span>
+
+<span class="c1"># Enable retry client mechanisms to handle failure. Those mechanisms can be</span>
+<span class="c1"># used to wrap all kind of pymemcache clients. The wrapper allows you to define</span>
+<span class="c1"># how many attempts to make and how long to wait between attemots. (boolean</span>
+<span class="c1"># value)</span>
+<span class="c1">#enable_retry_client = false</span>
+
+<span class="c1"># Number of times to attempt an action before failing. (integer value)</span>
+<span class="c1"># Minimum value: 1</span>
+<span class="c1">#retry_attempts = 2</span>
+
+<span class="c1"># Number of seconds to sleep between each attempt. (floating point value)</span>
+<span class="c1">#retry_delay = 0</span>
+
+<span class="c1"># Amount of times a client should be tried before it is marked dead and removed</span>
+<span class="c1"># from the pool in the HashClient&#39;s internal mechanisms. (integer value)</span>
+<span class="c1"># Minimum value: 1</span>
+<span class="c1">#hashclient_retry_attempts = 2</span>
+
+<span class="c1"># Time in seconds that should pass between retry attempts in the HashClient&#39;s</span>
+<span class="c1"># internal mechanisms. (floating point value)</span>
+<span class="c1">#hashclient_retry_delay = 1</span>
+
+<span class="c1"># Time in seconds before attempting to add a node back in the pool in the</span>
+<span class="c1"># HashClient&#39;s internal mechanisms. (floating point value)</span>
+<span class="c1">#dead_timeout = 60</span>
+
+<span class="c1"># Global toggle for enforcing the OpenSSL FIPS mode. This feature requires</span>
+<span class="c1"># Python support. This is available in Python 3.9 in all environments and may</span>
+<span class="c1"># have been backported to older Python versions on select environments. If the</span>
+<span class="c1"># Python executable used does not support OpenSSL FIPS mode, an exception will</span>
+<span class="c1"># be raised. Currently supported by ``dogpile.cache.bmemcache``,</span>
+<span class="c1"># ``dogpile.cache.pymemcache`` and ``oslo_cache.memcache_pool``. (boolean</span>
+<span class="c1"># value)</span>
+<span class="c1">#enforce_fips_mode = false</span>
+
+
+<span class="p">[</span><span class="n">cors</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From oslo.middleware.cors</span>
+<span class="c1">#</span>
+
+<span class="c1"># Indicate whether this resource may be shared with the domain received in the</span>
+<span class="c1"># requests &quot;origin&quot; header. Format: &quot;&lt;protocol&gt;://&lt;host&gt;[:&lt;port&gt;]&quot;, no trailing</span>
+<span class="c1"># slash. Example: https://horizon.example.com (list value)</span>
+<span class="c1">#allowed_origin = &lt;None&gt;</span>
+
+<span class="c1"># Indicate that the actual request can include user credentials (boolean value)</span>
+<span class="c1">#allow_credentials = true</span>
+
+<span class="c1"># Indicate which headers are safe to expose to the API. Defaults to HTTP Simple</span>
+<span class="c1"># Headers. (list value)</span>
+<span class="c1">#expose_headers = X-Auth-Token,X-Subject-Token,X-Service-Token,X-OpenStack-Request-ID,OpenStack-Volume-microversion</span>
+
+<span class="c1"># Maximum cache age of CORS preflight requests. (integer value)</span>
+<span class="c1">#max_age = 3600</span>
+
+<span class="c1"># Indicate which methods can be used during the actual request. (list value)</span>
+<span class="c1">#allow_methods = GET,PUT,POST,DELETE,PATCH</span>
+
+<span class="c1"># Indicate which header field names may be used during the actual request.</span>
+<span class="c1"># (list value)</span>
+<span class="c1">#allow_headers = X-Auth-Token,X-Identity-Status,X-Roles,X-Service-Catalog,X-User-Id,X-Tenant-Id,X-OpenStack-Request-ID</span>
+
+
+<span class="p">[</span><span class="n">database</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From neutron.db</span>
+<span class="c1">#</span>
+
+<span class="c1"># Database engine for which script will be generated when using offline</span>
+<span class="c1"># migration. (string value)</span>
+<span class="c1">#engine =</span>
+
+<span class="c1">#</span>
+<span class="c1"># From oslo.db</span>
+<span class="c1">#</span>
+
+<span class="c1"># If True, SQLite uses synchronous mode. (boolean value)</span>
+<span class="c1">#sqlite_synchronous = true</span>
+
+<span class="c1"># The back end to use for the database. (string value)</span>
+<span class="c1">#backend = sqlalchemy</span>
+
+<span class="c1"># The SQLAlchemy connection string to use to connect to the database. (string</span>
+<span class="c1"># value)</span>
+<span class="c1">#connection = &lt;None&gt;</span>
+
+<span class="c1"># The SQLAlchemy connection string to use to connect to the slave database.</span>
+<span class="c1"># (string value)</span>
+<span class="c1">#slave_connection = &lt;None&gt;</span>
+
+<span class="c1"># The SQLAlchemy asyncio connection string to use to connect to the database.</span>
+<span class="c1"># (string value)</span>
+<span class="c1">#asyncio_connection = &lt;None&gt;</span>
+
+<span class="c1"># The SQLAlchemy asyncio connection string to use to connect to the slave</span>
+<span class="c1"># database. (string value)</span>
+<span class="c1">#asyncio_slave_connection = &lt;None&gt;</span>
+
+<span class="c1"># The SQL mode to be used for MySQL sessions. This option, including the</span>
+<span class="c1"># default, overrides any server-set SQL mode. To use whatever SQL mode is set</span>
+<span class="c1"># by the server configuration, set this to no value. Example: mysql_sql_mode=</span>
+<span class="c1"># (string value)</span>
+<span class="c1">#mysql_sql_mode = TRADITIONAL</span>
+
+<span class="c1"># For Galera only, configure wsrep_sync_wait causality checks on new</span>
+<span class="c1"># connections.  Default is None, meaning don&#39;t configure any setting. (integer</span>
+<span class="c1"># value)</span>
+<span class="c1">#mysql_wsrep_sync_wait = &lt;None&gt;</span>
+
+<span class="c1"># Connections which have been present in the connection pool longer than this</span>
+<span class="c1"># number of seconds will be replaced with a new one the next time they are</span>
+<span class="c1"># checked out from the pool. (integer value)</span>
+<span class="c1">#connection_recycle_time = 3600</span>
+
+<span class="c1"># Maximum number of SQL connections to keep open in a pool. Setting a value of</span>
+<span class="c1"># 0 indicates no limit. (integer value)</span>
+<span class="c1">#max_pool_size = 5</span>
+
+<span class="c1"># Maximum number of database connection retries during startup. Set to -1 to</span>
+<span class="c1"># specify an infinite retry count. (integer value)</span>
+<span class="c1">#max_retries = 10</span>
+
+<span class="c1"># Interval between retries of opening a SQL connection. (integer value)</span>
+<span class="c1">#retry_interval = 10</span>
+
+<span class="c1"># If set, use this value for max_overflow with SQLAlchemy. (integer value)</span>
+<span class="c1">#max_overflow = 50</span>
+
+<span class="c1"># Verbosity of SQL debugging information: 0=None, 100=Everything. (integer</span>
+<span class="c1"># value)</span>
+<span class="c1"># Minimum value: 0</span>
+<span class="c1"># Maximum value: 100</span>
+<span class="c1">#connection_debug = 0</span>
+
+<span class="c1"># Add Python stack traces to SQL as comment strings. (boolean value)</span>
+<span class="c1">#connection_trace = false</span>
+
+<span class="c1"># If set, use this value for pool_timeout with SQLAlchemy. (integer value)</span>
+<span class="c1">#pool_timeout = &lt;None&gt;</span>
+
+<span class="c1"># Enable the experimental use of database reconnect on connection lost.</span>
+<span class="c1"># (boolean value)</span>
+<span class="c1">#use_db_reconnect = false</span>
+
+<span class="c1"># Seconds between retries of a database transaction. (integer value)</span>
+<span class="c1">#db_retry_interval = 1</span>
+
+<span class="c1"># If True, increases the interval between retries of a database operation up to</span>
+<span class="c1"># db_max_retry_interval. (boolean value)</span>
+<span class="c1">#db_inc_retry_interval = true</span>
+
+<span class="c1"># If db_inc_retry_interval is set, the maximum seconds between retries of a</span>
+<span class="c1"># database operation. (integer value)</span>
+<span class="c1">#db_max_retry_interval = 10</span>
+
+<span class="c1"># Maximum retries in case of connection error or deadlock error before error is</span>
+<span class="c1"># raised. Set to -1 to specify an infinite retry count. (integer value)</span>
+<span class="c1">#db_max_retries = 20</span>
+
+<span class="c1"># Optional URL parameters to append onto the connection URL at connect time;</span>
+<span class="c1"># specify as param1=value1&amp;param2=value2&amp;... (string value)</span>
+<span class="c1">#connection_parameters =</span>
+
+
+<span class="p">[</span><span class="n">designate</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From designate.auth</span>
+<span class="c1">#</span>
+
+<span class="c1"># Authentication URL (string value)</span>
+<span class="c1">#auth_url = &lt;None&gt;</span>
+
+<span class="c1"># Authentication type to load (string value)</span>
+<span class="c1"># Deprecated group/name - [designate]/auth_plugin</span>
+<span class="c1">#auth_type = &lt;None&gt;</span>
+
+<span class="c1"># PEM encoded Certificate Authority to use when verifying HTTPs connections.</span>
+<span class="c1"># (string value)</span>
+<span class="c1">#cafile = &lt;None&gt;</span>
+
+<span class="c1"># PEM encoded client certificate cert file (string value)</span>
+<span class="c1">#certfile = &lt;None&gt;</span>
+
+<span class="c1"># Collect per-API call timing information. (boolean value)</span>
+<span class="c1">#collect_timing = false</span>
+
+<span class="c1"># Optional domain ID to use with v3 and v2 parameters. It will be used for both</span>
+<span class="c1"># the user and project domain in v3 and ignored in v2 authentication. (string</span>
+<span class="c1"># value)</span>
+<span class="c1">#default_domain_id = &lt;None&gt;</span>
+
+<span class="c1"># Optional domain name to use with v3 API and v2 parameters. It will be used</span>
+<span class="c1"># for both the user and project domain in v3 and ignored in v2 authentication.</span>
+<span class="c1"># (string value)</span>
+<span class="c1">#default_domain_name = &lt;None&gt;</span>
+
+<span class="c1"># Domain ID to scope to (string value)</span>
+<span class="c1">#domain_id = &lt;None&gt;</span>
+
+<span class="c1"># Domain name to scope to (string value)</span>
+<span class="c1">#domain_name = &lt;None&gt;</span>
+
+<span class="c1"># Verify HTTPS connections. (boolean value)</span>
+<span class="c1">#insecure = false</span>
+
+<span class="c1"># PEM encoded client certificate key file (string value)</span>
+<span class="c1">#keyfile = &lt;None&gt;</span>
+
+<span class="c1"># User&#39;s password (string value)</span>
+<span class="c1">#password = &lt;None&gt;</span>
+
+<span class="c1"># Domain ID containing project (string value)</span>
+<span class="c1">#project_domain_id = &lt;None&gt;</span>
+
+<span class="c1"># Domain name containing project (string value)</span>
+<span class="c1">#project_domain_name = &lt;None&gt;</span>
+
+<span class="c1"># Project ID to scope to (string value)</span>
+<span class="c1"># Deprecated group/name - [designate]/tenant_id</span>
+<span class="c1">#project_id = &lt;None&gt;</span>
+
+<span class="c1"># Project name to scope to (string value)</span>
+<span class="c1"># Deprecated group/name - [designate]/tenant_name</span>
+<span class="c1">#project_name = &lt;None&gt;</span>
+
+<span class="c1"># Log requests to multiple loggers. (boolean value)</span>
+<span class="c1">#split_loggers = false</span>
+
+<span class="c1"># Scope for system operations (string value)</span>
+<span class="c1">#system_scope = &lt;None&gt;</span>
+
+<span class="c1"># Tenant ID (string value)</span>
+<span class="c1">#tenant_id = &lt;None&gt;</span>
+
+<span class="c1"># Tenant Name (string value)</span>
+<span class="c1">#tenant_name = &lt;None&gt;</span>
+
+<span class="c1"># Timeout value for http requests (integer value)</span>
+<span class="c1">#timeout = &lt;None&gt;</span>
+
+<span class="c1"># ID of the trust to use as a trustee use (string value)</span>
+<span class="c1">#trust_id = &lt;None&gt;</span>
+
+<span class="c1"># User&#39;s domain id (string value)</span>
+<span class="c1">#user_domain_id = &lt;None&gt;</span>
+
+<span class="c1"># User&#39;s domain name (string value)</span>
+<span class="c1">#user_domain_name = &lt;None&gt;</span>
+
+<span class="c1"># User id (string value)</span>
+<span class="c1">#user_id = &lt;None&gt;</span>
+
+<span class="c1"># Username (string value)</span>
+<span class="c1"># Deprecated group/name - [designate]/user_name</span>
+<span class="c1">#username = &lt;None&gt;</span>
+
+<span class="c1">#</span>
+<span class="c1"># From neutron</span>
+<span class="c1">#</span>
+
+<span class="c1"># URL for connecting to designate (uri value)</span>
+<span class="c1">#url = &lt;None&gt;</span>
+
+<span class="c1"># Allow the creation of PTR records (boolean value)</span>
+<span class="c1">#allow_reverse_dns_lookup = true</span>
+
+<span class="c1"># Number of bits in an IPv4 PTR zone that will be considered network prefix. It</span>
+<span class="c1"># has to align to byte boundary. Minimum value is 8. Maximum value is 24. As a</span>
+<span class="c1"># consequence, range of values is 8, 16 and 24 (IPv4 zone prefix)</span>
+<span class="c1"># Minimum value: 8</span>
+<span class="c1"># Maximum value: 24</span>
+<span class="c1">#ipv4_ptr_zone_prefix_size = 24</span>
+
+<span class="c1"># Number of bits in an IPv6 PTR zone that will be considered network prefix. It</span>
+<span class="c1"># has to align to nyble boundary. Minimum value is 4. Maximum value is 124. As</span>
+<span class="c1"># a consequence, range of values is 4, 8, 12, 16,..., 124 (IPv6 zone prefix)</span>
+<span class="c1"># Minimum value: 4</span>
+<span class="c1"># Maximum value: 124</span>
+<span class="c1">#ipv6_ptr_zone_prefix_size = 120</span>
+
+<span class="c1"># The email address to be used when creating PTR zones. If not specified, the</span>
+<span class="c1"># email address will be admin@&lt;dns_domain&gt; (string value)</span>
+<span class="c1">#ptr_zone_email =</span>
+
+
+<span class="p">[</span><span class="n">experimental</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From neutron.experimental</span>
+<span class="c1">#</span>
+
+<span class="c1"># Enable execution of the experimental IPv6 Prefix Delegation functionality in</span>
+<span class="c1"># the plugin. (boolean value)</span>
+<span class="c1">#ipv6_pd_enabled = false</span>
+
+
+<span class="p">[</span><span class="n">healthcheck</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From oslo.middleware.healthcheck</span>
+<span class="c1">#</span>
+
+<span class="c1"># DEPRECATED: The path to respond to healtcheck requests on. (string value)</span>
+<span class="c1"># This option is deprecated for removal.</span>
+<span class="c1"># Its value may be silently ignored in the future.</span>
+<span class="c1">#path = /healthcheck</span>
+
+<span class="c1"># Show more detailed information as part of the response. Security note:</span>
+<span class="c1"># Enabling this option may expose sensitive details about the service being</span>
+<span class="c1"># monitored. Be sure to verify that it will not violate your security policies.</span>
+<span class="c1"># (boolean value)</span>
+<span class="c1">#detailed = false</span>
+
+<span class="c1"># Additional backends that can perform health checks and report that</span>
+<span class="c1"># information back as part of a request. (list value)</span>
+<span class="c1">#backends =</span>
+
+<span class="c1"># A list of network addresses to limit source ip allowed to access healthcheck</span>
+<span class="c1"># information. Any request from ip outside of these network addresses are</span>
+<span class="c1"># ignored. (list value)</span>
+<span class="c1">#allowed_source_ranges =</span>
+
+<span class="c1"># Ignore requests with proxy headers. (boolean value)</span>
+<span class="c1">#ignore_proxied_requests = false</span>
+
+<span class="c1"># Check the presence of a file to determine if an application is running on a</span>
+<span class="c1"># port. Used by DisableByFileHealthcheck plugin. (string value)</span>
+<span class="c1">#disable_by_file_path = &lt;None&gt;</span>
+
+<span class="c1"># Check the presence of a file based on a port to determine if an application</span>
+<span class="c1"># is running on a port. Expects a &quot;port:path&quot; list of strings. Used by</span>
+<span class="c1"># DisableByFilesPortsHealthcheck plugin. (list value)</span>
+<span class="c1">#disable_by_file_paths =</span>
+
+<span class="c1"># Check the presence of files. Used by EnableByFilesHealthcheck plugin. (list</span>
+<span class="c1"># value)</span>
+<span class="c1">#enable_by_file_paths =</span>
+
+
+<span class="p">[</span><span class="n">ironic</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From ironic.auth</span>
+<span class="c1">#</span>
+
+<span class="c1"># Authentication URL (string value)</span>
+<span class="c1">#auth_url = &lt;None&gt;</span>
+
+<span class="c1"># Authentication type to load (string value)</span>
+<span class="c1"># Deprecated group/name - [ironic]/auth_plugin</span>
+<span class="c1">#auth_type = &lt;None&gt;</span>
+
+<span class="c1"># PEM encoded Certificate Authority to use when verifying HTTPs connections.</span>
+<span class="c1"># (string value)</span>
+<span class="c1">#cafile = &lt;None&gt;</span>
+
+<span class="c1"># PEM encoded client certificate cert file (string value)</span>
+<span class="c1">#certfile = &lt;None&gt;</span>
+
+<span class="c1"># Collect per-API call timing information. (boolean value)</span>
+<span class="c1">#collect_timing = false</span>
+
+<span class="c1"># Optional domain ID to use with v3 and v2 parameters. It will be used for both</span>
+<span class="c1"># the user and project domain in v3 and ignored in v2 authentication. (string</span>
+<span class="c1"># value)</span>
+<span class="c1">#default_domain_id = &lt;None&gt;</span>
+
+<span class="c1"># Optional domain name to use with v3 API and v2 parameters. It will be used</span>
+<span class="c1"># for both the user and project domain in v3 and ignored in v2 authentication.</span>
+<span class="c1"># (string value)</span>
+<span class="c1">#default_domain_name = &lt;None&gt;</span>
+
+<span class="c1"># Domain ID to scope to (string value)</span>
+<span class="c1">#domain_id = &lt;None&gt;</span>
+
+<span class="c1"># Domain name to scope to (string value)</span>
+<span class="c1">#domain_name = &lt;None&gt;</span>
+
+<span class="c1"># Verify HTTPS connections. (boolean value)</span>
+<span class="c1">#insecure = false</span>
+
+<span class="c1"># PEM encoded client certificate key file (string value)</span>
+<span class="c1">#keyfile = &lt;None&gt;</span>
+
+<span class="c1"># User&#39;s password (string value)</span>
+<span class="c1">#password = &lt;None&gt;</span>
+
+<span class="c1"># Domain ID containing project (string value)</span>
+<span class="c1">#project_domain_id = &lt;None&gt;</span>
+
+<span class="c1"># Domain name containing project (string value)</span>
+<span class="c1">#project_domain_name = &lt;None&gt;</span>
+
+<span class="c1"># Project ID to scope to (string value)</span>
+<span class="c1"># Deprecated group/name - [ironic]/tenant_id</span>
+<span class="c1">#project_id = &lt;None&gt;</span>
+
+<span class="c1"># Project name to scope to (string value)</span>
+<span class="c1"># Deprecated group/name - [ironic]/tenant_name</span>
+<span class="c1">#project_name = &lt;None&gt;</span>
+
+<span class="c1"># Log requests to multiple loggers. (boolean value)</span>
+<span class="c1">#split_loggers = false</span>
+
+<span class="c1"># Scope for system operations (string value)</span>
+<span class="c1">#system_scope = &lt;None&gt;</span>
+
+<span class="c1"># Tenant ID (string value)</span>
+<span class="c1">#tenant_id = &lt;None&gt;</span>
+
+<span class="c1"># Tenant Name (string value)</span>
+<span class="c1">#tenant_name = &lt;None&gt;</span>
+
+<span class="c1"># Timeout value for http requests (integer value)</span>
+<span class="c1">#timeout = &lt;None&gt;</span>
+
+<span class="c1"># ID of the trust to use as a trustee use (string value)</span>
+<span class="c1">#trust_id = &lt;None&gt;</span>
+
+<span class="c1"># User&#39;s domain id (string value)</span>
+<span class="c1">#user_domain_id = &lt;None&gt;</span>
+
+<span class="c1"># User&#39;s domain name (string value)</span>
+<span class="c1">#user_domain_name = &lt;None&gt;</span>
+
+<span class="c1"># User id (string value)</span>
+<span class="c1">#user_id = &lt;None&gt;</span>
+
+<span class="c1"># Username (string value)</span>
+<span class="c1"># Deprecated group/name - [ironic]/user_name</span>
+<span class="c1">#username = &lt;None&gt;</span>
+
+<span class="c1">#</span>
+<span class="c1"># From neutron</span>
+<span class="c1">#</span>
+
+<span class="c1"># Send notification events to Ironic. (For example on relevant port status</span>
+<span class="c1"># changes.) (boolean value)</span>
+<span class="c1">#enable_notifications = false</span>
+
+
+<span class="p">[</span><span class="n">keystone_authtoken</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From keystonemiddleware.auth_token</span>
+<span class="c1">#</span>
+
+<span class="c1"># Complete &quot;public&quot; Identity API endpoint. This endpoint should not be an</span>
+<span class="c1"># &quot;admin&quot; endpoint, as it should be accessible by all end users.</span>
+<span class="c1"># Unauthenticated clients are redirected to this endpoint to authenticate.</span>
+<span class="c1"># Although this endpoint should ideally be unversioned, client support in the</span>
+<span class="c1"># wild varies. If you&#39;re using a versioned v2 endpoint here, then this should</span>
+<span class="c1"># *not* be the same endpoint the service user utilizes for validating tokens,</span>
+<span class="c1"># because normal end users may not be able to reach that endpoint. (string</span>
+<span class="c1"># value)</span>
+<span class="c1"># Deprecated group/name - [keystone_authtoken]/auth_uri</span>
+<span class="c1">#www_authenticate_uri = &lt;None&gt;</span>
+
+<span class="c1"># DEPRECATED: Complete &quot;public&quot; Identity API endpoint. This endpoint should not</span>
+<span class="c1"># be an &quot;admin&quot; endpoint, as it should be accessible by all end users.</span>
+<span class="c1"># Unauthenticated clients are redirected to this endpoint to authenticate.</span>
+<span class="c1"># Although this endpoint should ideally be unversioned, client support in the</span>
+<span class="c1"># wild varies. If you&#39;re using a versioned v2 endpoint here, then this should</span>
+<span class="c1"># *not* be the same endpoint the service user utilizes for validating tokens,</span>
+<span class="c1"># because normal end users may not be able to reach that endpoint. This option</span>
+<span class="c1"># is deprecated in favor of www_authenticate_uri and will be removed in the S</span>
+<span class="c1"># release. (string value)</span>
+<span class="c1"># This option is deprecated for removal since Queens.</span>
+<span class="c1"># Its value may be silently ignored in the future.</span>
+<span class="c1"># Reason: The auth_uri option is deprecated in favor of www_authenticate_uri</span>
+<span class="c1"># and will be removed in the S  release.</span>
+<span class="c1">#auth_uri = &lt;None&gt;</span>
+
+<span class="c1"># API version of the Identity API endpoint. (string value)</span>
+<span class="c1">#auth_version = &lt;None&gt;</span>
+
+<span class="c1"># Interface to use for the Identity API endpoint. Valid values are &quot;public&quot;,</span>
+<span class="c1"># &quot;internal&quot; (default) or &quot;admin&quot;. (string value)</span>
+<span class="c1">#interface = internal</span>
+
+<span class="c1"># Do not handle authorization requests within the middleware, but delegate the</span>
+<span class="c1"># authorization decision to downstream WSGI components. (boolean value)</span>
+<span class="c1">#delay_auth_decision = false</span>
+
+<span class="c1"># Request timeout value for communicating with Identity API server. (integer</span>
+<span class="c1"># value)</span>
+<span class="c1">#http_connect_timeout = &lt;None&gt;</span>
+
+<span class="c1"># How many times are we trying to reconnect when communicating with Identity</span>
+<span class="c1"># API Server. (integer value)</span>
+<span class="c1">#http_request_max_retries = 3</span>
+
+<span class="c1"># Request environment key where the Swift cache object is stored. When</span>
+<span class="c1"># auth_token middleware is deployed with a Swift cache, use this option to have</span>
+<span class="c1"># the middleware share a caching backend with swift. Otherwise, use the</span>
+<span class="c1"># ``memcached_servers`` option instead. (string value)</span>
+<span class="c1">#cache = &lt;None&gt;</span>
+
+<span class="c1"># Required if identity server requires client certificate (string value)</span>
+<span class="c1">#certfile = &lt;None&gt;</span>
+
+<span class="c1"># Required if identity server requires client certificate (string value)</span>
+<span class="c1">#keyfile = &lt;None&gt;</span>
+
+<span class="c1"># A PEM encoded Certificate Authority to use when verifying HTTPs connections.</span>
+<span class="c1"># Defaults to system CAs. (string value)</span>
+<span class="c1">#cafile = &lt;None&gt;</span>
+
+<span class="c1"># Verify HTTPS connections. (boolean value)</span>
+<span class="c1">#insecure = false</span>
+
+<span class="c1"># The region in which the identity server can be found. (string value)</span>
+<span class="c1">#region_name = &lt;None&gt;</span>
+
+<span class="c1"># Optionally specify a list of memcached server(s) to use for caching. If left</span>
+<span class="c1"># undefined, tokens will instead be cached in-process. (list value)</span>
+<span class="c1"># Deprecated group/name - [keystone_authtoken]/memcache_servers</span>
+<span class="c1">#memcached_servers = &lt;None&gt;</span>
+
+<span class="c1"># In order to prevent excessive effort spent validating tokens, the middleware</span>
+<span class="c1"># caches previously-seen tokens for a configurable duration (in seconds). Set</span>
+<span class="c1"># to -1 to disable caching completely. (integer value)</span>
+<span class="c1">#token_cache_time = 300</span>
+
+<span class="c1"># (Optional) If defined, indicate whether token data should be authenticated or</span>
+<span class="c1"># authenticated and encrypted. If MAC, token data is authenticated (with HMAC)</span>
+<span class="c1"># in the cache. If ENCRYPT, token data is encrypted and authenticated in the</span>
+<span class="c1"># cache. If the value is not one of these options or empty, auth_token will</span>
+<span class="c1"># raise an exception on initialization. (string value)</span>
+<span class="c1"># Possible values:</span>
+<span class="c1"># None - &lt;No description provided&gt;</span>
+<span class="c1"># MAC - &lt;No description provided&gt;</span>
+<span class="c1"># ENCRYPT - &lt;No description provided&gt;</span>
+<span class="c1">#memcache_security_strategy = None</span>
+
+<span class="c1"># (Optional, mandatory if memcache_security_strategy is defined) This string is</span>
+<span class="c1"># used for key derivation. (string value)</span>
+<span class="c1">#memcache_secret_key = &lt;None&gt;</span>
+
+<span class="c1"># (Optional) Global toggle for TLS usage when comunicating with the caching</span>
+<span class="c1"># servers. (boolean value)</span>
+<span class="c1">#memcache_tls_enabled = false</span>
+
+<span class="c1"># (Optional) Path to a file of concatenated CA certificates in PEM format</span>
+<span class="c1"># necessary to establish the caching server&#39;s authenticity. If tls_enabled is</span>
+<span class="c1"># False, this option is ignored. (string value)</span>
+<span class="c1">#memcache_tls_cafile = &lt;None&gt;</span>
+
+<span class="c1"># (Optional) Path to a single file in PEM format containing the client&#39;s</span>
+<span class="c1"># certificate as well as any number of CA certificates needed to establish the</span>
+<span class="c1"># certificate&#39;s authenticity. This file is only required when client side</span>
+<span class="c1"># authentication is necessary. If tls_enabled is False, this option is ignored.</span>
+<span class="c1"># (string value)</span>
+<span class="c1">#memcache_tls_certfile = &lt;None&gt;</span>
+
+<span class="c1"># (Optional) Path to a single file containing the client&#39;s private key in.</span>
+<span class="c1"># Otherwhise the private key will be taken from the file specified in</span>
+<span class="c1"># tls_certfile. If tls_enabled is False, this option is ignored. (string value)</span>
+<span class="c1">#memcache_tls_keyfile = &lt;None&gt;</span>
+
+<span class="c1"># (Optional) Set the available ciphers for sockets created with the TLS</span>
+<span class="c1"># context. It should be a string in the OpenSSL cipher list format. If not</span>
+<span class="c1"># specified, all OpenSSL enabled ciphers will be available. (string value)</span>
+<span class="c1">#memcache_tls_allowed_ciphers = &lt;None&gt;</span>
+
+<span class="c1"># (Optional) Number of seconds memcached server is considered dead before it is</span>
+<span class="c1"># tried again. (integer value)</span>
+<span class="c1">#memcache_pool_dead_retry = 300</span>
+
+<span class="c1"># (Optional) Maximum total number of open connections to every memcached</span>
+<span class="c1"># server. (integer value)</span>
+<span class="c1">#memcache_pool_maxsize = 10</span>
+
+<span class="c1"># (Optional) Socket timeout in seconds for communicating with a memcached</span>
+<span class="c1"># server. (integer value)</span>
+<span class="c1">#memcache_pool_socket_timeout = 3</span>
+
+<span class="c1"># (Optional) Number of seconds a connection to memcached is held unused in the</span>
+<span class="c1"># pool before it is closed. (integer value)</span>
+<span class="c1">#memcache_pool_unused_timeout = 60</span>
+
+<span class="c1"># (Optional) Number of seconds that an operation will wait to get a memcached</span>
+<span class="c1"># client connection from the pool. (integer value)</span>
+<span class="c1">#memcache_pool_conn_get_timeout = 10</span>
+
+<span class="c1"># (Optional) Use the advanced (eventlet safe) memcached client pool. (boolean</span>
+<span class="c1"># value)</span>
+<span class="c1">#memcache_use_advanced_pool = true</span>
+
+<span class="c1"># (Optional) Indicate whether to set the X-Service-Catalog header. If False,</span>
+<span class="c1"># middleware will not ask for service catalog on token validation and will not</span>
+<span class="c1"># set the X-Service-Catalog header. (boolean value)</span>
+<span class="c1">#include_service_catalog = true</span>
+
+<span class="c1"># Used to control the use and type of token binding. Can be set to: &quot;disabled&quot;</span>
+<span class="c1"># to not check token binding. &quot;permissive&quot; (default) to validate binding</span>
+<span class="c1"># information if the bind type is of a form known to the server and ignore it</span>
+<span class="c1"># if not. &quot;strict&quot; like &quot;permissive&quot; but if the bind type is unknown the token</span>
+<span class="c1"># will be rejected. &quot;required&quot; any form of token binding is needed to be</span>
+<span class="c1"># allowed. Finally the name of a binding method that must be present in tokens.</span>
+<span class="c1"># (string value)</span>
+<span class="c1">#enforce_token_bind = permissive</span>
+
+<span class="c1"># A choice of roles that must be present in a service token. Service tokens are</span>
+<span class="c1"># allowed to request that an expired token can be used and so this check should</span>
+<span class="c1"># tightly control that only actual services should be sending this token. Roles</span>
+<span class="c1"># here are applied as an ANY check so any role in this list must be present.</span>
+<span class="c1"># For backwards compatibility reasons this currently only affects the</span>
+<span class="c1"># allow_expired check. (list value)</span>
+<span class="c1">#service_token_roles = service</span>
+
+<span class="c1"># For backwards compatibility reasons we must let valid service tokens pass</span>
+<span class="c1"># that don&#39;t pass the service_token_roles check as valid. Setting this true</span>
+<span class="c1"># will become the default in a future release and should be enabled if</span>
+<span class="c1"># possible. (boolean value)</span>
+<span class="c1">#service_token_roles_required = false</span>
+
+<span class="c1"># The name or type of the service as it appears in the service catalog. This is</span>
+<span class="c1"># used to validate tokens that have restricted access rules. (string value)</span>
+<span class="c1">#service_type = &lt;None&gt;</span>
+
+<span class="c1"># Enable the SASL(Simple Authentication and Security Layer) if the SASL_enable</span>
+<span class="c1"># is true, else disable. (boolean value)</span>
+<span class="c1">#memcache_sasl_enabled = false</span>
+
+<span class="c1"># the user name for the SASL (string value)</span>
+<span class="c1">#memcache_username =</span>
+
+<span class="c1"># the username password for SASL (string value)</span>
+<span class="c1">#memcache_password =</span>
+
+<span class="c1"># Authentication type to load (string value)</span>
+<span class="c1"># Deprecated group/name - [keystone_authtoken]/auth_plugin</span>
+<span class="c1">#auth_type = &lt;None&gt;</span>
+
+<span class="c1"># Config Section from which to load plugin specific options (string value)</span>
+<span class="c1">#auth_section = &lt;None&gt;</span>
+
+
+<span class="p">[</span><span class="n">nova</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From neutron</span>
+<span class="c1">#</span>
+
+<span class="c1"># Name of Nova region to use. Useful if Keystone manages more than one region.</span>
+<span class="c1"># (string value)</span>
+<span class="c1">#region_name = &lt;None&gt;</span>
+
+<span class="c1"># Type of the Nova endpoint to use.  This endpoint will be looked up in the</span>
+<span class="c1"># Keystone catalog and should be one of public, internal or admin. (string</span>
+<span class="c1"># value)</span>
+<span class="c1"># Possible values:</span>
+<span class="c1"># public - &lt;No description provided&gt;</span>
+<span class="c1"># admin - &lt;No description provided&gt;</span>
+<span class="c1"># internal - &lt;No description provided&gt;</span>
+<span class="c1">#endpoint_type = public</span>
+
+<span class="c1">#</span>
+<span class="c1"># From nova.auth</span>
+<span class="c1">#</span>
+
+<span class="c1"># Authentication URL (string value)</span>
+<span class="c1">#auth_url = &lt;None&gt;</span>
+
+<span class="c1"># Authentication type to load (string value)</span>
+<span class="c1"># Deprecated group/name - [nova]/auth_plugin</span>
+<span class="c1">#auth_type = &lt;None&gt;</span>
+
+<span class="c1"># PEM encoded Certificate Authority to use when verifying HTTPs connections.</span>
+<span class="c1"># (string value)</span>
+<span class="c1">#cafile = &lt;None&gt;</span>
+
+<span class="c1"># PEM encoded client certificate cert file (string value)</span>
+<span class="c1">#certfile = &lt;None&gt;</span>
+
+<span class="c1"># Collect per-API call timing information. (boolean value)</span>
+<span class="c1">#collect_timing = false</span>
+
+<span class="c1"># Optional domain ID to use with v3 and v2 parameters. It will be used for both</span>
+<span class="c1"># the user and project domain in v3 and ignored in v2 authentication. (string</span>
+<span class="c1"># value)</span>
+<span class="c1">#default_domain_id = &lt;None&gt;</span>
+
+<span class="c1"># Optional domain name to use with v3 API and v2 parameters. It will be used</span>
+<span class="c1"># for both the user and project domain in v3 and ignored in v2 authentication.</span>
+<span class="c1"># (string value)</span>
+<span class="c1">#default_domain_name = &lt;None&gt;</span>
+
+<span class="c1"># Domain ID to scope to (string value)</span>
+<span class="c1">#domain_id = &lt;None&gt;</span>
+
+<span class="c1"># Domain name to scope to (string value)</span>
+<span class="c1">#domain_name = &lt;None&gt;</span>
+
+<span class="c1"># Verify HTTPS connections. (boolean value)</span>
+<span class="c1">#insecure = false</span>
+
+<span class="c1"># PEM encoded client certificate key file (string value)</span>
+<span class="c1">#keyfile = &lt;None&gt;</span>
+
+<span class="c1"># User&#39;s password (string value)</span>
+<span class="c1">#password = &lt;None&gt;</span>
+
+<span class="c1"># Domain ID containing project (string value)</span>
+<span class="c1">#project_domain_id = &lt;None&gt;</span>
+
+<span class="c1"># Domain name containing project (string value)</span>
+<span class="c1">#project_domain_name = &lt;None&gt;</span>
+
+<span class="c1"># Project ID to scope to (string value)</span>
+<span class="c1"># Deprecated group/name - [nova]/tenant_id</span>
+<span class="c1">#project_id = &lt;None&gt;</span>
+
+<span class="c1"># Project name to scope to (string value)</span>
+<span class="c1"># Deprecated group/name - [nova]/tenant_name</span>
+<span class="c1">#project_name = &lt;None&gt;</span>
+
+<span class="c1"># Log requests to multiple loggers. (boolean value)</span>
+<span class="c1">#split_loggers = false</span>
+
+<span class="c1"># Scope for system operations (string value)</span>
+<span class="c1">#system_scope = &lt;None&gt;</span>
+
+<span class="c1"># Tenant ID (string value)</span>
+<span class="c1">#tenant_id = &lt;None&gt;</span>
+
+<span class="c1"># Tenant Name (string value)</span>
+<span class="c1">#tenant_name = &lt;None&gt;</span>
+
+<span class="c1"># Timeout value for http requests (integer value)</span>
+<span class="c1">#timeout = &lt;None&gt;</span>
+
+<span class="c1"># ID of the trust to use as a trustee use (string value)</span>
+<span class="c1">#trust_id = &lt;None&gt;</span>
+
+<span class="c1"># User&#39;s domain id (string value)</span>
+<span class="c1">#user_domain_id = &lt;None&gt;</span>
+
+<span class="c1"># User&#39;s domain name (string value)</span>
+<span class="c1">#user_domain_name = &lt;None&gt;</span>
+
+<span class="c1"># User id (string value)</span>
+<span class="c1">#user_id = &lt;None&gt;</span>
+
+<span class="c1"># Username (string value)</span>
+<span class="c1"># Deprecated group/name - [nova]/user_name</span>
+<span class="c1">#username = &lt;None&gt;</span>
+
+
+<span class="p">[</span><span class="n">oslo_concurrency</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From oslo.concurrency</span>
+<span class="c1">#</span>
+
+<span class="c1"># Enables or disables inter-process locks. (boolean value)</span>
+<span class="c1">#disable_process_locking = false</span>
+
+<span class="c1"># Directory to use for lock files.  For security, the specified directory</span>
+<span class="c1"># should only be writable by the user running the processes that need locking.</span>
+<span class="c1"># Defaults to environment variable OSLO_LOCK_PATH. If external locks are used,</span>
+<span class="c1"># a lock path must be set. (string value)</span>
+<span class="c1">#lock_path = &lt;None&gt;</span>
+
+
+<span class="p">[</span><span class="n">oslo_messaging_kafka</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From oslo.messaging</span>
+<span class="c1">#</span>
+
+<span class="c1"># Max fetch bytes of Kafka consumer (integer value)</span>
+<span class="c1">#kafka_max_fetch_bytes = 1048576</span>
+
+<span class="c1"># Default timeout(s) for Kafka consumers (floating point value)</span>
+<span class="c1">#kafka_consumer_timeout = 1.0</span>
+
+<span class="c1"># Group id for Kafka consumer. Consumers in one group will coordinate message</span>
+<span class="c1"># consumption (string value)</span>
+<span class="c1">#consumer_group = oslo_messaging_consumer</span>
+
+<span class="c1"># Upper bound on the delay for KafkaProducer batching in seconds (floating</span>
+<span class="c1"># point value)</span>
+<span class="c1">#producer_batch_timeout = 0.0</span>
+
+<span class="c1"># Size of batch for the producer async send (integer value)</span>
+<span class="c1">#producer_batch_size = 16384</span>
+
+<span class="c1"># The compression codec for all data generated by the producer. If not set,</span>
+<span class="c1"># compression will not be used. Note that the allowed values of this depend on</span>
+<span class="c1"># the kafka version (string value)</span>
+<span class="c1"># Possible values:</span>
+<span class="c1"># none - &lt;No description provided&gt;</span>
+<span class="c1"># gzip - &lt;No description provided&gt;</span>
+<span class="c1"># snappy - &lt;No description provided&gt;</span>
+<span class="c1"># lz4 - &lt;No description provided&gt;</span>
+<span class="c1"># zstd - &lt;No description provided&gt;</span>
+<span class="c1">#compression_codec = none</span>
+
+<span class="c1"># Enable asynchronous consumer commits (boolean value)</span>
+<span class="c1">#enable_auto_commit = false</span>
+
+<span class="c1"># The maximum number of records returned in a poll call (integer value)</span>
+<span class="c1">#max_poll_records = 500</span>
+
+<span class="c1"># Protocol used to communicate with brokers (string value)</span>
+<span class="c1"># Possible values:</span>
+<span class="c1"># PLAINTEXT - &lt;No description provided&gt;</span>
+<span class="c1"># SASL_PLAINTEXT - &lt;No description provided&gt;</span>
+<span class="c1"># SSL - &lt;No description provided&gt;</span>
+<span class="c1"># SASL_SSL - &lt;No description provided&gt;</span>
+<span class="c1">#security_protocol = PLAINTEXT</span>
+
+<span class="c1"># Mechanism when security protocol is SASL (string value)</span>
+<span class="c1">#sasl_mechanism = PLAIN</span>
+
+<span class="c1"># CA certificate PEM file used to verify the server certificate (string value)</span>
+<span class="c1">#ssl_cafile =</span>
+
+<span class="c1"># Client certificate PEM file used for authentication. (string value)</span>
+<span class="c1">#ssl_client_cert_file =</span>
+
+<span class="c1"># Client key PEM file used for authentication. (string value)</span>
+<span class="c1">#ssl_client_key_file =</span>
+
+<span class="c1"># Client key password file used for authentication. (string value)</span>
+<span class="c1">#ssl_client_key_password =</span>
+
+
+<span class="p">[</span><span class="n">oslo_messaging_notifications</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From oslo.messaging</span>
+<span class="c1">#</span>
+
+<span class="c1"># The Drivers(s) to handle sending notifications. Possible values are</span>
+<span class="c1"># messaging, messagingv2, routing, log, test, noop (multi valued)</span>
+<span class="c1">#driver =</span>
+
+<span class="c1"># A URL representing the messaging driver to use for notifications. If not set,</span>
+<span class="c1"># we fall back to the same configuration used for RPC. (string value)</span>
+<span class="c1">#transport_url = &lt;None&gt;</span>
+
+<span class="c1"># AMQP topic used for OpenStack notifications. (list value)</span>
+<span class="c1">#topics = notifications</span>
+
+<span class="c1"># The maximum number of attempts to re-send a notification message which failed</span>
+<span class="c1"># to be delivered due to a recoverable error. 0 - No retry, -1 - indefinite</span>
+<span class="c1"># (integer value)</span>
+<span class="c1">#retry = -1</span>
+
+
+<span class="p">[</span><span class="n">oslo_messaging_rabbit</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From oslo.messaging</span>
+<span class="c1">#</span>
+
+<span class="c1"># Use durable queues in AMQP. If rabbit_quorum_queue is enabled, queues will be</span>
+<span class="c1"># durable and this value will be ignored. (boolean value)</span>
+<span class="c1">#amqp_durable_queues = false</span>
+
+<span class="c1"># Auto-delete queues in AMQP. (boolean value)</span>
+<span class="c1">#amqp_auto_delete = false</span>
+
+<span class="c1"># Size of RPC connection pool. (integer value)</span>
+<span class="c1"># Minimum value: 1</span>
+<span class="c1">#rpc_conn_pool_size = 30</span>
+
+<span class="c1"># The pool size limit for connections expiration policy (integer value)</span>
+<span class="c1">#conn_pool_min_size = 2</span>
+
+<span class="c1"># The time-to-live in sec of idle connections in the pool (integer value)</span>
+<span class="c1">#conn_pool_ttl = 1200</span>
+
+<span class="c1"># Connect over SSL. (boolean value)</span>
+<span class="c1">#ssl = false</span>
+
+<span class="c1"># SSL version to use (valid only if SSL enabled). Valid values are TLSv1 and</span>
+<span class="c1"># SSLv23. SSLv2, SSLv3, TLSv1_1, and TLSv1_2 may be available on some</span>
+<span class="c1"># distributions. (string value)</span>
+<span class="c1">#ssl_version =</span>
+
+<span class="c1"># SSL key file (valid only if SSL enabled). (string value)</span>
+<span class="c1">#ssl_key_file =</span>
+
+<span class="c1"># SSL cert file (valid only if SSL enabled). (string value)</span>
+<span class="c1">#ssl_cert_file =</span>
+
+<span class="c1"># SSL certification authority file (valid only if SSL enabled). (string value)</span>
+<span class="c1">#ssl_ca_file =</span>
+
+<span class="c1"># Global toggle for enforcing the OpenSSL FIPS mode. This feature requires</span>
+<span class="c1"># Python support. This is available in Python 3.9 in all environments and may</span>
+<span class="c1"># have been backported to older Python versions on select environments. If the</span>
+<span class="c1"># Python executable used does not support OpenSSL FIPS mode, an exception will</span>
+<span class="c1"># be raised. (boolean value)</span>
+<span class="c1">#ssl_enforce_fips_mode = false</span>
+
+<span class="c1"># DEPRECATED: (DEPRECATED) It is recommend not to use this option anymore. Run</span>
+<span class="c1"># the health check heartbeat thread through a native python thread by default.</span>
+<span class="c1"># If this option is equal to False then the health check heartbeat will inherit</span>
+<span class="c1"># the execution model from the parent process. For example if the parent</span>
+<span class="c1"># process has monkey patched the stdlib by using eventlet/greenlet then the</span>
+<span class="c1"># heartbeat will be run through a green thread. This option should be set to</span>
+<span class="c1"># True only for the wsgi services. (boolean value)</span>
+<span class="c1"># This option is deprecated for removal.</span>
+<span class="c1"># Its value may be silently ignored in the future.</span>
+<span class="c1"># Reason: The option is related to Eventlet which will be removed. In addition</span>
+<span class="c1"># this has never worked as expected with services using eventlet for core</span>
+<span class="c1"># service framework.</span>
+<span class="c1">#heartbeat_in_pthread = false</span>
+
+<span class="c1"># How long to wait (in seconds) before reconnecting in response to an AMQP</span>
+<span class="c1"># consumer cancel notification. (floating point value)</span>
+<span class="c1"># Minimum value: 0.0</span>
+<span class="c1"># Maximum value: 4.5</span>
+<span class="c1">#kombu_reconnect_delay = 1.0</span>
+
+<span class="c1"># Random time to wait for when reconnecting in response to an AMQP consumer</span>
+<span class="c1"># cancel notification. (floating point value)</span>
+<span class="c1"># Minimum value: 0.0</span>
+<span class="c1">#kombu_reconnect_splay = 0.0</span>
+
+<span class="c1"># EXPERIMENTAL: Possible values are: gzip, bz2. If not set compression will not</span>
+<span class="c1"># be used. This option may not be available in future versions. (string value)</span>
+<span class="c1">#kombu_compression = &lt;None&gt;</span>
+
+<span class="c1"># How long to wait a missing client before abandoning to send it its replies.</span>
+<span class="c1"># This value should not be longer than rpc_response_timeout. (integer value)</span>
+<span class="c1"># Deprecated group/name - [oslo_messaging_rabbit]/kombu_reconnect_timeout</span>
+<span class="c1">#kombu_missing_consumer_retry_timeout = 60</span>
+
+<span class="c1"># Determines how the next RabbitMQ node is chosen in case the one we are</span>
+<span class="c1"># currently connected to becomes unavailable. Takes effect only if more than</span>
+<span class="c1"># one RabbitMQ node is provided in config. (string value)</span>
+<span class="c1"># Possible values:</span>
+<span class="c1"># round-robin - &lt;No description provided&gt;</span>
+<span class="c1"># shuffle - &lt;No description provided&gt;</span>
+<span class="c1">#kombu_failover_strategy = round-robin</span>
+
+<span class="c1"># The RabbitMQ login method. (string value)</span>
+<span class="c1"># Possible values:</span>
+<span class="c1"># PLAIN - &lt;No description provided&gt;</span>
+<span class="c1"># AMQPLAIN - &lt;No description provided&gt;</span>
+<span class="c1"># EXTERNAL - &lt;No description provided&gt;</span>
+<span class="c1"># RABBIT-CR-DEMO - &lt;No description provided&gt;</span>
+<span class="c1">#rabbit_login_method = AMQPLAIN</span>
+
+<span class="c1"># How frequently to retry connecting with RabbitMQ. (integer value)</span>
+<span class="c1"># Minimum value: 1</span>
+<span class="c1">#rabbit_retry_interval = 1</span>
+
+<span class="c1"># How long to backoff for between retries when connecting to RabbitMQ. (integer</span>
+<span class="c1"># value)</span>
+<span class="c1"># Minimum value: 0</span>
+<span class="c1">#rabbit_retry_backoff = 2</span>
+
+<span class="c1"># Maximum interval of RabbitMQ connection retries. (integer value)</span>
+<span class="c1"># Minimum value: 1</span>
+<span class="c1">#rabbit_interval_max = 30</span>
+
+<span class="c1"># Try to use HA queues in RabbitMQ (x-ha-policy: all). If you change this</span>
+<span class="c1"># option, you must wipe the RabbitMQ database. In RabbitMQ 3.0, queue mirroring</span>
+<span class="c1"># is no longer controlled by the x-ha-policy argument when declaring a queue.</span>
+<span class="c1"># If you just want to make sure that all queues (except those with auto-</span>
+<span class="c1"># generated names) are mirrored across all nodes, run: &quot;rabbitmqctl set_policy</span>
+<span class="c1"># HA &#39;^(?!amq\.).*&#39; &#39;{&quot;ha-mode&quot;: &quot;all&quot;}&#39; &quot; (boolean value)</span>
+<span class="c1">#rabbit_ha_queues = false</span>
+
+<span class="c1"># Use quorum queues in RabbitMQ (x-queue-type: quorum). The quorum queue is a</span>
+<span class="c1"># modern queue type for RabbitMQ implementing a durable, replicated FIFO queue</span>
+<span class="c1"># based on the Raft consensus algorithm. It is available as of RabbitMQ 3.8.0.</span>
+<span class="c1"># If set this option will conflict with the HA queues (``rabbit_ha_queues``)</span>
+<span class="c1"># aka mirrored queues, in other words the HA queues should be disabled. Quorum</span>
+<span class="c1"># queues are also durable by default so the amqp_durable_queues option is</span>
+<span class="c1"># ignored when this option is enabled. (boolean value)</span>
+<span class="c1">#rabbit_quorum_queue = false</span>
+
+<span class="c1"># Use quorum queues for transients queues in RabbitMQ. Enabling this option</span>
+<span class="c1"># will then make sure those queues are also using quorum kind of rabbit queues,</span>
+<span class="c1"># which are HA by default. (boolean value)</span>
+<span class="c1">#rabbit_transient_quorum_queue = false</span>
+
+<span class="c1"># Each time a message is redelivered to a consumer, a counter is incremented.</span>
+<span class="c1"># Once the redelivery count exceeds the delivery limit the message gets dropped</span>
+<span class="c1"># or dead-lettered (if a DLX exchange has been configured) Used only when</span>
+<span class="c1"># rabbit_quorum_queue is enabled, Default 0 which means dont set a limit.</span>
+<span class="c1"># (integer value)</span>
+<span class="c1">#rabbit_quorum_delivery_limit = 0</span>
+
+<span class="c1"># By default all messages are maintained in memory if a quorum queue grows in</span>
+<span class="c1"># length it can put memory pressure on a cluster. This option can limit the</span>
+<span class="c1"># number of messages in the quorum queue. Used only when rabbit_quorum_queue is</span>
+<span class="c1"># enabled, Default 0 which means dont set a limit. (integer value)</span>
+<span class="c1">#rabbit_quorum_max_memory_length = 0</span>
+
+<span class="c1"># By default all messages are maintained in memory if a quorum queue grows in</span>
+<span class="c1"># length it can put memory pressure on a cluster. This option can limit the</span>
+<span class="c1"># number of memory bytes used by the quorum queue. Used only when</span>
+<span class="c1"># rabbit_quorum_queue is enabled, Default 0 which means dont set a limit.</span>
+<span class="c1"># (integer value)</span>
+<span class="c1">#rabbit_quorum_max_memory_bytes = 0</span>
+
+<span class="c1"># Positive integer representing duration in seconds for queue TTL (x-expires).</span>
+<span class="c1"># Queues which are unused for the duration of the TTL are automatically</span>
+<span class="c1"># deleted. The parameter affects only reply and fanout queues. Setting 0 as</span>
+<span class="c1"># value will disable the x-expires. If doing so, make sure you have a rabbitmq</span>
+<span class="c1"># policy to delete the queues or you deployment will create an infinite number</span>
+<span class="c1"># of queue over time.In case rabbit_stream_fanout is set to True, this option</span>
+<span class="c1"># will control data retention policy (x-max-age) for messages in the fanout</span>
+<span class="c1"># queue rather then the queue duration itself. So the oldest data in the stream</span>
+<span class="c1"># queue will be discarded from it once reaching TTL Setting to 0 will disable</span>
+<span class="c1"># x-max-age for stream which make stream grow indefinitely filling up the</span>
+<span class="c1"># diskspace (integer value)</span>
+<span class="c1"># Minimum value: 0</span>
+<span class="c1">#rabbit_transient_queues_ttl = 1800</span>
+
+<span class="c1"># Specifies the number of messages to prefetch. Setting to zero allows</span>
+<span class="c1"># unlimited messages. (integer value)</span>
+<span class="c1">#rabbit_qos_prefetch_count = 0</span>
+
+<span class="c1"># Number of seconds after which the Rabbit broker is considered down if</span>
+<span class="c1"># heartbeat&#39;s keep-alive fails (0 disables heartbeat). (integer value)</span>
+<span class="c1">#heartbeat_timeout_threshold = 60</span>
+
+<span class="c1"># How often times during the heartbeat_timeout_threshold we check the</span>
+<span class="c1"># heartbeat. (integer value)</span>
+<span class="c1">#heartbeat_rate = 3</span>
+
+<span class="c1"># DEPRECATED: (DEPRECATED) Enable/Disable the RabbitMQ mandatory flag for</span>
+<span class="c1"># direct send. The direct send is used as reply, so the MessageUndeliverable</span>
+<span class="c1"># exception is raised in case the client queue does not</span>
+<span class="c1"># exist.MessageUndeliverable exception will be used to loop for a timeout to</span>
+<span class="c1"># lets a chance to sender to recover.This flag is deprecated and it will not be</span>
+<span class="c1"># possible to deactivate this functionality anymore (boolean value)</span>
+<span class="c1"># This option is deprecated for removal.</span>
+<span class="c1"># Its value may be silently ignored in the future.</span>
+<span class="c1"># Reason: Mandatory flag no longer deactivable.</span>
+<span class="c1">#direct_mandatory_flag = true</span>
+
+<span class="c1"># Enable x-cancel-on-ha-failover flag so that rabbitmq server will cancel and</span>
+<span class="c1"># notify consumerswhen queue is down (boolean value)</span>
+<span class="c1">#enable_cancel_on_failover = false</span>
+
+<span class="c1"># Should we use consistant queue names or random ones (boolean value)</span>
+<span class="c1">#use_queue_manager = false</span>
+
+<span class="c1"># Hostname used by queue manager. Defaults to the value returned by</span>
+<span class="c1"># socket.gethostname(). (string value)</span>
+<span class="c1">#</span>
+<span class="c1"># This option has a sample default set, which means that</span>
+<span class="c1"># its actual default value may vary from the one documented</span>
+<span class="c1"># below.</span>
+<span class="c1">#hostname = node1.example.com</span>
+
+<span class="c1"># Process name used by queue manager (string value)</span>
+<span class="c1">#</span>
+<span class="c1"># This option has a sample default set, which means that</span>
+<span class="c1"># its actual default value may vary from the one documented</span>
+<span class="c1"># below.</span>
+<span class="c1">#processname = nova-api</span>
+
+<span class="c1"># Use stream queues in RabbitMQ (x-queue-type: stream). Streams are a new</span>
+<span class="c1"># persistent and replicated data structure (&quot;queue type&quot;) in RabbitMQ which</span>
+<span class="c1"># models an append-only log with non-destructive consumer semantics. It is</span>
+<span class="c1"># available as of RabbitMQ 3.9.0. If set this option will replace all fanout</span>
+<span class="c1"># queues with only one stream queue. (boolean value)</span>
+<span class="c1">#rabbit_stream_fanout = false</span>
+
+
+<span class="p">[</span><span class="n">oslo_middleware</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From oslo.middleware.http_proxy_to_wsgi</span>
+<span class="c1">#</span>
+
+<span class="c1"># Whether the application is behind a proxy or not. This determines if the</span>
+<span class="c1"># middleware should parse the headers or not. (boolean value)</span>
+<span class="c1">#enable_proxy_headers_parsing = false</span>
+
+
+<span class="p">[</span><span class="n">oslo_policy</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From oslo.policy</span>
+<span class="c1">#</span>
+
+<span class="c1"># DEPRECATED: This option controls whether or not to enforce scope when</span>
+<span class="c1"># evaluating policies. If ``True``, the scope of the token used in the request</span>
+<span class="c1"># is compared to the ``scope_types`` of the policy being enforced. If the</span>
+<span class="c1"># scopes do not match, an ``InvalidScope`` exception will be raised. If</span>
+<span class="c1"># ``False``, a message will be logged informing operators that policies are</span>
+<span class="c1"># being invoked with mismatching scope. (boolean value)</span>
+<span class="c1"># This option is deprecated for removal.</span>
+<span class="c1"># Its value may be silently ignored in the future.</span>
+<span class="c1"># Reason: This configuration was added temporarily to facilitate a smooth</span>
+<span class="c1"># transition to the new RBAC. OpenStack will always enforce scope checks. This</span>
+<span class="c1"># configuration option is deprecated and will be removed in the 2025.2 cycle.</span>
+<span class="c1">#enforce_scope = true</span>
+
+<span class="c1"># This option controls whether or not to use old deprecated defaults when</span>
+<span class="c1"># evaluating policies. If ``True``, the old deprecated defaults are not going</span>
+<span class="c1"># to be evaluated. This means if any existing token is allowed for old defaults</span>
+<span class="c1"># but is disallowed for new defaults, it will be disallowed. It is encouraged</span>
+<span class="c1"># to enable this flag along with the ``enforce_scope`` flag so that you can get</span>
+<span class="c1"># the benefits of new defaults and ``scope_type`` together. If ``False``, the</span>
+<span class="c1"># deprecated policy check string is logically OR&#39;d with the new policy check</span>
+<span class="c1"># string, allowing for a graceful upgrade experience between releases with new</span>
+<span class="c1"># policies, which is the default behavior. (boolean value)</span>
+<span class="c1">#enforce_new_defaults = true</span>
+
+<span class="c1"># The relative or absolute path of a file that maps roles to permissions for a</span>
+<span class="c1"># given service. Relative paths must be specified in relation to the</span>
+<span class="c1"># configuration file setting this option. (string value)</span>
+<span class="c1">#policy_file = policy.yaml</span>
+
+<span class="c1"># Default rule. Enforced when a requested rule is not found. (string value)</span>
+<span class="c1">#policy_default_rule = default</span>
+
+<span class="c1"># Directories where policy configuration files are stored. They can be relative</span>
+<span class="c1"># to any directory in the search path defined by the config_dir option, or</span>
+<span class="c1"># absolute paths. The file defined by policy_file must exist for these</span>
+<span class="c1"># directories to be searched.  Missing or empty directories are ignored. (multi</span>
+<span class="c1"># valued)</span>
+<span class="c1">#policy_dirs = policy.d</span>
+
+<span class="c1"># Content Type to send and receive data for REST based policy check (string</span>
+<span class="c1"># value)</span>
+<span class="c1"># Possible values:</span>
+<span class="c1"># application/x-www-form-urlencoded - &lt;No description provided&gt;</span>
+<span class="c1"># application/json - &lt;No description provided&gt;</span>
+<span class="c1">#remote_content_type = application/x-www-form-urlencoded</span>
+
+<span class="c1"># server identity verification for REST based policy check (boolean value)</span>
+<span class="c1">#remote_ssl_verify_server_crt = false</span>
+
+<span class="c1"># Absolute path to ca cert file for REST based policy check (string value)</span>
+<span class="c1">#remote_ssl_ca_crt_file = &lt;None&gt;</span>
+
+<span class="c1"># Absolute path to client cert for REST based policy check (string value)</span>
+<span class="c1">#remote_ssl_client_crt_file = &lt;None&gt;</span>
+
+<span class="c1"># Absolute path client key file REST based policy check (string value)</span>
+<span class="c1">#remote_ssl_client_key_file = &lt;None&gt;</span>
+
+<span class="c1"># Timeout in seconds for REST based policy check (floating point value)</span>
+<span class="c1"># Minimum value: 0</span>
+<span class="c1">#remote_timeout = 60</span>
+
+
+<span class="p">[</span><span class="n">oslo_reports</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From oslo.reports</span>
+<span class="c1">#</span>
+
+<span class="c1"># Path to a log directory where to create a file (string value)</span>
+<span class="c1">#log_dir = &lt;None&gt;</span>
+
+<span class="c1"># The path to a file to watch for changes to trigger the reports, instead of</span>
+<span class="c1"># signals. Setting this option disables the signal trigger for the reports. If</span>
+<span class="c1"># application is running as a WSGI application it is recommended to use this</span>
+<span class="c1"># instead of signals. (string value)</span>
+<span class="c1">#file_event_handler = &lt;None&gt;</span>
+
+<span class="c1"># How many seconds to wait between polls when file_event_handler is set</span>
+<span class="c1"># (integer value)</span>
+<span class="c1">#file_event_handler_interval = 1</span>
+
+
+<span class="p">[</span><span class="n">oslo_versionedobjects</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From oslo.versionedobjects</span>
+<span class="c1">#</span>
+
+<span class="c1"># Make exception message format errors fatal (boolean value)</span>
+<span class="c1">#fatal_exception_format_errors = false</span>
+
+
+<span class="p">[</span><span class="n">placement</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From neutron</span>
+<span class="c1">#</span>
+
+<span class="c1"># Name of placement region to use. Useful if Keystone manages more than one</span>
+<span class="c1"># region. (string value)</span>
+<span class="c1">#region_name = &lt;None&gt;</span>
+
+<span class="c1"># Type of the placement endpoint to use.  This endpoint will be looked up in</span>
+<span class="c1"># the Keystone catalog and should be one of public, internal or admin. (string</span>
+<span class="c1"># value)</span>
+<span class="c1"># Possible values:</span>
+<span class="c1"># public - &lt;No description provided&gt;</span>
+<span class="c1"># admin - &lt;No description provided&gt;</span>
+<span class="c1"># internal - &lt;No description provided&gt;</span>
+<span class="c1">#endpoint_type = public</span>
+
+<span class="c1">#</span>
+<span class="c1"># From placement.auth</span>
+<span class="c1">#</span>
+
+<span class="c1"># Authentication URL (string value)</span>
+<span class="c1">#auth_url = &lt;None&gt;</span>
+
+<span class="c1"># Authentication type to load (string value)</span>
+<span class="c1"># Deprecated group/name - [placement]/auth_plugin</span>
+<span class="c1">#auth_type = &lt;None&gt;</span>
+
+<span class="c1"># PEM encoded Certificate Authority to use when verifying HTTPs connections.</span>
+<span class="c1"># (string value)</span>
+<span class="c1">#cafile = &lt;None&gt;</span>
+
+<span class="c1"># PEM encoded client certificate cert file (string value)</span>
+<span class="c1">#certfile = &lt;None&gt;</span>
+
+<span class="c1"># Collect per-API call timing information. (boolean value)</span>
+<span class="c1">#collect_timing = false</span>
+
+<span class="c1"># Optional domain ID to use with v3 and v2 parameters. It will be used for both</span>
+<span class="c1"># the user and project domain in v3 and ignored in v2 authentication. (string</span>
+<span class="c1"># value)</span>
+<span class="c1">#default_domain_id = &lt;None&gt;</span>
+
+<span class="c1"># Optional domain name to use with v3 API and v2 parameters. It will be used</span>
+<span class="c1"># for both the user and project domain in v3 and ignored in v2 authentication.</span>
+<span class="c1"># (string value)</span>
+<span class="c1">#default_domain_name = &lt;None&gt;</span>
+
+<span class="c1"># Domain ID to scope to (string value)</span>
+<span class="c1">#domain_id = &lt;None&gt;</span>
+
+<span class="c1"># Domain name to scope to (string value)</span>
+<span class="c1">#domain_name = &lt;None&gt;</span>
+
+<span class="c1"># Verify HTTPS connections. (boolean value)</span>
+<span class="c1">#insecure = false</span>
+
+<span class="c1"># PEM encoded client certificate key file (string value)</span>
+<span class="c1">#keyfile = &lt;None&gt;</span>
+
+<span class="c1"># User&#39;s password (string value)</span>
+<span class="c1">#password = &lt;None&gt;</span>
+
+<span class="c1"># Domain ID containing project (string value)</span>
+<span class="c1">#project_domain_id = &lt;None&gt;</span>
+
+<span class="c1"># Domain name containing project (string value)</span>
+<span class="c1">#project_domain_name = &lt;None&gt;</span>
+
+<span class="c1"># Project ID to scope to (string value)</span>
+<span class="c1"># Deprecated group/name - [placement]/tenant_id</span>
+<span class="c1">#project_id = &lt;None&gt;</span>
+
+<span class="c1"># Project name to scope to (string value)</span>
+<span class="c1"># Deprecated group/name - [placement]/tenant_name</span>
+<span class="c1">#project_name = &lt;None&gt;</span>
+
+<span class="c1"># Log requests to multiple loggers. (boolean value)</span>
+<span class="c1">#split_loggers = false</span>
+
+<span class="c1"># Scope for system operations (string value)</span>
+<span class="c1">#system_scope = &lt;None&gt;</span>
+
+<span class="c1"># Tenant ID (string value)</span>
+<span class="c1">#tenant_id = &lt;None&gt;</span>
+
+<span class="c1"># Tenant Name (string value)</span>
+<span class="c1">#tenant_name = &lt;None&gt;</span>
+
+<span class="c1"># Timeout value for http requests (integer value)</span>
+<span class="c1">#timeout = &lt;None&gt;</span>
+
+<span class="c1"># ID of the trust to use as a trustee use (string value)</span>
+<span class="c1">#trust_id = &lt;None&gt;</span>
+
+<span class="c1"># User&#39;s domain id (string value)</span>
+<span class="c1">#user_domain_id = &lt;None&gt;</span>
+
+<span class="c1"># User&#39;s domain name (string value)</span>
+<span class="c1">#user_domain_name = &lt;None&gt;</span>
+
+<span class="c1"># User id (string value)</span>
+<span class="c1">#user_id = &lt;None&gt;</span>
+
+<span class="c1"># Username (string value)</span>
+<span class="c1"># Deprecated group/name - [placement]/user_name</span>
+<span class="c1">#username = &lt;None&gt;</span>
+
+
+<span class="p">[</span><span class="n">privsep</span><span class="p">]</span>
+<span class="c1"># Configuration options for the oslo.privsep daemon. Note that this group name</span>
+<span class="c1"># can be changed by the consuming service. Check the service&#39;s docs to see if</span>
+<span class="c1"># this is the case.</span>
+
+<span class="c1">#</span>
+<span class="c1"># From oslo.privsep</span>
+<span class="c1">#</span>
+
+<span class="c1"># User that the privsep daemon should run as. (string value)</span>
+<span class="c1">#user = &lt;None&gt;</span>
+
+<span class="c1"># Group that the privsep daemon should run as. (string value)</span>
+<span class="c1">#group = &lt;None&gt;</span>
+
+<span class="c1"># List of Linux capabilities retained by the privsep daemon. (list value)</span>
+<span class="c1">#capabilities =</span>
+
+<span class="c1"># The number of threads available for privsep to concurrently run processes.</span>
+<span class="c1"># Defaults to the number of CPU cores in the system. (integer value)</span>
+<span class="c1"># Minimum value: 1</span>
+<span class="c1">#</span>
+<span class="c1"># This option has a sample default set, which means that</span>
+<span class="c1"># its actual default value may vary from the one documented</span>
+<span class="c1"># below.</span>
+<span class="c1">#thread_pool_size = multiprocessing.cpu_count()</span>
+
+<span class="c1"># Command to invoke to start the privsep daemon if not using the &quot;fork&quot; method.</span>
+<span class="c1"># If not specified, a default is generated using &quot;sudo privsep-helper&quot; and</span>
+<span class="c1"># arguments designed to recreate the current configuration. This command must</span>
+<span class="c1"># accept suitable --privsep_context and --privsep_sock_path arguments. (string</span>
+<span class="c1"># value)</span>
+<span class="c1">#helper_command = &lt;None&gt;</span>
+
+<span class="c1"># Logger name to use for this privsep context.  By default all contexts log</span>
+<span class="c1"># with oslo_privsep.daemon. (string value)</span>
+<span class="c1">#logger_name = oslo_privsep.daemon</span>
+
+<span class="c1"># Print the exception traceback happened in the daemon in the client logger</span>
+<span class="c1"># (boolean value)</span>
+<span class="c1">#log_daemon_traceback = false</span>
+
+
+<span class="p">[</span><span class="n">profiler</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From osprofiler</span>
+<span class="c1">#</span>
+
+<span class="c1">#</span>
+<span class="c1"># Enable the profiling for all services on this node.</span>
+<span class="c1">#</span>
+<span class="c1"># Default value is False (fully disable the profiling feature).</span>
+<span class="c1">#</span>
+<span class="c1"># Possible values:</span>
+<span class="c1">#</span>
+<span class="c1"># * True: Enables the feature</span>
+<span class="c1"># * False: Disables the feature. The profiling cannot be started via this</span>
+<span class="c1"># project</span>
+<span class="c1">#   operations. If the profiling is triggered by another project, this project</span>
+<span class="c1">#   part will be empty.</span>
+<span class="c1">#  (boolean value)</span>
+<span class="c1"># Deprecated group/name - [profiler]/profiler_enabled</span>
+<span class="c1">#enabled = false</span>
+
+<span class="c1">#</span>
+<span class="c1"># Enable SQL requests profiling in services.</span>
+<span class="c1">#</span>
+<span class="c1"># Default value is False (SQL requests won&#39;t be traced).</span>
+<span class="c1">#</span>
+<span class="c1"># Possible values:</span>
+<span class="c1">#</span>
+<span class="c1"># * True: Enables SQL requests profiling. Each SQL query will be part of the</span>
+<span class="c1">#   trace and can the be analyzed by how much time was spent for that.</span>
+<span class="c1"># * False: Disables SQL requests profiling. The spent time is only shown on a</span>
+<span class="c1">#   higher level of operations. Single SQL queries cannot be analyzed this way.</span>
+<span class="c1">#  (boolean value)</span>
+<span class="c1">#trace_sqlalchemy = false</span>
+
+<span class="c1">#</span>
+<span class="c1"># Enable python requests package profiling.</span>
+<span class="c1">#</span>
+<span class="c1"># Supported drivers: jaeger+otlp</span>
+<span class="c1">#</span>
+<span class="c1"># Default value is False.</span>
+<span class="c1">#</span>
+<span class="c1"># Possible values:</span>
+<span class="c1">#</span>
+<span class="c1"># * True: Enables requests profiling.</span>
+<span class="c1"># * False: Disables requests profiling.</span>
+<span class="c1">#  (boolean value)</span>
+<span class="c1">#trace_requests = false</span>
+
+<span class="c1">#</span>
+<span class="c1"># Secret key(s) to use for encrypting context data for performance profiling.</span>
+<span class="c1">#</span>
+<span class="c1"># This string value should have the following format:</span>
+<span class="c1"># &lt;key1&gt;[,&lt;key2&gt;,...&lt;keyn&gt;],</span>
+<span class="c1"># where each key is some random string. A user who triggers the profiling via</span>
+<span class="c1"># the REST API has to set one of these keys in the headers of the REST API call</span>
+<span class="c1"># to include profiling results of this node for this particular project.</span>
+<span class="c1">#</span>
+<span class="c1"># Both &quot;enabled&quot; flag and &quot;hmac_keys&quot; config options should be set to enable</span>
+<span class="c1"># profiling. Also, to generate correct profiling information across all</span>
+<span class="c1"># services</span>
+<span class="c1"># at least one key needs to be consistent between OpenStack projects. This</span>
+<span class="c1"># ensures it can be used from client side to generate the trace, containing</span>
+<span class="c1"># information from all possible resources.</span>
+<span class="c1">#  (string value)</span>
+<span class="c1">#hmac_keys = SECRET_KEY</span>
+
+<span class="c1">#</span>
+<span class="c1"># Connection string for a notifier backend.</span>
+<span class="c1">#</span>
+<span class="c1"># Default value is ``messaging://`` which sets the notifier to oslo_messaging.</span>
+<span class="c1">#</span>
+<span class="c1"># Examples of possible values:</span>
+<span class="c1">#</span>
+<span class="c1"># * ``messaging://`` - use oslo_messaging driver for sending spans.</span>
+<span class="c1"># * ``redis://127.0.0.1:6379`` - use redis driver for sending spans.</span>
+<span class="c1"># * ``mongodb://127.0.0.1:27017`` - use mongodb driver for sending spans.</span>
+<span class="c1"># * ``elasticsearch://127.0.0.1:9200`` - use elasticsearch driver for sending</span>
+<span class="c1">#   spans.</span>
+<span class="c1"># * ``jaeger://127.0.0.1:6831`` - use jaeger tracing as driver for sending</span>
+<span class="c1"># spans.</span>
+<span class="c1">#  (string value)</span>
+<span class="c1">#connection_string = messaging://</span>
+
+<span class="c1">#</span>
+<span class="c1"># Document type for notification indexing in elasticsearch.</span>
+<span class="c1">#  (string value)</span>
+<span class="c1">#es_doc_type = notification</span>
+
+<span class="c1">#</span>
+<span class="c1"># This parameter is a time value parameter (for example: es_scroll_time=2m),</span>
+<span class="c1"># indicating for how long the nodes that participate in the search will</span>
+<span class="c1"># maintain</span>
+<span class="c1"># relevant resources in order to continue and support it.</span>
+<span class="c1">#  (string value)</span>
+<span class="c1">#es_scroll_time = 2m</span>
+
+<span class="c1">#</span>
+<span class="c1"># Elasticsearch splits large requests in batches. This parameter defines</span>
+<span class="c1"># maximum size of each batch (for example: es_scroll_size=10000).</span>
+<span class="c1">#  (integer value)</span>
+<span class="c1">#es_scroll_size = 10000</span>
+
+<span class="c1">#</span>
+<span class="c1"># Redissentinel provides a timeout option on the connections.</span>
+<span class="c1"># This parameter defines that timeout (for example: socket_timeout=0.1).</span>
+<span class="c1">#  (floating point value)</span>
+<span class="c1">#socket_timeout = 0.1</span>
+
+<span class="c1">#</span>
+<span class="c1"># Redissentinel uses a service name to identify a master redis service.</span>
+<span class="c1"># This parameter defines the name (for example:</span>
+<span class="c1"># ``sentinal_service_name=mymaster``).</span>
+<span class="c1">#  (string value)</span>
+<span class="c1">#sentinel_service_name = mymaster</span>
+
+<span class="c1">#</span>
+<span class="c1"># Enable filter traces that contain error/exception to a separated place.</span>
+<span class="c1">#</span>
+<span class="c1"># Default value is set to False.</span>
+<span class="c1">#</span>
+<span class="c1"># Possible values:</span>
+<span class="c1">#</span>
+<span class="c1"># * True: Enable filter traces that contain error/exception.</span>
+<span class="c1"># * False: Disable the filter.</span>
+<span class="c1">#  (boolean value)</span>
+<span class="c1">#filter_error_trace = false</span>
+
+
+<span class="p">[</span><span class="n">profiler_jaeger</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From osprofiler</span>
+<span class="c1">#</span>
+
+<span class="c1">#</span>
+<span class="c1"># Set service name prefix to Jaeger service name.</span>
+<span class="c1">#  (string value)</span>
+<span class="c1">#service_name_prefix = &lt;None&gt;</span>
+
+<span class="c1">#</span>
+<span class="c1"># Set process tracer tags.</span>
+<span class="c1">#  (dict value)</span>
+<span class="c1">#process_tags =</span>
+
+
+<span class="p">[</span><span class="n">profiler_otlp</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From osprofiler</span>
+<span class="c1">#</span>
+
+<span class="c1">#</span>
+<span class="c1"># Set service name prefix to OTLP exporters.</span>
+<span class="c1">#  (string value)</span>
+<span class="c1">#service_name_prefix = &lt;None&gt;</span>
+
+
+<span class="p">[</span><span class="n">quotas</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From neutron</span>
+<span class="c1">#</span>
+
+<span class="c1"># Default number of resources allowed per tenant. A negative value means</span>
+<span class="c1"># unlimited. (integer value)</span>
+<span class="c1">#default_quota = -1</span>
+
+<span class="c1"># Number of networks allowed per tenant. A negative value means unlimited.</span>
+<span class="c1"># (integer value)</span>
+<span class="c1">#quota_network = 100</span>
+
+<span class="c1"># Number of subnets allowed per tenant, A negative value means unlimited.</span>
+<span class="c1"># (integer value)</span>
+<span class="c1">#quota_subnet = 100</span>
+
+<span class="c1"># Number of ports allowed per tenant. A negative value means unlimited.</span>
+<span class="c1"># (integer value)</span>
+<span class="c1">#quota_port = 500</span>
+
+<span class="c1"># Default driver to use for quota checks. (string value)</span>
+<span class="c1">#quota_driver = neutron.db.quota.driver_nolock.DbQuotaNoLockDriver</span>
+
+<span class="c1"># When set to True, quota usage will be tracked in the Neutron database for</span>
+<span class="c1"># each resource, by directly mapping to a data model class, for example,</span>
+<span class="c1"># networks, subnets, ports, etc. When set to False, quota usage will be tracked</span>
+<span class="c1"># by the quota engine as a count of the object type directly. For more</span>
+<span class="c1"># information, see the Quota Management and Enforcement guide. (boolean value)</span>
+<span class="c1">#track_quota_usage = true</span>
+
+<span class="c1">#</span>
+<span class="c1"># From neutron.extensions</span>
+<span class="c1">#</span>
+
+<span class="c1"># Number of routers allowed per tenant. A negative value means unlimited.</span>
+<span class="c1"># (integer value)</span>
+<span class="c1">#quota_router = 10</span>
+
+<span class="c1"># Number of floating IPs allowed per tenant. A negative value means unlimited.</span>
+<span class="c1"># (integer value)</span>
+<span class="c1">#quota_floatingip = 50</span>
+
+<span class="c1"># Number of security groups allowed per tenant. A negative value means</span>
+<span class="c1"># unlimited. (integer value)</span>
+<span class="c1">#quota_security_group = 10</span>
+
+<span class="c1"># Number of security group rules allowed per tenant. A negative value means</span>
+<span class="c1"># unlimited. (integer value)</span>
+<span class="c1">#quota_security_group_rule = 100</span>
+
+
+<span class="p">[</span><span class="n">service_providers</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From neutron</span>
+<span class="c1">#</span>
+
+<span class="c1"># Defines providers for advanced services using the format:</span>
+<span class="c1"># &lt;service_type&gt;:&lt;name&gt;:&lt;driver&gt;[:default] (multi valued)</span>
+<span class="c1">#service_provider =</span>
+
+
+<span class="p">[</span><span class="n">ssl</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># From oslo.service.sslutils</span>
+<span class="c1">#</span>
+
+<span class="c1"># DEPRECATED: CA certificate file to use to verify connecting clients. (string</span>
+<span class="c1"># value)</span>
+<span class="c1"># This option is deprecated for removal.</span>
+<span class="c1"># Its value may be silently ignored in the future.</span>
+<span class="c1"># Reason: The &#39;ca_file&#39; option is deprecated and will be removed in a future</span>
+<span class="c1"># release.</span>
+<span class="c1">#ca_file = &lt;None&gt;</span>
+
+<span class="c1"># DEPRECATED: Certificate file to use when starting the server securely.</span>
+<span class="c1"># (string value)</span>
+<span class="c1"># This option is deprecated for removal.</span>
+<span class="c1"># Its value may be silently ignored in the future.</span>
+<span class="c1"># Reason: The &#39;cert_file&#39; option is deprecated and will be removed in a future</span>
+<span class="c1"># release.</span>
+<span class="c1">#cert_file = &lt;None&gt;</span>
+
+<span class="c1"># DEPRECATED: Private key file to use when starting the server securely.</span>
+<span class="c1"># (string value)</span>
+<span class="c1"># This option is deprecated for removal.</span>
+<span class="c1"># Its value may be silently ignored in the future.</span>
+<span class="c1"># Reason: The &#39;key_file&#39; option is deprecated and will be removed in a future</span>
+<span class="c1"># release.</span>
+<span class="c1">#key_file = &lt;None&gt;</span>
+
+<span class="c1"># DEPRECATED: SSL version to use (valid only if SSL enabled). Valid values are</span>
+<span class="c1"># TLSv1 and SSLv23. SSLv2, SSLv3, TLSv1_1, and TLSv1_2 may be available on some</span>
+<span class="c1"># distributions. (string value)</span>
+<span class="c1"># This option is deprecated for removal.</span>
+<span class="c1"># Its value may be silently ignored in the future.</span>
+<span class="c1"># Reason: The &#39;version&#39; option is deprecated and will be removed in a future</span>
+<span class="c1"># release.</span>
+<span class="c1">#version = &lt;None&gt;</span>
+
+<span class="c1"># DEPRECATED: Sets the list of available ciphers. value should be a string in</span>
+<span class="c1"># the OpenSSL cipher list format. (string value)</span>
+<span class="c1"># This option is deprecated for removal.</span>
+<span class="c1"># Its value may be silently ignored in the future.</span>
+<span class="c1"># Reason: The &#39;ciphers&#39; option is deprecated and will be removed in a future</span>
+<span class="c1"># release.</span>
+<span class="c1">#ciphers = &lt;None&gt;</span>
+</pre></div>
+</div>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="../config-samples.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Sample Configuration Files"></i></a>
+          
+          
+            <a href="ml2-conf.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Sample ml2_conf.ini"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2017-07-13 06:34:22</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributor/index.html">Contributor Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "configuration/samples/neutron" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Sample neutron.conf in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2017-07-13 06:34:22";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "configuration/samples/neutron";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

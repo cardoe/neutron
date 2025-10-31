@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Routers &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Launch an instance on a provider network" href="launch-instance-provider-network.html" />
+    <link rel="prev" title="Self-service networks" href="selfservice-networks.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/admin/ovn/refarch/routers.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Routers</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="selfservice-networks.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Self-service networks"></i></a>
+    
+    
+    <a href="launch-instance-provider-network.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Launch an instance on a provider network"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="routers">
+<span id="refarch-routers"></span><h1>Routers<a class="headerlink" href="#routers" title="Link to this heading">¶</a></h1>
+<p>Routers pass traffic between layer-3 networks.</p>
+<section id="create-a-router">
+<h2>Create a router<a class="headerlink" href="#create-a-router" title="Link to this heading">¶</a></h2>
+<ol class="arabic">
+<li><p>On the controller node, source the credentials for a regular
+(non-privileged) project. The following example uses the <code class="docutils literal notranslate"><span class="pre">demo</span></code>
+project.</p></li>
+<li><p>On the controller node, create router in the Networking service.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>router<span class="w"> </span>create<span class="w"> </span>router
+<span class="go">+-----------------------+--------------------------------------+</span>
+<span class="go">| Field                 | Value                                |</span>
+<span class="go">+-----------------------+--------------------------------------+</span>
+<span class="go">| admin_state_up        | UP                                   |</span>
+<span class="go">| description           |                                      |</span>
+<span class="go">| external_gateway_info | null                                 |</span>
+<span class="go">| headers               |                                      |</span>
+<span class="go">| id                    | 24addfcd-5506-405d-a59f-003644c3d16a |</span>
+<span class="go">| name                  | router                               |</span>
+<span class="go">| project_id            | b1ebf33664df402693f729090cfab861     |</span>
+<span class="go">| routes                |                                      |</span>
+<span class="go">| status                | ACTIVE                               |</span>
+<span class="go">+-----------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<section id="ovn-operations">
+<h3>OVN operations<a class="headerlink" href="#ovn-operations" title="Link to this heading">¶</a></h3>
+<p>The OVN mechanism driver and OVN perform the following operations when
+creating a router.</p>
+<ol class="arabic">
+<li><p>The OVN mechanism driver translates the router into a logical
+router object in the OVN northbound database.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">_uuid               : 1c2e340d-dac9-496b-9e86-1065f9dab752</span>
+<span class="go">default_gw          : []</span>
+<span class="go">enabled             : []</span>
+<span class="go">external_ids        : {&quot;neutron:router_name&quot;=&quot;router&quot;}</span>
+<span class="go">name                : &quot;neutron-a24fd760-1a99-4eec-9f02-24bb284ff708&quot;</span>
+<span class="go">ports               : []</span>
+<span class="go">static_routes       : []</span>
+</pre></div>
+</div>
+</li>
+<li><p>The OVN northbound service translates this object into logical flows
+and datapath bindings in the OVN southbound database.</p>
+<ul>
+<li><p>Datapath bindings</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">_uuid               : 4a7485c6-a1ef-46a5-b57c-5ddb6ac15aaa</span>
+<span class="go">external_ids        : {logical-router=&quot;1c2e340d-dac9-496b-9e86-1065f9dab752&quot;}</span>
+<span class="go">tunnel_key          : 3</span>
+</pre></div>
+</div>
+</li>
+<li><p>Logical flows</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Datapath: 4a7485c6-a1ef-46a5-b57c-5ddb6ac15aaa  Pipeline: ingress</span>
+<span class="go">  table= 0(    lr_in_admission), priority=  100,</span>
+<span class="go">    match=(vlan.present || eth.src[40]),</span>
+<span class="go">    action=(drop;)</span>
+<span class="go">  table= 1(     lr_in_ip_input), priority=  100,</span>
+<span class="go">    match=(ip4.mcast || ip4.src == 255.255.255.255 ||</span>
+<span class="go">           ip4.src == 127.0.0.0/8 || ip4.dst == 127.0.0.0/8 ||</span>
+<span class="go">           ip4.src == 0.0.0.0/8 || ip4.dst == 0.0.0.0/8),</span>
+<span class="go">    action=(drop;)</span>
+<span class="go">  table= 1(     lr_in_ip_input), priority=   50, match=(ip4.mcast),</span>
+<span class="go">    action=(drop;)</span>
+<span class="go">  table= 1(     lr_in_ip_input), priority=   50, match=(eth.bcast),</span>
+<span class="go">    action=(drop;)</span>
+<span class="go">  table= 1(     lr_in_ip_input), priority=   30,</span>
+<span class="go">    match=(ip4 &amp;&amp; ip.ttl == {0, 1}), action=(drop;)</span>
+<span class="go">  table= 1(     lr_in_ip_input), priority=    0, match=(1),</span>
+<span class="go">    action=(next;)</span>
+<span class="go">  table= 2(       lr_in_unsnat), priority=    0, match=(1),</span>
+<span class="go">    action=(next;)</span>
+<span class="go">  table= 3(         lr_in_dnat), priority=    0, match=(1),</span>
+<span class="go">    action=(next;)</span>
+<span class="go">  table= 5(  lr_in_arp_resolve), priority=    0, match=(1),</span>
+<span class="go">    action=(get_arp(outport, reg0); next;)</span>
+<span class="go">  table= 6(  lr_in_arp_request), priority=  100,</span>
+<span class="go">    match=(eth.dst == 00:00:00:00:00:00),</span>
+<span class="go">    action=(arp { eth.dst = ff:ff:ff:ff:ff:ff; arp.spa = reg1;</span>
+<span class="go">            arp.op = 1; output; };)</span>
+<span class="go">  table= 6(  lr_in_arp_request), priority=    0, match=(1),</span>
+<span class="go">    action=(output;)</span>
+<span class="go">Datapath: 4a7485c6-a1ef-46a5-b57c-5ddb6ac15aaa  Pipeline: egress</span>
+<span class="go">  table= 0(        lr_out_snat), priority=    0, match=(1),</span>
+<span class="go">    action=(next;)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>The OVN controller service on each compute node translates these objects
+into flows on the integration bridge <code class="docutils literal notranslate"><span class="pre">br-int</span></code>.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span>ovs-ofctl<span class="w"> </span>dump-flows<span class="w"> </span>br-int
+<span class="go">cookie=0x0, duration=6.402s, table=16, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,metadata=0x5,vlan_tci=0x1000/0x1000</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.402s, table=16, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,metadata=0x5,</span>
+<span class="go">    dl_src=01:00:00:00:00:00/01:00:00:00:00:00</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.402s, table=17, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,ip,metadata=0x5,nw_dst=127.0.0.0/8</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.402s, table=17, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,ip,metadata=0x5,nw_dst=0.0.0.0/8</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.402s, table=17, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,ip,metadata=0x5,nw_dst=224.0.0.0/4</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.402s, table=17, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=50,ip,metadata=0x5,nw_dst=224.0.0.0/4</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.402s, table=17, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,ip,metadata=0x5,nw_src=255.255.255.255</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.402s, table=17, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,ip,metadata=0x5,nw_src=127.0.0.0/8</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.402s, table=17, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,ip,metadata=0x5,nw_src=0.0.0.0/8</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.402s, table=17, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=90,arp,metadata=0x5,arp_op=2</span>
+<span class="go">    actions=push:NXM_NX_REG0[],push:NXM_OF_ETH_SRC[],</span>
+<span class="go">        push:NXM_NX_ARP_SHA[],push:NXM_OF_ARP_SPA[],</span>
+<span class="go">        pop:NXM_NX_REG0[],pop:NXM_OF_ETH_SRC[],</span>
+<span class="go">        controller(userdata=00.00.00.01.00.00.00.00),</span>
+<span class="go">        pop:NXM_OF_ETH_SRC[],pop:NXM_NX_REG0[]</span>
+<span class="go">cookie=0x0, duration=6.402s, table=17, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=50,metadata=0x5,dl_dst=ff:ff:ff:ff:ff:ff</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.402s, table=17, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=30,ip,metadata=0x5,nw_ttl=0</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.402s, table=17, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=30,ip,metadata=0x5,nw_ttl=1</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.402s, table=17, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=0,metadata=0x5</span>
+<span class="go">    actions=resubmit(,18)</span>
+<span class="go">cookie=0x0, duration=6.402s, table=18, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=0,metadata=0x5</span>
+<span class="go">    actions=resubmit(,19)</span>
+<span class="go">cookie=0x0, duration=6.402s, table=19, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=0,metadata=0x5</span>
+<span class="go">    actions=resubmit(,20)</span>
+<span class="go">cookie=0x0, duration=6.402s, table=22, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=0,metadata=0x5</span>
+<span class="go">    actions=resubmit(,32)</span>
+<span class="go">cookie=0x0, duration=6.402s, table=48, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=0,metadata=0x5</span>
+<span class="go">    actions=resubmit(,49)</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+</section>
+<section id="attach-a-self-service-network-to-the-router">
+<h2>Attach a self-service network to the router<a class="headerlink" href="#attach-a-self-service-network-to-the-router" title="Link to this heading">¶</a></h2>
+<p>Self-service networks, particularly subnets, must interface with a
+router to enable connectivity with other self-service and provider
+networks.</p>
+<ol class="arabic">
+<li><p>On the controller node, add the self-service network subnet
+<code class="docutils literal notranslate"><span class="pre">selfservice-v4</span></code> to the router <code class="docutils literal notranslate"><span class="pre">router</span></code>.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>router<span class="w"> </span>add<span class="w"> </span>subnet<span class="w"> </span>router<span class="w"> </span>selfservice-v4
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command provides no output.</p>
+</div>
+</li>
+</ol>
+<section id="id1">
+<h3>OVN operations<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<p>The OVN mechanism driver and OVN perform the following operations when
+adding a subnet as an interface on a router.</p>
+<ol class="arabic">
+<li><p>The OVN mechanism driver translates the operation into logical
+objects and devices in the OVN northbound database and performs a
+series of operations on them.</p>
+<ul>
+<li><p>Create a logical port.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">_uuid               : 4c9e70b1-fff0-4d0d-af8e-42d3896eb76f</span>
+<span class="go">addresses           : [&quot;fa:16:3e:0c:55:62 192.168.1.1&quot;]</span>
+<span class="go">enabled             : true</span>
+<span class="go">external_ids        : {&quot;neutron:port_name&quot;=&quot;&quot;}</span>
+<span class="go">name                : &quot;5b72d278-5b16-44a6-9aa0-9e513a429506&quot;</span>
+<span class="go">options             : {router-port=&quot;lrp-5b72d278-5b16-44a6-9aa0-9e513a429506&quot;}</span>
+<span class="go">parent_name         : []</span>
+<span class="go">port_security       : []</span>
+<span class="go">tag                 : []</span>
+<span class="go">type                : router</span>
+<span class="go">up                  : false</span>
+</pre></div>
+</div>
+</li>
+<li><p>Add the logical port to logical switch.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">_uuid               : 0ab40684-7cf8-4d6c-ae8b-9d9143762d37</span>
+<span class="go">acls                : []</span>
+<span class="go">external_ids        : {&quot;neutron:network_name&quot;=&quot;selfservice&quot;}</span>
+<span class="go">name                : &quot;neutron-d5aadceb-d8d6-41c8-9252-c5e0fe6c26a5&quot;</span>
+<span class="go">ports               : [1ed7c28b-dc69-42b8-bed6-46477bb8b539,</span>
+<span class="go">                       4c9e70b1-fff0-4d0d-af8e-42d3896eb76f,</span>
+<span class="go">                       ae10a5e0-db25-4108-b06a-d2d5c127d9c4]</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create a logical router port object.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">_uuid               : f60ccb93-7b3d-4713-922c-37104b7055dc</span>
+<span class="go">enabled             : []</span>
+<span class="go">external_ids        : {}</span>
+<span class="go">mac                 : &quot;fa:16:3e:0c:55:62&quot;</span>
+<span class="go">name                : &quot;lrp-5b72d278-5b16-44a6-9aa0-9e513a429506&quot;</span>
+<span class="go">network             : &quot;192.168.1.1/24&quot;</span>
+<span class="go">peer                : []</span>
+</pre></div>
+</div>
+</li>
+<li><p>Add the logical router port to the logical router object.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">_uuid               : 1c2e340d-dac9-496b-9e86-1065f9dab752</span>
+<span class="go">default_gw          : []</span>
+<span class="go">enabled             : []</span>
+<span class="go">external_ids        : {&quot;neutron:router_name&quot;=&quot;router&quot;}</span>
+<span class="go">name                : &quot;neutron-a24fd760-1a99-4eec-9f02-24bb284ff708&quot;</span>
+<span class="go">ports               : [f60ccb93-7b3d-4713-922c-37104b7055dc]</span>
+<span class="go">static_routes       : []</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>The OVN northbound service translates these objects into logical flows,
+datapath bindings, and the appropriate multicast groups in the OVN
+southbound database.</p>
+<ul>
+<li><p>Logical flows in the logical router datapath</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Datapath: 4a7485c6-a1ef-46a5-b57c-5ddb6ac15aaa  Pipeline: ingress</span>
+<span class="go">  table= 0(    lr_in_admission), priority=   50,</span>
+<span class="go">    match=((eth.mcast || eth.dst == fa:16:3e:0c:55:62) &amp;&amp;</span>
+<span class="go">           inport == &quot;lrp-5b72d278-5b16-44a6-9aa0-9e513a429506&quot;),</span>
+<span class="go">    action=(next;)</span>
+<span class="go">  table= 1(     lr_in_ip_input), priority=  100,</span>
+<span class="go">    match=(ip4.src == {192.168.1.1, 192.168.1.255}), action=(drop;)</span>
+<span class="go">  table= 1(     lr_in_ip_input), priority=   90,</span>
+<span class="go">    match=(ip4.dst == 192.168.1.1 &amp;&amp; icmp4.type == 8 &amp;&amp;</span>
+<span class="go">           icmp4.code == 0),</span>
+<span class="go">    action=(ip4.dst = ip4.src; ip4.src = 192.168.1.1; ip.ttl = 255;</span>
+<span class="go">            icmp4.type = 0;</span>
+<span class="go">            inport = &quot;&quot;; /* Allow sending out inport. */ next; )</span>
+<span class="go">  table= 1(     lr_in_ip_input), priority=   90,</span>
+<span class="go">    match=(inport == &quot;lrp-5b72d278-5b16-44a6-9aa0-9e513a429506&quot; &amp;&amp;</span>
+<span class="go">           arp.tpa == 192.168.1.1 &amp;&amp; arp.op == 1),</span>
+<span class="go">    action=(eth.dst = eth.src; eth.src = fa:16:3e:0c:55:62;</span>
+<span class="go">            arp.op = 2; /* ARP reply */ arp.tha = arp.sha;</span>
+<span class="go">            arp.sha = fa:16:3e:0c:55:62; arp.tpa = arp.spa;</span>
+<span class="go">            arp.spa = 192.168.1.1;</span>
+<span class="go">            outport = &quot;lrp-5b72d278-5b16-44a6-9aa0-9e513a429506&quot;;</span>
+<span class="go">            inport = &quot;&quot;; /* Allow sending out inport. */ output;)</span>
+<span class="go">  table= 1(     lr_in_ip_input), priority=   60,</span>
+<span class="go">    match=(ip4.dst == 192.168.1.1), action=(drop;)</span>
+<span class="go">  table= 4(   lr_in_ip_routing), priority=   24,</span>
+<span class="go">    match=(ip4.dst == 192.168.1.0/255.255.255.0),</span>
+<span class="go">    action=(ip.ttl--; reg0 = ip4.dst; reg1 = 192.168.1.1;</span>
+<span class="go">            eth.src = fa:16:3e:0c:55:62;</span>
+<span class="go">            outport = &quot;lrp-5b72d278-5b16-44a6-9aa0-9e513a429506&quot;;</span>
+<span class="go">            next;)</span>
+<span class="go">Datapath: 4a7485c6-a1ef-46a5-b57c-5ddb6ac15aaa  Pipeline: egress</span>
+<span class="go">  table= 1(    lr_out_delivery), priority=  100,</span>
+<span class="go">    match=(outport == &quot;lrp-5b72d278-5b16-44a6-9aa0-9e513a429506),</span>
+<span class="go">    action=(output;)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Logical flows in the logical switch datapath</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Datapath: 611d35e8-b1e1-442c-bc07-7c6192ad6216  Pipeline: ingress</span>
+<span class="go">  table= 0(  ls_in_port_sec_l2), priority=   50,</span>
+<span class="go">    match=(inport == &quot;5b72d278-5b16-44a6-9aa0-9e513a429506&quot;),</span>
+<span class="go">    action=(next;)</span>
+<span class="go">  table= 3(      ls_in_pre_acl), priority=  110,</span>
+<span class="go">    match=(ip &amp;&amp; inport == &quot;5b72d278-5b16-44a6-9aa0-9e513a429506&quot;),</span>
+<span class="go">    action=(next;)</span>
+<span class="go">  table= 9(      ls_in_arp_rsp), priority=   50,</span>
+<span class="go">    match=(arp.tpa == 192.168.1.1 &amp;&amp; arp.op == 1),</span>
+<span class="go">    action=(eth.dst = eth.src; eth.src = fa:16:3e:0c:55:62;</span>
+<span class="go">            arp.op = 2; /* ARP reply */ arp.tha = arp.sha;</span>
+<span class="go">            arp.sha = fa:16:3e:0c:55:62; arp.tpa = arp.spa;</span>
+<span class="go">            arp.spa = 192.168.1.1; outport = inport;</span>
+<span class="go">            inport = &quot;&quot;; /* Allow sending out inport. */ output;)</span>
+<span class="go">  table=10(      ls_in_l2_lkup), priority=   50,</span>
+<span class="go">    match=(eth.dst == fa:16:3e:fa:76:8f),</span>
+<span class="go">    action=(outport = &quot;f112b99a-8ccc-4c52-8733-7593fa0966ea&quot;; output;)</span>
+<span class="go">Datapath: 611d35e8-b1e1-442c-bc07-7c6192ad6216  Pipeline: egress</span>
+<span class="go">  table= 1(     ls_out_pre_acl), priority=  110,</span>
+<span class="go">    match=(ip &amp;&amp; outport == &quot;f112b99a-8ccc-4c52-8733-7593fa0966ea&quot;),</span>
+<span class="go">    action=(next;)</span>
+<span class="go">  table= 7( ls_out_port_sec_l2), priority=   50,</span>
+<span class="go">    match=(outport == &quot;f112b99a-8ccc-4c52-8733-7593fa0966ea&quot;),</span>
+<span class="go">    action=(output;)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Port bindings</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">_uuid               : 0f86395b-a0d8-40fd-b22c-4c9e238a7880</span>
+<span class="go">chassis             : []</span>
+<span class="go">datapath            : 4a7485c6-a1ef-46a5-b57c-5ddb6ac15aaa</span>
+<span class="go">logical_port        : &quot;lrp-5b72d278-5b16-44a6-9aa0-9e513a429506&quot;</span>
+<span class="go">mac                 : []</span>
+<span class="go">options             : {peer=&quot;5b72d278-5b16-44a6-9aa0-9e513a429506&quot;}</span>
+<span class="go">parent_port         : []</span>
+<span class="go">tag                 : []</span>
+<span class="go">tunnel_key          : 1</span>
+<span class="go">type                : patch</span>
+
+<span class="go">_uuid               : 8d95ab8c-c2ea-4231-9729-7ecbfc2cd676</span>
+<span class="go">chassis             : []</span>
+<span class="go">datapath            : 4aef86e4-e54a-4c83-bb27-d65c670d4b51</span>
+<span class="go">logical_port        : &quot;5b72d278-5b16-44a6-9aa0-9e513a429506&quot;</span>
+<span class="go">mac                 : [&quot;fa:16:3e:0c:55:62 192.168.1.1&quot;]</span>
+<span class="go">options             : {peer=&quot;lrp-5b72d278-5b16-44a6-9aa0-9e513a429506&quot;}</span>
+<span class="go">parent_port         : []</span>
+<span class="go">tag                 : []</span>
+<span class="go">tunnel_key          : 3</span>
+<span class="go">type                : patch</span>
+</pre></div>
+</div>
+</li>
+<li><p>Multicast groups</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">_uuid               : 4a6191aa-d8ac-4e93-8306-b0d8fbbe4e35</span>
+<span class="go">datapath            : 4aef86e4-e54a-4c83-bb27-d65c670d4b51</span>
+<span class="go">name                : _MC_flood</span>
+<span class="go">ports               : [8d95ab8c-c2ea-4231-9729-7ecbfc2cd676,</span>
+<span class="go">                       be71fac3-9f04-41c9-9951-f3f7f1fa1ec5,</span>
+<span class="go">                       da5c1269-90b7-4df2-8d76-d4575754b02d]</span>
+<span class="go">tunnel_key          : 65535</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>In addition, if the self-service network contains ports with IP addresses
+(typically instances or DHCP servers), OVN creates a logical flow for
+each port, similar to the following example.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Datapath: 4a7485c6-a1ef-46a5-b57c-5ddb6ac15aaa  Pipeline: ingress</span>
+<span class="go">  table= 5(  lr_in_arp_resolve), priority=  100,</span>
+<span class="go">    match=(outport == &quot;lrp-f112b99a-8ccc-4c52-8733-7593fa0966ea&quot; &amp;&amp;</span>
+<span class="go">           reg0 == 192.168.1.11),</span>
+<span class="go">    action=(eth.dst = fa:16:3e:b6:91:70; next;)</span>
+</pre></div>
+</div>
+</li>
+<li><p>On each compute node, the OVN controller service creates patch ports,
+similar to the following example.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">7(patch-f112b99a-): addr:4e:01:91:2a:73:66</span>
+<span class="go">    config:     0</span>
+<span class="go">    state:      0</span>
+<span class="go">    speed: 0 Mbps now, 0 Mbps max</span>
+<span class="go">8(patch-lrp-f112b): addr:be:9d:7b:31:bb:87</span>
+<span class="go">    config:     0</span>
+<span class="go">    state:      0</span>
+<span class="go">    speed: 0 Mbps now, 0 Mbps max</span>
+</pre></div>
+</div>
+</li>
+<li><p>On all compute nodes, the OVN controller service creates the
+following additional flows:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cookie=0x0, duration=6.667s, table=0, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,in_port=8</span>
+<span class="go">    actions=load:0x9-&gt;OXM_OF_METADATA[],load:0x1-&gt;NXM_NX_REG6[],</span>
+<span class="go">        resubmit(,16)</span>
+<span class="go">cookie=0x0, duration=6.667s, table=0, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,in_port=7</span>
+<span class="go">    actions=load:0x7-&gt;OXM_OF_METADATA[],load:0x4-&gt;NXM_NX_REG6[],</span>
+<span class="go">        resubmit(,16)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=16, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=50,reg6=0x4,metadata=0x7</span>
+<span class="go">    actions=resubmit(,17)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=16, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=50,reg6=0x1,metadata=0x9,</span>
+<span class="go">        dl_dst=fa:16:3e:fa:76:8f</span>
+<span class="go">    actions=resubmit(,17)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=16, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=50,reg6=0x1,metadata=0x9,</span>
+<span class="go">        dl_dst=01:00:00:00:00:00/01:00:00:00:00:00</span>
+<span class="go">    actions=resubmit(,17)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=17, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,ip,metadata=0x9,nw_src=192.168.1.1</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.673s, table=17, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,ip,metadata=0x9,nw_src=192.168.1.255</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.673s, table=17, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=90,arp,reg6=0x1,metadata=0x9,</span>
+<span class="go">        arp_tpa=192.168.1.1,arp_op=1</span>
+<span class="go">    actions=move:NXM_OF_ETH_SRC[]-&gt;NXM_OF_ETH_DST[],</span>
+<span class="go">        mod_dl_src:fa:16:3e:fa:76:8f,load:0x2-&gt;NXM_OF_ARP_OP[],</span>
+<span class="go">        move:NXM_NX_ARP_SHA[]-&gt;NXM_NX_ARP_THA[],</span>
+<span class="go">        load:0xfa163efa768f-&gt;NXM_NX_ARP_SHA[],</span>
+<span class="go">        move:NXM_OF_ARP_SPA[]-&gt;NXM_OF_ARP_TPA[],</span>
+<span class="go">        load:0xc0a80101-&gt;NXM_OF_ARP_SPA[],load:0x1-&gt;NXM_NX_REG7[],</span>
+<span class="go">        load:0-&gt;NXM_NX_REG6[],load:0-&gt;NXM_OF_IN_PORT[],resubmit(,32)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=17, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=90,icmp,metadata=0x9,nw_dst=192.168.1.1,</span>
+<span class="go">        icmp_type=8,icmp_code=0</span>
+<span class="go">    actions=move:NXM_OF_IP_SRC[]-&gt;NXM_OF_IP_DST[],mod_nw_src:192.168.1.1,</span>
+<span class="go">        load:0xff-&gt;NXM_NX_IP_TTL[],load:0-&gt;NXM_OF_ICMP_TYPE[],</span>
+<span class="go">        load:0-&gt;NXM_NX_REG6[],load:0-&gt;NXM_OF_IN_PORT[],resubmit(,18)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=17, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=60,ip,metadata=0x9,nw_dst=192.168.1.1</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.674s, table=20, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=24,ip,metadata=0x9,nw_dst=192.168.1.0/24</span>
+<span class="go">    actions=dec_ttl(),move:NXM_OF_IP_DST[]-&gt;NXM_NX_REG0[],</span>
+<span class="go">        load:0xc0a80101-&gt;NXM_NX_REG1[],mod_dl_src:fa:16:3e:fa:76:8f,</span>
+<span class="go">        load:0x1-&gt;NXM_NX_REG7[],resubmit(,21)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=21, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,reg0=0xc0a80103,reg7=0x1,metadata=0x9</span>
+<span class="go">    actions=mod_dl_dst:fa:16:3e:d5:00:02,resubmit(,22)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=21, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,reg0=0xc0a80102,reg7=0x1,metadata=0x9</span>
+<span class="go">    actions=mod_dl_dst:fa:16:3e:82:8b:0e,resubmit(,22)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=21, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,reg0=0xc0a8010b,reg7=0x1,metadata=0x9</span>
+<span class="go">    actions=mod_dl_dst:fa:16:3e:b6:91:70,resubmit(,22)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=25, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=50,arp,metadata=0x7,arp_tpa=192.168.1.1,</span>
+<span class="go">        arp_op=1</span>
+<span class="go">    actions=move:NXM_OF_ETH_SRC[]-&gt;NXM_OF_ETH_DST[],</span>
+<span class="go">        mod_dl_src:fa:16:3e:fa:76:8f,load:0x2-&gt;NXM_OF_ARP_OP[],</span>
+<span class="go">        move:NXM_NX_ARP_SHA[]-&gt;NXM_NX_ARP_THA[],</span>
+<span class="go">        load:0xfa163efa768f-&gt;NXM_NX_ARP_SHA[],</span>
+<span class="go">        move:NXM_OF_ARP_SPA[]-&gt;NXM_OF_ARP_TPA[],</span>
+<span class="go">        load:0xc0a80101-&gt;NXM_OF_ARP_SPA[],</span>
+<span class="go">        move:NXM_NX_REG6[]-&gt;NXM_NX_REG7[],load:0-&gt;NXM_NX_REG6[],</span>
+<span class="go">        load:0-&gt;NXM_OF_IN_PORT[],resubmit(,32)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=26, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=50,metadata=0x7,dl_dst=fa:16:3e:fa:76:8f</span>
+<span class="go">    actions=load:0x4-&gt;NXM_NX_REG7[],resubmit(,32)</span>
+<span class="go">cookie=0x0, duration=6.667s, table=33, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,reg7=0x4,metadata=0x7</span>
+<span class="go">    actions=resubmit(,34)</span>
+<span class="go">cookie=0x0, duration=6.667s, table=33, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,reg7=0x1,metadata=0x9</span>
+<span class="go">    actions=resubmit(,34)</span>
+<span class="go">cookie=0x0, duration=6.667s, table=34, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,reg6=0x4,reg7=0x4,metadata=0x7</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.667s, table=34, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,reg6=0x1,reg7=0x1,metadata=0x9</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.674s, table=49, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=110,ipv6,reg7=0x4,metadata=0x7</span>
+<span class="go">    actions=resubmit(,50)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=49, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=110,ip,reg7=0x4,metadata=0x7</span>
+<span class="go">    actions=resubmit(,50)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=49, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,reg7=0x1,metadata=0x9</span>
+<span class="go">    actions=resubmit(,64)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=55, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=50,reg7=0x4,metadata=0x7</span>
+<span class="go">    actions=resubmit(,64)</span>
+<span class="go">cookie=0x0, duration=6.667s, table=64, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,reg7=0x4,metadata=0x7</span>
+<span class="go">    actions=output:7</span>
+<span class="go">cookie=0x0, duration=6.667s, table=64, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,reg7=0x1,metadata=0x9</span>
+<span class="go">    actions=output:8</span>
+</pre></div>
+</div>
+</li>
+<li><p>On compute nodes not containing a port on the network, the OVN controller
+also creates additional flows.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cookie=0x0, duration=6.673s, table=16, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,metadata=0x7,</span>
+<span class="go">        dl_src=01:00:00:00:00:00/01:00:00:00:00:00</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.674s, table=16, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,metadata=0x7,vlan_tci=0x1000/0x1000</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.674s, table=16, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=50,reg6=0x3,metadata=0x7,</span>
+<span class="go">        dl_src=fa:16:3e:b6:91:70</span>
+<span class="go">    actions=resubmit(,17)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=16, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=50,reg6=0x2,metadata=0x7</span>
+<span class="go">    actions=resubmit(,17)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=16, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=50,reg6=0x1,metadata=0x7</span>
+<span class="go">    actions=resubmit(,17)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=17, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=90,ip,reg6=0x3,metadata=0x7,</span>
+<span class="go">        dl_src=fa:16:3e:b6:91:70,nw_src=192.168.1.11</span>
+<span class="go">    actions=resubmit(,18)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=17, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=90,udp,reg6=0x3,metadata=0x7,</span>
+<span class="go">        dl_src=fa:16:3e:b6:91:70,nw_src=0.0.0.0,</span>
+<span class="go">        nw_dst=255.255.255.255,tp_src=68,tp_dst=67</span>
+<span class="go">    actions=resubmit(,18)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=17, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=80,ip,reg6=0x3,metadata=0x7,</span>
+<span class="go">        dl_src=fa:16:3e:b6:91:70</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.673s, table=17, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=80,ipv6,reg6=0x3,metadata=0x7,</span>
+<span class="go">        dl_src=fa:16:3e:b6:91:70</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.670s, table=17, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=0,metadata=0x7</span>
+<span class="go">    actions=resubmit(,18)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=18, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=90,arp,reg6=0x3,metadata=0x7,</span>
+<span class="go">        dl_src=fa:16:3e:b6:91:70,arp_spa=192.168.1.11,</span>
+<span class="go">        arp_sha=fa:16:3e:b6:91:70</span>
+<span class="go">    actions=resubmit(,19)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=18, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=80,icmp6,reg6=0x3,metadata=0x7,icmp_type=135,</span>
+<span class="go">        icmp_code=0</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.673s, table=18, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=80,icmp6,reg6=0x3,metadata=0x7,icmp_type=136,</span>
+<span class="go">        icmp_code=0</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.673s, table=18, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=80,arp,reg6=0x3,metadata=0x7</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.673s, table=18, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=0,metadata=0x7</span>
+<span class="go">    actions=resubmit(,19)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=19, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=110,icmp6,metadata=0x7,icmp_type=136,icmp_code=0</span>
+<span class="go">    actions=resubmit(,20)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=19, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=110,icmp6,metadata=0x7,icmp_type=135,icmp_code=0</span>
+<span class="go">    actions=resubmit(,20)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=19, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,ip,metadata=0x7</span>
+<span class="go">    actions=load:0x1-&gt;NXM_NX_REG0[0],resubmit(,20)</span>
+<span class="go">cookie=0x0, duration=6.670s, table=19, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,ipv6,metadata=0x7</span>
+<span class="go">    actions=load:0x1-&gt;NXM_NX_REG0[0],resubmit(,20)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=19, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=0,metadata=0x7</span>
+<span class="go">    actions=resubmit(,20)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=20, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=0,metadata=0x7</span>
+<span class="go">    actions=resubmit(,21)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=21, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,ipv6,reg0=0x1/0x1,metadata=0x7</span>
+<span class="go">    actions=ct(table=22,zone=NXM_NX_REG5[0..15])</span>
+<span class="go">cookie=0x0, duration=6.670s, table=21, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,ip,reg0=0x1/0x1,metadata=0x7</span>
+<span class="go">    actions=ct(table=22,zone=NXM_NX_REG5[0..15])</span>
+<span class="go">cookie=0x0, duration=6.674s, table=21, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=0,metadata=0x7</span>
+<span class="go">    actions=resubmit(,22)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=22, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=65535,ct_state=-new+est-rel-inv+trk,metadata=0x7</span>
+<span class="go">    actions=resubmit(,23)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=22, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=65535,ct_state=-new-est+rel-inv+trk,metadata=0x7</span>
+<span class="go">    actions=resubmit(,23)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=22, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=65535,ct_state=+inv+trk,metadata=0x7</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.673s, table=22, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=65535,icmp6,metadata=0x7,icmp_type=135,</span>
+<span class="go">        icmp_code=0</span>
+<span class="go">    actions=resubmit(,23)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=22, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=65535,icmp6,metadata=0x7,icmp_type=136,</span>
+<span class="go">        icmp_code=0</span>
+<span class="go">    actions=resubmit(,23)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=22, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=2002,udp,reg6=0x3,metadata=0x7,</span>
+<span class="go">        nw_dst=255.255.255.255,tp_src=68,tp_dst=67</span>
+<span class="go">    actions=load:0x1-&gt;NXM_NX_REG0[1],resubmit(,23)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=22, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=2002,udp,reg6=0x3,metadata=0x7,</span>
+<span class="go">        nw_dst=192.168.1.0/24,tp_src=68,tp_dst=67</span>
+<span class="go">    actions=load:0x1-&gt;NXM_NX_REG0[1],resubmit(,23)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=22, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=2002,ct_state=+new+trk,ipv6,reg6=0x3,metadata=0x7</span>
+<span class="go">    actions=load:0x1-&gt;NXM_NX_REG0[1],resubmit(,23)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=22, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=2002,ct_state=+new+trk,ip,reg6=0x3,metadata=0x7</span>
+<span class="go">    actions=load:0x1-&gt;NXM_NX_REG0[1],resubmit(,23)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=22, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=2001,ip,reg6=0x3,metadata=0x7</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.673s, table=22, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=2001,ipv6,reg6=0x3,metadata=0x7</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.674s, table=22, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=1,ipv6,metadata=0x7</span>
+<span class="go">    actions=load:0x1-&gt;NXM_NX_REG0[1],resubmit(,23)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=22, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=1,ip,metadata=0x7</span>
+<span class="go">    actions=load:0x1-&gt;NXM_NX_REG0[1],resubmit(,23)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=22, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=0,metadata=0x7</span>
+<span class="go">    actions=resubmit(,23)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=23, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=0,metadata=0x7</span>
+<span class="go">    actions=resubmit(,24)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=24, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,ipv6,reg0=0x2/0x2,metadata=0x7</span>
+<span class="go">    actions=ct(commit,zone=NXM_NX_REG5[0..15]),resubmit(,25)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=24, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,ip,reg0=0x2/0x2,metadata=0x7</span>
+<span class="go">    actions=ct(commit,zone=NXM_NX_REG5[0..15]),resubmit(,25)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=24, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,ipv6,reg0=0x4/0x4,metadata=0x7</span>
+<span class="go">    actions=ct(table=25,zone=NXM_NX_REG5[0..15],nat)</span>
+<span class="go">cookie=0x0, duration=6.670s, table=24, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,ip,reg0=0x4/0x4,metadata=0x7</span>
+<span class="go">    actions=ct(table=25,zone=NXM_NX_REG5[0..15],nat)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=24, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=0,metadata=0x7</span>
+<span class="go">    actions=resubmit(,25)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=25, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=50,arp,metadata=0x7,arp_tpa=192.168.1.11,</span>
+<span class="go">        arp_op=1</span>
+<span class="go">    actions=move:NXM_OF_ETH_SRC[]-&gt;NXM_OF_ETH_DST[],</span>
+<span class="go">        mod_dl_src:fa:16:3e:b6:91:70,load:0x2-&gt;NXM_OF_ARP_OP[],</span>
+<span class="go">        move:NXM_NX_ARP_SHA[]-&gt;NXM_NX_ARP_THA[],</span>
+<span class="go">        load:0xfa163eb69170-&gt;NXM_NX_ARP_SHA[],</span>
+<span class="go">        move:NXM_OF_ARP_SPA[]-&gt;NXM_OF_ARP_TPA[],</span>
+<span class="go">        load:0xc0a8010b-&gt;NXM_OF_ARP_SPA[],</span>
+<span class="go">        move:NXM_NX_REG6[]-&gt;NXM_NX_REG7[],load:0-&gt;NXM_NX_REG6[],</span>
+<span class="go">        load:0-&gt;NXM_OF_IN_PORT[],resubmit(,32)</span>
+<span class="go">cookie=0x0, duration=6.670s, table=25, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=50,arp,metadata=0x7,arp_tpa=192.168.1.3,arp_op=1</span>
+<span class="go">    actions=move:NXM_OF_ETH_SRC[]-&gt;NXM_OF_ETH_DST[],</span>
+<span class="go">        mod_dl_src:fa:16:3e:d5:00:02,load:0x2-&gt;NXM_OF_ARP_OP[],</span>
+<span class="go">        move:NXM_NX_ARP_SHA[]-&gt;NXM_NX_ARP_THA[],</span>
+<span class="go">        load:0xfa163ed50002-&gt;NXM_NX_ARP_SHA[],</span>
+<span class="go">        move:NXM_OF_ARP_SPA[]-&gt;NXM_OF_ARP_TPA[],</span>
+<span class="go">        load:0xc0a80103-&gt;NXM_OF_ARP_SPA[],</span>
+<span class="go">        move:NXM_NX_REG6[]-&gt;NXM_NX_REG7[],load:0-&gt;NXM_NX_REG6[],</span>
+<span class="go">        load:0-&gt;NXM_OF_IN_PORT[],resubmit(,32)</span>
+<span class="go">cookie=0x0, duration=6.670s, table=25, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=50,arp,metadata=0x7,arp_tpa=192.168.1.2,</span>
+<span class="go">        arp_op=1</span>
+<span class="go">    actions=move:NXM_OF_ETH_SRC[]-&gt;NXM_OF_ETH_DST[],</span>
+<span class="go">        mod_dl_src:fa:16:3e:82:8b:0e,load:0x2-&gt;NXM_OF_ARP_OP[],</span>
+<span class="go">        move:NXM_NX_ARP_SHA[]-&gt;NXM_NX_ARP_THA[],</span>
+<span class="go">        load:0xfa163e828b0e-&gt;NXM_NX_ARP_SHA[],</span>
+<span class="go">        move:NXM_OF_ARP_SPA[]-&gt;NXM_OF_ARP_TPA[],</span>
+<span class="go">        load:0xc0a80102-&gt;NXM_OF_ARP_SPA[],</span>
+<span class="go">        move:NXM_NX_REG6[]-&gt;NXM_NX_REG7[],load:0-&gt;NXM_NX_REG6[],</span>
+<span class="go">        load:0-&gt;NXM_OF_IN_PORT[],resubmit(,32)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=25, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=0,metadata=0x7</span>
+<span class="go">    actions=resubmit(,26)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=26, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,metadata=0x7,</span>
+<span class="go">        dl_dst=01:00:00:00:00:00/01:00:00:00:00:00</span>
+<span class="go">    actions=load:0xffff-&gt;NXM_NX_REG7[],resubmit(,32)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=26, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=50,metadata=0x7,dl_dst=fa:16:3e:d5:00:02</span>
+<span class="go">    actions=load:0x2-&gt;NXM_NX_REG7[],resubmit(,32)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=26, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=50,metadata=0x7,dl_dst=fa:16:3e:b6:91:70</span>
+<span class="go">    actions=load:0x3-&gt;NXM_NX_REG7[],resubmit(,32)</span>
+<span class="go">cookie=0x0, duration=6.670s, table=26, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=50,metadata=0x7,dl_dst=fa:16:3e:82:8b:0e</span>
+<span class="go">    actions=load:0x1-&gt;NXM_NX_REG7[],resubmit(,32)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=32, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,reg7=0x3,metadata=0x7</span>
+<span class="go">    actions=load:0x7-&gt;NXM_NX_TUN_ID[0..23],</span>
+<span class="go">        set_field:0x3/0xffffffff-&gt;tun_metadata0,</span>
+<span class="go">        move:NXM_NX_REG6[0..14]-&gt;NXM_NX_TUN_METADATA0[16..30],output:3</span>
+<span class="go">cookie=0x0, duration=6.673s, table=32, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,reg7=0x2,metadata=0x7</span>
+<span class="go">    actions=load:0x7-&gt;NXM_NX_TUN_ID[0..23],</span>
+<span class="go">        set_field:0x2/0xffffffff-&gt;tun_metadata0,</span>
+<span class="go">        move:NXM_NX_REG6[0..14]-&gt;NXM_NX_TUN_METADATA0[16..30],output:3</span>
+<span class="go">cookie=0x0, duration=6.670s, table=32, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,reg7=0x1,metadata=0x7</span>
+<span class="go">    actions=load:0x7-&gt;NXM_NX_TUN_ID[0..23],</span>
+<span class="go">        set_field:0x1/0xffffffff-&gt;tun_metadata0,</span>
+<span class="go">        move:NXM_NX_REG6[0..14]-&gt;NXM_NX_TUN_METADATA0[16..30],output:5</span>
+<span class="go">cookie=0x0, duration=6.674s, table=48, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=0,metadata=0x7</span>
+<span class="go">    actions=resubmit(,49)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=49, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=110,icmp6,metadata=0x7,icmp_type=135,icmp_code=0</span>
+<span class="go">    actions=resubmit(,50)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=49, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=110,icmp6,metadata=0x7,icmp_type=136,icmp_code=0</span>
+<span class="go">    actions=resubmit(,50)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=49, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,ipv6,metadata=0x7</span>
+<span class="go">    actions=load:0x1-&gt;NXM_NX_REG0[0],resubmit(,50)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=49, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,ip,metadata=0x7</span>
+<span class="go">    actions=load:0x1-&gt;NXM_NX_REG0[0],resubmit(,50)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=49, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=0,metadata=0x7</span>
+<span class="go">    actions=resubmit(,50)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=50, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,ip,reg0=0x1/0x1,metadata=0x7</span>
+<span class="go">    actions=ct(table=51,zone=NXM_NX_REG5[0..15])</span>
+<span class="go">cookie=0x0, duration=6.673s, table=50, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,ipv6,reg0=0x1/0x1,metadata=0x7</span>
+<span class="go">    actions=ct(table=51,zone=NXM_NX_REG5[0..15])</span>
+<span class="go">cookie=0x0, duration=6.673s, table=50, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=0,metadata=0x7</span>
+<span class="go">    actions=resubmit(,51)</span>
+<span class="go">cookie=0x0, duration=6.670s, table=51, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=0,metadata=0x7</span>
+<span class="go">    actions=resubmit(,52)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=52, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=65535,ct_state=+inv+trk,metadata=0x7</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.674s, table=52, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=65535,ct_state=-new+est-rel-inv+trk,metadata=0x7</span>
+<span class="go">    actions=resubmit(,53)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=52, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=65535,ct_state=-new-est+rel-inv+trk,metadata=0x7</span>
+<span class="go">    actions=resubmit(,53)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=52, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=65535,icmp6,metadata=0x7,icmp_type=136,</span>
+<span class="go">        icmp_code=0</span>
+<span class="go">    actions=resubmit(,53)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=52, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=65535,icmp6,metadata=0x7,icmp_type=135,</span>
+<span class="go">        icmp_code=0</span>
+<span class="go">    actions=resubmit(,53)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=52, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=2002,ct_state=+new+trk,ip,reg7=0x3,metadata=0x7,</span>
+<span class="go">        nw_src=192.168.1.11</span>
+<span class="go">    actions=load:0x1-&gt;NXM_NX_REG0[1],resubmit(,53)</span>
+<span class="go">cookie=0x0, duration=6.670s, table=52, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=2002,ct_state=+new+trk,ip,reg7=0x3,metadata=0x7,</span>
+<span class="go">        nw_src=192.168.1.11</span>
+<span class="go">    actions=load:0x1-&gt;NXM_NX_REG0[1],resubmit(,53)</span>
+<span class="go">cookie=0x0, duration=6.670s, table=52, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=2002,udp,reg7=0x3,metadata=0x7,</span>
+<span class="go">        nw_src=192.168.1.0/24,tp_src=67,tp_dst=68</span>
+<span class="go">    actions=load:0x1-&gt;NXM_NX_REG0[1],resubmit(,53)</span>
+<span class="go">cookie=0x0, duration=6.670s, table=52, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=2002,ct_state=+new+trk,ipv6,reg7=0x3,</span>
+<span class="go">        metadata=0x7</span>
+<span class="go">    actions=load:0x1-&gt;NXM_NX_REG0[1],resubmit(,53)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=52, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=2001,ip,reg7=0x3,metadata=0x7</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.673s, table=52, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=2001,ipv6,reg7=0x3,metadata=0x7</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.674s, table=52, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=1,ip,metadata=0x7</span>
+<span class="go">    actions=load:0x1-&gt;NXM_NX_REG0[1],resubmit(,53)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=52, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=1,ipv6,metadata=0x7</span>
+<span class="go">    actions=load:0x1-&gt;NXM_NX_REG0[1],resubmit(,53)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=52, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=0,metadata=0x7</span>
+<span class="go">    actions=resubmit(,53)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=53, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,ipv6,reg0=0x4/0x4,metadata=0x7</span>
+<span class="go">    actions=ct(table=54,zone=NXM_NX_REG5[0..15],nat)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=53, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,ip,reg0=0x4/0x4,metadata=0x7</span>
+<span class="go">    actions=ct(table=54,zone=NXM_NX_REG5[0..15],nat)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=53, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,ipv6,reg0=0x2/0x2,metadata=0x7</span>
+<span class="go">    actions=ct(commit,zone=NXM_NX_REG5[0..15]),resubmit(,54)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=53, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,ip,reg0=0x2/0x2,metadata=0x7</span>
+<span class="go">    actions=ct(commit,zone=NXM_NX_REG5[0..15]),resubmit(,54)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=53, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=0,metadata=0x7</span>
+<span class="go">    actions=resubmit(,54)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=54, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=90,ip,reg7=0x3,metadata=0x7,</span>
+<span class="go">        dl_dst=fa:16:3e:b6:91:70,nw_dst=255.255.255.255</span>
+<span class="go">    actions=resubmit(,55)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=54, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=90,ip,reg7=0x3,metadata=0x7,</span>
+<span class="go">        dl_dst=fa:16:3e:b6:91:70,nw_dst=192.168.1.11</span>
+<span class="go">    actions=resubmit(,55)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=54, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=90,ip,reg7=0x3,metadata=0x7,</span>
+<span class="go">        dl_dst=fa:16:3e:b6:91:70,nw_dst=224.0.0.0/4</span>
+<span class="go">    actions=resubmit(,55)</span>
+<span class="go">cookie=0x0, duration=6.670s, table=54, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=80,ip,reg7=0x3,metadata=0x7,</span>
+<span class="go">        dl_dst=fa:16:3e:b6:91:70</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.670s, table=54, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=80,ipv6,reg7=0x3,metadata=0x7,</span>
+<span class="go">        dl_dst=fa:16:3e:b6:91:70</span>
+<span class="go">    actions=drop</span>
+<span class="go">cookie=0x0, duration=6.674s, table=54, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=0,metadata=0x7</span>
+<span class="go">    actions=resubmit(,55)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=55, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=100,metadata=0x7,</span>
+<span class="go">        dl_dst=01:00:00:00:00:00/01:00:00:00:00:00</span>
+<span class="go">    actions=resubmit(,64)</span>
+<span class="go">cookie=0x0, duration=6.674s, table=55, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=50,reg7=0x3,metadata=0x7,</span>
+<span class="go">        dl_dst=fa:16:3e:b6:91:70</span>
+<span class="go">    actions=resubmit(,64)</span>
+<span class="go">cookie=0x0, duration=6.673s, table=55, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=50,reg7=0x1,metadata=0x7</span>
+<span class="go">    actions=resubmit(,64)</span>
+<span class="go">cookie=0x0, duration=6.670s, table=55, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=6, priority=50,reg7=0x2,metadata=0x7</span>
+<span class="go">    actions=resubmit(,64)</span>
+</pre></div>
+</div>
+</li>
+<li><p>On compute nodes containing a port on the network, the OVN controller
+also creates an additional flow.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cookie=0x0, duration=13.358s, table=52, n_packets=0, n_bytes=0,</span>
+<span class="go">    idle_age=13, priority=2002,ct_state=+new+trk,ipv6,reg7=0x3,</span>
+<span class="go">        metadata=0x7,ipv6_src=::</span>
+<span class="go">    actions=load:0x1-&gt;NXM_NX_REG0[1],resubmit(,53)</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="selfservice-networks.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Self-service networks"></i></a>
+          
+          
+            <a href="launch-instance-provider-network.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Launch an instance on a provider network"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2020-01-08 17:10:46</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">OpenStack Networking Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../intro.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../deploy.html">Deployment examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ops.html">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../migration.html">Migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../misc.html">Miscellaneous</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html">OVN Driver Administration Guide</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor/index.html">Contributor Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Routers</a><ul>
+<li><a class="reference internal" href="#create-a-router">Create a router</a><ul>
+<li><a class="reference internal" href="#ovn-operations">OVN operations</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#attach-a-self-service-network-to-the-router">Attach a self-service network to the router</a><ul>
+<li><a class="reference internal" href="#id1">OVN operations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "admin/ovn/refarch/routers" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Routers in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2020-01-08 17:10:46";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "admin/ovn/refarch/routers";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

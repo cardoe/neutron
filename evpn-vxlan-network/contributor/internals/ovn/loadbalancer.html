@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>OpenStack LoadBalancer API and OVN &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Distributed OVSDB events handler" href="distributed_ovsdb_events.html" />
+    <link rel="prev" title="Neutron/OVN Database consistency" href="database_consistency.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/contributor/internals/ovn/loadbalancer.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>OpenStack LoadBalancer API and OVN</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="database_consistency.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Neutron/OVN Database consistency"></i></a>
+    
+    
+    <a href="distributed_ovsdb_events.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Distributed OVSDB events handler"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="openstack-loadbalancer-api-and-ovn">
+<span id="loadbalancer"></span><h1>OpenStack LoadBalancer API and OVN<a class="headerlink" href="#openstack-loadbalancer-api-and-ovn" title="Link to this heading">¶</a></h1>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
+<p>Load balancing is essential for enabling simple or automatic delivery
+scaling and availability since application delivery, scaling and
+availability are considered vital features of any cloud.
+Octavia is an open source, operator-scale load balancing solution designed
+to work with OpenStack.</p>
+<p>The purpose of this document is to propose a design for how we can use OVN
+as the backend for OpenStack’s LoadBalancer API provided by Octavia.</p>
+</section>
+<section id="octavia-loadbalancers-today">
+<h2>Octavia LoadBalancers Today<a class="headerlink" href="#octavia-loadbalancers-today" title="Link to this heading">¶</a></h2>
+<p>A Detailed design analysis of Octavia is available here:</p>
+<p><a class="reference external" href="https://docs.openstack.org/octavia/queens/contributor/design/version0.5/component-design.html">https://docs.openstack.org/octavia/queens/contributor/design/version0.5/component-design.html</a></p>
+<p>Currently, Octavia uses the in-built Amphorae driver to fulfill the
+Loadbalancing requests in Openstack. Amphorae can be a Virtual machine,
+container, dedicated hardware, appliance or device that actually performs the
+task of load balancing in the Octavia system. More specifically, an amphora
+takes requests from clients on the front-end and distributes these to back-end
+systems. Amphorae communicates with its controllers over the LoadBalancer’s
+network through a driver interface on the controller.</p>
+<p>Amphorae needs a placeholder, such as a separate VM/Container for deployment,
+so that it can handle the LoadBalancer’s requests. Along with this,
+it also needs a separate network (termed as lb-mgmt-network) which handles all
+Amphorae requests.</p>
+<p>Amphorae has the capability to handle L4 (TCP/UDP) as well as L7 (HTTP)
+LoadBalancer requests and provides monitoring features using HealthMonitors.</p>
+</section>
+<section id="octavia-with-ovn">
+<h2>Octavia with OVN<a class="headerlink" href="#octavia-with-ovn" title="Link to this heading">¶</a></h2>
+<p>OVN native LoadBalancer currently supports L4 protocols, with support for L7
+protocols aimed for in future releases. Currently it also does not have any
+monitoring facility. However, it does not need any extra
+hardware/VM/Container for deployment, which is a major positive point when
+compared with Amphorae. Also, it does not need any special network to
+handle the LoadBalancer’s requests as they are taken care by OpenFlow rules
+directly. And, though OVN does not have support for TLS, it is in the works
+and once implemented can be integrated with Octavia.</p>
+<p>This following section details about how OVN can be used as an Octavia driver.</p>
+<section id="overview-of-proposed-approach">
+<h3>Overview of Proposed Approach<a class="headerlink" href="#overview-of-proposed-approach" title="Link to this heading">¶</a></h3>
+<p>The OVN Driver for Octavia runs under the scope of Octavia. Octavia API
+receives and forwards calls to the OVN Driver.</p>
+<p><strong>Step 1</strong> - Creating a LoadBalancer</p>
+<p>Octavia API receives and issues a LoadBalancer creation request on
+a network to the OVN Provider driver. OVN driver creates a LoadBalancer
+in the OVN NorthBound DB and asynchronously updates the Octavia DB
+with the status response. A VIP port is created in Neutron when the
+LoadBalancer creation is complete. The VIP information however is not updated
+in the NorthBound DB until the Members are associated with the
+LoadBalancer’s Pool.</p>
+<p><strong>Step 2</strong> - Creating LoadBalancer entities (Pools, Listeners, Members)</p>
+<p>Once a LoadBalancer is created by OVN in its NorthBound DB, users can now
+create Pools, Listeners and Members associated with the LoadBalancer using
+the Octavia API. With the creation of each entity, the LoadBalancer’s
+<em>external_ids</em> column in the NorthBound DB would be updated and corresponding
+Logical and Openflow rules would be added for handling them.</p>
+<p><strong>Step 3</strong> - LoadBalancer request processing</p>
+<p>When a user sends a request to the VIP IP address, OVN pipeline takes care of
+load balancing the VIP request to one of the backend members.
+More information about this can be found in the ovn-northd man pages.</p>
+</section>
+<section id="ovn-loadbalancer-driver-logic">
+<h3>OVN LoadBalancer Driver Logic<a class="headerlink" href="#ovn-loadbalancer-driver-logic" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>On startup: Open and maintain a connection to the OVN Northbound DB
+(using the ovsdbapp library). On first connection, and anytime a reconnect
+happens:</p>
+<ul>
+<li><p>Do a full sync.</p></li>
+</ul>
+</li>
+<li><p>Register a callback when a new interface is added to a router or deleted
+from a router.</p></li>
+<li><p>When a new LoadBalancer L1 is created, create a Row in OVN’s
+<code class="docutils literal notranslate"><span class="pre">Load_Balancer</span></code> table and update its entries for name and network
+references. If the network on which the LoadBalancer is created, is
+associated with a router, say R1, then add the router reference to the
+LoadBalancer’s <em>external_ids</em> and associate the LoadBalancer to the router.
+Also associate the LoadBalancer L1 with all those networks which have an
+interface on the router R1. This is required so that Logical Flows for
+inter-network communication while using the LoadBalancer L1 is possible.
+Also, during this time, a new port is created via Neutron which acts as a
+VIP Port. The information of this new port is not visible on the OVN’s
+NorthBound DB till a member is added to the LoadBalancer.</p></li>
+<li><p>If a new network interface is added to the router R1 described above, all
+the LoadBalancers on that network are associated with the router R1 and all
+the LoadBalancers on the router are associated with the new network.</p></li>
+<li><p>If a network interface is removed from the router R1, then all the
+LoadBalancers which have been solely created on that network (identified
+using the <em>ls_ref</em> attribute in the LoadBalancer’s <em>external_ids</em>) are
+removed from the router. Similarly those LoadBalancers which are associated
+with the network but not actually created on that network are removed from
+the network.</p></li>
+<li><p>LoadBalancer can either be deleted with all its children entities using
+the <em>cascade</em> option, or its members/pools/listeners can be individually
+deleted. When the LoadBalancer is deleted, its references and
+associations from all networks and routers are removed. This might change
+in the future once the association of LoadBalancers with networks/routers
+are changed to <em>weak</em> from <em>strong</em> [3]. Also the VIP port is deleted
+when the LoadBalancer is deleted.</p></li>
+</ul>
+</section>
+<section id="ovn-loadbalancer-at-work">
+<h3>OVN LoadBalancer at work<a class="headerlink" href="#ovn-loadbalancer-at-work" title="Link to this heading">¶</a></h3>
+<p>OVN Northbound schema [5] has a table to store LoadBalancers.
+The table looks like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;Load_Balancer&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;columns&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;vips&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;min&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">:</span> <span class="s2">&quot;unlimited&quot;</span><span class="p">}},</span>
+        <span class="s2">&quot;protocol&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;enum&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;set&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;tcp&quot;</span><span class="p">,</span> <span class="s2">&quot;udp&quot;</span><span class="p">]]},</span>
+                             <span class="s2">&quot;min&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}},</span>
+        <span class="s2">&quot;external_ids&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;min&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">:</span> <span class="s2">&quot;unlimited&quot;</span><span class="p">}}},</span>
+        <span class="s2">&quot;isRoot&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">},</span>
+</pre></div>
+</div>
+<p>There is a <code class="docutils literal notranslate"><span class="pre">load_balancer</span></code> column in the Logical_Switch table (which
+corresponds to a Neutron network) as well as the Logical_Router table
+(which corresponds to a Neutron router) referring back to the ‘Load_Balancer’
+table.</p>
+<p>The OVN driver updates the OVN Northbound DB. When a LoadBalancer is created,
+a row in this table is created. And when the listeners and members are added,
+‘vips’ column is updated accordingly. And the Logical_Switch’s
+<code class="docutils literal notranslate"><span class="pre">load_balancer</span></code> column is also updated accordingly.</p>
+<p>ovn-northd service which monitors for changes to the OVN Northbound DB,
+generates OVN logical flows to enable load balancing and ovn-controller
+running on each compute node, translates the logical flows into actual
+OpenFlow rules.</p>
+<p>The status of each entity in the Octavia DB is managed according to [4]</p>
+<p>Below are few examples on what happens when LoadBalancer commands are
+executed and what changes in the Load_Balancer Northbound DB table.</p>
+<ol class="arabic">
+<li><p>Create a LoadBalancer:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ openstack loadbalancer create --provider ovn --vip-subnet-id=private lb1
+
+$ ovn-nbctl list load_balancer
+_uuid         : 9dd65bae-2501-43f2-b34e-38a9cb7e4251
+external_ids  : {
+    lr_ref=&quot;neutron-52b6299c-6e38-4226-a275-77370296f257&quot;,
+    ls_refs=&quot;{\&quot;neutron-2526c68a-5a9e-484c-8e00-0716388f6563\&quot;: 1}&quot;,
+    neutron:vip=&quot;10.0.0.10&quot;,
+    neutron:vip_port_id=&quot;2526c68a-5a9e-484c-8e00-0716388f6563&quot;}
+name          : &quot;973a201a-8787-4f6e-9b8f-ab9f93c31f44&quot;
+protocol      : []
+vips          : {}
+</pre></div>
+</div>
+</li>
+<li><p>Create a pool:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ openstack loadbalancer pool create --name p1 --loadbalancer lb1
+--protocol TCP --lb-algorithm SOURCE_IP_PORT
+
+$ ovn-nbctl list load_balancer
+_uuid         : 9dd65bae-2501-43f2-b34e-38a9cb7e4251
+external_ids  : {
+    lr_ref=&quot;neutron-52b6299c-6e38-4226-a275-77370296f257&quot;,
+    ls_refs=&quot;{\&quot;neutron-2526c68a-5a9e-484c-8e00-0716388f6563\&quot;: 1}&quot;,
+    &quot;pool_f2ddf7a6-4047-4cc9-97be-1d1a6c47ece9&quot;=&quot;&quot;, neutron:vip=&quot;10.0.0.10&quot;,
+    neutron:vip_port_id=&quot;2526c68a-5a9e-484c-8e00-0716388f6563&quot;}
+name          : &quot;973a201a-8787-4f6e-9b8f-ab9f93c31f44&quot;
+protocol      : []
+vips          : {}
+</pre></div>
+</div>
+</li>
+<li><p>Create a member:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ openstack loadbalancer member create --address 10.0.0.107
+ --subnet-id 2d54ec67-c589-473b-bc67-41f3d1331fef --protocol-port 80 p1
+
+$ ovn-nbctl list load_balancer
+_uuid         : 9dd65bae-2501-43f2-b34e-38a9cb7e4251
+external_ids  : {
+    lr_ref=&quot;neutron-52b6299c-6e38-4226-a275-77370296f257&quot;,
+    ls_refs=&quot;{\&quot;neutron-2526c68a-5a9e-484c-8e00-0716388f6563\&quot;: 2}&quot;,
+    &quot;pool_f2ddf7a6-4047-4cc9-97be-1d1a6c47ece9&quot;=
+    &quot;member_579c0c9f-d37d-4ba5-beed-cabf6331032d_10.0.0.107:80&quot;,
+    neutron:vip=&quot;10.0.0.10&quot;,
+    neutron:vip_port_id=&quot;2526c68a-5a9e-484c-8e00-0716388f6563&quot;}
+name          : &quot;973a201a-8787-4f6e-9b8f-ab9f93c31f44&quot;
+protocol      : []
+vips          : {}
+</pre></div>
+</div>
+</li>
+<li><p>Create another member:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ openstack loadbalancer member create --address 20.0.0.107
+ --subnet-id c2e2da10-1217-4fe2-837a-1c45da587df7 --protocol-port 80 p1
+
+$ ovn-nbctl list load_balancer
+_uuid         : 9dd65bae-2501-43f2-b34e-38a9cb7e4251
+external_ids  : {
+    lr_ref=&quot;neutron-52b6299c-6e38-4226-a275-77370296f257&quot;,
+    ls_refs=&quot;{\&quot;neutron-2526c68a-5a9e-484c-8e00-0716388f6563\&quot;: 2,
+          \&quot;neutron-12c42705-3e15-4e2d-8fc0-070d1b80b9ef\&quot;: 1}&quot;,
+    &quot;pool_f2ddf7a6-4047-4cc9-97be-1d1a6c47ece9&quot;=
+    &quot;member_579c0c9f-d37d-4ba5-beed-cabf6331032d_10.0.0.107:80,
+     member_d100f2ed-9b55-4083-be78-7f203d095561_20.0.0.107:80&quot;,
+    neutron:vip=&quot;10.0.0.10&quot;,
+    neutron:vip_port_id=&quot;2526c68a-5a9e-484c-8e00-0716388f6563&quot;}
+name          : &quot;973a201a-8787-4f6e-9b8f-ab9f93c31f44&quot;
+protocol      : []
+vips          : {}
+</pre></div>
+</div>
+</li>
+<li><p>Create a listener:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ openstack loadbalancer listener create --name l1 --protocol TCP
+ --protocol-port 82 --default-pool p1 lb1
+
+$ ovn-nbctl list load_balancer
+_uuid         : 9dd65bae-2501-43f2-b34e-38a9cb7e4251
+external_ids  : {
+    lr_ref=&quot;neutron-52b6299c-6e38-4226-a275-77370296f257&quot;,
+    ls_refs=&quot;{\&quot;neutron-2526c68a-5a9e-484c-8e00-0716388f6563\&quot;: 2,
+              \&quot;neutron-12c42705-3e15-4e2d-8fc0-070d1b80b9ef\&quot;: 1}&quot;,
+    &quot;pool_f2ddf7a6-4047-4cc9-97be-1d1a6c47ece9&quot;=&quot;10.0.0.107:80,20.0.0.107:80&quot;,
+    &quot;listener_12345678-2501-43f2-b34e-38a9cb7e4132&quot;=
+        &quot;82:pool_f2ddf7a6-4047-4cc9-97be-1d1a6c47ece9&quot;,
+    neutron:vip=&quot;10.0.0.10&quot;,
+    neutron:vip_port_id=&quot;2526c68a-5a9e-484c-8e00-0716388f6563&quot;}
+name          : &quot;973a201a-8787-4f6e-9b8f-ab9f93c31f44&quot;
+protocol      : []
+vips          : {&quot;10.0.0.10:82&quot;=&quot;10.0.0.107:80,20.0.0.107:80&quot;}
+</pre></div>
+</div>
+</li>
+</ol>
+<p>As explained earlier in the design section:</p>
+<ul class="simple">
+<li><p>If a network N1 has a LoadBalancer LB1 associated to it and one of
+its interfaces is added to a router R1, LB1 is associated with R1 as well.</p></li>
+<li><p>If a network N2 has a LoadBalancer LB2 and one of its interfaces is added
+to the router R1, then R1 will have both LoadBalancers LB1 and LB2. N1 and
+N2 will also have both the LoadBalancers associated to them. However, kindly
+note that though network N1 would have both LB1 and LB2 LoadBalancers
+associated with it, only LB1 would be the LoadBalancer which has a direct
+reference to the network N1, since LB1 was created on N1. This is visible
+in the <code class="docutils literal notranslate"><span class="pre">ls_ref</span></code> key of the <code class="docutils literal notranslate"><span class="pre">external_ids</span></code> column in LB1’s entry in
+the <code class="docutils literal notranslate"><span class="pre">load_balancer</span></code> table.</p></li>
+<li><p>If a network N3 is added to the router R1, N3 will also have both
+LoadBalancers (LB1, LB2) associated to it.</p></li>
+<li><p>If the interface to network N2 is removed from R1, network N2 will now only
+have LB2 associated with it. Networks N1 and N3 and router R1 will have
+LoadBalancer LB1 associated with them.</p></li>
+</ul>
+</section>
+</section>
+<section id="limitations">
+<h2>Limitations<a class="headerlink" href="#limitations" title="Link to this heading">¶</a></h2>
+<p>Following actions are not supported by OVN Driver:</p>
+<ul class="simple">
+<li><p>Creating a LoadBalancer/Listener/Pool with L7 Protocol</p></li>
+<li><p>Creating HealthMonitors</p></li>
+<li><p>Currently only one algorithm is supported for pool management
+(Source IP Port)</p></li>
+<li><p>Creating Listeners and Pools with different protocols. They should be of the
+same protocol type.</p></li>
+</ul>
+<p>Following issue exists with OVN’s integration with Octavia:</p>
+<ul class="simple">
+<li><p>If creation/deletion of a LoadBalancer, Listener, Pool or Member fails, then
+the corresponding object will remain in the DB in a PENDING_* state.</p></li>
+</ul>
+</section>
+<section id="support-matrix">
+<h2>Support Matrix<a class="headerlink" href="#support-matrix" title="Link to this heading">¶</a></h2>
+<p>A detailed matrix of the operations supported by OVN Provider driver in Octavia
+can be found in <a class="reference external" href="https://docs.openstack.org/octavia/latest/user/feature-classification/index.html">https://docs.openstack.org/octavia/latest/user/feature-classification/index.html</a></p>
+</section>
+<section id="other-references">
+<h2>Other References<a class="headerlink" href="#other-references" title="Link to this heading">¶</a></h2>
+<p>[1] Octavia API:
+<a class="reference external" href="https://docs.openstack.org/api-ref/load-balancer/v2/">https://docs.openstack.org/api-ref/load-balancer/v2/</a></p>
+<p>[2] Octavia Glossary:
+<a class="reference external" href="https://docs.openstack.org/octavia/queens/reference/glossary.html">https://docs.openstack.org/octavia/queens/reference/glossary.html</a></p>
+<p>[3] <a class="reference external" href="https://github.com/openvswitch/ovs/commit/612f80fa8ebf88dad2e204364c6c02b451dca36c">https://github.com/openvswitch/ovs/commit/612f80fa8ebf88dad2e204364c6c02b451dca36c</a></p>
+<p>[4] <a class="reference external" href="https://docs.openstack.org/api-ref/load-balancer/v2/index.html#status-codes">https://docs.openstack.org/api-ref/load-balancer/v2/index.html#status-codes</a></p>
+<p>[5] <a class="reference external" href="https://github.com/openvswitch/ovs/blob/d1b235d7a6246e00d4afc359071d3b6b3ed244c3/ovn/ovn-nb.ovsschema#L117">https://github.com/openvswitch/ovs/blob/d1b235d7a6246e00d4afc359071d3b6b3ed244c3/ovn/ovn-nb.ovsschema#L117</a></p>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="database_consistency.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Neutron/OVN Database consistency"></i></a>
+          
+          
+            <a href="distributed_ovsdb_events.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Distributed OVSDB events handler"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2020-01-08 17:10:46</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Contributor Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#basic-information">Basic Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#neutron-policies">Neutron Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#gerrit-rechecks">Gerrit Rechecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#neutron-stadium">Neutron Stadium</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html#neutron-internals">Neutron Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#ovn-driver">OVN Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#dashboards">Dashboards</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">OpenStack LoadBalancer API and OVN</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#octavia-loadbalancers-today">Octavia LoadBalancers Today</a></li>
+<li><a class="reference internal" href="#octavia-with-ovn">Octavia with OVN</a><ul>
+<li><a class="reference internal" href="#overview-of-proposed-approach">Overview of Proposed Approach</a></li>
+<li><a class="reference internal" href="#ovn-loadbalancer-driver-logic">OVN LoadBalancer Driver Logic</a></li>
+<li><a class="reference internal" href="#ovn-loadbalancer-at-work">OVN LoadBalancer at work</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#limitations">Limitations</a></li>
+<li><a class="reference internal" href="#support-matrix">Support Matrix</a></li>
+<li><a class="reference internal" href="#other-references">Other References</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "contributor/internals/ovn/loadbalancer" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "OpenStack LoadBalancer API and OVN in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2020-01-08 17:10:46";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "contributor/internals/ovn/loadbalancer";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

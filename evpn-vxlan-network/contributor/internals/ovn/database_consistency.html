@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Neutron/OVN Database consistency &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="OpenStack LoadBalancer API and OVN" href="loadbalancer.html" />
+    <link rel="prev" title="OpenStack Metadata API and OVN" href="metadata_api.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/contributor/internals/ovn/database_consistency.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Neutron/OVN Database consistency</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="metadata_api.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: OpenStack Metadata API and OVN"></i></a>
+    
+    
+    <a href="loadbalancer.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: OpenStack LoadBalancer API and OVN"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="neutron-ovn-database-consistency">
+<span id="database-consistency"></span><h1>Neutron/OVN Database consistency<a class="headerlink" href="#neutron-ovn-database-consistency" title="Link to this heading">¶</a></h1>
+<p>This document presents the problem and proposes a solution for the data
+consistency issue between the Neutron and OVN databases. Although the
+focus of this document is OVN this problem is common enough to be present
+in other ML2 drivers (e.g OpenDayLight, BigSwitch, etc…). Some of them
+already contain a mechanism in place for dealing with it.</p>
+<section id="problem-description">
+<h2>Problem description<a class="headerlink" href="#problem-description" title="Link to this heading">¶</a></h2>
+<p>In a common Neutron deployment model there could have multiple Neutron
+API workers processing requests. For each request, the worker will update
+the Neutron database and then invoke the ML2 driver to translate the
+information to that specific SDN data model.</p>
+<p>There are at least two situations that could lead to some inconsistency
+between the Neutron and the SDN databases, for example:</p>
+<section id="problem-1-neutron-api-workers-race-condition">
+<span id="problem-1"></span><h3>Problem 1: Neutron API workers race condition<a class="headerlink" href="#problem-1-neutron-api-workers-race-condition" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="n">Neutron</span><span class="p">:</span>
+  <span class="k">with</span> <span class="n">neutron_db_transaction</span><span class="p">:</span>
+       <span class="n">update_neutron_db</span><span class="p">()</span>
+       <span class="n">ml2_driver</span><span class="o">.</span><span class="n">update_port_precommit</span><span class="p">()</span>
+  <span class="n">ml2_driver</span><span class="o">.</span><span class="n">update_port_postcommit</span><span class="p">()</span>
+
+<span class="n">In</span> <span class="n">the</span> <span class="n">ML2</span> <span class="n">driver</span><span class="p">:</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">update_port_postcommit</span><span class="p">:</span>
+      <span class="n">port</span> <span class="o">=</span> <span class="n">neutron_db</span><span class="o">.</span><span class="n">get_port</span><span class="p">()</span>
+      <span class="n">update_port_in_ovn</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Imagine the case where a port is being updated twice and each request
+is being handled by a different API worker. The method responsible for
+updating the resource in the OVN (<code class="docutils literal notranslate"><span class="pre">update_port_postcommit</span></code>) is not
+atomic and invoked outside of the Neutron database transaction. This could
+lead to a problem where the order in which the updates are committed to
+the Neutron database are different than the order that they are committed
+to the OVN database, resulting in an inconsistency.</p>
+<p>This problem has been reported at <a class="reference external" href="https://bugs.launchpad.net/networking-ovn/+bug/1605089">bug #1605089</a>.</p>
+</section>
+<section id="problem-2-backend-failures">
+<span id="problem-2"></span><h3>Problem 2: Backend failures<a class="headerlink" href="#problem-2-backend-failures" title="Link to this heading">¶</a></h3>
+<p>Another situation is when the changes are already committed in Neutron
+but an exception is raised upon trying to update the OVN database (e.g
+lost connectivity to the <code class="docutils literal notranslate"><span class="pre">ovsdb-server</span></code>). We currently don’t have a
+good way of handling this problem, obviously it would be possible to try
+to immediately rollback the changes in the Neutron database and raise an
+exception but, that rollback itself is an operation that could also fail.</p>
+<p>Plus, rollbacks is not very straight forward when it comes to updates
+or deletes. In a case where a VM is being teared down and OVN fail to
+delete a port, re-creating that port in Neutron doesn’t necessary fix the
+problem. The decommission of a VM involves many other things, in fact, we
+could make things even worse by leaving some dirty data around. I believe
+this is a problem that would be better dealt with by other methods.</p>
+</section>
+</section>
+<section id="proposed-change">
+<h2>Proposed change<a class="headerlink" href="#proposed-change" title="Link to this heading">¶</a></h2>
+<p>In order to fix the problems presented at the <a class="reference internal" href="#problem-description">Problem description</a>
+section this document proposes a solution based on the Neutron’s
+<code class="docutils literal notranslate"><span class="pre">revision_number</span></code> attribute. In summary, for every resource in Neutron
+there’s an attribute called <code class="docutils literal notranslate"><span class="pre">revision_number</span></code> which gets incremented
+on each update made on that resource. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ openstack port create --network nettest porttest
+...
+| revision_number | 2 |
+...
+
+$ openstack port set porttest --mac-address 11:22:33:44:55:66
+
+$ mysql -e &quot;use neutron; select standard_attr_id from ports where id=\&quot;91c08021-ded3-4c5a-8d57-5b5c389f8e39\&quot;;&quot;
++------------------+
+| standard_attr_id |
++------------------+
+|             1427 |
++------------------+
+
+$ mysql -e &quot;use neutron; SELECT revision_number FROM standardattributes WHERE id=1427;&quot;
++-----------------+
+| revision_number |
++-----------------+
+|               3 |
++-----------------+
+</pre></div>
+</div>
+<p>This document proposes a solution that will use the <cite>revision_number</cite>
+attribute for three things:</p>
+<ol class="arabic simple">
+<li><p>Perform a compare-and-swap operation based on the resource version</p></li>
+<li><p>Guarantee the order of the updates (<a class="reference internal" href="#problem-1">Problem 1</a>)</p></li>
+<li><p>Detecting when resources in Neutron and OVN are out-of-sync</p></li>
+</ol>
+<p>But, before any of points above can be done we need to change the
+ovn driver code to:</p>
+<section id="store-the-revision-number-referent-to-a-change-in-ovndb">
+<h3>#1 - Store the revision_number referent to a change in OVNDB<a class="headerlink" href="#store-the-revision-number-referent-to-a-change-in-ovndb" title="Link to this heading">¶</a></h3>
+<p>To be able to compare the version of the resource in Neutron against
+the version in OVN we first need to know which version the OVN resource
+is present at.</p>
+<p>Fortunately, each table in the OVNDB contains a special column called
+<code class="docutils literal notranslate"><span class="pre">external_ids</span></code> which external systems (like Neutron)
+can use to store information about its own resources that corresponds
+to the entries in OVNDB.</p>
+<p>So, every time a resource is created or updated in OVNDB by
+ovn driver, the Neutron <code class="docutils literal notranslate"><span class="pre">revision_number</span></code> referent to that change
+will be stored in the <code class="docutils literal notranslate"><span class="pre">external_ids</span></code> column of that resource. That
+will allow ovn driver to look at both databases and detect whether
+the version in OVN is up-to-date with Neutron or not.</p>
+</section>
+<section id="ensure-correctness-when-updating-ovn">
+<h3>#2 - Ensure correctness when updating OVN<a class="headerlink" href="#ensure-correctness-when-updating-ovn" title="Link to this heading">¶</a></h3>
+<p>As stated in <a class="reference internal" href="#problem-1">Problem 1</a>, simultaneous updates to a single
+resource will race and, with the current code, the order in which these
+updates are applied is not guaranteed to be the correct order. That
+means that, if two or more updates arrives we can’t prevent an older
+version of that update to be applied after a newer one.</p>
+<p>This document proposes creating a special <code class="docutils literal notranslate"><span class="pre">OVSDB</span> <span class="pre">command</span></code> that runs
+as part of the same transaction that is updating a resource in OVNDB to
+prevent changes with a lower <code class="docutils literal notranslate"><span class="pre">revision_number</span></code> to be applied in case
+the resource in OVN is at a higher <code class="docutils literal notranslate"><span class="pre">revision_number</span></code> already.</p>
+<p>This new OVSDB command needs to basically do two things:</p>
+<p>1. Add a verify operation to the <code class="docutils literal notranslate"><span class="pre">external_ids</span></code> column in OVNDB so
+that if another client modifies that column mid-operation the transaction
+will be restarted.</p>
+<p>A better explanation of what “verify” does is described at the doc string
+of the <a class="reference external" href="https://github.com/openvswitch/ovs/blob/3728b3b0316b44d1f9181be115b63ea85ff5883c/python/ovs/db/idl.py#L1014-L1055">Transaction class</a> in the OVS code itself, I quote:</p>
+<blockquote>
+<div><p>Because OVSDB handles multiple clients, it can happen that between
+the time that OVSDB client A reads a column and writes a new value,
+OVSDB client B has written that column.  Client A’s write should not
+ordinarily overwrite client B’s, especially if the column in question
+is a “map” column that contains several more or less independent data
+items.  If client A adds a “verify” operation before it writes the
+column, then the transaction fails in case client B modifies it first.
+Client A will then see the new value of the column and compose a new
+transaction based on the new contents written by client B.</p>
+</div></blockquote>
+<p>2. Compare the <code class="docutils literal notranslate"><span class="pre">revision_number</span></code> from the update against what is
+presently stored in OVNDB. If the version in OVNDB is already higher
+than the version in the update, abort the transaction.</p>
+<p>So basically this new command is responsible for guarding the OVN resource
+by not allowing old changes to be applied on top of new ones. Here’s a
+scenario where two concurrent updates comes in the wrong order and how
+the solution above will deal with it:</p>
+<p>Neutron worker 1 (NW-1): Updates a port with address A (revision_number: 2)</p>
+<p>Neutron worker 2 (NW-2): Updates a port with address B (revision_number: 3)</p>
+<p>TXN 1: NW-2 transaction is committed first and the OVN resource now has RN 3</p>
+<p>TXN 2: NW-1 transaction detects the change in the external_ids column and
+is restarted</p>
+<p>TXN 2: NW-1 the new command now sees that the OVN resource is at RN 3,
+which is higher than the update version (RN 2) and aborts the transaction.</p>
+<p>There’s a bit more for the above to work with the current ovn driver
+code, basically we need to tidy up the code to do two more things.</p>
+<ol class="arabic simple">
+<li><p>Consolidate changes to a resource in a single transaction.</p></li>
+</ol>
+<p>This is important regardless of this spec, having all changes to a
+resource done in a single transaction minimizes the risk of having
+half-changes written to the database in case of an eventual problem. This
+<a class="reference external" href="https://review.openstack.org/#/c/515673">should be done already</a>
+but it’s important to have it here in case we find more examples like
+that as we code.</p>
+<p>2. When doing partial updates, use the OVNDB as the source of comparison
+to create the deltas.</p>
+<p>Being able to do a partial update in a resource is important for
+performance reasons; it’s a way to minimize the number of changes that
+will be performed in the database.</p>
+<p>Right now, some of the update() methods in ovn driver creates the
+deltas using the <em>current</em> and <em>original</em> parameters that are passed to
+it. The <em>current</em> parameter is, as the name says, the current version
+of the object present in the Neutron DB. The <em>original</em> parameter is
+the previous version (current - 1) of that object.</p>
+<p>The problem of creating the deltas by comparing these two objects is
+because only the data in the Neutron DB is used for it. We need to stop
+using the <em>original</em> object for it and instead we should create the
+delta based on the <em>current</em> version of the Neutron DB against the data
+stored in the OVNDB to be able to detect the real differences between
+the two databases.</p>
+<p>So in summary, to guarantee the correctness of the updates this document
+proposes to:</p>
+<ol class="arabic simple">
+<li><p>Create a new OVSDB command is responsible for comparing revision
+numbers and aborting the transaction, when needed.</p></li>
+<li><p>Consolidate changes to a resource in a single transaction (should be
+done already)</p></li>
+<li><p>When doing partial updates, create the deltas based in the current
+version in the Neutron DB and the OVNDB.</p></li>
+</ol>
+</section>
+<section id="detect-and-fix-out-of-sync-resources">
+<h3>#3 - Detect and fix out-of-sync resources<a class="headerlink" href="#detect-and-fix-out-of-sync-resources" title="Link to this heading">¶</a></h3>
+<p>When things are working as expected the above changes should ensure
+that Neutron DB and OVNDB are in sync but, what happens when things go
+bad ? As per <a class="reference internal" href="#problem-2">Problem 2</a>, things like temporarily losing
+connectivity with the OVNDB could cause changes to fail to be committed
+and the databases getting out-of-sync. We need to be able to detect the
+resources that were affected by these failures and fix them.</p>
+<p>We do already have the means to do it, similar to what the
+<a class="reference external" href="https://github.com/openstack/networking-ovn/blob/a9af75cd3ce6cd6685b6435b325c97cacc83ce0e/networking_ovn/ovn_db_sync.py">ovn_db_sync.py</a> script does we could fetch all the data from both
+databases and compare each resource. But, depending on the size of the
+deployment this can be really slow and costy.</p>
+<p>This document proposes an optimization for this problem  to make it
+efficient enough so that we can run it periodically (as a periodic task)
+and not manually as a script anymore.</p>
+<p>First, we need to create an additional table in the Neutron database
+that would serve as a cache for the revision numbers in <strong>OVNDB</strong>.</p>
+<p>The new table schema could look this:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Column name</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>standard_attr_id</p></td>
+<td><p>Integer</p></td>
+<td><p>Primary key. The reference ID from the
+standardattributes table in Neutron for
+that resource. ONDELETE SET NULL.</p></td>
+</tr>
+<tr class="row-odd"><td><p>resource_uuid</p></td>
+<td><p>String</p></td>
+<td><p>The UUID of the resource</p></td>
+</tr>
+<tr class="row-even"><td><p>resource_type</p></td>
+<td><p>String</p></td>
+<td><p>The type of the resource (e.g, Port, Router, …)</p></td>
+</tr>
+<tr class="row-odd"><td><p>revision_number</p></td>
+<td><p>Integer</p></td>
+<td><p>The version of the object present in OVN</p></td>
+</tr>
+<tr class="row-even"><td><p>acquired_at</p></td>
+<td><p>DateTime</p></td>
+<td><p>The time that the entry was create. For
+troubleshooting purposes</p></td>
+</tr>
+<tr class="row-odd"><td><p>updated_at</p></td>
+<td><p>DateTime</p></td>
+<td><p>The time that the entry was updated. For
+troubleshooting purposes</p></td>
+</tr>
+</tbody>
+</table>
+<p>For the different actions: Create, update and delete; this table will be
+used as:</p>
+<ol class="arabic simple">
+<li><p>Create:</p></li>
+</ol>
+<p>In the create_*_precommit() method, we will create an entry in the new
+table within the same Neutron transaction. The revision_number column
+for the new entry will have a placeholder value until the resource is
+successfully created in OVNDB.</p>
+<p>In case we fail to create the resource in OVN (but succeed in Neutron)
+we still have the entry logged in the new table and this problem can
+be detected by fetching all resources where the revision_number column
+value is equal to the placeholder value.</p>
+<p>The pseudo-code will look something like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">create_port_precommit</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+    <span class="n">create_initial_revision</span><span class="p">(</span><span class="n">port</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="n">revision_number</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+                            <span class="n">session</span><span class="o">=</span><span class="n">ctx</span><span class="o">.</span><span class="n">session</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">create_port_postcommit</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+    <span class="n">create_port_in_ovn</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
+    <span class="n">bump_revision</span><span class="p">(</span><span class="n">port</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="n">revision_number</span><span class="o">=</span><span class="n">port</span><span class="p">[</span><span class="s1">&#39;revision_number&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Update:</p></li>
+</ol>
+<p>For update it’s simpler, we need to bump the revision number for
+that resource <strong>after</strong> the OVN transaction is committed in the
+update_*_postcommit() method. That way, if an update fails to be applied
+to OVN the inconsistencies can be detected by a JOIN between the new
+table and the <code class="docutils literal notranslate"><span class="pre">standardattributes</span></code> table where the revision_number
+columns does not match.</p>
+<p>The pseudo-code will look something like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">update_port_postcommit</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+    <span class="n">update_port_in_ovn</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
+    <span class="n">bump_revision</span><span class="p">(</span><span class="n">port</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="n">revision_number</span><span class="o">=</span><span class="n">port</span><span class="p">[</span><span class="s1">&#39;revision_number&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>Delete:</p></li>
+</ol>
+<p>The <code class="docutils literal notranslate"><span class="pre">standard_attr_id</span></code> column in the new table is a foreign key
+constraint with a <code class="docutils literal notranslate"><span class="pre">ONDELETE=SET</span> <span class="pre">NULL</span></code> set. That means that, upon
+Neutron deleting a resource the <code class="docutils literal notranslate"><span class="pre">standard_attr_id</span></code> column in the new
+table will be set to <em>NULL</em>.</p>
+<p>If deleting a resource succeeds in Neutron but fails in OVN, the
+inconsistency can be detect by looking at all resources that has a
+<code class="docutils literal notranslate"><span class="pre">standard_attr_id</span></code> equals to NULL.</p>
+<p>The pseudo-code will look something like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">delete_port_postcommit</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+    <span class="n">delete_port_in_ovn</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
+    <span class="n">delete_revision</span><span class="p">(</span><span class="n">port</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>With the above optimization it’s possible to create a periodic task that
+can run quite frequently to detect and fix the inconsistencies caused
+by random backend failures.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>There’s no lock linking both database updates in the postcommit()
+methods. So, it’s true that the method bumping the revision_number
+column in the new table in Neutron DB could still race but, that
+should be fine because this table acts like a cache and the real
+revision_number has been written in OVNDB.</p>
+<p>The mechanism that will detect and fix the out-of-sync resources should
+detect this inconsistency as well and, based on the revision_number
+in OVNDB, decide whether to sync the resource or only bump the
+revision_number in the cache table (in case the resource is already
+at the right version).</p>
+</div>
+</section>
+</section>
+<section id="refereces">
+<h2>Refereces<a class="headerlink" href="#refereces" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>There’s a chain of patches with a proof of concept for this approach,
+they start at: <a class="reference external" href="https://review.openstack.org/#/c/517049/">https://review.openstack.org/#/c/517049/</a></p></li>
+</ul>
+</section>
+<section id="alternatives">
+<h2>Alternatives<a class="headerlink" href="#alternatives" title="Link to this heading">¶</a></h2>
+<section id="journaling">
+<h3>Journaling<a class="headerlink" href="#journaling" title="Link to this heading">¶</a></h3>
+<p>An alternative solution to this problem is <em>journaling</em>. The basic
+idea is to create another table in the Neutron database and log every
+operation (create, update and delete) instead of passing it directly to
+the SDN controller.</p>
+<p>A separated thread (or multiple instances of it) is then responsible
+for reading this table and applying the operations to the SDN backend.</p>
+<p>This approach has been used and validated
+by drivers such as <a class="reference external" href="https://docs.openstack.org/networking-odl/latest/contributor/drivers_architecture.html#v2-design">networking-odl</a>.</p>
+<p>An attempt to implement this approach
+in <em>ovn driver</em> can be found <a class="reference external" href="https://review.openstack.org/#/q/project:openstack/networking-ovn+topic:bug/1605089-journaling">here</a>.</p>
+<p>Some things to keep in mind about this approach:</p>
+<ul class="simple">
+<li><p>The code can get quite complex as this approach is not only about
+applying the changes to the SDN backend asynchronously. The dependencies
+between each resource as well as their operations also needs to be
+computed. For example, before attempting to create a router port the
+router that this port belongs to needs to be created. Or, before
+attempting to delete a network all the dependent resources on it
+(subnets, ports, etc…) needs to be processed first.</p></li>
+<li><p>The number of journal threads running can cause problems. In my tests
+I had three controllers, each one with 24 CPU cores (Intel Xeon E5-2620
+with hyperthreading enabled) and 64GB RAM. Running 1 journal thread
+per Neutron API worker has caused <code class="docutils literal notranslate"><span class="pre">ovsdb-server</span></code> to misbehave
+when under heavy pressure <a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. Running multiple journal threads
+seem to be causing other types of problems <a class="reference external" href="https://bugs.launchpad.net/networking-odl/+bug/1683797">in other drivers as well</a>.</p></li>
+<li><p>When under heavy pressure <a class="footnote-reference brackets" href="#id3" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, I noticed that the journal
+threads could come to a halt (or really slowed down) while the
+API workers were handling a lot of requests. This resulted in some
+operations taking more than a minute to be processed. This behaviour
+can be seem <a class="reference external" href="http://i.imgur.com/GDG8Mic.png">in this screenshot</a>.</p></li>
+</ul>
+<ul class="simple">
+<li><p>Given that the 1 journal thread per Neutron API worker approach
+is problematic, determining the right number of journal threads is
+also difficult. In my tests, I’ve noticed that 3 journal threads
+per controller worked better but that number was pure based on
+<code class="docutils literal notranslate"><span class="pre">trial</span> <span class="pre">&amp;</span> <span class="pre">error</span></code>. In production this number should probably be
+calculated based in the environment.</p></li>
+<li><p>At least temporarily, the data in the Neutron database is duplicated
+between the normal tables and the journal one.</p></li>
+<li><p>Some operations like creating a new
+resource via Neutron’s API will return <a class="reference external" href="https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#2xx_Success">HTTP 201</a>,
+which indicates that the resource has been created and is ready to
+be used, but as these resources are created asynchronously one could
+argue that the HTTP codes are now misleading. As a note, the resource
+will be created at the Neutron database by the time the HTTP request
+returns but it may not be present in the SDN backend yet.</p></li>
+</ul>
+<p>Given all considerations, this approach is still valid and the fact
+that it’s already been used by other ML2 drivers makes it more open for
+collaboration and code sharing.</p>
+<p class="rubric">Footnotes</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id3" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id2">2</a>)</span>
+<p>I ran the tests using <a class="reference external" href="https://github.com/openstack/browbeat">Browbeat</a> which is basically orchestrate
+<a class="reference external" href="https://github.com/openstack/rally">Openstack Rally</a> and monitor the
+machine’s usage of resources.</p>
+</aside>
+</aside>
+</section>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="metadata_api.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: OpenStack Metadata API and OVN"></i></a>
+          
+          
+            <a href="loadbalancer.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: OpenStack LoadBalancer API and OVN"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2024-09-22 16:19:20</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Contributor Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#basic-information">Basic Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#neutron-policies">Neutron Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#gerrit-rechecks">Gerrit Rechecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#neutron-stadium">Neutron Stadium</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html#neutron-internals">Neutron Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#ovn-driver">OVN Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../index.html#dashboards">Dashboards</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Neutron/OVN Database consistency</a><ul>
+<li><a class="reference internal" href="#problem-description">Problem description</a><ul>
+<li><a class="reference internal" href="#problem-1-neutron-api-workers-race-condition">Problem 1: Neutron API workers race condition</a></li>
+<li><a class="reference internal" href="#problem-2-backend-failures">Problem 2: Backend failures</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#proposed-change">Proposed change</a><ul>
+<li><a class="reference internal" href="#store-the-revision-number-referent-to-a-change-in-ovndb">#1 - Store the revision_number referent to a change in OVNDB</a></li>
+<li><a class="reference internal" href="#ensure-correctness-when-updating-ovn">#2 - Ensure correctness when updating OVN</a></li>
+<li><a class="reference internal" href="#detect-and-fix-out-of-sync-resources">#3 - Detect and fix out-of-sync resources</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#refereces">Refereces</a></li>
+<li><a class="reference internal" href="#alternatives">Alternatives</a><ul>
+<li><a class="reference internal" href="#journaling">Journaling</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "contributor/internals/ovn/database_consistency" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Neutron/OVN Database consistency in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2024-09-22 16:19:20";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "contributor/internals/ovn/database_consistency";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>OVN L3 scheduler &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Configuration Guide" href="../../configuration/index.html" />
+    <link rel="prev" title="RPC messages in OVN" href="rpc.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/admin/ovn/l3_scheduler.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>OVN L3 scheduler</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="rpc.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: RPC messages in OVN"></i></a>
+    
+    
+    <a href="../../configuration/index.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Configuration Guide"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="ovn-l3-scheduler">
+<span id="l3-scheduler"></span><h1>OVN L3 scheduler<a class="headerlink" href="#ovn-l3-scheduler" title="Link to this heading">¶</a></h1>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
+<p>The OVN L3 scheduler assigns the router gateway ports to a list of chassis.
+Having more than one chassis assigned allows the service to have high
+availability: if the <code class="docutils literal notranslate"><span class="pre">Logical_Router_Port</span></code> acting as gateway is assigned
+to a failed chassis, OVN will bind this port to the next chassis in the list.
+This list of chassis is prioritized; the <code class="docutils literal notranslate"><span class="pre">Logical_Router_Port</span></code> will be bound
+to the chassis in the defined order.</p>
+<p>This is done by associating multiple <code class="docutils literal notranslate"><span class="pre">Gateway_Chassis</span></code> rows with a
+<code class="docutils literal notranslate"><span class="pre">Logical_Router_Port</span></code> in the OVN Northbound database. A <code class="docutils literal notranslate"><span class="pre">Gateway_Chassis</span></code>
+register is just a link to a <code class="docutils literal notranslate"><span class="pre">Chassis</span></code> register and a priority. For the
+same <code class="docutils literal notranslate"><span class="pre">Logical_Router_Port</span></code>, all <code class="docutils literal notranslate"><span class="pre">Gateway_Chassis</span></code> assigned will have
+a different priority, starting from 1 (the lowest priority) up to the number of
+<code class="docutils literal notranslate"><span class="pre">Gateway_Chassis</span></code> assigned.</p>
+<p>The maximum number of <code class="docutils literal notranslate"><span class="pre">Gateway_Chassis</span></code> that can be assigned to a
+<code class="docutils literal notranslate"><span class="pre">Logical_Router_Port</span></code> is 5. This number is hardcoded. That means in Neutron
+the highest priority a <code class="docutils literal notranslate"><span class="pre">Gateway_Chassis</span></code> will have is 5.</p>
+<p>If no gateway chassis are available during the <code class="docutils literal notranslate"><span class="pre">Logical_Router_Port</span></code>
+scheduling, no <code class="docutils literal notranslate"><span class="pre">Gateway_Chassis</span></code> will be assigned and no value will be set
+in the “options” column of the <code class="docutils literal notranslate"><span class="pre">Logical_Router</span></code> register; that will be used
+to detect an unhosted router gateway port.</p>
+</section>
+<section id="types-of-schedulers">
+<h2>Types of schedulers<a class="headerlink" href="#types-of-schedulers" title="Link to this heading">¶</a></h2>
+<p>The OVN L3 scheduler is configurable and allows us to implement several types
+of algorithms. There are currently two implemented in the in-tree repository:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">OVNGatewayChanceScheduler</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OVNGatewayLeastLoadedScheduler</span></code></p></li>
+</ul>
+<section id="ovngatewaychancescheduler">
+<h3><code class="docutils literal notranslate"><span class="pre">OVNGatewayChanceScheduler</span></code><a class="headerlink" href="#ovngatewaychancescheduler" title="Link to this heading">¶</a></h3>
+<p>The scheduler algorithm in this class is very simple: from the list of gateway
+chassis provided (candidate chassis), it shuffles and returns the list.</p>
+</section>
+<section id="ovngatewayleastloadedscheduler">
+<h3><code class="docutils literal notranslate"><span class="pre">OVNGatewayLeastLoadedScheduler</span></code><a class="headerlink" href="#ovngatewayleastloadedscheduler" title="Link to this heading">¶</a></h3>
+<p>The goal of this scheduler is to balance the available chassis to host the same
+number of <code class="docutils literal notranslate"><span class="pre">Logical_Router_Port</span></code>. Since <a class="footnote-reference brackets" href="#id6" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, the scheduler will retrieve the
+list of available candidates and will assign, per priority, the least loaded
+chassis. That means this scheduler will not only consider the chassis with
+bound <code class="docutils literal notranslate"><span class="pre">Logical_Router_Port</span></code> (highest priority gateway chassis), but it will
+balance also the lower priority assignations. This is done by (1) iterating
+over the list of priorities (from 1 to the number of chassis to schedule), (2)
+creating a list of <code class="docutils literal notranslate"><span class="pre">Logical_Router_Port</span></code> assigned to each <code class="docutils literal notranslate"><span class="pre">Chassis</span></code> <strong>on
+the select priority</strong> and (3) selecting the least loaded <code class="docutils literal notranslate"><span class="pre">Chassis</span></code></p>
+</section>
+</section>
+<section id="re-schedule-logical-router-port-if-a-chassis-is-removed">
+<h2>Re-schedule <code class="docutils literal notranslate"><span class="pre">Logical_Router_Port</span></code> if a <code class="docutils literal notranslate"><span class="pre">Chassis</span></code> is removed<a class="headerlink" href="#re-schedule-logical-router-port-if-a-chassis-is-removed" title="Link to this heading">¶</a></h2>
+<p>When a gateway <code class="docutils literal notranslate"><span class="pre">Chassis</span></code> is removed from the environment, it creates a “hole”
+in the <code class="docutils literal notranslate"><span class="pre">Gateway_Chassis</span></code> assignation for a <code class="docutils literal notranslate"><span class="pre">Logical_Router_Port</span></code>. The
+<code class="docutils literal notranslate"><span class="pre">Gateway_Chassis</span></code> register associated to the removed <code class="docutils literal notranslate"><span class="pre">Chassis</span></code> is deleted
+and removed from the list of HA assigned <code class="docutils literal notranslate"><span class="pre">Chassis</span></code>. This event is captured
+by Neutron, which re-schedules <code class="docutils literal notranslate"><span class="pre">Gateway_Chassis</span></code> to create a balanced list
+of assignations, same as done in <code class="docutils literal notranslate"><span class="pre">OVNGatewayLeastLoadedScheduler</span></code>. This was
+implemented in <a class="footnote-reference brackets" href="#id7" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
+<p>This process only applies to the lower priority <code class="docutils literal notranslate"><span class="pre">Gateway_Chassis</span></code> registers,
+never the upper one; this is because the <code class="docutils literal notranslate"><span class="pre">Logical_Router_Port</span></code> is bound to
+this <code class="docutils literal notranslate"><span class="pre">Chassis</span></code> and could be transmitting. If the highest <code class="docutils literal notranslate"><span class="pre">Gateway_Chassis</span></code>
+is changed, the <code class="docutils literal notranslate"><span class="pre">Logical_Router_Port</span></code> is bound to the new <code class="docutils literal notranslate"><span class="pre">Chassis</span></code> and
+could break any active sessions.</p>
+</section>
+<section id="availability-zones-az-distribution">
+<h2>Availability Zones (AZ) distribution<a class="headerlink" href="#availability-zones-az-distribution" title="Link to this heading">¶</a></h2>
+<p>Both the <code class="docutils literal notranslate"><span class="pre">OVNGatewayChanceScheduler</span></code> and the
+<code class="docutils literal notranslate"><span class="pre">OVNGatewayLeastLoadedScheduler</span></code> schedulers have the Availability Zones (AZ)
+in consideration. If a router has any AZ defined, the schedulers will select
+only those chassis located in the AZs. If no chassis meets this condition, the
+<code class="docutils literal notranslate"><span class="pre">Logical_Router_Port</span></code> won’t be assigned to any chassis and won’t be bound.</p>
+<p>Once the list of candidate <code class="docutils literal notranslate"><span class="pre">Chassis</span></code> (depending on the scheduler selected)
+is created, this list is reordered to prioritize these <code class="docutils literal notranslate"><span class="pre">Chassis</span></code> from
+different AZs. That will spread the allocation choices to all AZs; if the
+current (and highest) <code class="docutils literal notranslate"><span class="pre">Chassis</span></code> binding fails, the next <code class="docutils literal notranslate"><span class="pre">Chassis</span></code> in the
+list will belong to another AZ.</p>
+<p>This improvement was implemented in <a class="footnote-reference brackets" href="#id8" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p>
+</section>
+<section id="soft-anti-affinity-for-logical-router-with-multiple-logical-router-port">
+<h2>Soft Anti-Affinity for <code class="docutils literal notranslate"><span class="pre">Logical_Router</span></code> with multiple <code class="docutils literal notranslate"><span class="pre">Logical_Router_Port</span></code><a class="headerlink" href="#soft-anti-affinity-for-logical-router-with-multiple-logical-router-port" title="Link to this heading">¶</a></h2>
+<p>Support for multiple gateway ports <a class="footnote-reference brackets" href="#id9" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a> was implemented to support
+configurations that provide resiliency and load sharing across multiple router
+ports at the layer 3 level.</p>
+<p>In addition to external dependencies such as BFD for liveness detection and
+ECMP for load sharing accross default routes, the feature required changes to
+the scheduler, the goal being that each <code class="docutils literal notranslate"><span class="pre">Logical_Router_Port</span></code> record for a
+<code class="docutils literal notranslate"><span class="pre">Logical_Router</span></code> would have a different set of <code class="docutils literal notranslate"><span class="pre">Chassis</span></code> for each priority.</p>
+<p>The Anti-Affinity is accomplished by having the OVN driver provide the router
+object subject to scheduling to the scheduler. The scheduler then checks
+whether there already exists <code class="docutils literal notranslate"><span class="pre">Logical_Router_Port</span></code> records for the target
+router, and makes any <code class="docutils literal notranslate"><span class="pre">Chassis</span></code> involed in the already existing ports
+appear as having higher load, making it less likely that the already used
+<code class="docutils literal notranslate"><span class="pre">Chassis</span></code> gets picked for a new <code class="docutils literal notranslate"><span class="pre">Logical_Router_Port</span></code>.</p>
+<p>Since the algorithm is based on load and priority, Anti-Affinity is only
+supported for the <code class="docutils literal notranslate"><span class="pre">OVNGatewayLeastLoadedScheduler</span></code>.</p>
+<p>This improvement was implemented in <a class="footnote-reference brackets" href="#id10" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>.</p>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id6" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://review.opendev.org/c/openstack/neutron/+/893653">https://review.opendev.org/c/openstack/neutron/+/893653</a></p>
+</aside>
+<aside class="footnote brackets" id="id7" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://review.opendev.org/c/openstack/neutron/+/893654">https://review.opendev.org/c/openstack/neutron/+/893654</a></p>
+</aside>
+<aside class="footnote brackets" id="id8" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://review.opendev.org/c/openstack/neutron/+/892604">https://review.opendev.org/c/openstack/neutron/+/892604</a></p>
+</aside>
+<aside class="footnote brackets" id="id9" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://review.opendev.org/c/openstack/neutron-specs/+/870030">https://review.opendev.org/c/openstack/neutron-specs/+/870030</a></p>
+</aside>
+<aside class="footnote brackets" id="id10" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">5</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://review.opendev.org/c/openstack/neutron/+/873699">https://review.opendev.org/c/openstack/neutron/+/873699</a></p>
+</aside>
+</aside>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="rpc.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: RPC messages in OVN"></i></a>
+          
+          
+            <a href="../../configuration/index.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Configuration Guide"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2024-03-01 20:38:48</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">OpenStack Networking Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../intro.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../deploy.html">Deployment examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ops.html">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../migration.html">Migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../misc.html">Miscellaneous</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">OVN Driver Administration Guide</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributor/index.html">Contributor Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">OVN L3 scheduler</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#types-of-schedulers">Types of schedulers</a><ul>
+<li><a class="reference internal" href="#ovngatewaychancescheduler"><code class="docutils literal notranslate"><span class="pre">OVNGatewayChanceScheduler</span></code></a></li>
+<li><a class="reference internal" href="#ovngatewayleastloadedscheduler"><code class="docutils literal notranslate"><span class="pre">OVNGatewayLeastLoadedScheduler</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#re-schedule-logical-router-port-if-a-chassis-is-removed">Re-schedule <code class="docutils literal notranslate"><span class="pre">Logical_Router_Port</span></code> if a <code class="docutils literal notranslate"><span class="pre">Chassis</span></code> is removed</a></li>
+<li><a class="reference internal" href="#availability-zones-az-distribution">Availability Zones (AZ) distribution</a></li>
+<li><a class="reference internal" href="#soft-anti-affinity-for-logical-router-with-multiple-logical-router-port">Soft Anti-Affinity for <code class="docutils literal notranslate"><span class="pre">Logical_Router</span></code> with multiple <code class="docutils literal notranslate"><span class="pre">Logical_Router_Port</span></code></a></li>
+<li><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "admin/ovn/l3_scheduler" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "OVN L3 scheduler in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2024-03-01 20:38:48";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "admin/ovn/l3_scheduler";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

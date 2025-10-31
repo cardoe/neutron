@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>OVN with DevStack &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Tempest Testing" href="tempest.html" />
+    <link rel="prev" title="Neutron Jobs Running in Zuul CI" href="ci_jobs.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/contributor/testing/ml2_ovn_devstack.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>OVN with DevStack</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="ci_jobs.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Neutron Jobs Running in Zuul CI"></i></a>
+    
+    
+    <a href="tempest.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Tempest Testing"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="ovn-with-devstack">
+<span id="ml2-ovn-devstack"></span><h1>OVN with DevStack<a class="headerlink" href="#ovn-with-devstack" title="Link to this heading">¶</a></h1>
+<p>This document describes how to test OpenStack with OVN using DevStack. We will
+start by describing how to test on a single host.</p>
+<section id="single-node-test-environment">
+<h2>Single Node Test Environment<a class="headerlink" href="#single-node-test-environment" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Create a test system.</p></li>
+</ol>
+<p>It’s best to use a throwaway dev system for running DevStack. Your best bet is
+to use either CentOS 8 or the latest Ubuntu LTS (18.04, Bionic).</p>
+<ol class="arabic simple" start="2">
+<li><p>Create the <code class="docutils literal notranslate"><span class="pre">stack</span></code> user.</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://opendev.org/openstack/devstack.git
+$ sudo ./devstack/tools/create-stack-user.sh
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>Switch to the <code class="docutils literal notranslate"><span class="pre">stack</span></code> user and clone DevStack and Neutron.</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo su - stack
+$ git clone https://opendev.org/openstack/devstack.git
+$ git clone https://opendev.org/openstack/neutron.git
+</pre></div>
+</div>
+<ol class="arabic simple" start="4">
+<li><p>Configure DevStack to use the OVN driver.</p></li>
+</ol>
+<p>OVN driver comes with a sample DevStack configuration file you can start
+with.  For example, you may want to set some values for the various PASSWORD
+variables in that file so DevStack doesn’t have to prompt you for them.  Feel
+free to edit it if you’d like, but it should work as-is.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd devstack
+$ cp ../neutron/devstack/ovn-local.conf.sample local.conf
+</pre></div>
+</div>
+<ol class="arabic simple" start="5">
+<li><p>Run DevStack.</p></li>
+</ol>
+<p>This is going to take a while.  It installs a bunch of packages, clones a bunch
+of git repos, and installs everything from these git repos.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ./stack.sh
+</pre></div>
+</div>
+<p>Once DevStack completes successfully, you should see output that looks
+something like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">This</span> <span class="ow">is</span> <span class="n">your</span> <span class="n">host</span> <span class="n">IP</span> <span class="n">address</span><span class="p">:</span> <span class="mf">172.16.189.6</span>
+<span class="n">This</span> <span class="ow">is</span> <span class="n">your</span> <span class="n">host</span> <span class="n">IPv6</span> <span class="n">address</span><span class="p">:</span> <span class="p">::</span><span class="mi">1</span>
+<span class="n">Horizon</span> <span class="ow">is</span> <span class="n">now</span> <span class="n">available</span> <span class="n">at</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="mf">172.16.189.6</span><span class="o">/</span><span class="n">dashboard</span>
+<span class="n">Keystone</span> <span class="ow">is</span> <span class="n">serving</span> <span class="n">at</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="mf">172.16.189.6</span><span class="o">/</span><span class="n">identity</span><span class="o">/</span>
+<span class="n">The</span> <span class="n">default</span> <span class="n">users</span> <span class="n">are</span><span class="p">:</span> <span class="n">admin</span> <span class="ow">and</span> <span class="n">demo</span>
+<span class="n">The</span> <span class="n">password</span><span class="p">:</span> <span class="n">password</span>
+<span class="mi">2017</span><span class="o">-</span><span class="mi">03</span><span class="o">-</span><span class="mi">09</span> <span class="mi">15</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mf">54.117</span> <span class="o">|</span> <span class="n">stack</span><span class="o">.</span><span class="n">sh</span> <span class="n">completed</span> <span class="ow">in</span> <span class="mi">2110</span> <span class="n">seconds</span><span class="o">.</span>
+</pre></div>
+</div>
+</section>
+<section id="environment-variables">
+<h2>Environment Variables<a class="headerlink" href="#environment-variables" title="Link to this heading">¶</a></h2>
+<p>Once DevStack finishes successfully, we’re ready to start interacting with
+OpenStack APIs.  OpenStack provides a set of command line tools for interacting
+with these APIs.  DevStack provides a file you can source to set up the right
+environment variables to make the OpenStack command line tools work.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ . openrc
+</pre></div>
+</div>
+<p>If you’re curious what environment variables are set, they generally start with
+an OS prefix:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ env | grep OS
+OS_REGION_NAME=RegionOne
+OS_IDENTITY_API_VERSION=2.0
+OS_PASSWORD=password
+OS_AUTH_URL=http://192.168.122.8:5000/v2.0
+OS_USERNAME=demo
+OS_TENANT_NAME=demo
+OS_VOLUME_API_VERSION=2
+OS_CACERT=/opt/stack/data/CA/int-ca/ca-chain.pem
+OS_NO_CACHE=1
+</pre></div>
+</div>
+</section>
+<section id="default-network-configuration">
+<h2>Default Network Configuration<a class="headerlink" href="#default-network-configuration" title="Link to this heading">¶</a></h2>
+<p>By default, DevStack creates networks called <code class="docutils literal notranslate"><span class="pre">private</span></code> and <code class="docutils literal notranslate"><span class="pre">public</span></code>.
+Run the following command to see the existing networks:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ openstack network list
++--------------------------------------+---------+----------------------------------------------------------------------------+
+| ID                                   | Name    | Subnets                                                                    |
++--------------------------------------+---------+----------------------------------------------------------------------------+
+| 40080dad-0064-480a-b1b0-592ae51c1471 | private | 5ff81545-7939-4ae0-8365-1658d45fa85c, da34f952-3bfc-45bb-b062-d2d973c1a751 |
+| 7ec986dd-aae4-40b5-86cf-8668feeeab67 | public  | 60d0c146-a29b-4cd3-bd90-3745603b1a4b, f010c309-09be-4af2-80d6-e6af9c78bae7 |
++--------------------------------------+---------+----------------------------------------------------------------------------+
+</pre></div>
+</div>
+<p>A Neutron network is implemented as an OVN logical switch. OVN driver
+creates logical switches with a name in the format neutron-&lt;network UUID&gt;.
+We can use <code class="docutils literal notranslate"><span class="pre">ovn-nbctl</span></code> to list the configured logical switches and see that
+their names correlate with the output from <code class="docutils literal notranslate"><span class="pre">openstack</span> <span class="pre">network</span> <span class="pre">list</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ovn-nbctl ls-list
+71206f5c-b0e6-49ce-b572-eb2e964b2c4e (neutron-40080dad-0064-480a-b1b0-592ae51c1471)
+8d8270e7-fd51-416f-ae85-16565200b8a4 (neutron-7ec986dd-aae4-40b5-86cf-8668feeeab67)
+
+$ ovn-nbctl get Logical_Switch neutron-40080dad-0064-480a-b1b0-592ae51c1471 external_ids
+{&quot;neutron:network_name&quot;=private}
+</pre></div>
+</div>
+</section>
+<section id="booting-vms">
+<h2>Booting VMs<a class="headerlink" href="#booting-vms" title="Link to this heading">¶</a></h2>
+<p>In this section we’ll go through the steps to create two VMs that have a
+virtual NIC attached to the <code class="docutils literal notranslate"><span class="pre">private</span></code> Neutron network.</p>
+<p>DevStack uses libvirt as the Nova backend by default.  If KVM is available, it
+will be used.  Otherwise, it will just run qemu emulated guests.  This is
+perfectly fine for our testing, as we only need these VMs to be able to send
+and receive a small amount of traffic so performance is not very important.</p>
+<ol class="arabic simple">
+<li><p>Get the Network UUID.</p></li>
+</ol>
+<p>Start by getting the UUID for the <code class="docutils literal notranslate"><span class="pre">private</span></code> network from the output of
+<code class="docutils literal notranslate"><span class="pre">openstack</span> <span class="pre">network</span> <span class="pre">list</span></code> from earlier and save it off:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ PRIVATE_NET_ID=$(openstack network show private -c id -f value)
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Create an SSH keypair.</p></li>
+</ol>
+<p>Next create an SSH keypair in Nova.  Later, when we boot a VM, we’ll ask that
+the public key be put in the VM so we can SSH into it.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ openstack keypair create demo &gt; id_rsa_demo
+$ chmod 600 id_rsa_demo
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>Choose a flavor.</p></li>
+</ol>
+<p>We need minimal resources for these test VMs, so the <code class="docutils literal notranslate"><span class="pre">m1.nano</span></code> flavor is
+sufficient.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ openstack flavor list
++----+-----------+-------+------+-----------+-------+-----------+
+| ID | Name      |   RAM | Disk | Ephemeral | VCPUs | Is Public |
++----+-----------+-------+------+-----------+-------+-----------+
+| 1  | m1.tiny   |   512 |    1 |         0 |     1 | True      |
+| 2  | m1.small  |  2048 |   20 |         0 |     1 | True      |
+| 3  | m1.medium |  4096 |   40 |         0 |     2 | True      |
+| 4  | m1.large  |  8192 |   80 |         0 |     4 | True      |
+| 42 | m1.nano   |    64 |    0 |         0 |     1 | True      |
+| 5  | m1.xlarge | 16384 |  160 |         0 |     8 | True      |
+| 84 | m1.micro  |   128 |    0 |         0 |     1 | True      |
+| c1 | cirros256 |   256 |    0 |         0 |     1 | True      |
+| d1 | ds512M    |   512 |    5 |         0 |     1 | True      |
+| d2 | ds1G      |  1024 |   10 |         0 |     1 | True      |
+| d3 | ds2G      |  2048 |   10 |         0 |     2 | True      |
+| d4 | ds4G      |  4096 |   20 |         0 |     4 | True      |
++----+-----------+-------+------+-----------+-------+-----------+
+
+$ FLAVOR_ID=$(openstack flavor show m1.nano -c id -f value)
+</pre></div>
+</div>
+<ol class="arabic simple" start="4">
+<li><p>Choose an image.</p></li>
+</ol>
+<p>DevStack imports the CirrOS image by default, which is perfect for our testing.
+It’s a very small test image.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ openstack image list
++--------------------------------------+--------------------------+--------+
+| ID                                   | Name                     | Status |
++--------------------------------------+--------------------------+--------+
+| 849a8db2-3754-4cf6-9271-491fa4ff7195 | cirros-0.3.5-x86_64-disk | active |
++--------------------------------------+--------------------------+--------+
+
+$ IMAGE_ID=$(openstack image list -c ID -f value)
+</pre></div>
+</div>
+<ol class="arabic simple" start="5">
+<li><p>Setup a security rule so that we can access the VMs we will boot up next.</p></li>
+</ol>
+<p>By default, DevStack does not allow users to access VMs, to enable that, we
+will need to add a rule.  We will allow both ICMP and SSH.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ openstack security group rule create --ingress --ethertype IPv4 --dst-port 22 --protocol tcp default
+$ openstack security group rule create --ingress --ethertype IPv4 --protocol ICMP default
+$ openstack security group rule list
++--------------------------------------+-------------+-----------+------------+--------------------------------------+--------------------------------------+
+| ID                                   | IP Protocol | IP Range  | Port Range | Remote Security Group                | Security Group                       |
++--------------------------------------+-------------+-----------+------------+--------------------------------------+--------------------------------------+
+...
+| ade97198-db44-429e-9b30-24693d86d9b1 | tcp         | 0.0.0.0/0 | 22:22      | None                                 | a47b14da-5607-404a-8de4-3a0f1ad3649c |
+| d0861a98-f90e-4d1a-abfb-827b416bc2f6 | icmp        | 0.0.0.0/0 |            | None                                 | a47b14da-5607-404a-8de4-3a0f1ad3649c |
+...
++--------------------------------------+-------------+-----------+------------+--------------------------------------+--------------------------------------+
+</pre></div>
+</div>
+<ol class="arabic simple" start="6">
+<li><p>Boot some VMs.</p></li>
+</ol>
+<p>Now we will boot two VMs.  We’ll name them <code class="docutils literal notranslate"><span class="pre">test1</span></code> and <code class="docutils literal notranslate"><span class="pre">test2</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ openstack server create --nic net-id=$PRIVATE_NET_ID --flavor $FLAVOR_ID --image $IMAGE_ID --key-name demo test1
++-----------------------------+-----------------------------------------------------------------+
+| Field                       | Value                                                           |
++-----------------------------+-----------------------------------------------------------------+
+| OS-DCF:diskConfig           | MANUAL                                                          |
+| OS-EXT-AZ:availability_zone |                                                                 |
+| OS-EXT-STS:power_state      | NOSTATE                                                         |
+| OS-EXT-STS:task_state       | scheduling                                                      |
+| OS-EXT-STS:vm_state         | building                                                        |
+| OS-SRV-USG:launched_at      | None                                                            |
+| OS-SRV-USG:terminated_at    | None                                                            |
+| accessIPv4                  |                                                                 |
+| accessIPv6                  |                                                                 |
+| addresses                   |                                                                 |
+| adminPass                   | BzAWWA6byGP6                                                    |
+| config_drive                |                                                                 |
+| created                     | 2017-03-09T16:56:08Z                                            |
+| flavor                      | m1.nano (42)                                                    |
+| hostId                      |                                                                 |
+| id                          | d8b8084e-58ff-44f4-b029-a57e7ef6ba61                            |
+| image                       | cirros-0.3.5-x86_64-disk (849a8db2-3754-4cf6-9271-491fa4ff7195) |
+| key_name                    | demo                                                            |
+| name                        | test1                                                           |
+| progress                    | 0                                                               |
+| project_id                  | b6522570f7344c06b1f24303abf3c479                                |
+| properties                  |                                                                 |
+| security_groups             | name=&#39;default&#39;                                                  |
+| status                      | BUILD                                                           |
+| updated                     | 2017-03-09T16:56:08Z                                            |
+| user_id                     | c68f77f1d85e43eb9e5176380a68ac1f                                |
+| volumes_attached            |                                                                 |
++-----------------------------+-----------------------------------------------------------------+
+
+$ openstack server create --nic net-id=$PRIVATE_NET_ID --flavor $FLAVOR_ID --image $IMAGE_ID --key-name demo test2
++-----------------------------+-----------------------------------------------------------------+
+| Field                       | Value                                                           |
++-----------------------------+-----------------------------------------------------------------+
+| OS-DCF:diskConfig           | MANUAL                                                          |
+| OS-EXT-AZ:availability_zone |                                                                 |
+| OS-EXT-STS:power_state      | NOSTATE                                                         |
+| OS-EXT-STS:task_state       | scheduling                                                      |
+| OS-EXT-STS:vm_state         | building                                                        |
+| OS-SRV-USG:launched_at      | None                                                            |
+| OS-SRV-USG:terminated_at    | None                                                            |
+| accessIPv4                  |                                                                 |
+| accessIPv6                  |                                                                 |
+| addresses                   |                                                                 |
+| adminPass                   | YB8dmt5v88JV                                                    |
+| config_drive                |                                                                 |
+| created                     | 2017-03-09T16:56:50Z                                            |
+| flavor                      | m1.nano (42)                                                    |
+| hostId                      |                                                                 |
+| id                          | 170d4f37-9299-4a08-b48b-2b90fce8e09b                            |
+| image                       | cirros-0.3.5-x86_64-disk (849a8db2-3754-4cf6-9271-491fa4ff7195) |
+| key_name                    | demo                                                            |
+| name                        | test2                                                           |
+| progress                    | 0                                                               |
+| project_id                  | b6522570f7344c06b1f24303abf3c479                                |
+| properties                  |                                                                 |
+| security_groups             | name=&#39;default&#39;                                                  |
+| status                      | BUILD                                                           |
+| updated                     | 2017-03-09T16:56:51Z                                            |
+| user_id                     | c68f77f1d85e43eb9e5176380a68ac1f                                |
+| volumes_attached            |                                                                 |
++-----------------------------+-----------------------------------------------------------------+
+</pre></div>
+</div>
+<p>Once both VMs have been started, they will have a status of <code class="docutils literal notranslate"><span class="pre">ACTIVE</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ openstack server list
++--------------------------------------+-------+--------+---------------------------------------------------------+--------------------------+
+| ID                                   | Name  | Status | Networks                                                | Image Name               |
++--------------------------------------+-------+--------+---------------------------------------------------------+--------------------------+
+| 170d4f37-9299-4a08-b48b-2b90fce8e09b | test2 | ACTIVE | private=fd5d:9d1b:457c:0:f816:3eff:fe24:49df, 10.0.0.3  | cirros-0.3.5-x86_64-disk |
+| d8b8084e-58ff-44f4-b029-a57e7ef6ba61 | test1 | ACTIVE | private=fd5d:9d1b:457c:0:f816:3eff:fe3f:953d, 10.0.0.10 | cirros-0.3.5-x86_64-disk |
++--------------------------------------+-------+--------+---------------------------------------------------------+--------------------------+
+</pre></div>
+</div>
+<p>Our two VMs have addresses of <code class="docutils literal notranslate"><span class="pre">10.0.0.3</span></code> and <code class="docutils literal notranslate"><span class="pre">10.0.0.10</span></code>.  If we list
+Neutron ports, there are two new ports with these addresses associated
+with them:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ openstack port list
++--------------------------------------+------+-------------------+-----------------------------------------------------------------------------------------------------+--------+
+| ID                                   | Name | MAC Address       | Fixed IP Addresses                                                                                  | Status |
++--------------------------------------+------+-------------------+-----------------------------------------------------------------------------------------------------+--------+
+...
+| 97c970b0-485d-47ec-868d-783c2f7acde3 |      | fa:16:3e:3f:95:3d | ip_address=&#39;10.0.0.10&#39;, subnet_id=&#39;da34f952-3bfc-45bb-b062-d2d973c1a751&#39;                            | ACTIVE |
+|                                      |      |                   | ip_address=&#39;fd5d:9d1b:457c:0:f816:3eff:fe3f:953d&#39;, subnet_id=&#39;5ff81545-7939-4ae0-8365-1658d45fa85c&#39; |        |
+| e003044d-334a-4de3-96d9-35b2d2280454 |      | fa:16:3e:24:49:df | ip_address=&#39;10.0.0.3&#39;, subnet_id=&#39;da34f952-3bfc-45bb-b062-d2d973c1a751&#39;                             | ACTIVE |
+|                                      |      |                   | ip_address=&#39;fd5d:9d1b:457c:0:f816:3eff:fe24:49df&#39;, subnet_id=&#39;5ff81545-7939-4ae0-8365-1658d45fa85c&#39; |        |
+...
++--------------------------------------+------+-------------------+-----------------------------------------------------------------------------------------------------+--------+
+</pre></div>
+</div>
+<p>Now we can look at OVN using <code class="docutils literal notranslate"><span class="pre">ovn-nbctl</span></code> to see the logical switch ports
+that were created for these two Neutron ports.  The first part of the output
+is the OVN logical switch port UUID.  The second part in parentheses is the
+logical switch port name. Neutron sets the logical switch port name equal to
+the Neutron port ID.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ovn-nbctl lsp-list neutron-$PRIVATE_NET_ID
+...
+fde1744b-e03b-46b7-b181-abddcbe60bf2 (97c970b0-485d-47ec-868d-783c2f7acde3)
+7ce284a8-a48a-42f5-bf84-b2bca62cd0fe (e003044d-334a-4de3-96d9-35b2d2280454)
+...
+</pre></div>
+</div>
+<p>These two ports correspond to the two VMs we created.</p>
+</section>
+<section id="vm-connectivity">
+<h2>VM Connectivity<a class="headerlink" href="#vm-connectivity" title="Link to this heading">¶</a></h2>
+<p>We can connect to our VMs by associating a floating IP address from the public
+network.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ TEST1_PORT_ID=$(openstack port list --server test1 -c id -f value)
+$ openstack floating ip create --port $TEST1_PORT_ID public
++---------------------+--------------------------------------+
+| Field               | Value                                |
++---------------------+--------------------------------------+
+| created_at          | 2017-03-09T18:58:12Z                 |
+| description         |                                      |
+| fixed_ip_address    | 10.0.0.10                            |
+| floating_ip_address | 172.24.4.8                           |
+| floating_network_id | 7ec986dd-aae4-40b5-86cf-8668feeeab67 |
+| id                  | 24ff0799-5a72-4a5b-abc0-58b301c9aee5 |
+| name                | None                                 |
+| port_id             | 97c970b0-485d-47ec-868d-783c2f7acde3 |
+| project_id          | b6522570f7344c06b1f24303abf3c479     |
+| revision_number     | 1                                    |
+| router_id           | ee51adeb-0dd8-4da0-ab6f-7ce60e00e7b0 |
+| status              | DOWN                                 |
+| updated_at          | 2017-03-09T18:58:12Z                 |
++---------------------+--------------------------------------+
+</pre></div>
+</div>
+<p>Devstack does not wire up the public network by default so we must do
+that before connecting to this floating IP address.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo ip link set br-ex up
+$ sudo ip route add 172.24.4.0/24 dev br-ex
+$ sudo ip addr add 172.24.4.1/24 dev br-ex
+</pre></div>
+</div>
+<p>Now you should be able to connect to the VM via its floating IP address.
+First, ping the address.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ping -c 1 172.24.4.8
+PING 172.24.4.8 (172.24.4.8) 56(84) bytes of data.
+64 bytes from 172.24.4.8: icmp_seq=1 ttl=63 time=0.823 ms
+
+--- 172.24.4.8 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.823/0.823/0.823/0.000 ms
+</pre></div>
+</div>
+<p>Now SSH to the VM:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ssh -i id_rsa_demo cirros@172.24.4.8 hostname
+test1
+</pre></div>
+</div>
+</section>
+<section id="adding-another-compute-node">
+<h2>Adding Another Compute Node<a class="headerlink" href="#adding-another-compute-node" title="Link to this heading">¶</a></h2>
+<p>After completing the earlier instructions for setting up devstack, you can use
+a second VM to emulate an additional compute node.  This is important for OVN
+testing as it exercises the tunnels created by OVN between the hypervisors.</p>
+<p>Just as before, create a throwaway VM but make sure that this VM has a
+different host name. Having same host name for both VMs will confuse Nova and
+will not produce two hypervisors when you query nova hypervisor list later.
+Once the VM is setup, create the <code class="docutils literal notranslate"><span class="pre">stack</span></code> user:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://opendev.org/openstack/devstack.git
+$ sudo ./devstack/tools/create-stack-user.sh
+</pre></div>
+</div>
+<p>Switch to the <code class="docutils literal notranslate"><span class="pre">stack</span></code> user and clone DevStack and neutron:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo su - stack
+$ git clone https://opendev.org/openstack/devstack.git
+$ git clone https://opendev.org/openstack/neutron.git
+</pre></div>
+</div>
+<p>OVN comes with another sample configuration file that can be used
+for this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd devstack
+$ cp ../neutron/devstack/ovn-compute-local.conf.sample local.conf
+</pre></div>
+</div>
+<p>You must set SERVICE_HOST in local.conf.  The value should be the IP address of
+the main DevStack host.  You must also set HOST_IP to the IP address of this
+new host.  See the text in the sample configuration file for more
+information.  Once that is complete, run DevStack:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd devstack
+$ ./stack.sh
+</pre></div>
+</div>
+<p>This should complete in less time than before, as it’s only running a single
+OpenStack service (nova-compute) along with OVN (ovn-controller, ovs-vswitchd,
+ovsdb-server).  The final output will look something like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">This</span> <span class="ow">is</span> <span class="n">your</span> <span class="n">host</span> <span class="n">IP</span> <span class="n">address</span><span class="p">:</span> <span class="mf">172.16.189.30</span>
+<span class="n">This</span> <span class="ow">is</span> <span class="n">your</span> <span class="n">host</span> <span class="n">IPv6</span> <span class="n">address</span><span class="p">:</span> <span class="p">::</span><span class="mi">1</span>
+<span class="mi">2017</span><span class="o">-</span><span class="mi">03</span><span class="o">-</span><span class="mi">09</span> <span class="mi">18</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mf">27.058</span> <span class="o">|</span> <span class="n">stack</span><span class="o">.</span><span class="n">sh</span> <span class="n">completed</span> <span class="ow">in</span> <span class="mi">1149</span> <span class="n">seconds</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>Now go back to your main DevStack host.  You can use admin credentials to
+verify that the additional hypervisor has been added to the deployment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd devstack
+$ . openrc admin
+$ ./tools/discover_hosts.sh
+$ openstack hypervisor list
++----+------------------------+-----------------+---------------+-------+
+| ID | Hypervisor Hostname    | Hypervisor Type | Host IP       | State |
++----+------------------------+-----------------+---------------+-------+
+|  1 | centos7-ovn-devstack   | QEMU            | 172.16.189.6  | up    |
+|  2 | centos7-ovn-devstack-2 | QEMU            | 172.16.189.30 | up    |
++----+------------------------+-----------------+---------------+-------+
+</pre></div>
+</div>
+<p>You can also look at OVN and OVS to see that the second host has shown up.  For
+example, there will be a second entry in the Chassis table of the
+OVN_Southbound database.  You can use the <code class="docutils literal notranslate"><span class="pre">ovn-sbctl</span></code> utility to list
+chassis, their configuration, and the ports bound to each of them:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ovn-sbctl show
+
+Chassis &quot;ddc8991a-d838-4758-8d15-71032da9d062&quot;
+    hostname: &quot;centos7-ovn-devstack&quot;
+    Encap vxlan
+        ip: &quot;172.16.189.6&quot;
+        options: {csum=&quot;true&quot;}
+    Encap geneve
+        ip: &quot;172.16.189.6&quot;
+        options: {csum=&quot;true&quot;}
+    Port_Binding &quot;97c970b0-485d-47ec-868d-783c2f7acde3&quot;
+    Port_Binding &quot;e003044d-334a-4de3-96d9-35b2d2280454&quot;
+    Port_Binding &quot;cr-lrp-08d1f28d-cc39-4397-b12b-7124080899a1&quot;
+Chassis &quot;b194d07e-0733-4405-b795-63b172b722fd&quot;
+    hostname: &quot;centos7-ovn-devstack-2.os1.phx2.redhat.com&quot;
+    Encap geneve
+        ip: &quot;172.16.189.30&quot;
+        options: {csum=&quot;true&quot;}
+    Encap vxlan
+        ip: &quot;172.16.189.30&quot;
+        options: {csum=&quot;true&quot;}
+</pre></div>
+</div>
+<p>You can also see a tunnel created to the other compute node:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ovs-vsctl show
+...
+Bridge br-int
+    fail_mode: secure
+    ...
+    Port &quot;ovn-b194d0-0&quot;
+        Interface &quot;ovn-b194d0-0&quot;
+            type: geneve
+            options: {csum=&quot;true&quot;, key=flow, remote_ip=&quot;172.16.189.30&quot;}
+    ...
+...
+</pre></div>
+</div>
+</section>
+<section id="provider-networks">
+<h2>Provider Networks<a class="headerlink" href="#provider-networks" title="Link to this heading">¶</a></h2>
+<p>Neutron has a “provider networks” API extension that lets you specify
+some additional attributes on a network.  These attributes let you
+map a Neutron network to a physical network in your environment.
+The OVN ML2 driver is adding support for this API extension.  It currently
+supports “flat” and “vlan” networks.</p>
+<p>Here is how you can test it:</p>
+<p>First you must create an OVS bridge that provides connectivity to the
+provider network on every host running ovn-controller.  For trivial
+testing this could just be a dummy bridge.  In a real environment, you
+would want to add a local network interface to the bridge, as well.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ovs-vsctl add-br br-provider
+</pre></div>
+</div>
+<p>ovn-controller on each host must be configured with a mapping between
+a network name and the bridge that provides connectivity to that network.
+In this case we’ll create a mapping from the network name “providernet”
+to the bridge ‘br-provider”.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ovs-vsctl set open . \
+external-ids:ovn-bridge-mappings=providernet:br-provider
+</pre></div>
+</div>
+<p>If you want to enable this chassis to host a gateway router for
+external connectivity, then set ovn-cms-options to enable-chassis-as-gw.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ovs-vsctl set open . \
+external-ids:ovn-cms-options=&quot;enable-chassis-as-gw&quot;
+</pre></div>
+</div>
+<p>Now create a Neutron provider network.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ openstack network create provider --share \
+--provider-physical-network providernet \
+--provider-network-type flat
+</pre></div>
+</div>
+<p>Alternatively, you can define connectivity to a VLAN instead of a flat network:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ openstack network create provider-101 --share \
+--provider-physical-network providernet \
+--provider-network-type vlan
+--provider-segment 101
+</pre></div>
+</div>
+<p>Observe that the OVN ML2 driver created a special logical switch port of type
+localnet on the logical switch to model the connection to the physical network.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ovn-nbctl show
+...
+ switch 5bbccbbd-f5ca-411b-bad9-01095d6f1316 (neutron-729dbbee-db84-4a3d-afc3-82c0b3701074)
+     port provnet-729dbbee-db84-4a3d-afc3-82c0b3701074
+         addresses: [&quot;unknown&quot;]
+...
+
+$ ovn-nbctl lsp-get-type provnet-729dbbee-db84-4a3d-afc3-82c0b3701074
+localnet
+
+$ ovn-nbctl lsp-get-options provnet-729dbbee-db84-4a3d-afc3-82c0b3701074
+network_name=providernet
+</pre></div>
+</div>
+<p>If VLAN is used, there will be a VLAN tag shown on the localnet port as well.</p>
+<p>Finally, create a Neutron port on the provider network.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ openstack port create --network provider myport
+</pre></div>
+</div>
+<p>or if you followed the VLAN example, it would be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ openstack port create --network provider-101 myport
+</pre></div>
+</div>
+</section>
+<section id="skydive">
+<h2>Skydive<a class="headerlink" href="#skydive" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://github.com/skydive-project/skydive">Skydive</a> is an open source
+real-time network topology and protocols analyzer. It aims to provide a
+comprehensive way of understanding what is happening in the network
+infrastructure. Skydive works by utilizing agents to collect host-local
+information, and sending this information to a central agent for
+further analysis. It utilizes elasticsearch to store the data.</p>
+<p>To enable Skydive support with OVN and devstack, enable it on the control
+and compute nodes.</p>
+<p>On the control node, enable it as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">enable_plugin</span> <span class="n">skydive</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">skydive</span><span class="o">-</span><span class="n">project</span><span class="o">/</span><span class="n">skydive</span><span class="o">.</span><span class="n">git</span>
+<span class="n">enable_service</span> <span class="n">skydive</span><span class="o">-</span><span class="n">analyzer</span>
+</pre></div>
+</div>
+<p>On the compute nodes, enable it as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">enable_plugin</span> <span class="n">skydive</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">skydive</span><span class="o">-</span><span class="n">project</span><span class="o">/</span><span class="n">skydive</span><span class="o">.</span><span class="n">git</span>
+<span class="n">enable_service</span> <span class="n">skydive</span><span class="o">-</span><span class="n">agent</span>
+</pre></div>
+</div>
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading">¶</a></h2>
+<p>If you run into any problems, take a look at our
+<a class="reference internal" href="../../admin/ovn/troubleshooting.html"><span class="doc">Troubleshooting</span></a> page.</p>
+</section>
+<section id="additional-resources">
+<h2>Additional Resources<a class="headerlink" href="#additional-resources" title="Link to this heading">¶</a></h2>
+<p>See the documentation and other references linked
+from the <a class="reference internal" href="../../admin/ovn/ovn.html"><span class="doc">OVN information</span></a> page.</p>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="ci_jobs.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Neutron Jobs Running in Zuul CI"></i></a>
+          
+          
+            <a href="tempest.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Tempest Testing"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2024-08-23 12:03:12</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Contributor Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#basic-information">Basic Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-policies">Neutron Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#gerrit-rechecks">Gerrit Rechecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-stadium">Neutron Stadium</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-internals">Neutron Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#ovn-driver">OVN Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#dashboards">Dashboards</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">OVN with DevStack</a><ul>
+<li><a class="reference internal" href="#single-node-test-environment">Single Node Test Environment</a></li>
+<li><a class="reference internal" href="#environment-variables">Environment Variables</a></li>
+<li><a class="reference internal" href="#default-network-configuration">Default Network Configuration</a></li>
+<li><a class="reference internal" href="#booting-vms">Booting VMs</a></li>
+<li><a class="reference internal" href="#vm-connectivity">VM Connectivity</a></li>
+<li><a class="reference internal" href="#adding-another-compute-node">Adding Another Compute Node</a></li>
+<li><a class="reference internal" href="#provider-networks">Provider Networks</a></li>
+<li><a class="reference internal" href="#skydive">Skydive</a></li>
+<li><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
+<li><a class="reference internal" href="#additional-resources">Additional Resources</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "contributor/testing/ml2_ovn_devstack" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "OVN with DevStack in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2024-08-23 12:03:12";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "contributor/testing/ml2_ovn_devstack";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

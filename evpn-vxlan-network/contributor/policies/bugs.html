@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Bugs &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Code Reviews" href="code-reviews.html" />
+    <link rel="prev" title="Blueprints and Specs" href="blueprints.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/contributor/policies/bugs.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Bugs</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="blueprints.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Blueprints and Specs"></i></a>
+    
+    
+    <a href="code-reviews.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Code Reviews"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="bugs">
+<span id="neutron-bugs"></span><h1>Bugs<a class="headerlink" href="#bugs" title="Link to this heading">¶</a></h1>
+<p>Neutron (client, core, FwaaS, VPNaaS) maintains all of its bugs in the following
+Launchpad projects:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron">Launchpad Neutron</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/python-neutronclient">Launchpad python-neutronclient</a></p></li>
+</ul>
+<section id="neutron-bugs-team-in-launchpad">
+<h2>Neutron Bugs Team In Launchpad<a class="headerlink" href="#neutron-bugs-team-in-launchpad" title="Link to this heading">¶</a></h2>
+<p>The <a class="reference external" href="https://launchpad.net/~neutron-bugs">Neutron Bugs</a> team in Launchpad
+is used to allow access to the projects above. Members of the above group
+have the ability to set bug priorities, target bugs to releases, and other
+administrative tasks around bugs. The administrators of this group are the
+members of the <a class="reference external" href="https://review.opendev.org/#/admin/groups/464,members">neutron-drivers-core</a> gerrit group.
+Non administrators of this group include anyone who is involved with the
+Neutron project and has a desire to assist with bug triage.</p>
+<p>If you would like to join this Launchpad group, it’s best to reach out to a
+member of the above mentioned neutron-drivers-core team in #openstack-neutron
+on OFTC and let them know why you would like to be a member. The team is
+more than happy to add additional bug triage capability, but it helps to know
+who is requesting access, and IRC is a quick way to make the connection.</p>
+<p>As outlined below the bug deputy is a volunteer who wants to help with defect
+management. Permissions will have to be granted assuming that people sign up
+on the deputy role. The permission won’t be given freely, a person must show
+some degree of prior involvement.</p>
+</section>
+<section id="neutron-bug-deputy">
+<span id="id2"></span><h2>Neutron Bug Deputy<a class="headerlink" href="#neutron-bug-deputy" title="Link to this heading">¶</a></h2>
+<p>Neutron maintains the notion of a “bug deputy”. The bug deputy plays an
+important role in the Neutron community. As a large project, Neutron is
+routinely fielding many bug reports. The bug deputy is responsible for
+acting as a “first contact” for these bug reports and performing initial
+screening/triaging. The bug deputy is expected to communicate with the
+various Neutron teams when a bug has been triaged. In addition, the bug
+deputy should be reporting “High” and “Critical” priority bugs.</p>
+<p>To avoid burnout, and to give a chance to everyone to gain experience in
+defect management, the Neutron bug deputy is a rotating role. The rotation
+will be set on a period (typically one or two weeks) determined by the team
+during the weekly Neutron IRC meeting and/or according to holidays. During
+the Neutron IRC meeting we will expect a volunteer to step up for the period.
+Members of the Neutron core team are invited to fill in the role,
+however non-core Neutron contributors who are interested are also
+encouraged to take up the role.</p>
+<p>This contributor is going to be the bug deputy for the period, and he/she
+will be asked to report to the team during the subsequent IRC meeting. The
+PTL will also work with the team to assess that everyone gets his/her fair
+share at fulfilling this duty. It is reasonable to expect some imbalance
+from time to time, and the team will work together to resolve it to ensure
+that everyone is 100% effective and well rounded in their role as
+_custodian_ of Neutron quality. Should the duty load be too much in busy
+times of the release, the PTL and the team will work together to assess
+whether more than one deputy is necessary in a given period.</p>
+<p>The presence of a bug deputy does not mean the rest of the team is simply off
+the hook for the period, in fact the bug deputy will have to actively work
+with the Lieutenants/Drivers, and these should help in getting the bug report
+moving down the resolution pipeline.</p>
+<p>During the period a member acts as bug deputy, he/she is expected to watch
+bugs filed against the Neutron projects (as listed above) and do a first
+screening to determine potential severity, tagging, opensearch queries, other
+affected projects, affected releases, etc.</p>
+<p>From time to time bugs will be filed and auto-assigned by members of the
+core team to get them to a swift resolution. Obviously, the deputy is exempt
+from screening these.</p>
+<p>Finally, the PTL will work with the deputy to produce a brief summary of the
+issues of the week to be shared with the larger team during the weekly IRC
+meeting and tracked in the meeting notes. If for some reason the deputy is not
+going to attend the team meeting to report, the deputy should consider sending
+a brief report to the openstack-discuss&#64; mailing list in advance of the meeting.</p>
+</section>
+<section id="getting-ready-to-serve-as-the-neutron-bug-deputy">
+<h2>Getting Ready to Serve as the Neutron Bug Deputy<a class="headerlink" href="#getting-ready-to-serve-as-the-neutron-bug-deputy" title="Link to this heading">¶</a></h2>
+<p>If you are interested in serving as the Neutron bug deputy, there are several
+steps you will need to follow in order to be prepared.</p>
+<ul class="simple">
+<li><p>Request to be added to the <a class="reference external" href="https://launchpad.net/%7Eneutron-bugs">neutron-bugs team in Launchpad</a>.
+This request will be approved when you are assigned a bug deputy slot.</p></li>
+<li><p>Read this page in full.  Keep this document in mind at all times as it
+describes the duties of the bug deputy and how to triage bugs particularly
+around setting the importance and tags of bugs.</p></li>
+<li><p>Sign up for neutron bug emails from LaunchPad.</p>
+<ul>
+<li><p>Navigate to the <a class="reference external" href="https://bugs.launchpad.net/neutron">LaunchPad Neutron bug list</a>.</p></li>
+<li><p>On the right hand side, click on “Subscribe to bug mail”.</p></li>
+<li><p>In the pop-up that is displayed, keep the recipient as “Yourself”, and your
+subscription something useful like “Neutron Bugs”.  You can choose either
+option for how much mail you get, but keep in mind that getting mail for
+all changes - while informative - will result in several dozen emails per
+day at least.</p></li>
+<li><p>Do the same for the <a class="reference external" href="https://bugs.launchpad.net/python-neutronclient">LaunchPad python-neutronclient bug list</a>.</p></li>
+</ul>
+</li>
+<li><p>Configure the information you get from <a class="reference external" href="https://bugs.launchpad.net/neutron">LaunchPad</a>
+to make visible additional information, especially the ‘age’ of the bugs. You
+accomplish that by clicking the little gear on the left hand side of the
+screen at the top of the bugs list.  This provides an overview of information
+for each bug on a single page.</p></li>
+<li><p>Optional: Set up your mail client to highlight bug email that indicates a new
+bug has been filed, since those are the ones you will be wanting to triage.
+Filter based on email from “&#64;bugs.launchpad.net” with “[NEW]” in the subject
+line.</p></li>
+<li><p>Volunteer during the course of the Neutron team meeting, when volunteers to
+be bug deputy are requested (usually towards the beginning of the meeting).</p></li>
+<li><p>View your scheduled week on the <a class="reference external" href="https://wiki.openstack.org/wiki/Network/Meetings#Bug_deputy">Neutron Meetings page</a>.</p></li>
+<li><p>During your shift, if it is feasible for your timezone, plan on attending the
+Neutron Drivers meeting.  That way if you have tagged any bugs as RFE, you
+can be present to discuss them.</p></li>
+</ul>
+</section>
+<section id="bug-deputy-routines-in-your-week">
+<h2>Bug Deputy routines in your week<a class="headerlink" href="#bug-deputy-routines-in-your-week" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Scan ‘New’ bugs to triage.
+If it doesn’t have enough info to triage, ask more info and
+mark it ‘Incomplete’.
+If you could confirm it by yourself, mark it ‘Confirmed’.
+Otherwise, find someone familiar with the topic and ask his/her help.</p></li>
+<li><p>Scan ‘Incomplete’ bugs to see if it got more info.
+If it was, make it back to ‘New’.</p></li>
+<li><p>Repeat the above routines for bugs filed in your week at least.
+If you can, do the same for older bugs.</p></li>
+<li><p>Take a note of bugs you processed.
+At the end of your week, post a report on openstack-discuss mailing list.</p></li>
+</ul>
+</section>
+<section id="plugin-and-driver-repositories">
+<h2>Plugin and Driver Repositories<a class="headerlink" href="#plugin-and-driver-repositories" title="Link to this heading">¶</a></h2>
+<p>Many plugins and drivers have backend code that exists in another repository.
+These repositories may have their own Launchpad projects for bugs.  The teams
+working on the code in these repos assume full responsibility for bug handling
+in those projects. For this reason, bugs whose solution would exist solely in
+the plugin/driver repo should not have Neutron in the affected projects section.
+However, you should add Neutron (Or any other project) to that list only if you
+expect that a patch is needed to that repo in order to solve the bug.</p>
+<p>It’s also worth adding that some of these projects are part of the so
+called Neutron <a class="reference external" href="https://governance.openstack.org/tc/reference/projects/neutron.html#deliverables-and-tags">stadium</a>.
+Because of that, their release is managed centrally by the Neutron
+release team; requests for releases need to be funnelled and screened
+properly before they can happen. Release request process is described
+<a class="reference internal" href="../stadium/guidelines.html#guideline-releases"><span class="std std-ref">here</span></a>.</p>
+</section>
+<section id="bug-screening-best-practices">
+<span id="guidelines"></span><h2>Bug Screening Best Practices<a class="headerlink" href="#bug-screening-best-practices" title="Link to this heading">¶</a></h2>
+<p>When screening bug reports, the first step for the bug deputy is to assess
+how well written the bug report is, and whether there is enough information
+for anyone else besides the bug submitter to reproduce the bug and come up
+with a fix. There is plenty of information on the <a class="reference external" href="https://docs.openstack.org/project-team-guide/bugs.html">OpenStack Bugs</a>
+on how to write a good bug <a class="reference external" href="https://wiki.openstack.org/wiki/BugFilingRecommendations">report</a>
+and to learn how to tell a good bug report from a bad one. Should the bug
+report not adhere to these best practices, the bug deputy’s first step
+would be to redirect the submitter to this section, invite him/her to supply
+the missing information, and mark the bug report as ‘Incomplete’. For future
+submissions, the reporter can then use the template provided below to ensure
+speedy triaging. Done often enough, this practice should (ideally) ensure that
+in the long run, only ‘good’ bug reports are going to be filed.</p>
+<section id="bug-report-template">
+<h3>Bug Report Template<a class="headerlink" href="#bug-report-template" title="Link to this heading">¶</a></h3>
+<p>The more information you provide, the higher the chance of speedy triaging and
+resolution: identifying the problem is half the solution. To this aim, when
+writing a bug report, please consider supplying the following details and
+following these suggestions:</p>
+<ul class="simple">
+<li><p>Summary (Bug title): keep it small, possibly one line. If you cannot describe
+the issue in less than 100 characters, you are probably submitting more than
+one bug at once.</p></li>
+<li><p>Further information (Bug description): conversely from other bug trackers,
+Launchpad does not provide a structured way of submitting bug-related
+information, but everything goes in this section. Therefore, you are invited
+to break down the description in the following fields:</p>
+<ul>
+<li><p>High level description: provide a brief sentence (a couple of lines) of
+what are you trying to accomplish, or would like to accomplish differently;
+the ‘why’ is important, but can be omitted if obvious (not to you of course).</p></li>
+<li><p>Pre-conditions: what is the initial state of your system? Please consider
+enumerating resources available in the system, if useful in diagnosing
+the problem. Who are you? A regular user or a super-user? Are you
+describing service-to-service interaction?</p></li>
+<li><p>Step-by-step reproduction steps: these can be actual neutron client
+commands or raw API requests; Grab the output if you think it is useful.
+Please, consider using <a class="reference external" href="http://paste.openstack.org">paste.o.o</a> for long
+outputs as Launchpad poorly format the description field, making the
+reading experience somewhat painful.</p></li>
+<li><p>Expected output: what did you hope to see? How would you have expected the
+system to behave? A specific error/success code? The output in a specific
+format? Or more than a user was supposed to see, or less?</p></li>
+<li><p>Actual output: did the system silently fail (in this case log traces are
+useful)? Did you get a different response from what you expected?</p></li>
+<li><p>Version:</p>
+<ul>
+<li><p>OpenStack version (Specific stable branch, or git hash if from trunk);</p></li>
+<li><p>Linux distro, kernel. For a distro, it’s also worth knowing specific
+versions of client and server, not just major release;</p></li>
+<li><p>Relevant underlying processes such as openvswitch, iproute etc;</p></li>
+<li><p>DevStack or other _deployment_ mechanism?</p></li>
+</ul>
+</li>
+<li><p>Environment: what services are you running (core services like DB and
+AMQP broker, as well as Nova/hypervisor if it matters), and which type
+of deployment (clustered servers); if you are running DevStack, is it a
+single node? Is it multi-node? Are you reporting an issue in your own
+environment or something you encountered in the OpenStack CI
+Infrastructure, aka the Gate?</p></li>
+<li><p>Perceived severity: what would you consider the <a class="reference external" href="https://docs.openstack.org/project-team-guide/bugs.html#Importance">importance</a>
+to be?</p></li>
+</ul>
+</li>
+<li><p>Tags (Affected component): try to use the existing tags by relying on
+auto-completion. Please, refrain from creating new ones, if you need
+new “official” <a class="reference internal" href="#tags">tags</a>, please reach out to the PTL. If you would like
+a fix to be backported, please add a backport-potential tag.
+This does not mean you are gonna get the backport, as the stable team needs
+to follow the <a class="reference external" href="http://docs.openstack.org/project-team-guide/stable-branches.html">stable branch policy</a>
+for merging fixes to stable branches.</p></li>
+<li><p>Attachments: consider attaching logs, truncated log snippets are rarely
+useful. Be proactive, and consider attaching redacted configuration files
+if you can, as that will speed up the resolution process greatly.</p></li>
+</ul>
+</section>
+<section id="bug-triage-process">
+<h3>Bug Triage Process<a class="headerlink" href="#bug-triage-process" title="Link to this heading">¶</a></h3>
+<p>The process of bug triaging consists of the following steps:</p>
+<ul class="simple">
+<li><p>Check if a bug was filed for a correct component (project). If not, either
+change the project or mark it as “Invalid”.</p></li>
+<li><p>For bugs that affect documentation proceed like this. If documentation
+affects:</p>
+<ul>
+<li><p>the ReST API, add the “api-ref” tag to the bug.</p></li>
+<li><p>the OpenStack manuals, like the Networking Guide or the Configuration
+Reference, create a patch for the affected files in the documentation
+directory in this repository. For a layout of the how the documentation
+directory is structured see the <a class="reference external" href="../effective_neutron.html">effective neutron guide</a></p></li>
+<li><p>developer documentation (devref), set the bug to “Confirmed” for
+the project Neutron, otherwise set it to “Invalid”.</p></li>
+</ul>
+</li>
+<li><p>Check if a similar bug was filed before. Rely on your memory if Launchpad
+is not clever enough to spot a duplicate upon submission.  You may also
+check already verified bugs for <a class="reference external" href="https://review.opendev.org/#/q/status:open+label:Verified-2+project:openstack/neutron">Neutron</a>
+and <a class="reference external" href="https://review.opendev.org/#/q/status:open+label:Verified-2+project:openstack/python-neutronclient">python-neutronclient</a>
+to see if the bug has been reported.  If so, mark it as a duplicate of the
+previous bug.</p></li>
+<li><p>Check if the bug meets the requirements of a good bug report, by checking
+that the <a class="reference internal" href="#guidelines">guidelines</a> are being followed. Omitted information is still
+acceptable if the issue is clear nonetheless; use your good judgement and
+your experience. Consult another core member/PTL if in doubt. If the bug
+report needs some love, mark the bug as ‘Incomplete’, point the submitter
+to this document and hope he/she turns around quickly with the missing
+information.</p></li>
+</ul>
+<p>If the bug report is sound, move next:</p>
+<ul class="simple">
+<li><p>Revise tags as recommended by the submitter. Ensure they are ‘official’
+tags. If the bug report talks about deprecating features or config
+variables, add a deprecation tag to the list.</p></li>
+<li><p>As deputy one is usually excused not to process RFE bugs which are the
+responsibility of the drivers team members.</p></li>
+<li><p>Depending on ease of reproduction (or if the issue can be spotted in the
+code), mark it as ‘Confirmed’. If you are unable to assess/triage the
+issue because you do not have access to a repro environment, consider
+reaching out the <a class="reference internal" href="neutron-teams.html#core-review-hierarchy"><span class="std std-ref">Lieutenant</span></a>,
+go-to person for the affected component;
+he/she may be able to help: assign the bug to him/her for further
+screening. If the bug already has an assignee, check that a patch is
+in progress. Sometimes more than one patch is required to address an
+issue, make sure that there is at least one patch that ‘Closes’ the bug
+or document/question what it takes to mark the bug as fixed.</p></li>
+<li><p>If the bug indicates test or gate failure, look at the failures for that
+test over time using
+<a class="reference external" href="https://opensearch.logs.openstack.org/_dashboards/app/discover?security_tenant=global">OpenStack OpenSearch</a>.
+This can help to validate whether the bug identifies an issue that is
+occurring all of the time, some of the time, or only for the bug submitter.
+To use OpenSearch please check <a class="reference external" href="https://docs.openstack.org/project-team-guide/testing.html#checking-status-of-other-job-results">documentation</a>.</p></li>
+<li><p>If the bug is the result of a misuse of the system, mark the bug either
+as ‘Won’t fix’, or ‘Opinion’ if you are still on the fence and need
+other people’s input.</p></li>
+<li><p>Assign the importance after reviewing the proposed severity. Bugs that
+obviously break core and widely used functionality should get assigned as
+“High” or “Critical” importance. The same applies to bugs that were filed
+for gate failures.</p></li>
+<li><p>Choose a milestone, if you can. Targeted bugs are especially important
+close to the end of the release.</p></li>
+<li><p>(Optional). Add comments explaining the issue and possible strategy of
+fixing/working around the bug. Also, as good as some are at adding all
+thoughts to bugs, it is still helpful to share the in-progress items
+that might not be captured in a bug description or during our weekly
+meeting. In order to provide some guidance and reduce ramp up time as
+we rotate, tagging bugs with ‘needs-attention’ can be useful to quickly
+identify what reports need further screening/eyes on.</p></li>
+</ul>
+<p>Check for Bugs with the ‘timeout-abandon’ tag:</p>
+<ul class="simple">
+<li><p>Search for any bugs with the timeout abandon tag:
+<a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=timeout-abandon">Timeout abandon</a>.
+This tag indicates that the bug had a patch associated with it that was
+automatically abandoned after a timing out with negative feedback.</p></li>
+<li><p>For each bug with this tag, determine if the bug is still valid and update
+the status accordingly. For example, if another patch fixed the bug, ensure
+it’s marked as ‘Fix Released’. Or, if that was the only patch for the bug and
+it’s still valid, mark it as ‘Confirmed’.</p></li>
+<li><p>After ensuring the bug report is in the correct state, remove the
+‘timeout-abandon’ tag.</p></li>
+</ul>
+<p>You are done! Iterate.</p>
+</section>
+</section>
+<section id="bug-expiration-policy-and-bug-squashing">
+<h2>Bug Expiration Policy and Bug Squashing<a class="headerlink" href="#bug-expiration-policy-and-bug-squashing" title="Link to this heading">¶</a></h2>
+<p>More can be found at this <a class="reference external" href="https://help.launchpad.net/BugExpiry">Launchpad page</a>.
+In a nutshell, in order to make a bug report expire automatically, it needs to be
+unassigned, untargeted, and marked as Incomplete.</p>
+<p>The OpenStack community has had <a class="reference external" href="https://wiki.openstack.org/wiki/BugDays">Bug Days</a>
+but they have not been wildly successful. In order to keep the list of open bugs set
+to a manageable number (more like &lt;100+, rather than closer to 1000+), at the end of
+each release (in feature freeze and/or during less busy times), the PTL with the
+help of team will go through the list of open (namely new, opinion, in progress,
+confirmed, triaged) bugs, and do a major sweep to have the Launchpad Janitor pick
+them up. This gives 60 days grace period to reporters/assignees to come back and
+revive the bug. Assuming that at regime, bugs are properly reported, acknowledged
+and fix-proposed, losing unaddressed issues is not going to be a major issue,
+but brief stats will be collected to assess how the team is doing over time.</p>
+</section>
+<section id="tagging-bugs">
+<span id="tags"></span><h2>Tagging Bugs<a class="headerlink" href="#tagging-bugs" title="Link to this heading">¶</a></h2>
+<p>Launchpad’s Bug Tracker allows you to create ad-hoc groups of bugs with tagging.</p>
+<p>In the Neutron team, we have a list of agreed tags that we may apply to bugs
+reported against various aspects of Neutron itself. The list of approved tags
+used to be available on the <a class="reference external" href="https://wiki.openstack.org/wiki/Bug_Tags#Neutron">wiki</a>,
+however the section has been moved here, to improve collaborative editing, and
+keep the information more current. By using a standard set of tags, each
+explained on this page, we can avoid confusion. A bug report can have more than
+one tag at any given time.</p>
+<section id="proposing-new-tags">
+<h3>Proposing New Tags<a class="headerlink" href="#proposing-new-tags" title="Link to this heading">¶</a></h3>
+<p>New tags, or changes in the meaning of existing tags (or deletion), are to be
+proposed via patch to this section. After discussion, and approval, a member of
+the bug team will create/delete the tag in Launchpad. Each tag covers an area
+with an identified go-to contact or <a class="reference internal" href="neutron-teams.html#core-review-hierarchy"><span class="std std-ref">Lieutenant</span></a>,
+who can provide further insight. Bug queries are provided below for convenience,
+more will be added over time if needed.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Tag</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Contact</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="#access-control">access-control</a></p></td>
+<td><p>A bug affecting RBAC and policy.yaml</p></td>
+<td><p>Slawek Kaplonski</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#api">api</a></p></td>
+<td><p>A bug affecting the API layer</p></td>
+<td><p>Akihiro Motoki</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#api-ref">api-ref</a></p></td>
+<td><p>A bug affecting the API reference</p></td>
+<td><p>Akihiro Motoki</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#auto-allocated-topology">auto-allocated-topology</a></p></td>
+<td><p>A bug affecting get-me-a-network</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#baremetal">baremetal</a></p></td>
+<td><p>A bug affecting Ironic support</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#db">db</a></p></td>
+<td><p>A bug affecting the DB layer</p></td>
+<td><p>Rodolfo Alonso Hernandez</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#deprecation">deprecation</a></p></td>
+<td><p>To track config/feature deprecations</p></td>
+<td><p>Neutron PTL/drivers</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dns">dns</a></p></td>
+<td><p>A bug affecting DNS integration</p></td>
+<td><p>Miguel Lavalle</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#doc">doc</a></p></td>
+<td><p>A bug affecting in-tree doc</p></td>
+<td><p>Akihiro Motoki</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fullstack">fullstack</a></p></td>
+<td><p>A bug in the fullstack subtree</p></td>
+<td><p>Rodolfo Alonso Hernandez</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#functional-tests">functional-tests</a></p></td>
+<td><p>A bug in the functional tests subtree</p></td>
+<td><p>Rodolfo Alonso Hernandez</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gate-failure">gate-failure</a></p></td>
+<td><p>A bug affecting gate stability</p></td>
+<td><p>Slawek Kaplonski</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ipv6">ipv6</a></p></td>
+<td><p>A bug affecting IPv6 support</p></td>
+<td><p>Brian Haley</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l2-pop">l2-pop</a></p></td>
+<td><p>A bug in L2 Population mech driver</p></td>
+<td><p>Miguel Lavalle</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#l3-bgp">l3-bgp</a></p></td>
+<td><p>A bug affecting neutron-dynamic-routing</p></td>
+<td><p>Tobias Urdin/
+Jens Harbott</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l3-dvr-backlog">l3-dvr-backlog</a></p></td>
+<td><p>A bug affecting distributed routing</p></td>
+<td><p>Yulong Liu/
+Brian Haley</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#l3-ha">l3-ha</a></p></td>
+<td><p>A bug affecting L3 HA (vrrp)</p></td>
+<td><p>Brian Haley</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#l3-ipam-dhcp">l3-ipam-dhcp</a></p></td>
+<td><p>A bug affecting L3/DHCP/metadata</p></td>
+<td><p>Miguel Lavalle</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#lib">lib</a></p></td>
+<td><p>An issue affecting neutron-lib</p></td>
+<td><p>Neutron PTL</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#loadimpact">loadimpact</a></p></td>
+<td><p>Performance penalty/improvements</p></td>
+<td><p>Miguel Lavalle/
+Oleg Bondarev</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#logging">logging</a></p></td>
+<td><p>An issue with logging guidelines</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#low-hanging-fruit">low-hanging-fruit</a></p></td>
+<td><p>Starter bugs for new contributors</p></td>
+<td><p>Miguel Lavalle</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#metering">metering</a></p></td>
+<td><p>A bug affecting the metering layer</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#needs-attention">needs-attention</a></p></td>
+<td><p>A bug that needs further screening</p></td>
+<td><p>PTL/Bug Deputy</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#opnfv">opnfv</a></p></td>
+<td><p>Reported by/affecting OPNFV initiative</p></td>
+<td><p>Drivers team</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ops">ops</a></p></td>
+<td><p>Reported by or affecting operators</p></td>
+<td><p>Drivers Team</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#oslo">oslo</a></p></td>
+<td><p>An interop/cross-project issue</p></td>
+<td><p>Bernard Cafarelli/
+Rodolfo Alonso Hernandez</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ovn">ovn</a></p></td>
+<td><p>A bug affecting ML2/OVN</p></td>
+<td><p>Jakub Libosvar/
+Lucas Alvares Gomes</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ovn-bgp-agent">ovn-bgp-agent</a></p></td>
+<td><p>A bug affecting OVN BGP agent</p></td>
+<td><p>Luis Tomas Bolivar/
+Lucas Alvares Gomes</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ovn-octavia-provider">ovn-octavia-provider</a></p></td>
+<td><p>A bug affecting OVN Octavia provider
+driver</p></td>
+<td><p>Fernando Royo</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ovs">ovs</a></p></td>
+<td><p>A bug affecting ML2/OVS</p></td>
+<td><p>Miguel Lavalle</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ovs-fw">ovs-fw</a></p></td>
+<td><p>A bug affecting OVS firewall</p></td>
+<td><p>Miguel Lavalle</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ovsdb-lib">ovsdb-lib</a></p></td>
+<td><p>A bug affecting OVSDB library</p></td>
+<td><p>Terry Wilson</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#id32">pyroute2</a></p></td>
+<td><p>A bug affecting pyroute2 library</p></td>
+<td><p>Rodolfo Alonso Hernandez</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qos">qos</a></p></td>
+<td><p>A bug affecting ML2/QoS</p></td>
+<td><p>Rodolfo Alonso Hernandez</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rfe">rfe</a></p></td>
+<td><p>Feature enhancements being screened</p></td>
+<td><p>Drivers Team</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rfe-confirmed">rfe-confirmed</a></p></td>
+<td><p>Confirmed feature enhancements</p></td>
+<td><p>Drivers Team</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rfe-triaged">rfe-triaged</a></p></td>
+<td><p>Triaged feature enhancements</p></td>
+<td><p>Drivers Team</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rfe-approved">rfe-approved</a></p></td>
+<td><p>Approved feature enhancements</p></td>
+<td><p>Drivers Team</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rfe-postponed">rfe-postponed</a></p></td>
+<td><p>Postponed feature enhancements</p></td>
+<td><p>Drivers Team</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#sg-fw">sg-fw</a></p></td>
+<td><p>A bug affecting security groups</p></td>
+<td><p>Brian Haley</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sriov-pci-pt">sriov-pci-pt</a></p></td>
+<td><p>A bug affecting Sriov/PCI PassThrough</p></td>
+<td><p>Moshe Levi</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#id40">stable</a></p></td>
+<td><p>A bug affecting only stable branches</p></td>
+<td><p>Bernard Cafarelli</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tempest">tempest</a></p></td>
+<td><p>A bug in tempest subtree tests</p></td>
+<td><p>Rodolfo Alonso Hernandez</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#troubleshooting">troubleshooting</a></p></td>
+<td><p>An issue affecting ease of debugging</p></td>
+<td><p>PTL/Drivers Team</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#unittest">unittest</a></p></td>
+<td><p>A bug affecting the unit test subtree</p></td>
+<td><p>Rodolfo Alonso Hernandez</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#usability">usability</a></p></td>
+<td><p>UX, interoperability, feature parity</p></td>
+<td><p>PTL/Drivers Team</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#vpnaas">vpnaas</a></p></td>
+<td><p>A bug affecting neutron-vpnaas</p></td>
+<td><p>Dongcan Ye</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#xxx-backport-potential">xxx-backport-potential</a></p></td>
+<td><p>Cherry-pick request for stable team</p></td>
+<td><p>Bernard Cafarelli/
+Brian Haley</p></td>
+</tr>
+</tbody>
+</table>
+<section id="access-control">
+<span id="id4"></span><h4>Access Control<a class="headerlink" href="#access-control" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=access-control">Access Control - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=access-control">Access Control - In progress</a></p></li>
+</ul>
+</section>
+<section id="api">
+<span id="id5"></span><h4>API<a class="headerlink" href="#api" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=api">API - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=api">API - In progress</a></p></li>
+</ul>
+</section>
+<section id="api-reference">
+<span id="api-ref"></span><h4>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=api-ref">API Reference - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=api-ref">API Reference - In progress</a></p></li>
+</ul>
+</section>
+<section id="auto-allocated-topology">
+<span id="id6"></span><h4>Auto Allocated Topology<a class="headerlink" href="#auto-allocated-topology" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=auto-allocated-topology">Auto Allocated Topology - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=auto-allocated-topology">Auto Allocated Topology - In progress</a></p></li>
+</ul>
+</section>
+<section id="baremetal">
+<span id="id7"></span><h4>Baremetal<a class="headerlink" href="#baremetal" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=baremetal">Baremetal - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=baremetal">Baremetal - In progress</a></p></li>
+</ul>
+</section>
+<section id="db">
+<span id="id8"></span><h4>DB<a class="headerlink" href="#db" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=db">DB - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=db">DB - In progress</a></p></li>
+</ul>
+</section>
+<section id="deprecation">
+<span id="id9"></span><h4>Deprecation<a class="headerlink" href="#deprecation" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=deprecation">Deprecation - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=deprecation">DeprecationB - In progress</a></p></li>
+</ul>
+</section>
+<section id="dns">
+<span id="id10"></span><h4>DNS<a class="headerlink" href="#dns" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=dns">DNS - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=dns">DNS - In progress</a></p></li>
+</ul>
+</section>
+<section id="doc">
+<span id="id11"></span><h4>DOC<a class="headerlink" href="#doc" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=doc">DOC - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=doc">DOC - In progress</a></p></li>
+</ul>
+</section>
+<section id="fullstack">
+<span id="id12"></span><h4>Fullstack<a class="headerlink" href="#fullstack" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=fullstack">Fullstack - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=fullstack">Fullstack - In progress</a></p></li>
+</ul>
+</section>
+<section id="functional-tests">
+<span id="id13"></span><h4>Functional Tests<a class="headerlink" href="#functional-tests" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=functional-tests">Functional tests - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=functional-tests">Functional tests - In progress</a></p></li>
+</ul>
+</section>
+<section id="fwaas">
+<span id="id14"></span><h4>FWAAS<a class="headerlink" href="#fwaas" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=fwaas">FWaaS - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=fwaas">FWaaS - In progress</a></p></li>
+</ul>
+</section>
+<section id="gate-failure">
+<span id="id15"></span><h4>Gate Failure<a class="headerlink" href="#gate-failure" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=gate-failure">Gate failure - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=gate-failure">Gate failure - In progress</a></p></li>
+</ul>
+</section>
+<section id="ipv6">
+<span id="id16"></span><h4>IPV6<a class="headerlink" href="#ipv6" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=ipv6">IPv6 - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=ipv6">IPv6 - In progress</a></p></li>
+</ul>
+</section>
+<section id="l2-population">
+<span id="l2-pop"></span><h4>L2 Population<a class="headerlink" href="#l2-population" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=l2-pop">L2 Pop - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=l2-pop">L2 Pop - In progress</a></p></li>
+</ul>
+</section>
+<section id="l3-bgp">
+<span id="id17"></span><h4>L3 BGP<a class="headerlink" href="#l3-bgp" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=l3-bgp">L3 BGP - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=l3-bgp">L3 BGP - In progress</a></p></li>
+</ul>
+</section>
+<section id="l3-dvr-backlog">
+<span id="id18"></span><h4>L3 DVR Backlog<a class="headerlink" href="#l3-dvr-backlog" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=l3-dvr-backlog">L3 DVR - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=l3-dvr-backlog">L3 DVR - In progress</a></p></li>
+</ul>
+</section>
+<section id="l3-ha">
+<span id="id19"></span><h4>L3 HA<a class="headerlink" href="#l3-ha" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=l3-ha">L3 HA - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=l3-ha">L3 HA - In progress</a></p></li>
+</ul>
+</section>
+<section id="l3-ipam-dhcp">
+<span id="id20"></span><h4>L3 IPAM DHCP<a class="headerlink" href="#l3-ipam-dhcp" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=l3-ipam-dhcp">L3 IPAM DHCP - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=l3-ipam-dhcp">L3 IPAM DHCP - In progress</a></p></li>
+</ul>
+</section>
+<section id="lib">
+<span id="id21"></span><h4>Lib<a class="headerlink" href="#lib" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=lib">Lib - All bugs</a></p></li>
+</ul>
+</section>
+<section id="load-impact">
+<span id="loadimpact"></span><h4>Load Impact<a class="headerlink" href="#load-impact" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=loadimpact">Load Impact - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=loadimpact">Load Impact - In progress</a></p></li>
+</ul>
+</section>
+<section id="logging">
+<span id="id22"></span><h4>Logging<a class="headerlink" href="#logging" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=logging">Logging - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=logging">Logging - In progress</a></p></li>
+</ul>
+</section>
+<section id="low-hanging-fruit">
+<span id="id23"></span><h4>Low hanging fruit<a class="headerlink" href="#low-hanging-fruit" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=low-hanging-fruit">Low hanging fruit - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=low-hanging-fruit">Low hanging fruit - In progress</a></p></li>
+</ul>
+</section>
+<section id="metering">
+<span id="id24"></span><h4>Metering<a class="headerlink" href="#metering" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=metering">Metering - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=metering">Metering - In progress</a></p></li>
+</ul>
+</section>
+<section id="needs-attention">
+<span id="id25"></span><h4>Needs Attention<a class="headerlink" href="#needs-attention" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=needs-attention">Needs Attention - All bugs</a></p></li>
+</ul>
+</section>
+<section id="opnfv">
+<span id="id26"></span><h4>OPNFV<a class="headerlink" href="#opnfv" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=opnfv">OPNFV - All bugs</a></p></li>
+</ul>
+</section>
+<section id="operators-operations-ops">
+<span id="ops"></span><h4>Operators/Operations (ops)<a class="headerlink" href="#operators-operations-ops" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=ops">Ops - All bugs</a></p></li>
+</ul>
+</section>
+<section id="oslo">
+<span id="id27"></span><h4>OSLO<a class="headerlink" href="#oslo" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=oslo">Oslo - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=oslo">Oslo - In progress</a></p></li>
+</ul>
+</section>
+<section id="ovn">
+<span id="id28"></span><h4>OVN<a class="headerlink" href="#ovn" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=ovn">OVN - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=ovn">OVN - In progress</a></p></li>
+</ul>
+</section>
+<section id="ovn-bgp-agent">
+<span id="id29"></span><h4>OVN BGP Agent<a class="headerlink" href="#ovn-bgp-agent" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/ovn-bgp-agent/">OVN BGP Agent - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/ovn-bgp-agent/+bugs?field.status%3Alist=INPROGRESS">OVN BGP Agent - In progress</a></p></li>
+</ul>
+</section>
+<section id="ovn-octavia-provider-driver">
+<span id="ovn-octavia-provider"></span><h4>OVN Octavia Provider driver<a class="headerlink" href="#ovn-octavia-provider-driver" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=ovn-octavia-provider">OVN Octavia Provider driver - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=ovn-octavia-provider">OVN Octavia Provider driver - In progress</a></p></li>
+</ul>
+</section>
+<section id="ovs">
+<span id="id30"></span><h4>OVS<a class="headerlink" href="#ovs" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=ovs">OVS - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=ovs">OVS - In progress</a></p></li>
+</ul>
+</section>
+<section id="ovs-firewall">
+<span id="ovs-fw"></span><h4>OVS Firewall<a class="headerlink" href="#ovs-firewall" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=ovs-fw">OVS Firewall - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=ovs-fw">OVS Firewall - In progress</a></p></li>
+</ul>
+</section>
+<section id="ovsdb-lib">
+<span id="id31"></span><h4>OVSDB Lib<a class="headerlink" href="#ovsdb-lib" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=ovsdb-lib">OVSDB Lib - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=ovsdb-lib">OVSDB Lib - In progress</a></p></li>
+</ul>
+</section>
+<section id="pyroute2">
+<span id="qos"></span><h4>pyroute2<a class="headerlink" href="#pyroute2" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=pyroute2">Pyroute2 Lib - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=pyroute2">Pyroute2 Lib - In progress</a></p></li>
+</ul>
+</section>
+<section id="id32">
+<span id="id33"></span><h4>QoS<a class="headerlink" href="#id32" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=qos">QoS - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=qos">QoS - In progress</a></p></li>
+</ul>
+</section>
+<section id="rfe">
+<span id="id34"></span><h4>RFE<a class="headerlink" href="#rfe" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=rfe">RFE - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=rfe">RFE - In progress</a></p></li>
+</ul>
+</section>
+<section id="rfe-confirmed">
+<span id="id35"></span><h4>RFE-Confirmed<a class="headerlink" href="#rfe-confirmed" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=rfe-confirmed">RFE-Confirmed - All bugs</a></p></li>
+</ul>
+</section>
+<section id="rfe-triaged">
+<span id="id36"></span><h4>RFE-Triaged<a class="headerlink" href="#rfe-triaged" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=rfe-triaged">RFE-Triaged - All bugs</a></p></li>
+</ul>
+</section>
+<section id="rfe-approved">
+<span id="id37"></span><h4>RFE-Approved<a class="headerlink" href="#rfe-approved" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=rfe-approved">RFE-Approved - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=rfe-approved">RFE-Approved - In progress</a></p></li>
+</ul>
+</section>
+<section id="rfe-postponed">
+<span id="id38"></span><h4>RFE-Postponed<a class="headerlink" href="#rfe-postponed" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=rfe-postponed">RFE-Postponed - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=rfe-postponed">RFE-Postponed - In progress</a></p></li>
+</ul>
+</section>
+<section id="sriov-pci-passthrough">
+<span id="sriov-pci-pt"></span><h4>SRIOV-PCI PASSTHROUGH<a class="headerlink" href="#sriov-pci-passthrough" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=sriov-pci-pt">SRIOV/PCI-PT - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=sriov-pci-pt">SRIOV/PCI-PT - In progress</a></p></li>
+</ul>
+</section>
+<section id="sg-fw">
+<span id="id39"></span><h4>SG-FW<a class="headerlink" href="#sg-fw" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=sg-fw">Security groups - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=sg-fw">Security groups - In progress</a></p></li>
+</ul>
+</section>
+<section id="stable">
+<span id="tempest"></span><h4>Stable<a class="headerlink" href="#stable" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=stable">Stable - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=stable">Stable - In progress bugs</a></p></li>
+</ul>
+</section>
+<section id="id40">
+<span id="id41"></span><h4>Tempest<a class="headerlink" href="#id40" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=Tempest">Tempest - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=Tempest">Tempest - In progress</a></p></li>
+</ul>
+</section>
+<section id="troubleshooting">
+<span id="id42"></span><h4>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=Troubleshooting">Troubleshooting - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=Troubleshooting">Troubleshooting - In progress</a></p></li>
+</ul>
+</section>
+<section id="unit-test">
+<span id="unittest"></span><h4>Unit test<a class="headerlink" href="#unit-test" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=unittest">Unit test - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=unittest">Unit test - In progress</a></p></li>
+</ul>
+</section>
+<section id="usability">
+<span id="id43"></span><h4>Usability<a class="headerlink" href="#usability" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=usability">UX - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=usability">UX - In progress</a></p></li>
+</ul>
+</section>
+<section id="vpnaas">
+<span id="id44"></span><h4>VPNAAS<a class="headerlink" href="#vpnaas" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=vpnaas">VPNaaS - All bugs</a></p></li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.status%3Alist=INPROGRESS&amp;field.tag=vpnaas">VPNaaS - In progress</a></p></li>
+</ul>
+</section>
+<section id="backport-rc-potential">
+<span id="xxx-backport-potential"></span><h4>Backport/RC potential<a class="headerlink" href="#backport-rc-potential" title="Link to this heading">¶</a></h4>
+<p>List of all <code class="docutils literal notranslate"><span class="pre">Backport/RC</span> <span class="pre">potential</span></code> bugs for stable releases can be found on
+launchpad. Pointer to Launchpad’s page with list of such bugs for any stable
+release can be built by using link:</p>
+<p><a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field">https://bugs.launchpad.net/neutron/+bugs?field</a>.tag={STABLE_BRANCH}-backport-potential</p>
+<p>where <code class="docutils literal notranslate"><span class="pre">STABLE_BRANCH</span></code> is always name of one of the 3 latest releases.</p>
+</section>
+</section>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="blueprints.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Blueprints and Specs"></i></a>
+          
+          
+            <a href="code-reviews.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Code Reviews"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2024-08-26 17:49:17</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Contributor Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#basic-information">Basic Information</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#neutron-policies">Neutron Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#gerrit-rechecks">Gerrit Rechecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-stadium">Neutron Stadium</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-internals">Neutron Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#ovn-driver">OVN Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#dashboards">Dashboards</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Bugs</a><ul>
+<li><a class="reference internal" href="#neutron-bugs-team-in-launchpad">Neutron Bugs Team In Launchpad</a></li>
+<li><a class="reference internal" href="#neutron-bug-deputy">Neutron Bug Deputy</a></li>
+<li><a class="reference internal" href="#getting-ready-to-serve-as-the-neutron-bug-deputy">Getting Ready to Serve as the Neutron Bug Deputy</a></li>
+<li><a class="reference internal" href="#bug-deputy-routines-in-your-week">Bug Deputy routines in your week</a></li>
+<li><a class="reference internal" href="#plugin-and-driver-repositories">Plugin and Driver Repositories</a></li>
+<li><a class="reference internal" href="#bug-screening-best-practices">Bug Screening Best Practices</a><ul>
+<li><a class="reference internal" href="#bug-report-template">Bug Report Template</a></li>
+<li><a class="reference internal" href="#bug-triage-process">Bug Triage Process</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#bug-expiration-policy-and-bug-squashing">Bug Expiration Policy and Bug Squashing</a></li>
+<li><a class="reference internal" href="#tagging-bugs">Tagging Bugs</a><ul>
+<li><a class="reference internal" href="#proposing-new-tags">Proposing New Tags</a><ul>
+<li><a class="reference internal" href="#access-control">Access Control</a></li>
+<li><a class="reference internal" href="#api">API</a></li>
+<li><a class="reference internal" href="#api-reference">API Reference</a></li>
+<li><a class="reference internal" href="#auto-allocated-topology">Auto Allocated Topology</a></li>
+<li><a class="reference internal" href="#baremetal">Baremetal</a></li>
+<li><a class="reference internal" href="#db">DB</a></li>
+<li><a class="reference internal" href="#deprecation">Deprecation</a></li>
+<li><a class="reference internal" href="#dns">DNS</a></li>
+<li><a class="reference internal" href="#doc">DOC</a></li>
+<li><a class="reference internal" href="#fullstack">Fullstack</a></li>
+<li><a class="reference internal" href="#functional-tests">Functional Tests</a></li>
+<li><a class="reference internal" href="#fwaas">FWAAS</a></li>
+<li><a class="reference internal" href="#gate-failure">Gate Failure</a></li>
+<li><a class="reference internal" href="#ipv6">IPV6</a></li>
+<li><a class="reference internal" href="#l2-population">L2 Population</a></li>
+<li><a class="reference internal" href="#l3-bgp">L3 BGP</a></li>
+<li><a class="reference internal" href="#l3-dvr-backlog">L3 DVR Backlog</a></li>
+<li><a class="reference internal" href="#l3-ha">L3 HA</a></li>
+<li><a class="reference internal" href="#l3-ipam-dhcp">L3 IPAM DHCP</a></li>
+<li><a class="reference internal" href="#lib">Lib</a></li>
+<li><a class="reference internal" href="#load-impact">Load Impact</a></li>
+<li><a class="reference internal" href="#logging">Logging</a></li>
+<li><a class="reference internal" href="#low-hanging-fruit">Low hanging fruit</a></li>
+<li><a class="reference internal" href="#metering">Metering</a></li>
+<li><a class="reference internal" href="#needs-attention">Needs Attention</a></li>
+<li><a class="reference internal" href="#opnfv">OPNFV</a></li>
+<li><a class="reference internal" href="#operators-operations-ops">Operators/Operations (ops)</a></li>
+<li><a class="reference internal" href="#oslo">OSLO</a></li>
+<li><a class="reference internal" href="#ovn">OVN</a></li>
+<li><a class="reference internal" href="#ovn-bgp-agent">OVN BGP Agent</a></li>
+<li><a class="reference internal" href="#ovn-octavia-provider-driver">OVN Octavia Provider driver</a></li>
+<li><a class="reference internal" href="#ovs">OVS</a></li>
+<li><a class="reference internal" href="#ovs-firewall">OVS Firewall</a></li>
+<li><a class="reference internal" href="#ovsdb-lib">OVSDB Lib</a></li>
+<li><a class="reference internal" href="#pyroute2">pyroute2</a></li>
+<li><a class="reference internal" href="#id32">QoS</a></li>
+<li><a class="reference internal" href="#rfe">RFE</a></li>
+<li><a class="reference internal" href="#rfe-confirmed">RFE-Confirmed</a></li>
+<li><a class="reference internal" href="#rfe-triaged">RFE-Triaged</a></li>
+<li><a class="reference internal" href="#rfe-approved">RFE-Approved</a></li>
+<li><a class="reference internal" href="#rfe-postponed">RFE-Postponed</a></li>
+<li><a class="reference internal" href="#sriov-pci-passthrough">SRIOV-PCI PASSTHROUGH</a></li>
+<li><a class="reference internal" href="#sg-fw">SG-FW</a></li>
+<li><a class="reference internal" href="#stable">Stable</a></li>
+<li><a class="reference internal" href="#id40">Tempest</a></li>
+<li><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
+<li><a class="reference internal" href="#unit-test">Unit test</a></li>
+<li><a class="reference internal" href="#usability">Usability</a></li>
+<li><a class="reference internal" href="#vpnaas">VPNAAS</a></li>
+<li><a class="reference internal" href="#backport-rc-potential">Backport/RC potential</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "contributor/policies/bugs" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Bugs in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2024-08-26 17:49:17";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "contributor/policies/bugs";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

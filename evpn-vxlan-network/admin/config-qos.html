@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Quality of Service (QoS) &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/support-matrix.css?v=ac26a930" />
+    <script src="../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Quality of Service (QoS): Guaranteed Minimum Bandwidth" href="config-qos-min-bw.html" />
+    <link rel="prev" title="Packet Logging Framework" href="config-logging.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/admin/config-qos.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Quality of Service (QoS)</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="config-logging.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Packet Logging Framework"></i></a>
+    
+    
+    <a href="config-qos-min-bw.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Quality of Service (QoS): Guaranteed Minimum Bandwidth"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="quality-of-service-qos">
+<span id="config-qos"></span><h1>Quality of Service (QoS)<a class="headerlink" href="#quality-of-service-qos" title="Link to this heading">¶</a></h1>
+<p>QoS is defined as the ability to guarantee certain network requirements
+like bandwidth, latency, jitter, and reliability in order to satisfy a
+Service Level Agreement (SLA) between an application provider and end
+users.</p>
+<p>Network devices such as switches and routers can mark traffic so that it is
+handled with a higher priority to fulfill the QoS conditions agreed under
+the SLA. In other cases, certain network traffic such as Voice over IP (VoIP)
+and video streaming needs to be transmitted with minimal bandwidth
+constraints. On a system without network QoS management, all traffic will be
+transmitted in a “best-effort” manner making it impossible to guarantee service
+delivery to customers.</p>
+<p>QoS is an advanced service plug-in. QoS is decoupled from the rest of the
+OpenStack Networking code on multiple levels and it is available through the
+ml2 extension driver.</p>
+<p>Details about the DB models, API extension, and use cases are out of the scope
+of this guide but can be found in the
+<a class="reference external" href="https://specs.openstack.org/openstack/neutron-specs/specs/liberty/qos-api-extension.html">Neutron QoS specification</a>.</p>
+<section id="supported-qos-rule-types">
+<h2>Supported QoS rule types<a class="headerlink" href="#supported-qos-rule-types" title="Link to this heading">¶</a></h2>
+<p>QoS supported rule types are now available as <code class="docutils literal notranslate"><span class="pre">VALID_RULE_TYPES</span></code> in <a class="reference external" href="https://opendev.org/openstack/neutron-lib/src/branch/master/neutron_lib/services/qos/constants.py">QoS rule types</a>:</p>
+<ul class="simple">
+<li><p>bandwidth_limit: Bandwidth limitations on networks, ports or floating IPs.</p></li>
+<li><p>packet_rate_limit: Packet rate limitations on certain types of traffic.</p></li>
+<li><p>dscp_marking: Marking network traffic with a DSCP value.</p></li>
+<li><p>minimum_bandwidth: Minimum bandwidth constraints on certain types of traffic.</p></li>
+<li><p>minimum_packet_rate: Minimum packet rate constraints on certain types of
+traffic.</p></li>
+</ul>
+<p>Any QoS driver can claim support for some QoS rule types
+by providing a driver property called
+<code class="docutils literal notranslate"><span class="pre">supported_rules</span></code>, the QoS driver manager will recalculate rule types
+dynamically that the QoS driver supports. In the most simple case, the
+property can be represented by a simple Python list defined on the class.</p>
+<p>The following table shows the Networking back ends, QoS supported rules, and
+traffic directions (from the VM point of view).</p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text"><strong>Networking back ends, supported rules, and traffic direction</strong></span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Rule \ back end</p></th>
+<th class="head"><p>Open vSwitch</p></th>
+<th class="head"><p>SR-IOV</p></th>
+<th class="head"><p>OVN</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Bandwidth limit</p></td>
+<td><p>Egress \ Ingress</p></td>
+<td><p>Egress (1)</p></td>
+<td><p>Egress \ Ingress</p></td>
+</tr>
+<tr class="row-odd"><td><p>Packet rate limit</p></td>
+<td><p>Egress \ Ingress</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td><p>Minimum bandwidth</p></td>
+<td><p>Egress \ Ingress (2)</p></td>
+<td><p>Egress \ Ingress (2)</p></td>
+<td><p>Egress \ Ingress (2)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Minimum packet rate</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td><p>DSCP marking</p></td>
+<td><p>Egress</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Egress</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ol class="arabic simple">
+<li><p>Max burst parameter is skipped because it is not supported by the
+IP tool.</p></li>
+<li><p>Placement based enforcement works for both egress and ingress directions,
+but dataplane enforcement depends on the backend.</p></li>
+</ol>
+</div>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-text"><strong>Neutron backends, supported directions and enforcement types for Minimum Bandwidth rule</strong></span><a class="headerlink" href="#id2" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Enforcement type Backend</p></th>
+<th class="head"><p>Open vSwitch</p></th>
+<th class="head"><p>SR-IOV</p></th>
+<th class="head"><p>OVN</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Dataplane</p></td>
+<td><p>Egress (3)</p></td>
+<td><p>Egress (1)</p></td>
+<td><p>Egress (4)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Placement</p></td>
+<td><p>Egress/Ingress (2)</p></td>
+<td><p>Egress/Ingress (2)</p></td>
+<td><p>Egress/Ingress (4)</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ol class="arabic simple">
+<li><p>Since Newton</p></li>
+<li><p>Since Stein</p></li>
+<li><p>Open vSwitch minimum bandwidth support is only implemented for egress
+direction and only for networks without tunneled traffic (only VLAN and
+flat network types).</p></li>
+<li><p>Since Zed</p></li>
+</ol>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The SR-IOV agent does not support dataplane enforcement for ports
+with <code class="docutils literal notranslate"><span class="pre">direct-physical</span></code> vnic_type. However since Yoga the Placement
+enforcement is supported for this vnic_type too.</p>
+</div>
+<table class="docutils align-default" id="id3">
+<caption><span class="caption-text"><strong>Neutron backends, supported directions and enforcement types for Minimum Packet Rate rule</strong></span><a class="headerlink" href="#id3" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Enforcement type Backend</p></th>
+<th class="head"><p>Open vSwitch</p></th>
+<th class="head"><p>SR-IOV</p></th>
+<th class="head"><p>OVN</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Dataplane</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Placement</p></td>
+<td><p>Any(1)/Egress/Ingress (2)</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ol class="arabic simple">
+<li><p>Minimum packet rate rule supports <code class="docutils literal notranslate"><span class="pre">any</span></code> direction that can be used
+with non-hardware-offloaded OVS deployments, where packets processed
+from both ingress and egress directions are handled by the same set of
+CPU cores.</p></li>
+<li><p>Since Yoga.</p></li>
+</ol>
+</div>
+<p>For an ml2 plug-in, the list of supported QoS rule types and parameters is
+defined as a common subset of rules supported by all active mechanism drivers.
+A QoS rule is always attached to a QoS policy. When a rule is created or
+updated:</p>
+<ul class="simple">
+<li><p>The QoS plug-in will check if this rule and parameters are supported by any
+active mechanism driver if the QoS policy is not attached to any port or
+network.</p></li>
+<li><p>The QoS plug-in will check if this rule and parameters are supported by the
+mechanism drivers managing those ports if the QoS policy is attached to any
+port or network.</p></li>
+</ul>
+<section id="valid-dscp-marks">
+<h3>Valid DSCP Marks<a class="headerlink" href="#valid-dscp-marks" title="Link to this heading">¶</a></h3>
+<p>Valid DSCP mark values are even numbers between 0 and 56, except 2-6, 42, and
+50-54.  The full list of valid DSCP marks is:</p>
+<p>0, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 44, 46,
+48, 56</p>
+</section>
+</section>
+<section id="l3-qos-support">
+<h2>L3 QoS support<a class="headerlink" href="#l3-qos-support" title="Link to this heading">¶</a></h2>
+<p>The Neutron L3 services have implemented their own QoS extensions. It is
+possible to apply QoS policies to the floating IPs and to the routers; in the
+last one (routers), the QoS policy will be applied on the gateway port.</p>
+<p>The rule support depends on the ML2 backend used.</p>
+<section id="ml2-ovs">
+<h3>ML2/OVS<a class="headerlink" href="#ml2-ovs" title="Link to this heading">¶</a></h3>
+<p>The ML2/OVS L3 QoS supports only rate limit rules:</p>
+<ul class="simple">
+<li><p>Floating IP bandwidth limit: rate limit is applied per floating IP address
+independently.</p></li>
+<li><p>Gateway IP bandwidth limit: the rate limit is applied in the router namespace
+gateway port (or in the SNAT namespace in case of DVR edge router). The rate
+limit applies to the gateway IP; that means all traffic using this gateway IP
+will be limited. This rate limit does not apply to the floating IP traffic.</p></li>
+</ul>
+</section>
+<section id="ml2-ovn">
+<h3>ML2/OVN<a class="headerlink" href="#ml2-ovn" title="Link to this heading">¶</a></h3>
+<p>The ML2/OVN L3 QoS supports both rate limit and DSCP rules. Both floating IP
+and gateway port QoS policies are applied using the QoS metering rules.</p>
+<ul class="simple">
+<li><p>Floating IP: the traffic should match the gateway port and the floating IP
+address. The port can be centralized or distributed.</p></li>
+<li><p>Gateway port: the traffic should match the gateway chassis port.</p></li>
+</ul>
+<p>Because both floating IP and router can have QoS policies and both QoS policies
+will match the same traffic, the floating IP policy has a higher priority and
+will match this one only. In case of having port policies, that will apply to
+the virtual machine private port, the private port rule will be applied first.
+This is the QoS rules precedence and result:</p>
+<ul class="simple">
+<li><p>Rate limit rules: if both private port QoS and router/floating IP rules are
+applied, because both will be executed, the minimum rate limit value will
+apply.</p></li>
+<li><p>DSCP rules: if both private port QoS and router/floating IP rules are
+applied, the router/floating IP DSCP mark will be applied on the egress
+packet.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In case of having both router and floating IP QoS policies, the floating IP
+QoS policy has precedence always over the router QoS one. See <a class="reference external" href="https://review.opendev.org/q/If01a8783ac998b2a1f1249ab6f555dd1a5148ea8">[OVN] Change
+the OVN QoS rule priority for floating IPs</a>.</p>
+</div>
+</section>
+<section id="l3-services-that-provide-qos-extensions">
+<h3>L3 services that provide QoS extensions<a class="headerlink" href="#l3-services-that-provide-qos-extensions" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>L3 router: implements the rate limit using <a class="reference external" href="https://man7.org/linux/man-pages/man8/tc.8.html">Linux TC</a>.</p></li>
+<li><p>OVN L3: implements the rate limit using the <a class="reference external" href="https://man7.org/linux/man-pages/man8/ovn-nbctl.8.html#LOGICAL_SWITCH_QOS_RULE_COMMANDS">OVN QoS metering rules</a>.</p></li>
+</ul>
+<p>The following table shows the L3 service, the QoS supported extension, and
+traffic directions (from the VM point of view) for <strong>bandwidth limiting</strong>.</p>
+<table class="docutils align-default" id="id4">
+<caption><span class="caption-text"><strong>L3 service, supported extension and traffic direction for
+       bandwidth limiting</strong></span><a class="headerlink" href="#id4" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>L3 service</p></th>
+<th class="head"><p>L3 router</p></th>
+<th class="head"><p>OVN L3</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Floating IP</p></td>
+<td><p>Egress \ Ingress</p></td>
+<td><p>Egress \ Ingress</p></td>
+</tr>
+<tr class="row-odd"><td><p>Gateway IP</p></td>
+<td><p>Egress \ Ingress</p></td>
+<td><p>Egress \ Ingress</p></td>
+</tr>
+</tbody>
+</table>
+<p>The following table shows the L3 service, the QoS supported extension, and
+traffic directions (from the VM point of view) for <strong>DSCP marking</strong>.</p>
+<table class="docutils align-default" id="id5">
+<caption><span class="caption-text"><strong>L3 service, supported extension and traffic direction for
+       DSCP marking</strong></span><a class="headerlink" href="#id5" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>L3 service</p></th>
+<th class="head"><p>L3 router</p></th>
+<th class="head"><p>OVN L3</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Floating IP</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Egress</p></td>
+</tr>
+<tr class="row-odd"><td><p>Gateway IP</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Egress</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Link to this heading">¶</a></h2>
+<p>To enable the service on a cloud with the architecture described in
+<a class="reference external" href="https://docs.openstack.org/security-guide/networking/architecture.html#openstack-networking-service-placement-on-physical-servers">Networking architecture</a>,
+follow the steps below:</p>
+<p>On the controller nodes:</p>
+<ol class="arabic">
+<li><p>Add the QoS service to the <code class="docutils literal notranslate"><span class="pre">service_plugins</span></code> setting in
+<code class="docutils literal notranslate"><span class="pre">/etc/neutron/neutron.conf</span></code>. For example:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">service_plugins</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">router,metering,qos</span>
+</pre></div>
+</div>
+</li>
+<li><p>Optionally, set the needed <code class="docutils literal notranslate"><span class="pre">notification_drivers</span></code> in the <code class="docutils literal notranslate"><span class="pre">[qos]</span></code>
+section in <code class="docutils literal notranslate"><span class="pre">/etc/neutron/neutron.conf</span></code> (<code class="docutils literal notranslate"><span class="pre">message_queue</span></code> is the
+default).</p></li>
+<li><p>Optionally, in order to enable the floating IP QoS extension <code class="docutils literal notranslate"><span class="pre">qos-fip</span></code>,
+set the <code class="docutils literal notranslate"><span class="pre">service_plugins</span></code> option in <code class="docutils literal notranslate"><span class="pre">/etc/neutron/neutron.conf</span></code> to
+include both <code class="docutils literal notranslate"><span class="pre">router</span></code> and <code class="docutils literal notranslate"><span class="pre">qos</span></code>. For example:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">service_plugins</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">router,qos</span>
+</pre></div>
+</div>
+</li>
+<li><p>In <code class="docutils literal notranslate"><span class="pre">/etc/neutron/plugins/ml2/ml2_conf.ini</span></code>, add <code class="docutils literal notranslate"><span class="pre">qos</span></code> to
+<code class="docutils literal notranslate"><span class="pre">extension_drivers</span></code> in the <code class="docutils literal notranslate"><span class="pre">[ml2]</span></code> section. For example:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[ml2]</span>
+<span class="na">extension_drivers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">port_security,qos</span>
+</pre></div>
+</div>
+</li>
+<li><p>Edit the configuration file for the agent you are using and set the
+<code class="docutils literal notranslate"><span class="pre">extensions</span></code> to include <code class="docutils literal notranslate"><span class="pre">qos</span></code> in the <code class="docutils literal notranslate"><span class="pre">[agent]</span></code> section of the
+configuration file. The agent configuration file will reside in
+<code class="docutils literal notranslate"><span class="pre">/etc/neutron/plugins/ml2/&lt;agent_name&gt;_agent.ini</span></code> where <code class="docutils literal notranslate"><span class="pre">agent_name</span></code>
+is the name of the agent being used (for example <code class="docutils literal notranslate"><span class="pre">openvswitch</span></code>).
+For example:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[agent]</span>
+<span class="na">extensions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">qos</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>On the network and compute nodes:</p>
+<ol class="arabic">
+<li><p>Edit the configuration file for the agent you are using and set the
+<code class="docutils literal notranslate"><span class="pre">extensions</span></code> to include <code class="docutils literal notranslate"><span class="pre">qos</span></code> in the <code class="docutils literal notranslate"><span class="pre">[agent]</span></code> section of the
+configuration file. The agent configuration file will reside in
+<code class="docutils literal notranslate"><span class="pre">/etc/neutron/plugins/ml2/&lt;agent_name&gt;_agent.ini</span></code> where <code class="docutils literal notranslate"><span class="pre">agent_name</span></code>
+is the name of the agent being used (for example <code class="docutils literal notranslate"><span class="pre">openvswitch</span></code>).
+For example:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[agent]</span>
+<span class="na">extensions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">qos</span>
+</pre></div>
+</div>
+</li>
+<li><p>Optionally, for Neutron openvswitch agent, set the <code class="docutils literal notranslate"><span class="pre">qos_meter_bandwidth</span></code>
+in the <code class="docutils literal notranslate"><span class="pre">[ovs]</span></code> section to enable the OVS meter bandwith limit.
+For example:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[ovs]</span>
+<span class="na">qos_meter_bandwidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</pre></div>
+</div>
+</li>
+<li><p>Optionally, in order to enable QoS for floating IPs, set the <code class="docutils literal notranslate"><span class="pre">extensions</span></code>
+option in the <code class="docutils literal notranslate"><span class="pre">[agent]</span></code> section of <code class="docutils literal notranslate"><span class="pre">/etc/neutron/l3_agent.ini</span></code> to
+include <code class="docutils literal notranslate"><span class="pre">fip_qos</span></code>. If <code class="docutils literal notranslate"><span class="pre">dvr</span></code> is enabled, this has to be done for all the
+L3 agents. For example:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[agent]</span>
+<span class="na">extensions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">fip_qos</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Floating IP associated to neutron port or to port forwarding
+can all have bandwidth limit since Stein release. These neutron server
+side and agent side extension configs will enable it once for all.</p>
+</div>
+<ol class="arabic">
+<li><p>Optionally, in order to enable QoS for router gateway IPs, set the
+<code class="docutils literal notranslate"><span class="pre">extensions</span></code> option in the <code class="docutils literal notranslate"><span class="pre">[agent]</span></code> section of
+<code class="docutils literal notranslate"><span class="pre">/etc/neutron/l3_agent.ini</span></code> to include <code class="docutils literal notranslate"><span class="pre">gateway_ip_qos</span></code>. Set this
+to all the <code class="docutils literal notranslate"><span class="pre">dvr_snat</span></code> or <code class="docutils literal notranslate"><span class="pre">legacy</span></code> L3 agents. For example:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[agent]</span>
+<span class="na">extensions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">gateway_ip_qos</span>
+</pre></div>
+</div>
+<p>And <code class="docutils literal notranslate"><span class="pre">gateway_ip_qos</span></code> should work together with the <code class="docutils literal notranslate"><span class="pre">fip_qos</span></code> in L3
+agent for centralized routers, then all L3 IPs with binding QoS policy
+can be limited under the QoS bandwidth limit rules:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[agent]</span>
+<span class="na">extensions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">fip_qos, gateway_ip_qos</span>
+</pre></div>
+</div>
+</li>
+<li><p>As rate limit doesn’t work on Open vSwitch’s <code class="docutils literal notranslate"><span class="pre">internal</span></code> ports,
+optionally, as a workaround, to make QoS bandwidth limit work on
+router’s gateway ports, set <code class="docutils literal notranslate"><span class="pre">ovs_use_veth</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code> in <code class="docutils literal notranslate"><span class="pre">DEFAULT</span></code>
+section in <code class="docutils literal notranslate"><span class="pre">/etc/neutron/l3_agent.ini</span></code></p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[DEFAULT]</span>
+<span class="na">ovs_use_veth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>QoS currently works with ml2 only (SR-IOV and Open vSwitch are drivers
+enabled for QoS).</p>
+</div>
+<section id="dscp-marking-on-outer-header-for-overlay-networks">
+<h3>DSCP marking on outer header for overlay networks<a class="headerlink" href="#dscp-marking-on-outer-header-for-overlay-networks" title="Link to this heading">¶</a></h3>
+<p>When using overlay networks (e.g., VxLAN), the DSCP marking rule only
+applies to the inner header, and during encapsulation, the DSCP mark is
+not automatically copied to the outer header.</p>
+<ol class="arabic">
+<li><p>In order to set the DSCP value of the outer header, modify the <code class="docutils literal notranslate"><span class="pre">dscp</span></code>
+configuration option in <code class="docutils literal notranslate"><span class="pre">/etc/neutron/plugins/ml2/&lt;agent_name&gt;_agent.ini</span></code>
+where <code class="docutils literal notranslate"><span class="pre">&lt;agent_name&gt;</span></code> is the name of the agent being used
+(e.g., <code class="docutils literal notranslate"><span class="pre">openvswitch</span></code>):</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[agent]</span>
+<span class="na">dscp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">8</span>
+</pre></div>
+</div>
+</li>
+<li><p>In order to copy the DSCP field of the inner header to the outer header,
+change the <code class="docutils literal notranslate"><span class="pre">dscp_inherit</span></code> configuration option to true in
+<code class="docutils literal notranslate"><span class="pre">/etc/neutron/plugins/ml2/&lt;agent_name&gt;_agent.ini</span></code> where <code class="docutils literal notranslate"><span class="pre">&lt;agent_name&gt;</span></code>
+is the name of the agent being used (e.g., <code class="docutils literal notranslate"><span class="pre">openvswitch</span></code>):</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[agent]</span>
+<span class="na">dscp_inherit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">true</span>
+</pre></div>
+</div>
+<p>If the <code class="docutils literal notranslate"><span class="pre">dscp_inherit</span></code> option is set to true, the previous <code class="docutils literal notranslate"><span class="pre">dscp</span></code> option
+is overwritten.</p>
+</li>
+</ol>
+</section>
+<section id="trusted-projects-policy-yaml-configuration">
+<h3>Trusted projects policy.yaml configuration<a class="headerlink" href="#trusted-projects-policy-yaml-configuration" title="Link to this heading">¶</a></h3>
+<p>If projects are trusted to administrate their own QoS policies in
+your cloud, neutron’s file <code class="docutils literal notranslate"><span class="pre">policy.yaml</span></code> can be modified to allow this.</p>
+<p>Modify <code class="docutils literal notranslate"><span class="pre">/etc/neutron/policy.yaml</span></code> policy entries as follows:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="s">&quot;get_policy&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+<span class="s">&quot;create_policy&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+<span class="s">&quot;update_policy&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+<span class="s">&quot;delete_policy&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+<span class="s">&quot;get_rule_type&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+</pre></div>
+</div>
+<p>To enable bandwidth limit rule:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="s">&quot;get_policy_bandwidth_limit_rule&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+<span class="s">&quot;create_policy_bandwidth_limit_rule&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+<span class="s">&quot;delete_policy_bandwidth_limit_rule&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+<span class="s">&quot;update_policy_bandwidth_limit_rule&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+</pre></div>
+</div>
+<p>To enable DSCP marking rule:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="s">&quot;get_policy_dscp_marking_rule&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+<span class="s">&quot;create_policy_dscp_marking_rule&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+<span class="s">&quot;delete_policy_dscp_marking_rule&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+<span class="s">&quot;update_policy_dscp_marking_rule&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+</pre></div>
+</div>
+<p>To enable minimum bandwidth rule:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="s">&quot;get_policy_minimum_bandwidth_rule&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+<span class="s">&quot;create_policy_minimum_bandwidth_rule&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+<span class="s">&quot;delete_policy_minimum_bandwidth_rule&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+<span class="s">&quot;update_policy_minimum_bandwidth_rule&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+</pre></div>
+</div>
+<p>To enable minimum packet rate rule:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="s">&quot;get_policy_minimum_packet_rate_rule&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+<span class="s">&quot;create_policy_minimum_packet_rate_rule&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+<span class="s">&quot;delete_policy_minimum_packet_rate_rule&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+<span class="s">&quot;update_policy_minimum_packet_rate_rule&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="user-workflow">
+<h2>User workflow<a class="headerlink" href="#user-workflow" title="Link to this heading">¶</a></h2>
+<p>QoS policies are only created by admins with the default <code class="docutils literal notranslate"><span class="pre">policy.yaml</span></code>.
+Therefore, you should have the cloud operator set them up on
+behalf of the cloud projects.</p>
+<p>If projects are trusted to create their own policies, check the trusted
+projects <code class="docutils literal notranslate"><span class="pre">policy.yaml</span></code> configuration section.</p>
+<p>First, create a QoS policy and its bandwidth limit rule:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>qos<span class="w"> </span>policy<span class="w"> </span>create<span class="w"> </span>bw-limiter
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| Field             | Value                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| description       |                                      |</span>
+<span class="go">| id                | 5df855e9-a833-49a3-9c82-c0839a5f103f |</span>
+<span class="go">| is_default        | False                                |</span>
+<span class="go">| name              | bw-limiter                           |</span>
+<span class="go">| project_id        | 4db7c1ed114a4a7fb0f077148155c500     |</span>
+<span class="go">| rules             | []                                   |</span>
+<span class="go">| shared            | False                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+
+
+<span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>qos<span class="w"> </span>rule<span class="w"> </span>create<span class="w"> </span>--type<span class="w"> </span>bandwidth-limit<span class="w"> </span>--max-kbps<span class="w"> </span><span class="m">3000</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--max-burst-kbits<span class="w"> </span><span class="m">2400</span><span class="w"> </span>--egress<span class="w"> </span>bw-limiter
+<span class="go">+----------------+--------------------------------------+</span>
+<span class="go">| Field          | Value                                |</span>
+<span class="go">+----------------+--------------------------------------+</span>
+<span class="go">| direction      | egress                               |</span>
+<span class="go">| id             | 92ceb52f-170f-49d0-9528-976e2fee2d6f |</span>
+<span class="go">| max_burst_kbps | 2400                                 |</span>
+<span class="go">| max_kbps       | 3000                                 |</span>
+<span class="go">| name           | None                                 |</span>
+<span class="go">| project_id     |                                      |</span>
+<span class="go">+----------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The QoS implementation requires a burst value to ensure proper behavior of
+bandwidth limit rules in the Open vSwitch agent.
+Configuring the proper burst value is very important. If the burst value is
+set too low, bandwidth usage will be throttled even with a proper bandwidth
+limit setting. This issue is discussed in various documentation sources, for
+example in <a class="reference external" href="http://www.juniper.net/documentation/en_US/junos12.3/topics/concept/policer-mx-m120-m320-burstsize-determining.html">Juniper’s documentation</a>.
+For TCP traffic it is recommended to set burst value as 80% of desired bandwidth
+limit value. For example, if the bandwidth limit is set to 1000kbps then enough
+burst value will be 800kbit. If the configured burst value is too low,
+achieved bandwidth limit will be lower than expected. If the configured burst
+value is too high, too few packets could be limited and achieved bandwidth
+limit would be higher than expected.
+If you do not provide a value, it defaults to 80% of the bandwidth limit which
+works for typical TCP traffic.</p>
+</div>
+<p>Second, associate the created policy with an existing neutron port.
+In order to do this, user extracts the port id to be associated to
+the already created policy. In the next example, we will assign the
+<code class="docutils literal notranslate"><span class="pre">bw-limiter</span></code> policy to the VM with IP address <code class="docutils literal notranslate"><span class="pre">192.0.2.1</span></code>.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>port<span class="w"> </span>list
+<span class="go">+--------------------------------------+-----------------------------------+</span>
+<span class="go">| ID                                   | Fixed IP Addresses                |</span>
+<span class="go">+--------------------------------------+-----------------------------------+</span>
+<span class="go">| 0271d1d9-1b16-4410-bd74-82cdf6dcb5b3 | { ... , &quot;ip_address&quot;: &quot;192.0.2.1&quot;}|</span>
+<span class="go">| 88101e57-76fa-4d12-b0e0-4fc7634b874a | { ... , &quot;ip_address&quot;: &quot;192.0.2.3&quot;}|</span>
+<span class="go">| e04aab6a-5c6c-4bd9-a600-33333551a668 | { ... , &quot;ip_address&quot;: &quot;192.0.2.2&quot;}|</span>
+<span class="go">+--------------------------------------+-----------------------------------+</span>
+
+<span class="gp">$ </span>openstack<span class="w"> </span>port<span class="w"> </span><span class="nb">set</span><span class="w"> </span>--qos-policy<span class="w"> </span>bw-limiter<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>88101e57-76fa-4d12-b0e0-4fc7634b874a
+</pre></div>
+</div>
+<p>In order to detach a port from the QoS policy, simply update again the
+port configuration.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>port<span class="w"> </span><span class="nb">unset</span><span class="w"> </span>--qos-policy<span class="w"> </span>88101e57-76fa-4d12-b0e0-4fc7634b874a
+</pre></div>
+</div>
+<p>Ports can be created with a policy attached to them too.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>port<span class="w"> </span>create<span class="w"> </span>--qos-policy<span class="w"> </span>bw-limiter<span class="w"> </span>--network<span class="w"> </span>private<span class="w"> </span>port1
+<span class="go">+-----------------------+--------------------------------------------------+</span>
+<span class="go">| Field                 | Value                                            |</span>
+<span class="go">+-----------------------+--------------------------------------------------+</span>
+<span class="go">| admin_state_up        | UP                                               |</span>
+<span class="go">| allowed_address_pairs |                                                  |</span>
+<span class="go">| binding_host_id       |                                                  |</span>
+<span class="go">| binding_profile       |                                                  |</span>
+<span class="go">| binding_vif_details   |                                                  |</span>
+<span class="go">| binding_vif_type      | unbound                                          |</span>
+<span class="go">| binding_vnic_type     | normal                                           |</span>
+<span class="go">| created_at            | 2017-05-15T08:43:00Z                             |</span>
+<span class="go">| data_plane_status     | None                                             |</span>
+<span class="go">| description           |                                                  |</span>
+<span class="go">| device_id             |                                                  |</span>
+<span class="go">| device_owner          |                                                  |</span>
+<span class="go">| dns_assignment        | None                                             |</span>
+<span class="go">| dns_name              | None                                             |</span>
+<span class="go">| extra_dhcp_opts       |                                                  |</span>
+<span class="go">| fixed_ips             | ip_address=&#39;10.0.10.4&#39;, subnet_id=&#39;292f8c1e-...&#39; |</span>
+<span class="go">| id                    | f51562ee-da8d-42de-9578-f6f5cb248226             |</span>
+<span class="go">| ip_address            | None                                             |</span>
+<span class="go">| mac_address           | fa:16:3e:d9:f2:ba                                |</span>
+<span class="go">| name                  | port1                                            |</span>
+<span class="go">| network_id            | 55dc2f70-0f92-4002-b343-ca34277b0234             |</span>
+<span class="go">| option_name           | None                                             |</span>
+<span class="go">| option_value          | None                                             |</span>
+<span class="go">| port_security_enabled | False                                            |</span>
+<span class="go">| project_id            | 4db7c1ed114a4a7fb0f077148155c500                 |</span>
+<span class="go">| qos_policy_id         | 5df855e9-a833-49a3-9c82-c0839a5f103f             |</span>
+<span class="go">| revision_number       | 6                                                |</span>
+<span class="go">| security_group_ids    | 0531cc1a-19d1-4cc7-ada5-49f8b08245be             |</span>
+<span class="go">| status                | DOWN                                             |</span>
+<span class="go">| subnet_id             | None                                             |</span>
+<span class="go">| tags                  | []                                               |</span>
+<span class="go">| trunk_details         | None                                             |</span>
+<span class="go">| updated_at            | 2017-05-15T08:43:00Z                             |</span>
+<span class="go">+-----------------------+--------------------------------------------------+</span>
+</pre></div>
+</div>
+<p>You can attach networks to a QoS policy. The meaning of this is that
+any compute port connected to the network will use the network policy by
+default unless the port has a specific policy attached to it. Internal network
+owned ports like DHCP and internal router ports are excluded from network
+policy application.</p>
+<p>In order to attach a QoS policy to a network, update an existing
+network, or initially create the network attached to the policy.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span><span class="nb">set</span><span class="w"> </span>--qos-policy<span class="w"> </span>bw-limiter<span class="w"> </span>private
+</pre></div>
+</div>
+<p>The created policy can be associated with an existing floating IP.
+In order to do this, user extracts the floating IP id to be associated to
+the already created policy. In the next example, we will assign the
+<code class="docutils literal notranslate"><span class="pre">bw-limiter</span></code> policy to the floating IP address <code class="docutils literal notranslate"><span class="pre">172.16.100.18</span></code>.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>floating<span class="w"> </span>ip<span class="w"> </span>list
+<span class="go">+--------------------------------------+---------------------+------------------+------+-----+</span>
+<span class="go">| ID                                   | Floating IP Address | Fixed IP Address | Port | ... |</span>
+<span class="go">+--------------------------------------+---------------------+------------------+------+-----+</span>
+<span class="go">| 1163d127-6df3-44bb-b69c-c0e916303eb3 | 172.16.100.9        | None             | None | ... |</span>
+<span class="go">| d0ed7491-3eb7-4c4f-a0f0-df04f10a067c | 172.16.100.18       | None             | None | ... |</span>
+<span class="go">| f5a9ed48-2e9f-411c-8787-2b6ecd640090 | 172.16.100.2        | None             | None | ... |</span>
+<span class="go">+--------------------------------------+---------------------+------------------+------+-----+</span>
+</pre></div>
+</div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>floating<span class="w"> </span>ip<span class="w"> </span><span class="nb">set</span><span class="w"> </span>--qos-policy<span class="w"> </span>bw-limiter<span class="w"> </span>d0ed7491-3eb7-4c4f-a0f0-df04f10a067c
+</pre></div>
+</div>
+<p>In order to detach a floating IP from the QoS policy, simply update the
+floating IP configuration.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>floating<span class="w"> </span>ip<span class="w"> </span><span class="nb">set</span><span class="w"> </span>--no-qos-policy<span class="w"> </span>d0ed7491-3eb7-4c4f-a0f0-df04f10a067c
+</pre></div>
+</div>
+<p>Or use the <code class="docutils literal notranslate"><span class="pre">unset</span></code> action.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>floating<span class="w"> </span>ip<span class="w"> </span><span class="nb">unset</span><span class="w"> </span>--qos-policy<span class="w"> </span>d0ed7491-3eb7-4c4f-a0f0-df04f10a067c
+</pre></div>
+</div>
+<p>Floating IPs can be created with a policy attached to them too.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>floating<span class="w"> </span>ip<span class="w"> </span>create<span class="w"> </span>--qos-policy<span class="w"> </span>bw-limiter<span class="w"> </span>public
+<span class="go">+---------------------+--------------------------------------+</span>
+<span class="go">| Field               | Value                                |</span>
+<span class="go">+---------------------+--------------------------------------+</span>
+<span class="go">| created_at          | 2017-12-06T02:12:09Z                 |</span>
+<span class="go">| description         |                                      |</span>
+<span class="go">| fixed_ip_address    | None                                 |</span>
+<span class="go">| floating_ip_address | 172.16.100.12                        |</span>
+<span class="go">| floating_network_id | 4065eb05-cccb-4048-988c-e8c5480a746f |</span>
+<span class="go">| id                  | 6a0efeef-462b-4312-b4ad-627cde8a20e6 |</span>
+<span class="go">| name                | 172.16.100.12                        |</span>
+<span class="go">| port_id             | None                                 |</span>
+<span class="go">| project_id          | 916e39e8be52433ba040da3a3a6d0847     |</span>
+<span class="go">| qos_policy_id       | 5df855e9-a833-49a3-9c82-c0839a5f103f |</span>
+<span class="go">| revision_number     | 1                                    |</span>
+<span class="go">| router_id           | None                                 |</span>
+<span class="go">| status              | DOWN                                 |</span>
+<span class="go">| updated_at          | 2017-12-06T02:12:09Z                 |</span>
+<span class="go">+---------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>The QoS bandwidth limit rules attached to a floating IP will become
+active when you associate the latter with a port. For example, to associate
+the previously created floating IP <code class="docutils literal notranslate"><span class="pre">172.16.100.12</span></code> to the instance port with
+uuid <code class="docutils literal notranslate"><span class="pre">a7f25e73-4288-4a16-93b9-b71e6fd00862</span></code> and fixed IP <code class="docutils literal notranslate"><span class="pre">192.168.222.5</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>floating<span class="w"> </span>ip<span class="w"> </span><span class="nb">set</span><span class="w"> </span>--port<span class="w"> </span>a7f25e73-4288-4a16-93b9-b71e6fd00862<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>0eeb1f8a-de96-4cd9-a0f6-3f535c409558
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The QoS policy attached to a floating IP is not applied to a port,
+it is applied to an associated floating IP only.
+Thus the ID of QoS policy attached to a floating IP will not be visible
+in a port’s <code class="docutils literal notranslate"><span class="pre">qos_policy_id</span></code> field after asscoating a floating IP to
+the port. It is only visible in the floating IP attributes.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For now, the L3 agent floating IP QoS extension only supports
+<code class="docutils literal notranslate"><span class="pre">bandwidth_limit</span></code> rules. Other rule types (like DSCP marking) will be
+silently ignored for floating IPs. A QoS policy that does not contain any
+<code class="docutils literal notranslate"><span class="pre">bandwidth_limit</span></code> rules will have no effect when attached to a
+floating IP.</p>
+<p>If floating IP is bound to a port, and both have binding QoS bandwidth
+rules, the L3 agent floating IP QoS extension ignores the behavior of
+the port QoS, and installs the rules from the QoS policy associated to the
+floating IP on the appropriate device in the router namespace.</p>
+</div>
+<p>Each project can have at most one default QoS policy, although it is not
+mandatory. If a default QoS policy is defined, all new networks created within
+this project will have this policy assigned, as long as no other QoS policy is
+explicitly attached during the creation process. If the default QoS policy is
+unset, no change to existing networks will be made.</p>
+<p>In order to set a QoS policy as default, the parameter <code class="docutils literal notranslate"><span class="pre">--default</span></code> must be
+used. To unset this QoS policy as default, the parameter <code class="docutils literal notranslate"><span class="pre">--no-default</span></code> must
+be used.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>qos<span class="w"> </span>policy<span class="w"> </span>create<span class="w"> </span>--default<span class="w"> </span>bw-limiter
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| Field             | Value                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| description       |                                      |</span>
+<span class="go">| id                | 5df855e9-a833-49a3-9c82-c0839a5f103f |</span>
+<span class="go">| is_default        | True                                 |</span>
+<span class="go">| name              | bw-limiter                           |</span>
+<span class="go">| project_id        | 4db7c1ed114a4a7fb0f077148155c500     |</span>
+<span class="go">| rules             | []                                   |</span>
+<span class="go">| shared            | False                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+
+<span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>qos<span class="w"> </span>policy<span class="w"> </span><span class="nb">set</span><span class="w"> </span>--no-default<span class="w"> </span>bw-limiter
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| Field             | Value                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| description       |                                      |</span>
+<span class="go">| id                | 5df855e9-a833-49a3-9c82-c0839a5f103f |</span>
+<span class="go">| is_default        | False                                |</span>
+<span class="go">| name              | bw-limiter                           |</span>
+<span class="go">| project_id        | 4db7c1ed114a4a7fb0f077148155c500     |</span>
+<span class="go">| rules             | []                                   |</span>
+<span class="go">| shared            | False                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>Create qos policy with packet rate limit rules:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>qos<span class="w"> </span>policy<span class="w"> </span>create<span class="w"> </span>pps-limiter
+<span class="go">+-------------+--------------------------------------+</span>
+<span class="go">| Field       | Value                                |</span>
+<span class="go">+-------------+--------------------------------------+</span>
+<span class="go">| description |                                      |</span>
+<span class="go">| id          | 97f0ac37-7dd6-4579-8359-3bef0751a505 |</span>
+<span class="go">| is_default  | False                                |</span>
+<span class="go">| name        | pps-limiter                          |</span>
+<span class="go">| project_id  | 1d70739f831b421fb38a27adb368fc17     |</span>
+<span class="go">| rules       | []                                   |</span>
+<span class="go">| shared      | False                                |</span>
+<span class="go">| tags        | []                                   |</span>
+<span class="go">+-------------+--------------------------------------+</span>
+
+<span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>qos<span class="w"> </span>rule<span class="w"> </span>create<span class="w"> </span>--max-kpps<span class="w"> </span><span class="m">1000</span><span class="w"> </span>--max-burst-kpps<span class="w"> </span><span class="m">100</span><span class="w"> </span>--ingress<span class="w"> </span>--type<span class="w"> </span>packet-rate-limit<span class="w"> </span>pps-limiter
+<span class="go">+----------------+--------------------------------------+</span>
+<span class="go">| Field          | Value                                |</span>
+<span class="go">+----------------+--------------------------------------+</span>
+<span class="go">| direction      | ingress                              |</span>
+<span class="go">| id             | 4a1cb166-9661-48d7-bddb-00b7d75846cd |</span>
+<span class="go">| max_burst_kpps | 100                                  |</span>
+<span class="go">| max_kpps       | 1000                                 |</span>
+<span class="go">| name           | None                                 |</span>
+<span class="go">| project_id     |                                      |</span>
+<span class="go">+----------------+--------------------------------------+</span>
+
+<span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>qos<span class="w"> </span>rule<span class="w"> </span>create<span class="w"> </span>--max-kpps<span class="w"> </span><span class="m">1000</span><span class="w"> </span>--max-burst-kpps<span class="w"> </span><span class="m">100</span><span class="w"> </span>--egress<span class="w"> </span>--type<span class="w"> </span>packet-rate-limit<span class="w"> </span>pps-limiter
+<span class="go">+----------------+--------------------------------------+</span>
+<span class="go">| Field          | Value                                |</span>
+<span class="go">+----------------+--------------------------------------+</span>
+<span class="go">| direction      | egress                               |</span>
+<span class="go">| id             | 6abd67f7-0bde-4ad3-ac54-b0a6103b0449 |</span>
+<span class="go">| max_burst_kpps | 100                                  |</span>
+<span class="go">| max_kpps       | 1000                                 |</span>
+<span class="go">| name           | None                                 |</span>
+<span class="go">| project_id     |                                      |</span>
+<span class="go">+----------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The unit for the rate and burst is kilo (1000) packets per second.</p>
+</div>
+<p>Now apply the packet rate limit QoS policy to a Port:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>port<span class="w"> </span><span class="nb">set</span><span class="w"> </span>--qos-policy<span class="w"> </span>pps-limiter<span class="w"> </span>251948bd-08e4-4569-a47f-ecbc1fd4af4d
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Packet rate limit is only supported by the ml2 ovs driver. And it leverages
+the meter actions of the ovs kernel datapath or the userspace ovs dpdk datapath.
+The meter action is only supported when the datapath is in user mode
+or ovs kernel datapath with kernerl version &gt;= 4.15.</p>
+</div>
+<section id="administrator-enforcement">
+<h3>Administrator enforcement<a class="headerlink" href="#administrator-enforcement" title="Link to this heading">¶</a></h3>
+<p>Administrators are able to enforce policies on project ports or networks.
+As long as the policy is not shared, the project is not be able to detach
+any policy attached to a network or port.</p>
+<p>If the policy is shared, the project is able to attach or detach such
+policy from its own ports and networks.</p>
+</section>
+<section id="rule-modification">
+<h3>Rule modification<a class="headerlink" href="#rule-modification" title="Link to this heading">¶</a></h3>
+<p>You can modify rules at runtime. Rule modifications will be propagated to any
+attached port.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>qos<span class="w"> </span>rule<span class="w"> </span><span class="nb">set</span><span class="w"> </span>--max-kbps<span class="w"> </span><span class="m">2000</span><span class="w"> </span>--max-burst-kbits<span class="w"> </span><span class="m">1600</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--ingress<span class="w"> </span>bw-limiter<span class="w"> </span>92ceb52f-170f-49d0-9528-976e2fee2d6f
+
+<span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>qos<span class="w"> </span>rule<span class="w"> </span>show<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>bw-limiter<span class="w"> </span>92ceb52f-170f-49d0-9528-976e2fee2d6f
+<span class="go">+----------------+--------------------------------------+</span>
+<span class="go">| Field          | Value                                |</span>
+<span class="go">+----------------+--------------------------------------+</span>
+<span class="go">| direction      | ingress                              |</span>
+<span class="go">| id             | 92ceb52f-170f-49d0-9528-976e2fee2d6f |</span>
+<span class="go">| max_burst_kbps | 1600                                 |</span>
+<span class="go">| max_kbps       | 2000                                 |</span>
+<span class="go">| name           | None                                 |</span>
+<span class="go">| project_id     |                                      |</span>
+<span class="go">+----------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>Just like with bandwidth limiting, create a policy for DSCP marking rule:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>qos<span class="w"> </span>policy<span class="w"> </span>create<span class="w"> </span>dscp-marking
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| Field             | Value                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| description       |                                      |</span>
+<span class="go">| id                | d1f90c76-fbe8-4d6f-bb87-a9aea997ed1e |</span>
+<span class="go">| is_default        | False                                |</span>
+<span class="go">| name              | dscp-marking                         |</span>
+<span class="go">| project_id        | 4db7c1ed114a4a7fb0f077148155c500     |</span>
+<span class="go">| rules             | []                                   |</span>
+<span class="go">| shared            | False                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>You can create, update, list, delete, and show DSCP markings
+with the neutron client:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>qos<span class="w"> </span>rule<span class="w"> </span>create<span class="w"> </span>--type<span class="w"> </span>dscp-marking<span class="w"> </span>--dscp-mark<span class="w"> </span><span class="m">26</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>dscp-marking
+<span class="go">+----------------+--------------------------------------+</span>
+<span class="go">| Field          | Value                                |</span>
+<span class="go">+----------------+--------------------------------------+</span>
+<span class="go">| dscp_mark      | 26                                   |</span>
+<span class="go">| id             | 115e4f70-8034-4176-8fe9-2c47f8878a7d |</span>
+<span class="go">| name           | None                                 |</span>
+<span class="go">| project_id     |                                      |</span>
+<span class="go">+----------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>qos<span class="w"> </span>rule<span class="w"> </span><span class="nb">set</span><span class="w"> </span>--dscp-mark<span class="w"> </span><span class="m">22</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>dscp-marking<span class="w"> </span>115e4f70-8034-4176-8fe9-2c47f8878a7d
+
+<span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>qos<span class="w"> </span>rule<span class="w"> </span>list<span class="w"> </span>dscp-marking
+<span class="go">+--------------------------------------+----------------------------------+</span>
+<span class="go">| ID                                   | DSCP Mark                        |</span>
+<span class="go">+--------------------------------------+----------------------------------+</span>
+<span class="go">| 115e4f70-8034-4176-8fe9-2c47f8878a7d | 22                               |</span>
+<span class="go">+--------------------------------------+----------------------------------+</span>
+
+<span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>qos<span class="w"> </span>rule<span class="w"> </span>show<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>dscp-marking<span class="w"> </span>115e4f70-8034-4176-8fe9-2c47f8878a7d
+<span class="go">+----------------+--------------------------------------+</span>
+<span class="go">| Field          | Value                                |</span>
+<span class="go">+----------------+--------------------------------------+</span>
+<span class="go">| dscp_mark      | 22                                   |</span>
+<span class="go">| id             | 115e4f70-8034-4176-8fe9-2c47f8878a7d |</span>
+<span class="go">| name           | None                                 |</span>
+<span class="go">| project_id     |                                      |</span>
+<span class="go">+----------------+--------------------------------------+</span>
+
+<span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>qos<span class="w"> </span>rule<span class="w"> </span>delete<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>dscp-marking<span class="w"> </span>115e4f70-8034-4176-8fe9-2c47f8878a7d
+</pre></div>
+</div>
+<p>You can also include minimum bandwidth rules in your policy:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>qos<span class="w"> </span>policy<span class="w"> </span>create<span class="w"> </span>bandwidth-control
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| Field             | Value                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| description       |                                      |</span>
+<span class="go">| id                | 8491547e-add1-4c6c-a50e-42121237256c |</span>
+<span class="go">| is_default        | False                                |</span>
+<span class="go">| name              | bandwidth-control                    |</span>
+<span class="go">| project_id        | 7cc5a84e415d48e69d2b06aa67b317d8     |</span>
+<span class="go">| revision_number   | 1                                    |</span>
+<span class="go">| rules             | []                                   |</span>
+<span class="go">| shared            | False                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+
+<span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>qos<span class="w"> </span>rule<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--type<span class="w"> </span>minimum-bandwidth<span class="w"> </span>--min-kbps<span class="w"> </span><span class="m">1000</span><span class="w"> </span>--egress<span class="w"> </span>bandwidth-control
+<span class="go">+------------+--------------------------------------+</span>
+<span class="go">| Field      | Value                                |</span>
+<span class="go">+------------+--------------------------------------+</span>
+<span class="go">| direction  | egress                               |</span>
+<span class="go">| id         | da858b32-44bc-43c9-b92b-cf6e2fa836ab |</span>
+<span class="go">| min_kbps   | 1000                                 |</span>
+<span class="go">| name       | None                                 |</span>
+<span class="go">| project_id |                                      |</span>
+<span class="go">+------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>A policy with a minimum bandwidth ensures best efforts are made to provide
+no less than the specified bandwidth to each port on which the rule is
+applied. However, as this feature is not yet integrated with the Compute
+scheduler, minimum bandwidth cannot be guaranteed.</p>
+<p>It is also possible to combine several rules in one policy, as long as the type
+or direction of each rule is different. For example, You can specify two
+<code class="docutils literal notranslate"><span class="pre">bandwidth-limit</span></code> rules, one with <code class="docutils literal notranslate"><span class="pre">egress</span></code> and one with <code class="docutils literal notranslate"><span class="pre">ingress</span></code>
+direction.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>qos<span class="w"> </span>rule<span class="w"> </span>create<span class="w"> </span>--type<span class="w"> </span>bandwidth-limit<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--max-kbps<span class="w"> </span><span class="m">50000</span><span class="w"> </span>--max-burst-kbits<span class="w"> </span><span class="m">50000</span><span class="w"> </span>--egress<span class="w"> </span>bandwidth-control
+<span class="go">+----------------+--------------------------------------+</span>
+<span class="go">| Field          | Value                                |</span>
+<span class="go">+----------------+--------------------------------------+</span>
+<span class="go">| direction      | egress                               |</span>
+<span class="go">| id             | 0db48906-a762-4d32-8694-3f65214c34a6 |</span>
+<span class="go">| max_burst_kbps | 50000                                |</span>
+<span class="go">| max_kbps       | 50000                                |</span>
+<span class="go">| name           | None                                 |</span>
+<span class="go">| project_id     |                                      |</span>
+<span class="go">+----------------+--------------------------------------+</span>
+
+<span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>qos<span class="w"> </span>rule<span class="w"> </span>create<span class="w"> </span>--type<span class="w"> </span>bandwidth-limit<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--max-kbps<span class="w"> </span><span class="m">10000</span><span class="w"> </span>--max-burst-kbits<span class="w"> </span><span class="m">10000</span><span class="w"> </span>--ingress<span class="w"> </span>bandwidth-control
+<span class="go">+----------------+--------------------------------------+</span>
+<span class="go">| Field          | Value                                |</span>
+<span class="go">+----------------+--------------------------------------+</span>
+<span class="go">| direction      | ingress                              |</span>
+<span class="go">| id             | faabef24-e23a-4fdf-8e92-f8cb66998834 |</span>
+<span class="go">| max_burst_kbps | 10000                                |</span>
+<span class="go">| max_kbps       | 10000                                |</span>
+<span class="go">| name           | None                                 |</span>
+<span class="go">| project_id     |                                      |</span>
+<span class="go">+----------------+--------------------------------------+</span>
+
+<span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>qos<span class="w"> </span>rule<span class="w"> </span>create<span class="w"> </span>--type<span class="w"> </span>minimum-bandwidth<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--min-kbps<span class="w"> </span><span class="m">1000</span><span class="w"> </span>--egress<span class="w"> </span>bandwidth-control
+<span class="go">+------------+--------------------------------------+</span>
+<span class="go">| Field      | Value                                |</span>
+<span class="go">+------------+--------------------------------------+</span>
+<span class="go">| direction  | egress                               |</span>
+<span class="go">| id         | da858b32-44bc-43c9-b92b-cf6e2fa836ab |</span>
+<span class="go">| min_kbps   | 1000                                 |</span>
+<span class="go">| name       | None                                 |</span>
+<span class="go">| project_id |                                      |</span>
+<span class="go">+------------+--------------------------------------+</span>
+
+<span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>qos<span class="w"> </span>policy<span class="w"> </span>show<span class="w"> </span>bandwidth-control
+<span class="go">+-------------------+-------------------------------------------------------------------+</span>
+<span class="go">| Field             | Value                                                             |</span>
+<span class="go">+-------------------+-------------------------------------------------------------------+</span>
+<span class="go">| description       |                                                                   |</span>
+<span class="go">| id                | 8491547e-add1-4c6c-a50e-42121237256c                              |</span>
+<span class="go">| is_default        | False                                                             |</span>
+<span class="go">| name              | bandwidth-control                                                 |</span>
+<span class="go">| project_id        | 7cc5a84e415d48e69d2b06aa67b317d8                                  |</span>
+<span class="go">| revision_number   | 4                                                                 |</span>
+<span class="go">| rules             | [{u&#39;max_kbps&#39;: 50000, u&#39;direction&#39;: u&#39;egress&#39;,                    |</span>
+<span class="go">|                   |   u&#39;type&#39;: u&#39;bandwidth_limit&#39;,                                    |</span>
+<span class="go">|                   |   u&#39;id&#39;: u&#39;0db48906-a762-4d32-8694-3f65214c34a6&#39;,                 |</span>
+<span class="go">|                   |   u&#39;max_burst_kbps&#39;: 50000,                                       |</span>
+<span class="go">|                   |   u&#39;qos_policy_id&#39;: u&#39;8491547e-add1-4c6c-a50e-42121237256c&#39;},     |</span>
+<span class="go">|                   | [{u&#39;max_kbps&#39;: 10000, u&#39;direction&#39;: u&#39;ingress&#39;,                   |</span>
+<span class="go">|                   |   u&#39;type&#39;: u&#39;bandwidth_limit&#39;,                                    |</span>
+<span class="go">|                   |   u&#39;id&#39;: u&#39;faabef24-e23a-4fdf-8e92-f8cb66998834&#39;,                 |</span>
+<span class="go">|                   |   u&#39;max_burst_kbps&#39;: 10000,                                       |</span>
+<span class="go">|                   |   u&#39;qos_policy_id&#39;: u&#39;8491547e-add1-4c6c-a50e-42121237256c&#39;},     |</span>
+<span class="go">|                   |  {u&#39;direction&#39;:                                                   |</span>
+<span class="go">|                   |   u&#39;egress&#39;, u&#39;min_kbps&#39;: 1000, u&#39;type&#39;: u&#39;minimum_bandwidth&#39;,    |</span>
+<span class="go">|                   |   u&#39;id&#39;: u&#39;da858b32-44bc-43c9-b92b-cf6e2fa836ab&#39;,                 |</span>
+<span class="go">|                   |   u&#39;qos_policy_id&#39;: u&#39;8491547e-add1-4c6c-a50e-42121237256c&#39;}]     |</span>
+<span class="go">| shared            | False                                                             |</span>
+<span class="go">+-------------------+-------------------------------------------------------------------+</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="config-logging.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Packet Logging Framework"></i></a>
+          
+          
+            <a href="config-qos-min-bw.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Quality of Service (QoS): Guaranteed Minimum Bandwidth"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2025-08-01 07:42:37</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation Guide</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">OpenStack Networking Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deploy.html">Deployment examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ops.html">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">Migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ovn/index.html">OVN Driver Administration Guide</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributor/index.html">Contributor Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Quality of Service (QoS)</a><ul>
+<li><a class="reference internal" href="#supported-qos-rule-types">Supported QoS rule types</a><ul>
+<li><a class="reference internal" href="#valid-dscp-marks">Valid DSCP Marks</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#l3-qos-support">L3 QoS support</a><ul>
+<li><a class="reference internal" href="#ml2-ovs">ML2/OVS</a></li>
+<li><a class="reference internal" href="#ml2-ovn">ML2/OVN</a></li>
+<li><a class="reference internal" href="#l3-services-that-provide-qos-extensions">L3 services that provide QoS extensions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li><a class="reference internal" href="#dscp-marking-on-outer-header-for-overlay-networks">DSCP marking on outer header for overlay networks</a></li>
+<li><a class="reference internal" href="#trusted-projects-policy-yaml-configuration">Trusted projects policy.yaml configuration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#user-workflow">User workflow</a><ul>
+<li><a class="reference internal" href="#administrator-enforcement">Administrator enforcement</a></li>
+<li><a class="reference internal" href="#rule-modification">Rule modification</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "admin/config-qos" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Quality of Service (QoS) in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2025-08-01 07:42:37";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "admin/config-qos";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

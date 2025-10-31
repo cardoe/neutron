@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Effective Neutron: 100 specific ways to improve your Neutron contributions &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/support-matrix.css?v=ac26a930" />
+    <script src="../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Setting Up a Development Environment" href="development_environment.html" />
+    <link rel="prev" title="Sub-Project Guidelines" href="stadium/guidelines.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/contributor/effective_neutron.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Effective Neutron: 100 specific ways to improve your Neutron contributions</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="stadium/guidelines.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Sub-Project Guidelines"></i></a>
+    
+    
+    <a href="development_environment.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Setting Up a Development Environment"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="effective-neutron-100-specific-ways-to-improve-your-neutron-contributions">
+<h1>Effective Neutron: 100 specific ways to improve your Neutron contributions<a class="headerlink" href="#effective-neutron-100-specific-ways-to-improve-your-neutron-contributions" title="Link to this heading">¶</a></h1>
+<p>There are a number of skills that make a great Neutron developer: writing good
+code, reviewing effectively, listening to peer feedback, etc. The objective of
+this document is to describe, by means of examples, the pitfalls, the good and
+bad practices that ‘we’ as project encounter on a daily basis and that make us
+either go slower or accelerate while contributing to Neutron.</p>
+<p>By reading and collaboratively contributing to such a knowledge base, your
+development and review cycle becomes shorter, because you will learn (and teach
+to others after you) what to watch out for, and how to be proactive in order
+to prevent negative feedback, minimize programming errors, writing better
+tests, and so on and so forth…in a nutshell, how to become an effective
+Neutron developer.</p>
+<p>The notes below are meant to be free-form and brief by design. They are not meant
+to replace or duplicate <a class="reference external" href="http://docs.openstack.org">OpenStack documentation</a>,
+or any project-wide documentation initiative like <a class="reference external" href="http://docs.openstack.org/infra/manual/developers.html#peer-review">peer-review notes</a>
+or the <a class="reference external" href="http://docs.openstack.org/project-team-guide/">team guide</a>. For this
+reason, references are acceptable and should be favored, if the shortcut is
+deemed useful to expand on the distilled information.
+We will try to keep these notes tidy by breaking them down into sections if it
+makes sense. Feel free to add, adjust, remove as you see fit. Please do so,
+taking into consideration yourself and other Neutron developers as readers.
+Capture your experience during development and review and add any comment that
+you believe will make your life and others’ easier.</p>
+<p>Happy hacking!</p>
+<section id="developing-better-software">
+<h2>Developing better software<a class="headerlink" href="#developing-better-software" title="Link to this heading">¶</a></h2>
+<section id="plugin-development">
+<h3>Plugin development<a class="headerlink" href="#plugin-development" title="Link to this heading">¶</a></h3>
+<p>Document common pitfalls as well as good practices done during plugin
+development.</p>
+<ul class="simple">
+<li><p>Use mixin classes as last resort. They can be a powerful tool to add behavior
+but their strength is also a weakness, as they can introduce <a class="reference external" href="https://review.opendev.org/#/c/121290/">unpredictable</a>
+behavior to the <a class="reference external" href="https://www.python.org/download/releases/2.3/mro/">MRO</a>,
+amongst other issues.</p></li>
+<li><p>In lieu of mixins, if you need to add behavior that is relevant for ML2,
+consider using the <a class="reference external" href="http://specs.openstack.org/openstack/neutron-specs/specs/juno/neutron-ml2-mechanismdriver-extensions.html">extension manager</a>.</p></li>
+<li><p>If you make changes to the DB class methods, like calling methods that can
+be inherited, think about what effect that may have to plugins that have
+controller <a class="reference external" href="https://review.opendev.org/#/c/116924/">backends</a>.</p></li>
+<li><p>If you make changes to the ML2 plugin or components used by the ML2 plugin,
+think about the <a class="reference external" href="http://lists.openstack.org/pipermail/openstack-dev/2015-October/076134.html">effect</a>
+that may have to other plugins.</p></li>
+<li><p>When adding behavior to the L2 and L3 db base classes, do not assume that
+there is an agent on the other side of the message broker that interacts
+with the server. Plugins may not rely on <a class="reference external" href="https://review.opendev.org/#/c/174020/">agents</a> at all.</p></li>
+<li><p>Be mindful of required capabilities when you develop plugin extensions. The
+<a class="reference external" href="https://github.com/openstack/neutron/blob/b14c06b5/neutron/api/extensions.py#L122">Extension description</a>
+provides the ability to specify the list of required capabilities
+for the extension you are developing. By declaring this list, the server will
+not start up if the requirements are not met, thus avoiding leading the
+system to experience undetermined behavior at runtime.</p></li>
+</ul>
+</section>
+<section id="database-interaction">
+<h3>Database interaction<a class="headerlink" href="#database-interaction" title="Link to this heading">¶</a></h3>
+<p>Document common pitfalls as well as good practices done during database
+development.</p>
+<ul>
+<li><p><a class="reference external" href="http://docs.sqlalchemy.org/en/rel_1_0/orm/query.html#sqlalchemy.orm.query.Query.first">first()</a>
+does not raise an exception.</p></li>
+<li><p>Do not use <a class="reference external" href="http://docs.sqlalchemy.org/en/rel_1_0/orm/query.html#sqlalchemy.orm.query.Query.delete">delete()</a>
+to remove objects. A delete query does not load the object so no sqlalchemy
+events can be triggered that would do things like recalculate quotas or
+update revision numbers of parent objects. For more details on all of the
+things that can go wrong using bulk delete operations, see the “Warning”
+sections in the link above.</p></li>
+<li><p>Beware of the <a class="reference external" href="http://docs.sqlalchemy.org/en/latest/faq/sessions.html#this-session-s-transaction-has-been-rolled-back-due-to-a-previous-exception-during-flush-or-similar">InvalidRequestError</a> exception.
+There is even a <a class="reference external" href="https://bugs.launchpad.net/neutron/+bug/1409774">Neutron bug</a>
+registered for it. Bear in mind that this error may also occur when nesting
+transaction blocks, and the innermost block raises an error without proper
+rollback. Consider if <a class="reference external" href="http://docs.sqlalchemy.org/en/rel_1_0/orm/session_transaction.html#using-savepoint">savepoints</a>
+can fit your use case.</p></li>
+<li><p>When designing data models that are related to each other, be careful to how
+you model the relationships’ loading <a class="reference external" href="http://docs.sqlalchemy.org/en/latest/orm/loading_relationships.html#using-loader-strategies-lazy-loading-eager-loading">strategy</a>. For instance a joined relationship can
+be very efficient over others (some examples include <a class="reference external" href="https://review.opendev.org/#/c/88665/">router gateways</a>
+or <a class="reference external" href="https://review.opendev.org/#/c/257086/">network availability zones</a>).</p></li>
+<li><p>If you add a relationship to a Neutron object that will be referenced in the
+majority of cases where the object is retrieved, be sure to use the
+lazy=’joined’ parameter to the relationship so the related objects are loaded
+as part of the same query. Otherwise, the default method is ‘select’, which
+emits a new DB query to retrieve each related object adversely impacting
+performance. For example, see <a class="reference external" href="https://review.opendev.org/#/c/88665/">patch 88665</a>
+which resulted in a significant improvement since router retrieval functions
+always include the gateway interface.</p></li>
+<li><p>Conversely, do not use lazy=’joined’ if the relationship is only used in
+corner cases because the JOIN statement comes at a cost that may be
+significant if the relationship contains many objects. For example, see
+<a class="reference external" href="https://review.opendev.org/#/c/168214/">patch 168214</a> which reduced a
+subnet retrieval by ~90% by avoiding a join to the IP allocation table.</p></li>
+<li><p>When writing extensions to existing objects (e.g. Networks), ensure that
+they are written in a way that the data on the object can be calculated
+without additional DB lookup. If that’s not possible, ensure the DB lookup
+is performed once in bulk during a list operation. Otherwise a list call
+for a 1000 objects will change from a constant small number of DB queries
+to 1000 DB queries. For example, see
+<a class="reference external" href="https://review.opendev.org/#/c/257086/">patch 257086</a> which changed the
+availability zone code from the incorrect style to a database friendly one.</p></li>
+<li><p>Beware of ResultProxy.inserted_primary_key which returns a list of last
+inserted primary keys not the last inserted primary key:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">mymodel</span><span class="o">.</span><span class="n">insert</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="o">**</span><span class="n">values</span><span class="p">))</span>
+<span class="c1"># result.inserted_primary_key is a list even if we inserted a unique row!</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="system-development">
+<h3>System development<a class="headerlink" href="#system-development" title="Link to this heading">¶</a></h3>
+<p>Document common pitfalls as well as good practices done when invoking system
+commands and interacting with linux utils.</p>
+<ul class="simple">
+<li><p>When a patch requires a new platform tool or a new feature in an existing
+tool, check if common platforms ship packages with the aforementioned
+feature. Also, tag such a patch with <code class="docutils literal notranslate"><span class="pre">UpgradeImpact</span></code> to raise its
+visibility (as these patches are brought up to the attention of the core team
+during team meetings).
+More details in <a class="reference internal" href="policies/code-reviews.html#spec-review-practices"><span class="std std-ref">review guidelines</span></a>.</p></li>
+<li><p>When a patch or the code depends on a new feature in the kernel or in any
+platform tools (dnsmasq, ip, Open vSwitch etc.), consider introducing a new
+sanity check to validate deployments for the expected features. Note that
+sanity checks <em>must not</em> check for version numbers of underlying platform
+tools because distributions may decide to backport needed features into older
+versions. Instead, sanity checks should validate actual features by
+attempting to use them.</p></li>
+</ul>
+</section>
+<section id="eventlet-concurrent-model">
+<h3>Eventlet concurrent model<a class="headerlink" href="#eventlet-concurrent-model" title="Link to this heading">¶</a></h3>
+<p>Document common pitfalls as well as good practices done when using eventlet
+and monkey patching.</p>
+<ul class="simple">
+<li><p>Do not use with_lockmode(‘update’) on SQL queries without protecting the
+operation with a lockutils semaphore. For some SQLAlchemy database drivers
+that operators may choose (e.g. MySQLdb) it may result in a temporary
+deadlock by yielding to another coroutine while holding the DB lock.
+The following wiki provides more details:
+<a class="reference external" href="https://wiki.openstack.org/wiki/OpenStack_and_SQLAlchemy#MySQLdb_.2B_eventlet_.3D_sad">https://wiki.openstack.org/wiki/OpenStack_and_SQLAlchemy#MySQLdb_.2B_eventlet_.3D_sad</a></p></li>
+</ul>
+</section>
+<section id="mocking-and-testing">
+<h3>Mocking and testing<a class="headerlink" href="#mocking-and-testing" title="Link to this heading">¶</a></h3>
+<p>Document common pitfalls as well as good practices done when writing tests,
+any test. For anything more elaborate, please visit the testing section.</p>
+<ul>
+<li><p>Preferring low level testing versus full path testing (e.g. not testing
+database via client calls). The former is to be favored in unit testing,
+whereas the latter is to be favored in functional testing.</p></li>
+<li><p>Prefer specific assertions (assert(Not)In, assert(Not)IsInstance,
+assert(Not)IsNone, etc) over generic ones (assertTrue/False, assertEqual)
+because they raise more meaningful errors:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">test_specific</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="c1"># raise meaningful error: &quot;MismatchError: 3 not in [1, 2]&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_generic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="mi">3</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="c1"># raise meaningless error: &quot;AssertionError: False is not true&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Use the pattern “self.assertEqual(expected, observed)” not the opposite, it
+helps reviewers to understand which one is the expected/observed value in
+non-trivial assertions. The expected and observed values are also labeled
+in the output when the assertion fails.</p></li>
+<li><p>Prefer specific assertions (assertTrue, assertFalse) over
+assertEqual(True/False, observed).</p></li>
+<li><p>Don’t write tests that don’t test the intended code. This might seem silly
+but it is easy to do with a lot of mocks in place. Ensure that your tests
+break as expected before your code change.</p></li>
+<li><p>Avoid heavy use of the mock library to test your code. If your code requires
+more than one mock to ensure that it does the correct thing, it needs to be
+refactored into smaller, testable units. Otherwise we depend on
+fullstack/tempest/api tests to test all of the real behavior and we end up
+with code containing way too many hidden dependencies and side effects.</p></li>
+<li><p>All behavior changes to fix bugs should include a test that prevents a
+regression. If you made a change and it didn’t break a test, it means the
+code was not adequately tested in the first place, it’s not an excuse to
+leave it untested.</p></li>
+<li><p>Test the failure cases. Use a mock side effect to throw the necessary
+exceptions to test your ‘except’ clauses.</p></li>
+<li><p>Don’t mimic existing tests that violate these guidelines. We are attempting
+to replace all of these so more tests like them create more work. If you
+need help writing a test, reach out to the testing lieutenants and the team
+on IRC.</p></li>
+<li><p>Mocking open() is a dangerous practice because it can lead to unexpected
+bugs like <a class="reference external" href="https://bugs.launchpad.net/neutron/+bug/1503847">bug 1503847</a>.
+In fact, when the built-in open method is mocked during tests, some
+utilities (like debtcollector) may still rely on the real thing, and may
+end up using the mock rather what they are really looking for. If you must,
+consider using <a class="reference external" href="https://review.opendev.org/#/c/232716/">OpenFixture</a>, but
+it is better not to mock open() at all.</p></li>
+</ul>
+</section>
+<section id="documentation">
+<h3>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">¶</a></h3>
+<p>The documenation for Neutron that exists in this repository is broken
+down into the following directories based on content:</p>
+<ul class="simple">
+<li><p>doc/source/admin/ - feature-specific configuration documentation aimed
+at operators.</p></li>
+<li><p>doc/source/configuration - stubs for auto-generated configuration files.
+Only needs updating if new config files are added.</p></li>
+<li><p>doc/source/contributor/internals - developer documentation for lower-level
+technical details.</p></li>
+<li><p>doc/source/contributor/policies - neutron team policies and best practices.</p></li>
+<li><p>doc/source/install - install-specific documentation for standing-up
+network-enabled nodes.</p></li>
+</ul>
+<p>Additional documentation resides in the neutron-lib repository:</p>
+<ul class="simple">
+<li><p>api-ref - API reference documentation for Neutron resource and API
+extensions.</p></li>
+</ul>
+</section>
+<section id="backward-compatibility">
+<h3>Backward compatibility<a class="headerlink" href="#backward-compatibility" title="Link to this heading">¶</a></h3>
+<p>Document common pitfalls as well as good practices done when extending the
+RPC Interfaces.</p>
+<ul class="simple">
+<li><p>Make yourself familiar with
+<a class="reference internal" href="internals/upgrade.html#upgrade-review-guidelines"><span class="std std-ref">Upgrade review guidelines</span></a>.</p></li>
+</ul>
+<section id="deprecation">
+<h4>Deprecation<a class="headerlink" href="#deprecation" title="Link to this heading">¶</a></h4>
+<p>Sometimes we want to refactor things in a non-backward compatible way. In most
+cases you can use <a class="reference external" href="http://docs.openstack.org/debtcollector/latest/">debtcollector</a> to mark things for
+deprecation. Config items have <a class="reference external" href="https://docs.openstack.org/oslo.config/latest/reference/opts.html">deprecation options supported by oslo.config</a>.</p>
+<p>The deprecation process must follow the <a class="reference external" href="https://governance.openstack.org/tc/reference/tags/assert_follows-standard-deprecation.html#requirements">standard deprecation requirements</a>.
+In terms of neutron development, this means:</p>
+<ul class="simple">
+<li><p>A launchpad bug to track the deprecation.</p></li>
+<li><p>A patch to mark the deprecated items. If the deprecation affects
+users (config items, API changes) then a <a class="reference external" href="https://docs.openstack.org/reno/latest/user/usage.html">release note</a> must be
+included.</p></li>
+<li><p>Wait at least one cycle and at least three months linear time.</p></li>
+<li><p>A patch that removes the deprecated items. Make sure to refer to the
+original launchpad bug in the commit message of this patch.</p></li>
+</ul>
+</section>
+</section>
+<section id="scalability-issues">
+<h3>Scalability issues<a class="headerlink" href="#scalability-issues" title="Link to this heading">¶</a></h3>
+<p>Document common pitfalls as well as good practices done when writing code
+that needs to process a lot of data.</p>
+</section>
+<section id="translation-and-logging">
+<h3>Translation and logging<a class="headerlink" href="#translation-and-logging" title="Link to this heading">¶</a></h3>
+<p>Document common pitfalls as well as good practices done when instrumenting
+your code.</p>
+<ul class="simple">
+<li><p>Make yourself familiar with <a class="reference external" href="http://specs.openstack.org/openstack/openstack-specs/specs/log-guidelines.html#definition-of-log-levels">OpenStack logging guidelines</a>
+to avoid littering the logs with traces logged at inappropriate levels.</p></li>
+<li><p>The logger should only be passed unicode values. For example, do not pass it
+exceptions or other objects directly (LOG.error(exc), LOG.error(port), etc.).
+See <a class="reference external" href="https://docs.openstack.org/oslo.log/latest/user/migration.html#no-more-implicit-conversion-to-unicode-str">https://docs.openstack.org/oslo.log/latest/user/migration.html#no-more-implicit-conversion-to-unicode-str</a>
+for more details.</p></li>
+<li><p>Don’t pass exceptions into LOG.exception: it is already implicitly included
+in the log message by Python logging module.</p></li>
+<li><p>Don’t use LOG.exception when there is no exception registered in current
+thread context: Python 3.x versions before 3.5 are known to fail on it.</p></li>
+</ul>
+</section>
+<section id="project-interfaces">
+<h3>Project interfaces<a class="headerlink" href="#project-interfaces" title="Link to this heading">¶</a></h3>
+<p>Document common pitfalls as well as good practices done when writing code
+that is used to interface with other projects, like Keystone or Nova.</p>
+</section>
+<section id="documenting-your-code">
+<h3>Documenting your code<a class="headerlink" href="#documenting-your-code" title="Link to this heading">¶</a></h3>
+<p>Document common pitfalls as well as good practices done when writing
+docstrings.</p>
+</section>
+</section>
+<section id="landing-patches-more-rapidly">
+<h2>Landing patches more rapidly<a class="headerlink" href="#landing-patches-more-rapidly" title="Link to this heading">¶</a></h2>
+<section id="scoping-your-patch-appropriately">
+<h3>Scoping your patch appropriately<a class="headerlink" href="#scoping-your-patch-appropriately" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Do not make multiple changes in one patch unless absolutely necessary.
+Cleaning up nearby functions or fixing a small bug you noticed while working
+on something else makes the patch very difficult to review. It also makes
+cherry-picking and reverting very difficult.  Even apparently minor changes
+such as reformatting whitespace around your change can burden reviewers and
+cause merge conflicts.</p></li>
+<li><p>If a fix or feature requires code refactoring, submit the refactoring as a
+separate patch than the one that changes the logic. Otherwise
+it’s difficult for a reviewer to tell the difference between mistakes
+in the refactor and changes required for the fix/feature. If it’s a bug fix,
+try to implement the fix before the refactor to avoid making cherry-picks to
+stable branches difficult.</p></li>
+<li><p>Consider your reviewers’ time before submitting your patch. A patch that
+requires many hours or days to review will sit in the “todo” list until
+someone has many hours or days free (which may never happen.) If you can
+deliver your patch in small but incrementally understandable and testable
+pieces you will be more likely to attract reviewers.</p></li>
+</ul>
+</section>
+<section id="nits-and-pedantic-comments">
+<h3>Nits and pedantic comments<a class="headerlink" href="#nits-and-pedantic-comments" title="Link to this heading">¶</a></h3>
+<p>Document common nits and pedantic comments to watch out for.</p>
+<ul class="simple">
+<li><p>Make sure you spell correctly, the best you can, no-one wants rebase
+generators at the end of the release cycle!</p></li>
+<li><p>The odd pep8 error may cause an entire CI run to be wasted. Consider running
+validation (pep8 and/or tests) before submitting your patch. If you keep
+forgetting consider installing a git
+<a class="reference external" href="https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks">hook</a>
+so that Git will do it for you.</p></li>
+<li><p>Sometimes, new contributors want to dip their toes with trivial patches,
+but we at OpenStack <em>love</em> bike shedding and their patches may sometime
+stall. In some extreme cases, the more trivial the patch, the higher the
+chances it fails to merge. To ensure we as a team provide/have a
+frustration-free experience new contributors should be redirected to fixing
+<a class="reference external" href="https://bugs.launchpad.net/neutron/+bugs?field.tag=low-hanging-fruit">low-hanging-fruit bugs</a>
+that have a tangible positive impact to the codebase. Spelling mistakes, and
+docstring are fine, but there is a lot more that is relatively easy to fix
+and has a direct impact to Neutron users.</p></li>
+</ul>
+</section>
+<section id="reviewer-comments">
+<h3>Reviewer comments<a class="headerlink" href="#reviewer-comments" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Acknowledge them one by one by either clicking ‘Done’ or by replying
+extensively. If you do not, the reviewer won’t know whether you thought it
+was not important, or you simply forgot. If the reply satisfies the reviewer,
+consider capturing the input in the code/document itself so that it’s for
+reviewers of newer patchsets to see (and other developers when the
+patch merges).</p></li>
+<li><p>Watch for the feedback on your patches. Acknowledge it promptly and act on it
+quickly, so that the reviewer remains engaged. If you disappear for a week
+after you posted a patchset, it is very likely that the patch will end up
+being neglected.</p></li>
+<li><p>Do not take negative feedback personally. Neutron is a large project with
+lots of contributors with different opinions on how things should be done.
+Many come from widely varying cultures and languages so the English,
+text-only feedback can unintentionally come across as harsh. Getting a -1
+means reviewers are trying to help get the patch into a state that can be
+merged, it doesn’t just mean they are trying to block it. It’s very rare to
+get a patch merged on the first iteration that makes everyone happy.</p></li>
+</ul>
+</section>
+<section id="code-review">
+<h3>Code Review<a class="headerlink" href="#code-review" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>You should visit <a class="reference external" href="https://wiki.openstack.org/wiki/How_To_Contribute#Reviewing">OpenStack How To Review wiki</a></p></li>
+<li><p>Stay focussed and review what matters for the release. Please check out the
+Neutron section for the
+<a class="reference external" href="http://status.openstack.org/reviews/">Gerrit dashboard</a>. The output
+is generated by this
+<a class="reference external" href="https://github.com/openstack-infra/reviewday/blob/master/bin/neutron">tool</a>.</p></li>
+</ul>
+</section>
+<section id="irc">
+<h3>IRC<a class="headerlink" href="#irc" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>IRC is a place where you can speak with many of the Neutron developers
+and core reviewers. For more information you should visit
+<a class="reference external" href="http://wiki.openstack.org/wiki/IRC">OpenStack IRC wiki</a>
+Neutron IRC channel is #openstack-neutron</p></li>
+<li><p>There are weekly IRC meetings related to many different projects/teams
+in Neutron.
+A full list of these meetings and their date/time can be found in
+<a class="reference external" href="http://eavesdrop.openstack.org">OpenStack IRC Meetings</a>.
+It is important to attend these meetings in the area of your contribution
+and possibly mention your work and patches.</p></li>
+<li><p>When you have questions regarding an idea or a specific patch of yours, it
+can be helpful to find a relevant person in IRC and speak with them about
+it.
+You can find a user’s IRC nickname in their launchpad account.</p></li>
+<li><p>Being available on IRC is useful, since reviewers can contact
+you directly to quickly clarify a review issue. This speeds
+up the feedback loop.</p></li>
+<li><p>Each area of Neutron or sub-project of Neutron has a specific lieutenant
+in charge of it.
+You can most likely find these lieutenants on IRC, it is advised however to
+try and send public questions to the channel rather then to a specific person
+if possible.
+(This increase the chances of getting faster answers to your questions).
+A list of the areas and lieutenants nicknames can be found at
+<a class="reference internal" href="policies/neutron-teams.html"><span class="doc">Core Reviewers</span></a>.</p></li>
+</ul>
+</section>
+<section id="commit-messages">
+<h3>Commit messages<a class="headerlink" href="#commit-messages" title="Link to this heading">¶</a></h3>
+<p>Document common pitfalls as well as good practices done when writing commit
+messages.
+For more details see <a class="reference external" href="https://wiki.openstack.org/wiki/GitCommitMessages">Git commit message best practices</a>.
+This is the TL;DR version with the important points for committing to Neutron.</p>
+<ul class="simple">
+<li><p>One liners are bad, unless the change is trivial.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">UpgradeImpact</span></code> when the change could cause issues during the upgrade
+from one version to the next.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">APIImpact</span></code> should be used when the api-ref in neutron-lib must be updated
+to reflect the change, and only as a last resort. Rather, the ideal workflow
+includes submitting a corresponding neutron-lib api-ref change along with
+the implementation, thereby removing the need to use <code class="docutils literal notranslate"><span class="pre">APIImpact</span></code>.</p></li>
+<li><p>Make sure the commit message doesn’t have any spelling/grammar errors. This
+is the first thing reviewers read and they can be distracting enough to
+invite -1’s.</p></li>
+<li><p>Describe what the change accomplishes. If it’s a bug fix, explain how this
+code will fix the problem. If it’s part of a feature implementation, explain
+what component of the feature the patch implements. Do not just describe the
+bug, that’s what launchpad is for.</p></li>
+<li><p>Use the “Closes-Bug: #BUG-NUMBER” tag if the patch addresses a bug.
+Submitting a bugfix without a launchpad bug reference is unacceptable, even
+if it’s trivial. Launchpad is how bugs are tracked so fixes without a
+launchpad bug are a nightmare when users report the bug from an older
+version and the Neutron team can’t tell if/why/how it’s been fixed.
+Launchpad is also how backports are identified and tracked so patches
+without a bug report cannot be picked to stable branches.</p></li>
+<li><p>Use the “Implements: blueprint NAME-OF-BLUEPRINT” or “Partially-Implements:
+blueprint NAME-OF-BLUEPRINT” for features so reviewers can determine if the
+code matches the spec that was agreed upon. This also updates the blueprint
+on launchpad so it’s easy to see all patches that are related to a feature.</p></li>
+<li><p>If it’s not immediately obvious, explain what the previous code was doing
+that was incorrect. (e.g. code assumed it would never get ‘None’ from
+a function call)</p></li>
+<li><p>Be specific in your commit message about what the patch does and why it does
+this. For example, “Fixes incorrect logic in security groups” is not helpful
+because the code diff already shows that you are modifying security groups.
+The message should be specific enough that a reviewer looking at the code can
+tell if the patch does what the commit says in the most appropriate manner.
+If the reviewer has to guess why you did something, lots of your time will be
+wasted explaining why certain changes were made.</p></li>
+</ul>
+</section>
+<section id="dealing-with-zuul">
+<h3>Dealing with Zuul<a class="headerlink" href="#dealing-with-zuul" title="Link to this heading">¶</a></h3>
+<p>Document common pitfalls as well as good practices done when dealing with
+OpenStack CI.</p>
+<ul class="simple">
+<li><p>When you submit a patch, consider checking its <a class="reference external" href="http://status.openstack.org/zuul/">status</a>
+in the queue. If you see a job failures, you might as well save time and try
+to figure out in advance why it is failing.</p></li>
+<li><p>Excessive use of ‘recheck’ to get test to pass is discouraged. Please examine
+the logs for the failing test(s) and make sure your change has not tickled
+anything that might be causing a new failure or race condition. Getting your
+change in could make it even harder to debug what is actually broken
+later on.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="stadium/guidelines.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Sub-Project Guidelines"></i></a>
+          
+          
+            <a href="development_environment.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Setting Up a Development Environment"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2024-11-05 13:27:15</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Contributor Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index.html#basic-information">Basic Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#neutron-policies">Neutron Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#gerrit-rechecks">Gerrit Rechecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#neutron-stadium">Neutron Stadium</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#neutron-internals">Neutron Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#ovn-driver">OVN Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#dashboards">Dashboards</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Effective Neutron: 100 specific ways to improve your Neutron contributions</a><ul>
+<li><a class="reference internal" href="#developing-better-software">Developing better software</a><ul>
+<li><a class="reference internal" href="#plugin-development">Plugin development</a></li>
+<li><a class="reference internal" href="#database-interaction">Database interaction</a></li>
+<li><a class="reference internal" href="#system-development">System development</a></li>
+<li><a class="reference internal" href="#eventlet-concurrent-model">Eventlet concurrent model</a></li>
+<li><a class="reference internal" href="#mocking-and-testing">Mocking and testing</a></li>
+<li><a class="reference internal" href="#documentation">Documentation</a></li>
+<li><a class="reference internal" href="#backward-compatibility">Backward compatibility</a><ul>
+<li><a class="reference internal" href="#deprecation">Deprecation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#scalability-issues">Scalability issues</a></li>
+<li><a class="reference internal" href="#translation-and-logging">Translation and logging</a></li>
+<li><a class="reference internal" href="#project-interfaces">Project interfaces</a></li>
+<li><a class="reference internal" href="#documenting-your-code">Documenting your code</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#landing-patches-more-rapidly">Landing patches more rapidly</a><ul>
+<li><a class="reference internal" href="#scoping-your-patch-appropriately">Scoping your patch appropriately</a></li>
+<li><a class="reference internal" href="#nits-and-pedantic-comments">Nits and pedantic comments</a></li>
+<li><a class="reference internal" href="#reviewer-comments">Reviewer comments</a></li>
+<li><a class="reference internal" href="#code-review">Code Review</a></li>
+<li><a class="reference internal" href="#irc">IRC</a></li>
+<li><a class="reference internal" href="#commit-messages">Commit messages</a></li>
+<li><a class="reference internal" href="#dealing-with-zuul">Dealing with Zuul</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "contributor/effective_neutron" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Effective Neutron: 100 specific ways to improve your Neutron contributions in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2024-11-05 13:27:15";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "contributor/effective_neutron";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

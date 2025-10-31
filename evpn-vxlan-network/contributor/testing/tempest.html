@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Tempest Testing &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Template for ModelMigrationSync for external repos" href="template_model_sync_test.html" />
+    <link rel="prev" title="OVN with DevStack" href="ml2_ovn_devstack.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/contributor/testing/tempest.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Tempest Testing</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="ml2_ovn_devstack.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: OVN with DevStack"></i></a>
+    
+    
+    <a href="template_model_sync_test.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Template for ModelMigrationSync for external repos"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="tempest-testing">
+<span id="id1"></span><h1>Tempest Testing<a class="headerlink" href="#tempest-testing" title="Link to this heading">¶</a></h1>
+<section id="tempest-basics-in-networking-projects">
+<h2>Tempest basics in Networking projects<a class="headerlink" href="#tempest-basics-in-networking-projects" title="Link to this heading">¶</a></h2>
+<p>Tempest is the integration test suite of Openstack, for details see
+<a class="reference external" href="https://docs.openstack.org/tempest/latest/">Tempest Testing Project</a>.</p>
+<p>Tempest makes it possible to add project-specific plugins, and for networking
+this is <a class="reference external" href="https://opendev.org/openstack/neutron-tempest-plugin">neutron-tempest-plugin</a>.</p>
+<p>neutron-tempest-plugin covers API and scenario tests not just for core Neutron
+functionality, but for stadium projects as well.
+For reference please read
+<a class="reference external" href="testing.html#api-tests">Testing Neutron's related sections</a></p>
+<section id="api-tests">
+<h3>API Tests<a class="headerlink" href="#api-tests" title="Link to this heading">¶</a></h3>
+<p>API tests (neutron-tempest-plugin/neutron_tempest_plugin/api/) are
+intended to ensure the function
+and stability of the Neutron API. As much as possible, changes to
+this path should not be made at the same time as changes to the code
+to limit the potential for introducing backwards-incompatible changes,
+although the same patch that introduces a new API should include an API
+test.</p>
+<p>Since API tests target a deployed Neutron daemon that is not test-managed,
+they should not depend on controlling the runtime configuration
+of the target daemon. API tests should be black-box - no assumptions should
+be made about implementation. Only the contract defined by Neutron’s REST API
+should be validated, and all interaction with the daemon should be via
+a REST client.</p>
+<p>The neutron-tempest-plugin/neutron_tempest_plugin directory was copied from the
+Tempest project around the Kilo timeframe. At the time, there was an overlap
+of tests between the Tempest and Neutron repositories. This overlap was then
+eliminated by carving out a subset of resources that belong to Tempest, with
+the rest in Neutron.</p>
+<p>API tests that belong to Tempest deal with a subset of Neutron’s resources:</p>
+<ul class="simple">
+<li><p>Port</p></li>
+<li><p>Network</p></li>
+<li><p>Subnet</p></li>
+<li><p>Security Group</p></li>
+<li><p>Router</p></li>
+<li><p>Floating IP</p></li>
+</ul>
+<p>These resources were chosen for their ubiquity. They are found in most
+Neutron deployments regardless of plugin, and are directly involved in the
+networking and security of an instance. Together, they form the bare minimum
+needed by Neutron.</p>
+<p>This is excluding extensions to these resources (For example: Extra DHCP
+options to subnets, or snat_gateway mode to routers) that are not mandatory
+in the majority of cases.</p>
+<p>Tests for other resources should be contributed to the neutron-tempest-plugin
+repository. Scenario tests should be similarly split up between Tempest and
+Neutron according to the API they’re targeting.</p>
+<p>To create an API test, the testing class must at least inherit from
+neutron_tempest_plugin.api.base.BaseNetworkTest base class. As some of tests
+may require certain extensions to be enabled, the base class provides
+<code class="docutils literal notranslate"><span class="pre">required_extensions</span></code> class attribute which can be used by subclasses to
+define a list of required extensions for a particular test class.</p>
+</section>
+<section id="scenario-tests">
+<h3>Scenario Tests<a class="headerlink" href="#scenario-tests" title="Link to this heading">¶</a></h3>
+<p>Scenario tests (neutron-tempest-plugin/neutron_tempest_plugin/scenario),
+like API tests, use the Tempest test infrastructure and have the same
+requirements. Guidelines for writing a good scenario test may be found in
+the Tempest developer guide:
+<a class="reference external" href="https://docs.openstack.org/tempest/latest/field_guide/scenario.html">https://docs.openstack.org/tempest/latest/field_guide/scenario.html</a></p>
+<p>Scenario tests, like API tests, are split between the Tempest and Neutron
+repositories according to the Neutron API the test is targeting.</p>
+<p>Some scenario tests require advanced <code class="docutils literal notranslate"><span class="pre">Glance</span></code> images (for example, <code class="docutils literal notranslate"><span class="pre">Ubuntu</span></code>
+or <code class="docutils literal notranslate"><span class="pre">CentOS</span></code>) in order to pass. Those tests are skipped by default. To enable
+them, include the following in <code class="docutils literal notranslate"><span class="pre">tempest.conf</span></code>:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[compute]</span>
+<span class="na">image_ref</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&lt;uuid of advanced image&gt;</span>
+<span class="k">[neutron_plugin_options]</span>
+<span class="na">default_image_is_advanced</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</pre></div>
+</div>
+<p>To use the <code class="docutils literal notranslate"><span class="pre">advanced</span> <span class="pre">image</span></code> only for the tests that really need it and
+<code class="docutils literal notranslate"><span class="pre">cirros</span></code> for the rest to keep test execution as fast as possible:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[compute]</span>
+<span class="na">image_ref</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&lt;uuid of cirros image&gt;</span>
+<span class="k">[neutron_plugin_options]</span>
+<span class="na">advanced_image_ref</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&lt;uuid of advanced image&gt;</span>
+<span class="na">advanced_image_flavor_ref</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&lt;suitable flavor for the advance image&gt;</span>
+<span class="na">advanced_image_ssh_user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&lt;username for the advanced image&gt;</span>
+</pre></div>
+</div>
+<p>Specific test requirements for advanced images are:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">test_trunk</span></code> requires <code class="docutils literal notranslate"><span class="pre">802.11q</span></code> kernel module loaded.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">test_metadata</span></code> requires capabilty to run <code class="docutils literal notranslate"><span class="pre">curl</span></code> for IPv6 addresses.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">test_multicast</span></code> needs to execute python script on the VM to open
+multicast sockets.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">test_mtu</span></code> requires ping to be able to send packets with specific <code class="docutils literal notranslate"><span class="pre">mtu</span></code>.</p></li>
+</ol>
+</section>
+</section>
+<section id="zuul-basics-job-structure">
+<h2>Zuul basics &amp; job structure<a class="headerlink" href="#zuul-basics-job-structure" title="Link to this heading">¶</a></h2>
+<p>Zuul is the gating system behind Openstack, for details see:
+<a class="reference external" href="https://zuul-ci.org/docs/zuul/">Zuul - A Project Gating System</a>.</p>
+<p>Zuul job definitions are in yaml, ansible in the depths. The job definitions can be
+inherited. Networking projects job definitions parents are coming from
+<a class="reference external" href="https://opendev.org/openstack/devstack/src/branch/master/.zuul.yaml">devstack zuul job config</a>
+and from <a class="reference external" href="https://opendev.org/openstack/tempest/src/branch/master/tempest">tempest</a>
+and defined in <a class="reference external" href="https://opendev.org/openstack/neutron-tempest-plugin/src/branch/master/zuul.d">neutron-tempest-plugin zuul.d folder</a>
+and in <a class="reference external" href="https://opendev.org/openstack/neutron/src/branch/master/zuul.d">neutron zuul.d folder</a> .</p>
+</section>
+<section id="where-to-look">
+<h2>Where to look<a class="headerlink" href="#where-to-look" title="Link to this heading">¶</a></h2>
+<section id="debugging-zuul-results">
+<h3>Debugging zuul results<a class="headerlink" href="#debugging-zuul-results" title="Link to this heading">¶</a></h3>
+<p>Tempest executed with different configurations,
+for details check this page
+<a class="reference internal" href="ci_jobs.html#ci-jobs"><span class="std std-ref">Tempest jobs running in Neutron CI</span></a></p>
+<p>When zuul reports back job results to a review it gives links to the results
+as well.</p>
+<p>The logs can be checked online if you select <code class="docutils literal notranslate"><span class="pre">Logs</span></code> tab on the logs page.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">job-output.txt</span></code> is the full log which contains not just test execution
+logs, but devstack console output.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">test_results.html</span></code> is the clickable html test report.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">controller</span></code> and <code class="docutils literal notranslate"><span class="pre">compute</span></code> (in case of multinode job) are a dictionary
+tree containing the relevant files (configuration files, logs etc)
+created in the job. For example under controller/logs/etc/neutron/ you can
+check how Neutron services were configured, or in the file
+controller/logs/tempest_conf.txt you can check tempest configuration file.</p></li>
+<li><p>services’ log files are the in files <code class="docutils literal notranslate"><span class="pre">controller/logs/screen-`*`.txt</span></code>,
+so for example neutron l2 agent logs are in the file
+controller/logs/screen-q-agt.txt.</p></li>
+</ul>
+<section id="downloading-logs">
+<h4>Downloading logs<a class="headerlink" href="#downloading-logs" title="Link to this heading">¶</a></h4>
+<p>There is a possibility to download all logs related to a job.</p>
+<p>If you choose this on the zuul logs page select <code class="docutils literal notranslate"><span class="pre">Artifacts</span></code> tab on the
+logs page and click on <code class="docutils literal notranslate"><span class="pre">Download</span> <span class="pre">all</span> <span class="pre">logs</span></code>. This will download a script
+<code class="docutils literal notranslate"><span class="pre">download-logs.sh</span></code>, which when executed downloads all the logs for the job
+under <code class="docutils literal notranslate"><span class="pre">/tmp/</span></code>:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>chmod<span class="w"> </span>+x<span class="w"> </span>download-logs.sh
+$<span class="w"> </span>./download-logs.sh
+<span class="m">2020</span>-12-07T18:12:09+01:00<span class="w"> </span><span class="p">|</span><span class="w"> </span>Querying<span class="w"> </span>https://zuul.opendev.org/api/tenant/openstack/build/8caed05f5ba441b4be2b061d1d421e4e<span class="w"> </span><span class="k">for</span><span class="w"> </span>manifest
+<span class="m">2020</span>-12-07T18:12:11+01:00<span class="w"> </span><span class="p">|</span><span class="w"> </span>Saving<span class="w"> </span>logs<span class="w"> </span>to<span class="w"> </span>/tmp/zuul-logs.c8ZhLM
+<span class="m">2020</span>-12-07T18:12:11+01:00<span class="w"> </span><span class="p">|</span><span class="w"> </span>Getting<span class="w"> </span>logs<span class="w"> </span>from<span class="w"> </span>https://3612101d6c142bf9c77a-c96c299047b55dcdeaefef8e344ceab6.ssl.cf1.rackcdn.com/694539/11/check/tempest-slow-py3/8caed05/
+<span class="m">2020</span>-12-07T18:12:11+01:00<span class="w"> </span><span class="p">|</span><span class="w">   </span>compute1/logs/apache/access_log.txt<span class="w">                                              </span><span class="o">[</span><span class="w"> </span><span class="m">0001</span>/0337<span class="w"> </span><span class="o">]</span>
+...
+
+$<span class="w"> </span>ls<span class="w"> </span>/tmp/zuul-logs.c8ZhLM/
+compute1
+controller
+</pre></div>
+</div>
+</section>
+</section>
+<section id="executing-tempest-locally">
+<h3>Executing tempest locally<a class="headerlink" href="#executing-tempest-locally" title="Link to this heading">¶</a></h3>
+<p>For executing tempest locally you need a working devstack, to make it worse
+if you have to debug a test executed in a multinode job you need a multinode
+setup as well.</p>
+<p>For devstack documentation please refer to this page:
+<a class="reference external" href="https://docs.openstack.org/devstack/latest/">DevStack</a></p>
+<p>To have tempest installed and have a proper configuration file for it in your
+local.conf file enable tempest as service:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">ENABLED_SERVICES+</span><span class="o">=</span><span class="s">tempest</span>
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">enable_service tempest</span>
+</pre></div>
+</div>
+<p>To use specific config options for tempest you can add those as well to
+local.conf:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[[test-config|/opt/stack/tempest/etc/tempest.conf]]</span>
+<span class="k">[network-feature-enabled]</span>
+<span class="na">qos_placement_physnet</span><span class="o">=</span><span class="s">physnet1</span>
+</pre></div>
+</div>
+<p>To make devstack setup neutron and neutron-tempest-plugin as well enable their
+devstack plugin:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">enable_plugin neutron https</span><span class="o">:</span><span class="s">//opendev.org/openstack/neutron</span>
+<span class="na">enable_plugin neutron-tempest-plugin https</span><span class="o">:</span><span class="s">//opendev.org/openstack/neutron-tempest-plugin</span>
+</pre></div>
+</div>
+<p>If you need a special image for the tests you can set that too in local.conf:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">IMAGE_URLS</span><span class="o">=</span><span class="s">&quot;http://download.cirros-cloud.net/0.3.4/cirros-0.3.4-i386-disk.img,https://cloud-images.ubuntu.com/releases/bionic/release/ubuntu-18.04-server-cloudimg-amd64.img&quot;</span>
+<span class="na">ADVANCED_IMAGE_NAME</span><span class="o">=</span><span class="s">ubuntu-18.04-server-cloudimg-amd64</span>
+<span class="na">ADVANCED_INSTANCE_TYPE</span><span class="o">=</span><span class="s">ds512M</span>
+<span class="na">ADVANCED_INSTANCE_USER</span><span class="o">=</span><span class="s">ubuntu</span>
+</pre></div>
+</div>
+<p>If devstack succeeds you can find tempest and neutron-tempest-plugin under
+<code class="docutils literal notranslate"><span class="pre">/opt/stack/</span></code> directory (with all other project folders which are set to be
+installed from git).</p>
+<p>Tempest’s configuration file is under <code class="docutils literal notranslate"><span class="pre">/opt/stack/tempest/etc/</span></code> folder, you
+can check there if everything is as expected.</p>
+<p>You can check if neutron-tempest-plugin is known as a tempest plugin by
+tempest:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>tempest<span class="w"> </span>list-plugins
++---------------------------------+------------------------------------------------------------+
+<span class="p">|</span><span class="w">               </span>Name<span class="w">              </span><span class="p">|</span><span class="w">                         </span>EntryPoint<span class="w">                         </span><span class="p">|</span>
++---------------------------------+------------------------------------------------------------+
+<span class="p">|</span><span class="w">          </span>neutron_tests<span class="w">          </span><span class="p">|</span><span class="w">     </span>neutron_tempest_plugin.plugin:NeutronTempestPlugin<span class="w">     </span><span class="p">|</span>
++---------------------------------+------------------------------------------------------------+
+</pre></div>
+</div>
+<p>To execute a given test or group of tests you can use a regex, or you can use
+the idempotent id of a test or the tag associated with the test:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>tempest<span class="w"> </span>run<span class="w"> </span>--config<span class="w"> </span>etc/tempest.conf<span class="w"> </span>--regex<span class="w"> </span>tempest.scenario
+tempest<span class="w"> </span>run<span class="w"> </span>--config<span class="w"> </span>etc/tempest.conf<span class="w"> </span>--regex<span class="w"> </span>neutron_tempest_plugin.scenario
+tempest<span class="w"> </span>run<span class="w"> </span>--config<span class="w"> </span>etc/tempest.conf<span class="w"> </span>smoke
+tempest<span class="w"> </span>run<span class="w"> </span>--config<span class="w"> </span>etc/tempest.conf<span class="w"> </span>ab40fc48-ca8d-41a0-b2a3-f6679c847bfe
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="ml2_ovn_devstack.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: OVN with DevStack"></i></a>
+          
+          
+            <a href="template_model_sync_test.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Template for ModelMigrationSync for external repos"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2024-08-23 12:03:12</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Contributor Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#basic-information">Basic Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-policies">Neutron Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#gerrit-rechecks">Gerrit Rechecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-stadium">Neutron Stadium</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-internals">Neutron Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#ovn-driver">OVN Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#dashboards">Dashboards</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Tempest Testing</a><ul>
+<li><a class="reference internal" href="#tempest-basics-in-networking-projects">Tempest basics in Networking projects</a><ul>
+<li><a class="reference internal" href="#api-tests">API Tests</a></li>
+<li><a class="reference internal" href="#scenario-tests">Scenario Tests</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zuul-basics-job-structure">Zuul basics &amp; job structure</a></li>
+<li><a class="reference internal" href="#where-to-look">Where to look</a><ul>
+<li><a class="reference internal" href="#debugging-zuul-results">Debugging zuul results</a><ul>
+<li><a class="reference internal" href="#downloading-logs">Downloading logs</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#executing-tempest-locally">Executing tempest locally</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "contributor/testing/tempest" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Tempest Testing in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2024-08-23 12:03:12";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "contributor/testing/tempest";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

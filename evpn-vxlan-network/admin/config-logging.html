@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Packet Logging Framework &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/support-matrix.css?v=ac26a930" />
+    <script src="../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Quality of Service (QoS)" href="config-qos.html" />
+    <link rel="prev" title="Open vSwitch Native Firewall Driver" href="config-ovsfwdriver.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/admin/config-logging.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Packet Logging Framework</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="config-ovsfwdriver.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Open vSwitch Native Firewall Driver"></i></a>
+    
+    
+    <a href="config-qos.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Quality of Service (QoS)"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="packet-logging-framework">
+<span id="config-logging"></span><h1>Packet Logging Framework<a class="headerlink" href="#packet-logging-framework" title="Link to this heading">¶</a></h1>
+<p>Packet logging service is designed as a Neutron plug-in that captures network
+packets for relevant resources (e.g. security group or firewall group) when the
+registered events occur.</p>
+<section id="ml2-ovn-driver">
+<h2>ML2/OVN Driver<a class="headerlink" href="#ml2-ovn-driver" title="Link to this heading">¶</a></h2>
+<section id="supported-loggable-resource-types">
+<h3>Supported loggable resource types<a class="headerlink" href="#supported-loggable-resource-types" title="Link to this heading">¶</a></h3>
+<p>From the Wallaby release the ML2/OVN driver supports the <code class="docutils literal notranslate"><span class="pre">security_group</span></code>
+resource.</p>
+<p>The following diagram shows a mapping from Neutron security group framework to
+the ACLs, which are the resources where we enable the logging when using
+ML2/OVN. Each security group rule maps to an ACL associated to a port group
+that contains all the ports belonging to the security group.</p>
+<a class="reference internal image-reference" href="../_images/secgrouprule-to-acl.png"><img alt="Packet Logging Framework with ML2/OVS" src="../_images/secgrouprule-to-acl.png" style="width: 100%;" />
+</a>
+<p>For more details on the developing peculiarities of this implementation, you
+can check the <a class="reference external" href="https://docs.openstack.org/neutron/latest/contributor/internals/ovn/ovn_network_logging.html">contributors documentation</a>.</p>
+</section>
+<section id="service-configuration">
+<h3>Service Configuration<a class="headerlink" href="#service-configuration" title="Link to this heading">¶</a></h3>
+<p>To enable the logging service, add <code class="docutils literal notranslate"><span class="pre">log</span></code> to the <code class="docutils literal notranslate"><span class="pre">service_plugins</span></code> setting
+in <code class="docutils literal notranslate"><span class="pre">/etc/neutron/neutron.conf</span></code>:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">service_plugins</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">router,metering,log</span>
+</pre></div>
+</div>
+<p>It is possible to set parameters in ml2_conf.ini to tune how we want to log the
+packets by modifying <code class="docutils literal notranslate"><span class="pre">rate_limit</span></code> and <code class="docutils literal notranslate"><span class="pre">burst_limit</span></code> in section
+<code class="docutils literal notranslate"><span class="pre">[network_log]</span></code> in <code class="docutils literal notranslate"><span class="pre">/etc/neutron/plugins/ml2/ml2_conf.ini</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rate_limit</span></code> - Limit the packet rate of the logs that are sent to the OVN
+controller, in packets per second. The higher the number, the more logs we
+will get in the log file.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">burst_limit</span></code> - Increase the packet rate limit by the specified value for a
+short period of time.</p></li>
+</ul>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[network_log]</span>
+<span class="na">rate_limit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">150</span>
+<span class="na">burst_limit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">50</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>There is a minimum value for these parameters. For <code class="docutils literal notranslate"><span class="pre">rate_limit</span></code> it is
+100 and for <code class="docutils literal notranslate"><span class="pre">burst_limit</span></code> it is 25.</p>
+</div>
+<p>In order to make the changes to rate and burst effective, restart the
+neutron-server service. To ensure the configuration for rate and burst was
+updated, check the meter-band table on the OVN Northbound database. You need to
+create at least one log object to see the meter band entry created.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ovn-nbctl<span class="w"> </span>list<span class="w"> </span>meter-band
+</pre></div>
+</div>
+</section>
+<section id="service-workflow">
+<h3>Service workflow<a class="headerlink" href="#service-workflow" title="Link to this heading">¶</a></h3>
+<p>Create a logging resource with security group as resource type:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>log<span class="w"> </span>create<span class="w"> </span>--resource-type<span class="w"> </span>security_group<span class="w"> </span><span class="se">\</span>
+--resource<span class="w"> </span>sg1<span class="w"> </span>--event<span class="w"> </span>ALL<span class="w"> </span>log1
+
+<span class="go">  +-----------------+--------------------------------------+</span>
+<span class="go">  | Field           | Value                                |</span>
+<span class="go">  +-----------------+--------------------------------------+</span>
+<span class="go">  | Description     |                                      |</span>
+<span class="go">  | Enabled         | True                                 |</span>
+<span class="go">  | Event           | ALL                                  |</span>
+<span class="go">  | ID              | 67b1f618-0b89-4b9c-b3e4-9378b4472175 |</span>
+<span class="go">  | Name            | log1                                 |</span>
+<span class="go">  | Project         | 74731b187a824a8d9b85a12b6eacbcbb     |</span>
+<span class="go">  | Resource        | 387494cb-392a-4760-8c36-09be2fdb0b49 |</span>
+<span class="go">  | Target          | None                                 |</span>
+<span class="go">  | Type            | security_group                       |</span>
+<span class="go">  | created_at      | 2023-07-31T09:44:34Z                 |</span>
+<span class="go">  | revision_number | 0                                    |</span>
+<span class="go">  | tenant_id       | 74731b187a824a8d9b85a12b6eacbcbb     |</span>
+<span class="go">  | updated_at      | 2023-07-31T09:44:34Z                 |</span>
+<span class="go">  +-----------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Due to the internal design of the ML2/OVN driver, there is one ACL that
+aggregates all dropped traffic, instead of having one drop ACL per
+security group. Since the smallest logging unit in OVN is the ACL, that
+means that if we choose to log DROP traffic, we will get traffic logged
+from all security groups.</p>
+<p>If we choose to log ALL traffic, we will get the accepted traffic
+from the selected security group, but the dropped traffic from all
+security groups.</p>
+<p>This can change in following releases if the ACL management is redesigned
+in OVN.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>We cannot assign individual ports when using ML2/OVN, so the <code class="docutils literal notranslate"><span class="pre">--target</span></code>
+parameter is not used.</p>
+</div>
+<p>Just as with ML2/OVS, we can enable or disable logging objects at runtime. If
+we have two objects targeted to log the same resource, as long as one of them
+is enabled, the resource will be logged on the logfile.</p>
+</section>
+<section id="understanding-the-logging">
+<h3>Understanding the logging<a class="headerlink" href="#understanding-the-logging" title="Link to this heading">¶</a></h3>
+<p>In ML2/OVN we find the packet monitoring logging recorded on each
+<code class="docutils literal notranslate"><span class="pre">ovn-controller.log</span></code> file within the compute nodes. This means that we will
+have as many logfiles as compute nodes, because each OVN controller has the
+capacity of logging only the traffic they manage. The location of the OVN
+controller log may differ depending on the distribution, please consult your
+installation documentation for more details. The format of the logging is:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">2023-01-08T17:57:28.283002425+00:00 stderr F</span>
+<span class="go">2023-01-08T17:57:28Z|00094|acl_log(ovn_pinctrl0)|INFO|</span>
+<span class="go">name=&quot;neutron-e9ebf19c-3d84-49ae-a81e-7a01035a8768&quot;, verdict=allow,</span>
+<span class="go">severity=info, direction=to-lport: icmp, vlan_tci=0x0000,</span>
+<span class="go">dl_src=fa:16:3e:d3:b4:48, dl_dst=fa:16:3e:9a:d9:7d, nw_src=10.0.0.67,</span>
+<span class="go">nw_dst=192.168.100.11, nw_tos=0, nw_ecn=0, nw_ttl=63, nw_frag=no,</span>
+<span class="go">icmp_type=8, icmp_code=0</span>
+</pre></div>
+</div>
+<p>In this example, the name is <code class="docutils literal notranslate"><span class="pre">neutron-&lt;security</span> <span class="pre">group</span> <span class="pre">log</span> <span class="pre">object</span> <span class="pre">ID&gt;</span></code>. We can
+also see the verdict, the severity, the direction of the datagram and the
+content.</p>
+</section>
+</section>
+<section id="ml2-ovs-driver">
+<h2>ML2/OVS Driver<a class="headerlink" href="#ml2-ovs-driver" title="Link to this heading">¶</a></h2>
+<a class="reference internal image-reference" href="../_images/logging-framework.png"><img alt="Packet Logging Framework with ML2/OVS" src="../_images/logging-framework.png" style="width: 100%;" />
+</a>
+<section id="id1">
+<h3>Supported loggable resource types<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<p>From Rocky Release, the ML2/OVS driver supports both <code class="docutils literal notranslate"><span class="pre">security_group</span></code> and
+<code class="docutils literal notranslate"><span class="pre">firewall_group</span></code> as resource types in the Neutron packet logging framework.</p>
+</section>
+<section id="id2">
+<h3>Service Configuration<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
+<p>To enable the logging service, follow the below steps.</p>
+<ol class="arabic">
+<li><p>On Neutron controller node, add <code class="docutils literal notranslate"><span class="pre">log</span></code> to <code class="docutils literal notranslate"><span class="pre">service_plugins</span></code> setting in
+<code class="docutils literal notranslate"><span class="pre">/etc/neutron/neutron.conf</span></code> file. For example:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">service_plugins</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">router,metering,log</span>
+</pre></div>
+</div>
+</li>
+<li><p>To enable logging service for <code class="docutils literal notranslate"><span class="pre">security_group</span></code> in Layer 2, add <code class="docutils literal notranslate"><span class="pre">log</span></code> to
+option <code class="docutils literal notranslate"><span class="pre">extensions</span></code> in section <code class="docutils literal notranslate"><span class="pre">[agent]</span></code> in
+<code class="docutils literal notranslate"><span class="pre">/etc/neutron/plugins/ml2/ml2_conf.ini</span></code> for controller node and in
+<code class="docutils literal notranslate"><span class="pre">/etc/neutron/plugins/ml2/openvswitch_agent.ini</span></code>
+for compute/network nodes. For example:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[agent]</span>
+<span class="na">extensions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">log</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Fwaas v2 log is currently only supported by openvswitch.</p>
+</div>
+</li>
+<li><p>To enable logging service for <code class="docutils literal notranslate"><span class="pre">firewall_group</span></code> in Layer 3, add
+<code class="docutils literal notranslate"><span class="pre">fwaas_v2_log</span></code> to option <code class="docutils literal notranslate"><span class="pre">extensions</span></code> in section <code class="docutils literal notranslate"><span class="pre">[AGENT]</span></code> in
+<code class="docutils literal notranslate"><span class="pre">/etc/neutron/l3_agent.ini</span></code> for network nodes. For example:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[AGENT]</span>
+<span class="na">extensions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">fwaas_v2,fwaas_v2_log</span>
+</pre></div>
+</div>
+</li>
+<li><p>On compute/network nodes, add configuration for logging service to
+<code class="docutils literal notranslate"><span class="pre">[network_log]</span></code> in <code class="docutils literal notranslate"><span class="pre">/etc/neutron/plugins/ml2/openvswitch_agent.ini</span></code>
+and in <code class="docutils literal notranslate"><span class="pre">/etc/neutron/l3_agent.ini</span></code> as shown below:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[network_log]</span>
+<span class="na">rate_limit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">100</span>
+<span class="na">burst_limit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">25</span>
+<span class="c1">#local_output_log_base = &lt;None&gt;</span>
+</pre></div>
+</div>
+<p>In which, <code class="docutils literal notranslate"><span class="pre">rate_limit</span></code> is used to configure the maximum number of packets
+to be logged per second (packets per second). When a high rate triggers
+<code class="docutils literal notranslate"><span class="pre">rate_limit</span></code>, logging queues packets to be logged. <code class="docutils literal notranslate"><span class="pre">burst_limit</span></code> is
+used to configure the maximum of queued packets. And logged packets can be
+stored anywhere by using <code class="docutils literal notranslate"><span class="pre">local_output_log_base</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>It requires at least <code class="docutils literal notranslate"><span class="pre">100</span></code> for <code class="docutils literal notranslate"><span class="pre">rate_limit</span></code> and at least <code class="docutils literal notranslate"><span class="pre">25</span></code>
+for <code class="docutils literal notranslate"><span class="pre">burst_limit</span></code>.</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">rate_limit</span></code> is unset, logging will log unlimited.</p></li>
+<li><p>If we don’t specify <code class="docutils literal notranslate"><span class="pre">local_output_log_base</span></code>, logged packets will be
+stored in system journal like <code class="docutils literal notranslate"><span class="pre">/var/log/syslog</span></code> by default.</p></li>
+</ul>
+</div>
+</li>
+</ol>
+<section id="trusted-projects-policy-yaml-configuration">
+<h4>Trusted projects policy.yaml configuration<a class="headerlink" href="#trusted-projects-policy-yaml-configuration" title="Link to this heading">¶</a></h4>
+<p>With the default <code class="docutils literal notranslate"><span class="pre">/etc/neutron/policy.yaml</span></code>, administrators must set up
+resource logging on behalf of the cloud projects.</p>
+<p>If projects are trusted to administer their own loggable resources  in their
+cloud, neutron’s policy file <code class="docutils literal notranslate"><span class="pre">policy.yaml</span></code> can be modified to allow this.</p>
+<p>Modify <code class="docutils literal notranslate"><span class="pre">/etc/neutron/policy.yaml</span></code> entries as follows:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="s">&quot;get_loggable_resources&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+<span class="s">&quot;create_log&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+<span class="s">&quot;get_log&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+<span class="s">&quot;get_logs&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+<span class="s">&quot;update_log&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+<span class="s">&quot;delete_log&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;rule:regular_user&quot;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="service-workflow-for-operator">
+<h3>Service workflow for Operator<a class="headerlink" href="#service-workflow-for-operator" title="Link to this heading">¶</a></h3>
+<ol class="arabic">
+<li><p>To check the loggable resources that are supported by framework:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>loggable<span class="w"> </span>resources<span class="w"> </span>list
+<span class="go">+-----------------+</span>
+<span class="go">| Supported types |</span>
+<span class="go">+-----------------+</span>
+<span class="go">| security_group  |</span>
+<span class="go">| firewall_group  |</span>
+<span class="go">+-----------------+</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>In VM ports, logging for <code class="docutils literal notranslate"><span class="pre">security_group</span></code> in currently works with
+<code class="docutils literal notranslate"><span class="pre">openvswitch</span></code> firewall driver.</p></li>
+<li><p>Logging for <code class="docutils literal notranslate"><span class="pre">firewall_group</span></code> works on internal router ports only. VM
+ports would be supported in the future.</p></li>
+</ul>
+</div>
+</li>
+<li><p>Log creation:</p>
+<ul>
+<li><p>Create a logging resource with an appropriate resource type</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>log<span class="w"> </span>create<span class="w"> </span>--resource-type<span class="w"> </span>security_group<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--description<span class="w"> </span><span class="s2">&quot;Collecting all security events&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--event<span class="w"> </span>ALL<span class="w"> </span>Log_Created
+<span class="go">+-----------------+------------------------------------------------+</span>
+<span class="go">| Field           | Value                                          |</span>
+<span class="go">+-----------------+------------------------------------------------+</span>
+<span class="go">| Description     | Collecting all security events                 |</span>
+<span class="go">| Enabled         | True                                           |</span>
+<span class="go">| Event           | ALL                                            |</span>
+<span class="go">| ID              | 8085c3e6-0fa2-4954-b5ce-ff6207931b6d           |</span>
+<span class="go">| Name            | Log_Created                                    |</span>
+<span class="go">| Project         | 02568bd62b414221956f15dbe9527d16               |</span>
+<span class="go">| Resource        | None                                           |</span>
+<span class="go">| Target          | None                                           |</span>
+<span class="go">| Type            | security_group                                 |</span>
+<span class="go">| created_at      | 2017-07-05T02:56:43Z                           |</span>
+<span class="go">| revision_number | 0                                              |</span>
+<span class="go">| tenant_id       | 02568bd62b414221956f15dbe9527d16               |</span>
+<span class="go">| updated_at      | 2017-07-05T02:56:43Z                           |</span>
+<span class="go">+-----------------+------------------------------------------------+</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>In the case of <code class="docutils literal notranslate"><span class="pre">--resource</span></code> and <code class="docutils literal notranslate"><span class="pre">--target</span></code> are not specified from the
+request, these arguments will be assigned to <code class="docutils literal notranslate"><span class="pre">ALL</span></code> by default. Hence,
+there is an enormous range of log events will be created.</p>
+</div>
+</li>
+<li><p>Create logging resource with a given resource (sg1 or fwg1)</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>log<span class="w"> </span>create<span class="w"> </span>my-log<span class="w"> </span>--resource-type<span class="w"> </span>security_group<span class="w"> </span>--resource<span class="w"> </span>sg1
+<span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>log<span class="w"> </span>create<span class="w"> </span>my-log<span class="w"> </span>--resource-type<span class="w"> </span>firewall_group<span class="w"> </span>--resource<span class="w"> </span>fwg1
+</pre></div>
+</div>
+</li>
+<li><p>Create logging resource with a given target (portA)</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>log<span class="w"> </span>create<span class="w"> </span>my-log<span class="w"> </span>--resource-type<span class="w"> </span>security_group<span class="w"> </span>--target<span class="w"> </span>portA
+</pre></div>
+</div>
+</li>
+<li><p>Create logging resource for only the given target (portB) and the given
+resource (sg1 or fwg1)</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>log<span class="w"> </span>create<span class="w"> </span>my-log<span class="w"> </span>--resource-type<span class="w"> </span>security_group<span class="w"> </span>--target<span class="w"> </span>portB<span class="w"> </span>--resource<span class="w"> </span>sg1
+<span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>log<span class="w"> </span>create<span class="w"> </span>my-log<span class="w"> </span>--resource-type<span class="w"> </span>firewall_group<span class="w"> </span>--target<span class="w"> </span>portB<span class="w"> </span>--resource<span class="w"> </span>fwg1
+</pre></div>
+</div>
+</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">Enabled</span></code> field is set to <code class="docutils literal notranslate"><span class="pre">True</span></code> by default. If enabled, logged
+events are written to the destination if <code class="docutils literal notranslate"><span class="pre">local_output_log_base</span></code> is
+configured or <code class="docutils literal notranslate"><span class="pre">/var/log/syslog</span></code> in default.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">Event</span></code> field will be set to <code class="docutils literal notranslate"><span class="pre">ALL</span></code> if <code class="docutils literal notranslate"><span class="pre">--event</span></code> is not specified
+from log creation request.</p></li>
+</ul>
+</div>
+</li>
+<li><p>Enable/Disable log</p>
+<p>We can <code class="docutils literal notranslate"><span class="pre">enable</span></code> or <code class="docutils literal notranslate"><span class="pre">disable</span></code> logging objects at runtime. It means that
+it will apply to all registered ports with the logging object immediately.
+For example:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>log<span class="w"> </span><span class="nb">set</span><span class="w"> </span>--disable<span class="w"> </span>Log_Created
+<span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>log<span class="w"> </span>show<span class="w"> </span>Log_Created
+<span class="go"> +-----------------+------------------------------------------------+</span>
+<span class="go"> | Field           | Value                                          |</span>
+<span class="go"> +-----------------+------------------------------------------------+</span>
+<span class="go"> | Description     | Collecting all security events                 |</span>
+<span class="go"> | Enabled         | False                                          |</span>
+<span class="go"> | Event           | ALL                                            |</span>
+<span class="go"> | ID              | 8085c3e6-0fa2-4954-b5ce-ff6207931b6d           |</span>
+<span class="go"> | Name            | Log_Created                                    |</span>
+<span class="go"> | Project         | 02568bd62b414221956f15dbe9527d16               |</span>
+<span class="go"> | Resource        | None                                           |</span>
+<span class="go"> | Target          | None                                           |</span>
+<span class="go"> | Type            | security_group                                 |</span>
+<span class="go"> | created_at      | 2017-07-05T02:56:43Z                           |</span>
+<span class="go"> | revision_number | 1                                              |</span>
+<span class="go"> | tenant_id       | 02568bd62b414221956f15dbe9527d16               |</span>
+<span class="go"> | updated_at      | 2017-07-05T03:12:01Z                           |</span>
+<span class="go"> +-----------------+------------------------------------------------+</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="logged-events-description">
+<h3>Logged events description<a class="headerlink" href="#logged-events-description" title="Link to this heading">¶</a></h3>
+<p>Currently, packet logging framework supports to collect <code class="docutils literal notranslate"><span class="pre">ACCEPT</span></code> or <code class="docutils literal notranslate"><span class="pre">DROP</span></code>
+or both events related to registered resources. As mentioned above, Neutron
+packet logging framework offers two loggable resources through the <code class="docutils literal notranslate"><span class="pre">log</span></code>
+service plug-in: <code class="docutils literal notranslate"><span class="pre">security_group</span></code> and <code class="docutils literal notranslate"><span class="pre">firewall_group</span></code>.</p>
+<p>The  general characteristics of each event will be shown as the following:</p>
+<ul class="simple">
+<li><p>Log every <code class="docutils literal notranslate"><span class="pre">DROP</span></code> event: Every <code class="docutils literal notranslate"><span class="pre">DROP</span></code> security events will be generated
+when an incoming or outgoing session is blocked by the security groups or
+firewall groups</p></li>
+<li><p>Log an <code class="docutils literal notranslate"><span class="pre">ACCEPT</span></code> event: The <code class="docutils literal notranslate"><span class="pre">ACCEPT</span></code> security event will be generated only
+for each <code class="docutils literal notranslate"><span class="pre">NEW</span></code> incoming or outgoing session that is allowed by security
+groups or firewall groups. More details for the <code class="docutils literal notranslate"><span class="pre">ACCEPT</span></code> events are shown
+as bellow:</p>
+<ul>
+<li><p>North/South <code class="docutils literal notranslate"><span class="pre">ACCEPT</span></code>: For a North/South session there would be a single
+<code class="docutils literal notranslate"><span class="pre">ACCEPT</span></code> event irrespective of direction.</p></li>
+<li><p>East/West <code class="docutils literal notranslate"><span class="pre">ACCEPT</span></code>/<code class="docutils literal notranslate"><span class="pre">ACCEPT</span></code>: In an intra-project East/West session
+where the originating port allows the session and the destination port
+allows the session, i.e. the traffic is allowed, there would be two
+<code class="docutils literal notranslate"><span class="pre">ACCEPT</span></code> security events generated, one from the perspective of the
+originating port and one from the perspective of the destination port.</p></li>
+<li><p>East/West <code class="docutils literal notranslate"><span class="pre">ACCEPT</span></code>/<code class="docutils literal notranslate"><span class="pre">DROP</span></code>: In an intra-project East/West session
+initiation where the originating port allows the session and the
+destination port does not allow the session there would be <code class="docutils literal notranslate"><span class="pre">ACCEPT</span></code>
+security events generated from the perspective of the originating port and
+<code class="docutils literal notranslate"><span class="pre">DROP</span></code> security events generated from the perspective of the destination
+port.</p></li>
+</ul>
+</li>
+</ul>
+<ol class="arabic">
+<li><p>The security events that are collected by security group should include:</p>
+<ul>
+<li><p>A timestamp of the flow.</p></li>
+<li><p>A status of the flow <code class="docutils literal notranslate"><span class="pre">ACCEPT</span></code>/<code class="docutils literal notranslate"><span class="pre">DROP</span></code>.</p></li>
+<li><p>An indication of the originator of the flow, e.g which project or log
+resource generated the events.</p></li>
+<li><p>An identifier of the associated instance interface (neutron port id).</p></li>
+<li><p>A layer 2, 3 and 4 information (mac, address, port, protocol, etc).</p></li>
+<li><p>Security event record format:</p>
+<p>Logged data of an <code class="docutils literal notranslate"><span class="pre">ACCEPT</span></code> event would look like:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">May 5 09:05:07 action=ACCEPT project_id=736672c700cd43e1bd321aeaf940365c</span>
+<span class="go">log_resource_ids=[&#39;4522efdf-8d44-4e19-b237-64cafc49469b&#39;, &#39;42332d89-df42-4588-a2bb-3ce50829ac51&#39;]</span>
+<span class="go">vm_port=e0259ade-86de-482e-a717-f58258f7173f</span>
+<span class="go">ethernet(dst=&#39;fa:16:3e:ec:36:32&#39;,ethertype=2048,src=&#39;fa:16:3e:50:aa:b5&#39;),</span>
+<span class="go">ipv4(csum=62071,dst=&#39;10.0.0.4&#39;,flags=2,header_length=5,identification=36638,offset=0,</span>
+<span class="go">option=None,proto=6,src=&#39;172.24.4.10&#39;,tos=0,total_length=60,ttl=63,version=4),</span>
+<span class="go">tcp(ack=0,bits=2,csum=15097,dst_port=80,offset=10,option=[TCPOptionMaximumSegmentSize(kind=2,length=4,max_seg_size=1460),</span>
+<span class="go">TCPOptionSACKPermitted(kind=4,length=2), TCPOptionTimestamps(kind=8,length=10,ts_ecr=0,ts_val=196418896),</span>
+<span class="go">TCPOptionNoOperation(kind=1,length=1), TCPOptionWindowScale(kind=3,length=3,shift_cnt=3)],</span>
+<span class="go">seq=3284890090,src_port=47825,urgent=0,window_size=14600)</span>
+</pre></div>
+</div>
+<p>Logged data of a <code class="docutils literal notranslate"><span class="pre">DROP</span></code> event:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">May 5 09:05:07 action=DROP project_id=736672c700cd43e1bd321aeaf940365c</span>
+<span class="go">log_resource_ids=[&#39;4522efdf-8d44-4e19-b237-64cafc49469b&#39;] vm_port=e0259ade-86de-482e-a717-f58258f7173f</span>
+<span class="go">ethernet(dst=&#39;fa:16:3e:ec:36:32&#39;,ethertype=2048,src=&#39;fa:16:3e:50:aa:b5&#39;),</span>
+<span class="go">ipv4(csum=62071,dst=&#39;10.0.0.4&#39;,flags=2,header_length=5,identification=36638,offset=0,</span>
+<span class="go">option=None,proto=6,src=&#39;172.24.4.10&#39;,tos=0,total_length=60,ttl=63,version=4),</span>
+<span class="go">tcp(ack=0,bits=2,csum=15097,dst_port=80,offset=10,option=[TCPOptionMaximumSegmentSize(kind=2,length=4,max_seg_size=1460),</span>
+<span class="go">TCPOptionSACKPermitted(kind=4,length=2), TCPOptionTimestamps(kind=8,length=10,ts_ecr=0,ts_val=196418896),</span>
+<span class="go">TCPOptionNoOperation(kind=1,length=1), TCPOptionWindowScale(kind=3,length=3,shift_cnt=3)],</span>
+<span class="go">seq=3284890090,src_port=47825,urgent=0,window_size=14600)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>The events that are collected by firewall group should include:</p>
+<ul>
+<li><p>A timestamp of the flow.</p></li>
+<li><p>A status of the flow <code class="docutils literal notranslate"><span class="pre">ACCEPT</span></code>/<code class="docutils literal notranslate"><span class="pre">DROP</span></code>.</p></li>
+<li><p>The identifier of log objects that are collecting this event</p></li>
+<li><p>An identifier of the associated instance interface (neutron port id).</p></li>
+<li><p>A layer 2, 3 and 4 information (mac, address, port, protocol, etc).</p></li>
+<li><p>Security event record format:</p>
+<p>Logged data of an <code class="docutils literal notranslate"><span class="pre">ACCEPT</span></code> event would look like:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Jul 26 14:46:20:</span>
+<span class="go">action=ACCEPT, log_resource_ids=[u&#39;2e030f3a-e93d-4a76-bc60-1d11c0f6561b&#39;], port=9882c485-b808-4a34-a3fb-b537642c66b2</span>
+<span class="go">pkt=ethernet(dst=&#39;fa:16:3e:8f:47:c5&#39;,ethertype=2048,src=&#39;fa:16:3e:1b:3e:67&#39;)</span>
+<span class="go">ipv4(csum=47423,dst=&#39;10.10.1.16&#39;,flags=2,header_length=5,identification=27969,offset=0,option=None,proto=1,src=&#39;10.10.0.5&#39;,tos=0,total_length=84,ttl=63,version=4)</span>
+<span class="go">icmp(code=0,csum=41376,data=echo(data=&#39;\xe5\xf2\xfej\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00</span>
+<span class="go">\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00</span>
+<span class="go">\x00\x00\x00\x00\x00\x00\x00&#39;,id=29185,seq=0),type=8)</span>
+</pre></div>
+</div>
+<p>Logged data of a <code class="docutils literal notranslate"><span class="pre">DROP</span></code> event:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Jul 26 14:51:20:</span>
+<span class="go">action=DROP, log_resource_ids=[u&#39;2e030f3a-e93d-4a76-bc60-1d11c0f6561b&#39;], port=9882c485-b808-4a34-a3fb-b537642c66b2</span>
+<span class="go">pkt=ethernet(dst=&#39;fa:16:3e:32:7d:ff&#39;,ethertype=2048,src=&#39;fa:16:3e:28:83:51&#39;)</span>
+<span class="go">ipv4(csum=17518,dst=&#39;10.10.0.5&#39;,flags=2,header_length=5,identification=57874,offset=0,option=None,proto=1,src=&#39;10.10.1.16&#39;,tos=0,total_length=84,ttl=63,version=4)</span>
+<span class="go">icmp(code=0,csum=23772,data=echo(data=&#39;\x8a\xa0\xac|\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00</span>
+<span class="go">\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00</span>
+<span class="go">\x00\x00\x00\x00\x00\x00\x00&#39;,id=25601,seq=5),type=8)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>No other extraneous events are generated within the security event logs,
+e.g. no debugging data, etc.</p>
+</div>
+</section>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="config-ovsfwdriver.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Open vSwitch Native Firewall Driver"></i></a>
+          
+          
+            <a href="config-qos.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Quality of Service (QoS)"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2024-08-26 17:49:17</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation Guide</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">OpenStack Networking Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deploy.html">Deployment examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ops.html">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">Migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ovn/index.html">OVN Driver Administration Guide</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributor/index.html">Contributor Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Packet Logging Framework</a><ul>
+<li><a class="reference internal" href="#ml2-ovn-driver">ML2/OVN Driver</a><ul>
+<li><a class="reference internal" href="#supported-loggable-resource-types">Supported loggable resource types</a></li>
+<li><a class="reference internal" href="#service-configuration">Service Configuration</a></li>
+<li><a class="reference internal" href="#service-workflow">Service workflow</a></li>
+<li><a class="reference internal" href="#understanding-the-logging">Understanding the logging</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ml2-ovs-driver">ML2/OVS Driver</a><ul>
+<li><a class="reference internal" href="#id1">Supported loggable resource types</a></li>
+<li><a class="reference internal" href="#id2">Service Configuration</a><ul>
+<li><a class="reference internal" href="#trusted-projects-policy-yaml-configuration">Trusted projects policy.yaml configuration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#service-workflow-for-operator">Service workflow for Operator</a></li>
+<li><a class="reference internal" href="#logged-events-description">Logged events description</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "admin/config-logging" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Packet Logging Framework in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2024-08-26 17:49:17";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "admin/config-logging";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Quota Management and Enforcement &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Retrying Operations" href="retries.html" />
+    <link rel="prev" title="Quality of Service" href="quality_of_service.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/contributor/internals/quota.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Quota Management and Enforcement</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="quality_of_service.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Quality of Service"></i></a>
+    
+    
+    <a href="retries.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Retrying Operations"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="quota-management-and-enforcement">
+<h1>Quota Management and Enforcement<a class="headerlink" href="#quota-management-and-enforcement" title="Link to this heading">¶</a></h1>
+<p>Most resources exposed by the Neutron API are subject to quota limits.
+The Neutron API exposes an extension for managing such quotas. Quota limits are
+enforced at the API layer, before the request is dispatched to the plugin.</p>
+<p>Default values for quota limits are specified in neutron.conf. Admin users
+can override those defaults values on a per-project basis. Limits are stored
+in the Neutron database; if no limit is found for a given resource and project,
+then the default value for such resource is used.
+Configuration-based quota management, where every project gets the same quota
+limit specified in the configuration file, has been deprecated as of the
+Liberty release.</p>
+<p>Please note that Neutron does not support both specification of quota limits
+per user and quota management for hierarchical multitenancy (as a matter of
+fact Neutron does not support hierarchical multitenancy at all). Also, quota
+limits are currently not enforced on RPC interfaces listening on the AMQP
+bus.</p>
+<p>Plugin and ML2 drivers are not supposed to enforce quotas for resources they
+manage. However, the <code class="docutils literal notranslate"><span class="pre">subnet_allocation</span></code> <a class="footnote-reference brackets" href="#id8" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> extension is an exception and
+will be discussed below.</p>
+<p>The quota management and enforcement mechanisms discussed here apply to every
+resource which has been registered with the Quota engine, regardless of
+whether such resource belongs to the core Neutron API or one of its extensions.</p>
+<section id="high-level-view">
+<h2>High Level View<a class="headerlink" href="#high-level-view" title="Link to this heading">¶</a></h2>
+<p>There are two main components in the Neutron quota system:</p>
+<ul class="simple">
+<li><p>The Quota API extensions.</p></li>
+<li><p>The Quota Engine.</p></li>
+</ul>
+<p>Both components rely on a quota driver. The neutron codebase currently defines
+three quota drivers:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">neutron.db.quota.driver.DbQuotaDriver</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">neutron.db.quota.driver_nolock.DbQuotaNoLockDriver</span></code> (default)</p></li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">DbQuotaNoLockDriver</span></code> is the default quota driver, defined in the
+configuration option <code class="docutils literal notranslate"><span class="pre">quota_driver</span></code>.</p>
+<p>The Quota API extension handles quota management, whereas the Quota Engine
+component handles quota enforcement. This API extension is loaded like any
+other extension. For this reason plugins must explicitly support it by
+including “quotas” in the supported_extension_aliases attribute.</p>
+<p>In the Quota API simple CRUD operations are used for managing project quotas.
+Please note that the current behaviour when deleting a project quota is to
+reset quota limits for that project to configuration defaults. The API
+extension does not validate the project identifier with the identity service.</p>
+<p>In addition, the Quota Detail API extension complements the Quota API extension
+by allowing users (typically admins) the ability to retrieve details about
+quotas per project. Quota details include the used/limit/reserved
+count for the project’s resources (networks, ports, etc.).</p>
+<p>Performing quota enforcement is the responsibility of the Quota Engine.
+RESTful API controllers, before sending a request to the plugin, try to obtain
+a reservation from the quota engine for the resources specified in the client
+request. If the reservation is successful, then it proceeds to dispatch the
+operation to the plugin.</p>
+<p>For a reservation to be successful, the total amount of resources requested,
+plus the total amount of resources reserved, plus the total amount of resources
+already stored in the database should not exceed the project’s quota limit.</p>
+<p>Finally, both quota management and enforcement rely on a “quota driver” <a class="footnote-reference brackets" href="#id9" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>,
+whose task is basically to perform database operations.</p>
+</section>
+<section id="quota-management">
+<h2>Quota Management<a class="headerlink" href="#quota-management" title="Link to this heading">¶</a></h2>
+<p>The quota management component is fairly straightforward.</p>
+<p>However, unlike the vast majority of Neutron extensions, it uses it own
+controller class <a class="footnote-reference brackets" href="#id10" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.
+This class does not implement the POST operation. List, get, update, and
+delete operations are implemented by the usual index, show, update and
+delete methods. These method simply call into the quota driver for either
+fetching project quotas or updating them.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">_update_attributes</span></code> method is called only once in the controller
+lifetime.
+This method dynamically updates Neutron’s resource attribute map <a class="footnote-reference brackets" href="#id11" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a> so that
+an attribute is added for every resource managed by the quota engine.
+Request authorisation is performed in this controller, and only ‘admin’ users
+are allowed to modify quotas for projects. As the neutron policy engine is not
+used, it is not possible to configure which users should be allowed to manage
+quotas using <code class="docutils literal notranslate"><span class="pre">policy.yaml</span></code>.</p>
+<p>The driver operations dealing with quota management are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">delete_tenant_quota</span></code>, which simply removes all entries from the ‘quotas’
+table for a given project identifier;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">update_quota_limit</span></code>, which adds or updates an entry in the ‘quotas’
+project for a given project identifier and a given resource name;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">_get_quotas</span></code>, which fetches limits for a set of resource and a given
+project identifier;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">_get_all_quotas</span></code>, which behaves like <code class="docutils literal notranslate"><span class="pre">_get_quotas</span></code>, but for all projects</p></li>
+</ul>
+</section>
+<section id="resource-usage-info">
+<h2>Resource Usage Info<a class="headerlink" href="#resource-usage-info" title="Link to this heading">¶</a></h2>
+<p>Neutron has two ways of tracking resource usage info:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CountableResource</span></code>, where resource usage is calculated every time quotas
+limits are enforced by counting rows in the resource table or resources
+tables and reservations for that resource.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TrackedResource</span></code>, depends on the selected driver:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">DbQuotaDriver</span></code>: the resource usage relies on a specific table tracking
+usage data, and performs explicitly counting only when the data in this
+table are not in sync with actual used and reserved resources.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DbQuotaNoLockDriver</span></code>: the resource usage is counted directly from the
+database table associated to the resource. In this new driver,
+<code class="docutils literal notranslate"><span class="pre">CountableResource</span></code> and <code class="docutils literal notranslate"><span class="pre">TrackedResource</span></code> could look similar but
+<code class="docutils literal notranslate"><span class="pre">TrackedResource</span></code> depends on one single database model (table) and the
+resource count is done directly on this table only.</p></li>
+</ul>
+</li>
+</ul>
+<p>Another difference between <code class="docutils literal notranslate"><span class="pre">CountableResource</span></code> and <code class="docutils literal notranslate"><span class="pre">TrackedResource</span></code> is
+that the former invokes a plugin method to count resources.
+<code class="docutils literal notranslate"><span class="pre">CountableResource</span></code> should be
+therefore employed for plugins which do not leverage the Neutron database.
+The actual class that the Neutron quota engine will use is determined by the
+<code class="docutils literal notranslate"><span class="pre">track_quota_usage</span></code> variable in the quota configuration section. If <code class="docutils literal notranslate"><span class="pre">True</span></code>,
+<code class="docutils literal notranslate"><span class="pre">TrackedResource</span></code> instances will be created, otherwise the quota engine will
+use <code class="docutils literal notranslate"><span class="pre">CountableResource</span></code> instances.
+Resource creation is performed by the <code class="docutils literal notranslate"><span class="pre">create_resource_instance</span></code> factory
+method in the <code class="docutils literal notranslate"><span class="pre">neutron.quota.resource</span></code> module.</p>
+</section>
+<section id="dbquotadriver-description">
+<h2>DbQuotaDriver description<a class="headerlink" href="#dbquotadriver-description" title="Link to this heading">¶</a></h2>
+<p>From a performance perspective, having a table tracking resource usage
+has some advantages, albeit not fundamental. Indeed the time required for
+executing queries to explicitly count objects will increase with the number of
+records in the table. On the other hand, using <code class="docutils literal notranslate"><span class="pre">TrackedResource</span></code> will fetch a
+single record, but has the drawback of having to execute an UPDATE statement
+once the operation is completed.
+Nevertheless, <code class="docutils literal notranslate"><span class="pre">CountableResource</span></code> instances do not simply perform a SELECT
+query on the relevant table for a resource, but invoke a plugin method, which
+might execute several statements and sometimes even interacts with the backend
+before returning.
+Resource usage tracking also becomes important for operational correctness
+when coupled with the concept of resource reservation, discussed in another
+section of this chapter.</p>
+<p>Tracking quota usage is not as simple as updating a counter every time
+resources are created or deleted.
+Indeed a quota-limited resource in Neutron can be created in several ways.
+While a RESTful API request is the most common one, resources can be created
+by RPC handlers listing on the AMQP bus, such as those which create DHCP
+ports, or by plugin operations, such as those which create router ports.</p>
+<p>To this aim, <code class="docutils literal notranslate"><span class="pre">TrackedResource</span></code> instances are initialised with a reference to
+the model class for the resource for which they track usage data. During
+object initialisation, SqlAlchemy event handlers are installed for this class.
+The event handler is executed after a record is inserted or deleted.
+As result usage data for that resource and will be marked as ‘dirty’ once
+the operation completes, so that the next time usage data is requested,
+it will be synchronised counting resource usage from the database.
+Even if this solution has some drawbacks, listed in the ‘exceptions and
+caveats’ section, it is more reliable than solutions such as:</p>
+<ul class="simple">
+<li><p>Updating the usage counters with the new ‘correct’ value every time an
+operation completes.</p></li>
+<li><p>Having a periodic task synchronising quota usage data with actual data in
+the Neutron DB.</p></li>
+</ul>
+</section>
+<section id="dbquotanolockdriver-description">
+<h2>DbQuotaNoLockDriver description<a class="headerlink" href="#dbquotanolockdriver-description" title="Link to this heading">¶</a></h2>
+<p>The strategy of this quota driver is the opposite to <code class="docutils literal notranslate"><span class="pre">DbQuotaDriver</span></code>.
+Instead of tracking the usage quota of each resource in a specific table,
+this driver retrieves the used resources directly form the database.
+Each <code class="docutils literal notranslate"><span class="pre">TrackedResource</span></code> is linked to a database table that stores the tracked
+resources. This driver claims that a trivial query on the resource table,
+filtering by project ID, is faster than attending to the DB events and tracking
+the quota usage in an independent table.</p>
+<p>This driver relays on the database engine transactionality isolation. Each
+time a new resource is requested, the quota driver opens a database transaction
+to:</p>
+<ul class="simple">
+<li><p>Clean up the expired reservations. The amount of expired reservations is
+always limited because of the short timeout set (2 minutes).</p></li>
+<li><p>Retrieve the used resources for a specific project. This query retrieves
+only the “project_id” column of the resource to avoid backref requests; that
+limits the scope of the query and speeds up it.</p></li>
+<li><p>Retrieve the reserved resources, created by other concurrent operations.</p></li>
+<li><p>If there is enough quota, create a new reservation register.</p></li>
+</ul>
+<p>Those operations, executed in the same transaction, are fast enough to avoid
+another concurrent resource reservation, exceeding the available quota. At the
+same time, this driver does not create a lock per resource and project ID,
+allowing concurrent requests that won’t be blocked by the resource lock.
+Because the quota reservation process, described before, is a fast operation,
+the chances of overcommiting resources over the quota limits are low. Neutron
+does not enforce quota in such way that a quota limit violation could never
+occur <a class="footnote-reference brackets" href="#id12" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>.</p>
+<p>Regardless of whether <code class="docutils literal notranslate"><span class="pre">CountableResource</span></code> or <code class="docutils literal notranslate"><span class="pre">TrackedResource</span></code> is used,
+the quota engine always invokes its <code class="docutils literal notranslate"><span class="pre">count()</span></code> method to retrieve resource
+usage. Therefore, from the perspective of the Quota engine there is absolutely
+no difference between <code class="docutils literal notranslate"><span class="pre">CountableResource</span></code> and <code class="docutils literal notranslate"><span class="pre">TrackedResource</span></code>.</p>
+</section>
+<section id="quota-enforcement-in-dbquotadriver">
+<h2>Quota Enforcement in DbQuotaDriver<a class="headerlink" href="#quota-enforcement-in-dbquotadriver" title="Link to this heading">¶</a></h2>
+<p>Before dispatching a request to the plugin, the Neutron ‘base’ controller <a class="footnote-reference brackets" href="#id13" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a>
+attempts to make a reservation for requested resource(s).
+Reservations are made by calling the <code class="docutils literal notranslate"><span class="pre">make_reservation</span></code> method in
+<code class="docutils literal notranslate"><span class="pre">neutron.quota.QuotaEngine</span></code>.
+The process of making a reservation is fairly straightforward:</p>
+<ul class="simple">
+<li><p>Get current resource usages. This is achieved by invoking the count method
+on every requested resource, and then retrieving the amount of reserved
+resources.</p></li>
+<li><p>Fetch current quota limits for requested resources, by invoking the
+<code class="docutils literal notranslate"><span class="pre">_get_project_quotas</span></code> method.</p></li>
+<li><p>Fetch expired reservations for selected resources. This amount will be
+subtracted from resource usage. As in most cases there won’t be any
+expired reservation, this approach actually requires less DB operations than
+doing a sum of non-expired, reserved resources for each request.</p></li>
+<li><p>For each resource calculate its headroom, and verify the requested
+amount of resource is less than the headroom.</p></li>
+<li><p>If the above is true for all resource, the reservation is saved in the DB,
+otherwise an <code class="docutils literal notranslate"><span class="pre">OverQuotaLimit</span></code> exception is raised.</p></li>
+</ul>
+<p>The quota engine is able to make a reservation for multiple resources.
+However, it is worth noting that because of the current structure of the
+Neutron API layer, there will not be any practical case in which a reservation
+for multiple resources is made. For this reason performance optimisation
+avoiding repeating queries for every resource are not part of the current
+implementation.</p>
+<p>In order to ensure correct operations, a row-level lock is acquired in
+the transaction which creates the reservation. The lock is acquired when
+reading usage data. In case of write-set certification failures,
+which can occur in active/active clusters such as MySQL galera, the decorator
+<code class="docutils literal notranslate"><span class="pre">neutron_lib.db.api.retry_db_errors</span></code> will retry the transaction if a
+DBDeadLock exception is raised.
+While non-locking approaches are possible, it has been found out that, since
+a non-locking algorithms increases the chances of collision, the cost of
+handling a <code class="docutils literal notranslate"><span class="pre">DBDeadlock</span></code> is still lower than the cost of retrying the
+operation when a collision is detected. A study in this direction was conducted
+for IP allocation operations, but the same principles apply here as well <a class="footnote-reference brackets" href="#id14" id="id7" role="doc-noteref"><span class="fn-bracket">[</span>7<span class="fn-bracket">]</span></a>.
+Nevertheless, moving away for DB-level locks is something that must happen
+for quota enforcement in the future.</p>
+<p>Committing and cancelling a reservation is as simple as deleting the
+reservation itself. When a reservation is committed, the resources which
+were committed are now stored in the database, so the reservation itself
+should be deleted. The Neutron quota engine simply removes the record when
+cancelling a reservation (i.e. the request failed to complete), and also
+marks quota usage info as dirty when the reservation is committed (i.e.
+the request completed correctly).
+Reservations are committed or cancelled by respectively calling the
+<code class="docutils literal notranslate"><span class="pre">commit_reservation</span></code> and <code class="docutils literal notranslate"><span class="pre">cancel_reservation</span></code> methods in
+<code class="docutils literal notranslate"><span class="pre">neutron.quota.QuotaEngine</span></code>.</p>
+<p>Reservations are not perennial. Eternal reservation would eventually exhaust
+projects’ quotas because they would never be removed when an API worker crashes
+whilst in the middle of an operation.
+Reservation expiration is currently set to 120 seconds, and is not
+configurable, not yet at least. Expired reservations are not counted when
+calculating resource usage. While creating a reservation, if any expired
+reservation is found, all expired reservation for that project and resource
+will be removed from the database, thus avoiding build-up of expired
+reservations.</p>
+</section>
+<section id="setting-up-resource-tracking-for-a-plugin">
+<h2>Setting up Resource Tracking for a Plugin<a class="headerlink" href="#setting-up-resource-tracking-for-a-plugin" title="Link to this heading">¶</a></h2>
+<p>By default plugins do not leverage resource tracking. Having the plugin
+explicitly declare which resources should be tracked is a precise design
+choice aimed at limiting as much as possible the chance of introducing
+errors in existing plugins.</p>
+<p>For this reason a plugin must declare which resource it intends to track.
+This can be achieved using the tracked_resources decorator available in the
+neutron.quota.resource_registry module.
+The decorator should ideally be applied to the plugin’s __init__ method.</p>
+<p>The decorator accepts in input a list of keyword arguments. The name of the
+argument must be a resource name, and the value of the argument must be
+a DB model class. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@resource_registry</span><span class="o">.</span><span class="n">tracked_resources</span><span class="p">(</span><span class="n">network</span><span class="o">=</span><span class="n">models_v2</span><span class="o">.</span><span class="n">Network</span><span class="p">,</span>
+                                    <span class="n">port</span><span class="o">=</span><span class="n">models_v2</span><span class="o">.</span><span class="n">Port</span><span class="p">,</span>
+                                    <span class="n">subnet</span><span class="o">=</span><span class="n">models_v2</span><span class="o">.</span><span class="n">Subnet</span><span class="p">,</span>
+                                    <span class="n">subnetpool</span><span class="o">=</span><span class="n">models_v2</span><span class="o">.</span><span class="n">SubnetPool</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Will ensure network, port, subnet and subnetpool resources are tracked.
+In theory, it is possible to use this decorator multiple times, and not
+exclusively to <code class="docutils literal notranslate"><span class="pre">__init__</span></code> methods. However, this would eventually lead to
+code readability and maintainability problems, so developers are strongly
+encourage to apply this decorator exclusively to the plugin’s <code class="docutils literal notranslate"><span class="pre">__init__</span></code>
+method (or any other method which is called by the plugin only once
+during its initialization).</p>
+</section>
+<section id="notes-for-implementors-of-rpc-interfaces-and-restful-controllers">
+<h2>Notes for Implementors of RPC Interfaces and RESTful Controllers<a class="headerlink" href="#notes-for-implementors-of-rpc-interfaces-and-restful-controllers" title="Link to this heading">¶</a></h2>
+<p>Neutron unfortunately does not have a layer which is called before dispatching
+the operation from the plugin which can be leveraged both from RESTful and
+RPC over AMQP APIs. In particular the RPC handlers call straight into the
+plugin, without doing any request authorisation or quota enforcement.</p>
+<p>Therefore RPC handlers must explicitly indicate if they are going to call the
+plugin to create or delete any sort of resources. This is achieved in a simple
+way, by ensuring modified resources are marked as dirty after the RPC handler
+execution terminates. To this aim developers can use the mark_resources_dirty
+decorator available in the module neutron.quota.resource_registry.</p>
+<p>The decorator would scan the whole list of registered resources, and store
+the dirty status for their usage trackers in the database for those resources
+for which items have been created or destroyed during the plugin operation.</p>
+</section>
+<section id="exceptions-and-caveats">
+<h2>Exceptions and Caveats<a class="headerlink" href="#exceptions-and-caveats" title="Link to this heading">¶</a></h2>
+<p>Please be aware of the following limitations of the quota enforcement engine:</p>
+<ul class="simple">
+<li><p>Subnet allocation from subnet pools, in particularly shared pools, is also
+subject to quota limit checks. However this checks are not enforced by the
+quota engine, but trough a mechanism implemented in the
+<code class="docutils literal notranslate"><span class="pre">neutron.ipam.subnetalloc</span></code> module. This is because the quota engine is not
+able to satisfy the requirements for quotas on subnet allocation.</p></li>
+<li><p>The quota engine also provides a <code class="docutils literal notranslate"><span class="pre">limit_check</span></code> routine which enforces quota
+checks without creating reservations. This way of doing quota enforcement
+is extremely unreliable and superseded by the reservation mechanism. It
+has not been removed to ensure off-tree plugins and extensions which leverage
+are not broken.</p></li>
+<li><p>SqlAlchemy events might not be the most reliable way for detecting changes
+in resource usage. Since the event mechanism monitors the data model class,
+it is paramount for a correct quota enforcement, that resources are always
+created and deleted using object relational mappings. For instance, deleting
+a resource with a <code class="docutils literal notranslate"><span class="pre">query.delete</span></code> call will not trigger the event.
+SQLAlchemy events should be considered as a temporary measure adopted as
+Neutron lacks persistent API objects.</p></li>
+<li><p>As <code class="docutils literal notranslate"><span class="pre">CountableResource</span></code> instance do not track usage data, when making a
+reservation no write-intent lock is acquired. Therefore the quota engine
+with <code class="docutils literal notranslate"><span class="pre">CountableResource</span></code> is not concurrency-safe.</p></li>
+<li><p>The mechanism for specifying for which resources enable usage tracking
+relies on the fact that the plugin is loaded before quota-limited resources
+are registered. For this reason it is not possible to validate whether a
+resource actually exists or not when enabling tracking for it. Developers
+should pay particular attention into ensuring resource names are correctly
+specified.</p></li>
+<li><p>The code assumes usage trackers are a trusted source of truth: if they
+report a usage counter and the dirty bit is not set, that counter is
+correct. If it’s dirty than surely that counter is out of sync.
+This is not very robust, as there might be issues upon restart when toggling
+the use_tracked_resources configuration variable, as stale counters might be
+trusted upon for making reservations. Also, the same situation might occur
+if a server crashes after the API operation is completed but before the
+reservation is committed, as the actual resource usage is changed but
+the corresponding usage tracker is not marked as dirty.</p></li>
+</ul>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id8" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Subnet allocation extension: <a class="reference external" href="http://opendev.org/openstack/neutron/src/neutron/extensions/subnetallocation.py">http://opendev.org/openstack/neutron/src/neutron/extensions/subnetallocation.py</a></p>
+</aside>
+<aside class="footnote brackets" id="id9" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>DB Quota driver class: <a class="reference external" href="http://opendev.org/openstack/neutron/src/neutron/db/quota/driver.py#L30">http://opendev.org/openstack/neutron/src/neutron/db/quota/driver.py#L30</a></p>
+</aside>
+<aside class="footnote brackets" id="id10" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p>Quota API extension controller: <a class="reference external" href="https://opendev.org/openstack/neutron/src/tag/19.0.0/neutron/extensions/quotasv2.py#L56">https://opendev.org/openstack/neutron/src/tag/19.0.0/neutron/extensions/quotasv2.py#L56</a></p>
+</aside>
+<aside class="footnote brackets" id="id11" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
+<p>Neutron resource attribute map: <a class="reference external" href="https://opendev.org/openstack/neutron-lib/src/tag/2.17.0/neutron_lib/api/attributes.py#L299">https://opendev.org/openstack/neutron-lib/src/tag/2.17.0/neutron_lib/api/attributes.py#L299</a></p>
+</aside>
+<aside class="footnote brackets" id="id12" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">5</a><span class="fn-bracket">]</span></span>
+<p>Quota limit exceeded: <a class="reference external" href="https://bugs.launchpad.net/neutron/+bug/1862050/">https://bugs.launchpad.net/neutron/+bug/1862050/</a></p>
+</aside>
+<aside class="footnote brackets" id="id13" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id6">6</a><span class="fn-bracket">]</span></span>
+<p>Base controller class: <a class="reference external" href="https://opendev.org/openstack/neutron/src/tag/19.0.0/neutron/api/v2/base.py#L44">https://opendev.org/openstack/neutron/src/tag/19.0.0/neutron/api/v2/base.py#L44</a></p>
+</aside>
+<aside class="footnote brackets" id="id14" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id7">7</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="http://lists.openstack.org/pipermail/openstack-dev/2015-February/057534.html">http://lists.openstack.org/pipermail/openstack-dev/2015-February/057534.html</a></p>
+</aside>
+</aside>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="quality_of_service.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Quality of Service"></i></a>
+          
+          
+            <a href="retries.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Retrying Operations"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2024-08-23 12:03:12</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Contributor Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#basic-information">Basic Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-policies">Neutron Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#gerrit-rechecks">Gerrit Rechecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-stadium">Neutron Stadium</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#neutron-internals">Neutron Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#ovn-driver">OVN Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#dashboards">Dashboards</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Quota Management and Enforcement</a><ul>
+<li><a class="reference internal" href="#high-level-view">High Level View</a></li>
+<li><a class="reference internal" href="#quota-management">Quota Management</a></li>
+<li><a class="reference internal" href="#resource-usage-info">Resource Usage Info</a></li>
+<li><a class="reference internal" href="#dbquotadriver-description">DbQuotaDriver description</a></li>
+<li><a class="reference internal" href="#dbquotanolockdriver-description">DbQuotaNoLockDriver description</a></li>
+<li><a class="reference internal" href="#quota-enforcement-in-dbquotadriver">Quota Enforcement in DbQuotaDriver</a></li>
+<li><a class="reference internal" href="#setting-up-resource-tracking-for-a-plugin">Setting up Resource Tracking for a Plugin</a></li>
+<li><a class="reference internal" href="#notes-for-implementors-of-rpc-interfaces-and-restful-controllers">Notes for Implementors of RPC Interfaces and RESTful Controllers</a></li>
+<li><a class="reference internal" href="#exceptions-and-caveats">Exceptions and Caveats</a></li>
+<li><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "contributor/internals/quota" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Quota Management and Enforcement in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2024-08-23 12:03:12";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "contributor/internals/quota";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

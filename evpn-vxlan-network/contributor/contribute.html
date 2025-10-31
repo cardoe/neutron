@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Contributing new extensions to Neutron &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/support-matrix.css?v=ac26a930" />
+    <script src="../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Neutron public API" href="neutron_api.html" />
+    <link rel="prev" title="Sparse architecture" href="ovn_vagrant/sparse-architecture.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/contributor/contribute.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Contributing new extensions to Neutron</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="ovn_vagrant/sparse-architecture.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Sparse architecture"></i></a>
+    
+    
+    <a href="neutron_api.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Neutron public API"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="contributing-new-extensions-to-neutron">
+<h1>Contributing new extensions to Neutron<a class="headerlink" href="#contributing-new-extensions-to-neutron" title="Link to this heading">¶</a></h1>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
+<p>Neutron has a pluggable architecture, with a number of extension points.
+This documentation covers aspects relevant to contributing new Neutron
+v2 core (aka monolithic) plugins, ML2 mechanism drivers, and L3 service
+plugins. This document will initially cover a number of process-oriented
+aspects of the contribution process, and proceed to provide a how-to guide
+that shows how to go from 0 LOC’s to successfully contributing new
+extensions to Neutron. In the remainder of this guide, we will try to
+use practical examples as much as we can so that people have working
+solutions they can start from.</p>
+<p>This guide is for a developer who wants to have a degree of visibility
+within the OpenStack Networking project. If you are a developer who
+wants to provide a Neutron-based solution without interacting with the
+Neutron community, you are free to do so, but you can stop reading now,
+as this guide is not for you.</p>
+<p>Plugins and drivers for non-reference implementations are known as
+“third-party” code. This includes code for supporting vendor products, as well
+as code for supporting open-source networking implementations.</p>
+<p>Before the Kilo release these plugins and drivers were included in the Neutron
+tree. During the Kilo cycle the third-party plugins and drivers underwent the
+first phase of a process called decomposition. During this phase, each plugin
+and driver moved the bulk of its logic to a separate git repository, while
+leaving a thin “shim” in the neutron tree together with the DB models and
+migrations (and perhaps some config examples).</p>
+<p>During the Liberty cycle the decomposition concept was taken to its conclusion
+by allowing third-party code to exist entirely out of tree. Further extension
+mechanisms have been provided to better support external plugins and drivers
+that alter the API and/or the data model.</p>
+<p>In the Mitaka cycle we will <strong>require</strong> all third-party code to be moved out of
+the neutron tree completely.</p>
+<p>‘Outside the tree’ can be anything that is publicly available: it may be a repo
+on opendev.org for instance, a tarball, a pypi package, etc. A
+plugin/drivers maintainer team self-governs in order to promote sharing, reuse,
+innovation, and release of the ‘out-of-tree’ deliverable. It should not be
+required for any member of the core team to be involved with this process,
+although core members of the Neutron team can participate in whichever capacity
+is deemed necessary to facilitate out-of-tree development.</p>
+<p>This guide is aimed at you as the maintainer of code that integrates with
+Neutron but resides in a separate repository.</p>
+</section>
+<section id="contribution-process">
+<h2>Contribution Process<a class="headerlink" href="#contribution-process" title="Link to this heading">¶</a></h2>
+<p>If you want to extend OpenStack Networking with your technology, and you want
+to do it within the visibility of the OpenStack project, follow the guidelines
+and examples below. We’ll describe best practices for:</p>
+<ul class="simple">
+<li><p>Design and Development;</p></li>
+<li><p>Testing and Continuous Integration;</p></li>
+<li><p>Defect Management;</p></li>
+<li><p>Backport Management for plugin specific code;</p></li>
+<li><p>DevStack Integration;</p></li>
+<li><p>Documentation;</p></li>
+</ul>
+<p>Once you have everything in place you may want to add your project to the list
+of Neutron sub-projects. See <a class="reference internal" href="stadium/governance.html#add-remove-projects-to-stadium"><span class="std std-ref">Adding or removing projects to the Stadium</span></a>
+for details.</p>
+</section>
+<section id="design-and-development">
+<h2>Design and Development<a class="headerlink" href="#design-and-development" title="Link to this heading">¶</a></h2>
+<p>Assuming you have a working repository, any development to your own repo does
+not need any blueprint, specification or bugs against Neutron. However, if your
+project is a part of the Neutron Stadium effort, you are expected to
+participate in the principles of the Four Opens, meaning your design should be
+done in the open. Thus, it is encouraged to file documentation for changes in
+your own repository.</p>
+<p>If your code is hosted on opendev.org then the gerrit review system is
+automatically provided. Contributors should follow the review guidelines
+similar to those of Neutron. However, you as the maintainer have the
+flexibility to choose who can approve/merge changes in your own repo.</p>
+<p>It is recommended (but not required,
+see <a class="reference internal" href="policies/thirdparty-ci.html"><span class="doc">policies</span></a>)
+that you set up a third-party CI system. This will provide a vehicle for
+checking the third-party code against Neutron changes. See <a class="reference internal" href="#testing-and-continuous-integration">Testing and
+Continuous Integration</a> below for more detailed recommendations.</p>
+<p>Design documents can still be supplied in form of Restructured Text (RST)
+documents, within the same third-party library repo. If changes to the common
+Neutron code are required, an <a class="reference internal" href="policies/blueprints.html#request-for-feature-enhancement"><span class="std std-ref">RFE</span></a>
+may need to be filed. However, every case is different and you are invited to
+seek guidance from Neutron core reviewers about what steps to follow.</p>
+</section>
+<section id="testing-and-continuous-integration">
+<h2>Testing and Continuous Integration<a class="headerlink" href="#testing-and-continuous-integration" title="Link to this heading">¶</a></h2>
+<p>The following strategies are recommendations only, since third-party CI testing
+is not an enforced requirement. However, these strategies are employed by the
+majority of the plugin/driver contributors that actively participate in the
+Neutron development community, since they have learned from experience how
+quickly their code can fall out of sync with the rapidly changing Neutron core
+code base.</p>
+<ul>
+<li><p>You should run unit tests in your own external library (e.g. on
+opendev.org where Zuul setup is for free).</p></li>
+<li><p>Your third-party CI should validate third-party integration with Neutron via
+functional testing. The third-party CI is a communication mechanism. The
+objective of this mechanism is as follows:</p>
+<ul class="simple">
+<li><p>it communicates to you when someone has contributed a change that
+potentially breaks your code. It is then up to you maintaining the affected
+plugin/driver to determine whether the failure is transient or real, and
+resolve the problem if it is.</p></li>
+<li><p>it communicates to a patch author that they may be breaking a
+plugin/driver. If they have the time/energy/relationship with the
+maintainer of the plugin/driver in question, then they can (at their
+discretion) work to resolve the breakage.</p></li>
+<li><p>it communicates to the community at large whether a given plugin/driver
+is being actively maintained.</p></li>
+<li><p>A maintainer that is perceived to be responsive to failures in their
+third-party CI jobs is likely to generate community goodwill.</p></li>
+</ul>
+<p>It is worth noting that if the plugin/driver repository is hosted on
+opendev.org, due to current openstack-infra limitations, it is not
+possible to have third-party CI systems participating in the gate pipeline
+for the repo. This means that the only validation provided during the merge
+process to the repo is through unit tests. Post-merge hooks can still be
+exploited to provide third-party CI feedback, and alert you of potential
+issues. As mentioned above, third-party CI systems will continue to validate
+Neutron core commits. This will allow them to detect when incompatible
+changes occur, whether they are in Neutron or in the third-party repo.</p>
+</li>
+</ul>
+</section>
+<section id="defect-management">
+<h2>Defect Management<a class="headerlink" href="#defect-management" title="Link to this heading">¶</a></h2>
+<p>Bugs affecting third-party code should <em>not</em> be filed in the Neutron project on
+launchpad. Bug tracking can be done in any system you choose, but by creating a
+third-party project in launchpad, bugs that affect both Neutron and your code
+can be more easily tracked using launchpad’s “also affects project” feature.</p>
+<section id="security-issues">
+<h3>Security Issues<a class="headerlink" href="#security-issues" title="Link to this heading">¶</a></h3>
+<p>Here are some answers to how to handle security issues in your repo, taken
+from <a class="reference external" href="http://lists.openstack.org/pipermail/openstack-dev/2015-July/068617.html">this mailing list message</a>:</p>
+<ul class="simple">
+<li><p>How should security your issues be managed?</p></li>
+</ul>
+<p>The OpenStack Vulnerability Management Team (VMT) follows a <a class="reference external" href="https://security.openstack.org/vmt-process.html">documented process</a> which can basically be
+reused by any project-team when needed.</p>
+<ul class="simple">
+<li><p>Should the OpenStack security team be involved?</p></li>
+</ul>
+<p>The OpenStack VMT directly oversees vulnerability reporting and disclosure for
+a <a class="reference external" href="https://wiki.openstack.org/wiki/Security_supported_projects">subset of OpenStack source code repositories</a>.  However, they
+are still quite happy to answer any questions you might have about
+vulnerability management for your own projects even if they’re not part of that
+set. Feel free to reach out to the VMT in public or in private.</p>
+<p>Also, the VMT is an autonomous subgroup of the much larger <a class="reference external" href="https://governance.openstack.org/tc/reference/projects/security.html">OpenStack Security
+project-team</a>. They’re a
+knowledgeable bunch and quite responsive if you want to get their opinions or
+help with security-related issues (vulnerabilities or otherwise).</p>
+<ul class="simple">
+<li><p>Does a CVE need to be filed?</p></li>
+</ul>
+<p>It can vary widely. If a commercial distribution such as Red Hat is
+redistributing a vulnerable version of your software, then they may assign one
+anyway even if you don’t request one yourself. Or the reporter may request one;
+the reporter may even be affiliated with an organization who has already
+assigned/obtained a CVE before they initiate contact with you.</p>
+<ul class="simple">
+<li><p>Do the maintainers need to publish OSSN or equivalent documents?</p></li>
+</ul>
+<p>OpenStack Security Advisories (OSSA) are official publications of the OpenStack
+VMT and only cover VMT-supported software. OpenStack Security Notes (OSSN) are
+published by editors within the OpenStack Security project-team on more general
+security topics and may even cover issues in non-OpenStack software commonly
+used in conjunction with OpenStack, so it’s at their discretion as to whether
+they would be able to accommodate a particular issue with an OSSN.</p>
+<p>However, these are all fairly arbitrary labels, and what really matters in the
+grand scheme of things is that vulnerabilities are handled seriously, fixed
+with due urgency and care, and announced widely – not just on relevant
+OpenStack mailing lists but also preferably somewhere with broader distribution
+like the <a class="reference external" href="http://oss-security.openwall.org/wiki/mailing-lists/oss-security">Open Source Security mailing list</a>. The goal
+is to get information on your vulnerabilities, mitigating measures and fixes
+into the hands of the people using your software in a timely manner.</p>
+<ul class="simple">
+<li><p>Anything else to consider here?</p></li>
+</ul>
+<p>The OpenStack VMT is in the process of trying to reinvent itself so that it can
+better scale within the context of the “Big Tent.” This includes making sure
+the policy/process documentation is more consumable and reusable even by
+project-teams working on software outside the scope of our charter. It’s a work
+in progress, and any input is welcome on how we can make this function well for
+everyone.</p>
+</section>
+</section>
+<section id="backport-management-strategies">
+<h2>Backport Management Strategies<a class="headerlink" href="#backport-management-strategies" title="Link to this heading">¶</a></h2>
+<p>This section applies only to third-party maintainers who had code in the
+Neutron tree during the Kilo and earlier releases. It will be obsolete once the
+Kilo release is no longer supported.</p>
+<p>If a change made to out-of-tree third-party code needs to be back-ported to
+in-tree code in a stable branch, you may submit a review without a
+corresponding master branch change. The change will be evaluated by core
+reviewers for stable branches to ensure that the backport is justified and that
+it does not affect Neutron core code stability.</p>
+</section>
+<section id="devstack-integration-strategies">
+<h2>DevStack Integration Strategies<a class="headerlink" href="#devstack-integration-strategies" title="Link to this heading">¶</a></h2>
+<p>When developing and testing a new or existing plugin or driver, the aid
+provided by DevStack is incredibly valuable: DevStack can help get all the
+software bits installed, and configured correctly, and more importantly in a
+predictable way.</p>
+<p>For DevStack integration there are a few options available, and they may or
+may not make sense depending on whether you are contributing a new or
+existing plugin or driver.</p>
+<p>If you are contributing a new plugin, the approach to choose should be based on
+<a class="reference external" href="https://docs.openstack.org/devstack/latest/plugins.html#extras-d-hooks">Extras.d Hooks’ externally hosted plugins</a>.
+With the extra.d hooks, the DevStack integration is co-located with the
+third-party integration library, and it leads to the greatest level of
+flexibility when dealing with DevStack based dev/test deployments.</p>
+<p>One final consideration is worth making for third-party CI setups: if <a class="reference external" href="https://opendev.org/openstack/devstack-gate">Devstack
+Gate</a> is used,
+it does provide hook functions that can be executed at specific times of the
+devstack-gate-wrap script run. For more details see <a class="reference external" href="https://opendev.org/openstack/devstack-gate/src/devstack-vm-gate-wrap.sh">devstack-vm-gate-wrap.sh</a>.</p>
+</section>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">¶</a></h2>
+<p>For a layout of the how the documentation directory is structured see the
+<a class="reference external" href="effective_neutron.html">effective neutron guide</a></p>
+</section>
+<section id="project-initial-setup">
+<h2>Project Initial Setup<a class="headerlink" href="#project-initial-setup" title="Link to this heading">¶</a></h2>
+<p>The how-to below assumes that the third-party library will be hosted on
+opendev.org. This lets you tap in the entire OpenStack CI infrastructure
+and can be a great place to start from to contribute your new or existing
+driver/plugin. The list of steps below are summarized version of what you can
+find on <a class="reference external" href="http://docs.openstack.org/infra/manual/creators.html">http://docs.openstack.org/infra/manual/creators.html</a>. They are meant to
+be the bare minimum you have to complete in order to get you off the ground.</p>
+<ul class="simple">
+<li><p>Create a public repository: this can be a personal opendev.org repo or any
+publicly available git repo, e.g. <code class="docutils literal notranslate"><span class="pre">https://github.com/john-doe/foo.git</span></code>.
+This would be a temporary buffer to be used to feed the one on opendev.org.</p></li>
+<li><p>Initialize the repository: if you are starting afresh, you may <em>optionally</em>
+want to use cookiecutter to get a skeleton project. You can learn how to use
+cookiecutter on <a class="reference external" href="https://opendev.org/openstack-dev/cookiecutter">https://opendev.org/openstack-dev/cookiecutter</a>.
+If you want to build the repository from an existing Neutron module, you may
+want to skip this step now, build the history first (next step), and come
+back here to initialize the remainder of the repository with other files
+being generated by the cookiecutter (like tox.ini, setup.cfg,
+setup.py, etc.).</p></li>
+<li><p>Create a repository on opendev.org. For
+this you need the help of the OpenStack infra team. It is worth noting that
+you only get one shot at creating the repository on opendev.org. This
+is the time you get to choose whether you want to start from a clean slate,
+or you want to import the repo created during the previous step. In the
+latter case, you can do so by specifying the upstream section for your
+project in project-config/gerrit/project.yaml.  Steps are documented on the
+<a class="reference external" href="http://docs.openstack.org/infra/manual/creators.html">Repository Creator’s Guide</a>.</p></li>
+<li><p>Ask for a Launchpad user to be assigned to the core team created. Steps are
+documented in <a class="reference external" href="http://docs.openstack.org/infra/manual/creators.html#update-the-gerrit-group-members">this section</a>.</p></li>
+<li><p>Fix, fix, fix: at this point you have an external base to work on. You can
+develop against the new opendev.org project, the same way you work with
+any other OpenStack project: you have pep8, docs, and python CI jobs that
+validate your patches when posted to Gerrit. For instance, one thing you
+would need to do is to define an entry point for your plugin or driver in
+your own setup.cfg similarly as to how it is done in the <a class="reference external" href="https://opendev.org/openstack/networking-odl/src/tag/19.0.0/setup.cfg#L41">setup.cfg for ODL</a>.</p></li>
+<li><p>Define an entry point for your plugin or driver in setup.cfg</p></li>
+<li><p>Create third-party CI account: if you do not already have one, follow
+instructions for <a class="reference external" href="http://docs.openstack.org/infra/system-config/third_party.html">third-party CI</a> to get
+one.</p></li>
+</ul>
+</section>
+<section id="internationalization-support">
+<h2>Internationalization support<a class="headerlink" href="#internationalization-support" title="Link to this heading">¶</a></h2>
+<p>OpenStack is committed to broad international support.
+Internationalization (I18n) is one of important areas to make OpenStack
+ubiquitous. Each project is recommended to support i18n.</p>
+<p>This section describes how to set up translation support.
+The description in this section uses the following variables:</p>
+<ul class="simple">
+<li><p>repository : <code class="docutils literal notranslate"><span class="pre">openstack/${REPOSITORY}</span></code> (e.g., <code class="docutils literal notranslate"><span class="pre">openstack/networking-foo</span></code>)</p></li>
+<li><p>top level python path : <code class="docutils literal notranslate"><span class="pre">${MODULE_NAME}</span></code> (e.g., <code class="docutils literal notranslate"><span class="pre">networking_foo</span></code>)</p></li>
+</ul>
+<section id="oslo-i18n">
+<h3>oslo.i18n<a class="headerlink" href="#oslo-i18n" title="Link to this heading">¶</a></h3>
+<ul>
+<li><p>Each subproject repository should have its own oslo.i18n integration
+wrapper module <code class="docutils literal notranslate"><span class="pre">${MODULE_NAME}/_i18n.py</span></code>. The detail is found at
+<a class="reference external" href="https://docs.openstack.org/oslo.i18n/latest/user/usage.html">https://docs.openstack.org/oslo.i18n/latest/user/usage.html</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>DOMAIN</strong> name should match your <strong>module</strong> name <code class="docutils literal notranslate"><span class="pre">${MODULE_NAME}</span></code>.</p>
+</div>
+</li>
+<li><p>Import <code class="docutils literal notranslate"><span class="pre">_()</span></code> from your <code class="docutils literal notranslate"><span class="pre">${MODULE_NAME}/_i18n.py</span></code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Do not use <code class="docutils literal notranslate"><span class="pre">_()</span></code> in the builtins namespace which is
+registered by <strong>gettext.install()</strong> in <code class="docutils literal notranslate"><span class="pre">neutron/__init__.py</span></code>.
+It is now deprecated as described in oslo.18n documentation.</p>
+</div>
+</li>
+</ul>
+</section>
+<section id="enable-translation">
+<h3>Enable Translation<a class="headerlink" href="#enable-translation" title="Link to this heading">¶</a></h3>
+<p>To update and import translations, you need to make a change in project-config.
+A good example is found at <a class="reference external" href="https://review.opendev.org/#/c/224222/">https://review.opendev.org/#/c/224222/</a>.
+After doing this, the necessary jobs will be run and push/pull a
+message catalog to/from the translation infrastructure.</p>
+</section>
+</section>
+<section id="integrating-with-the-neutron-system">
+<h2>Integrating with the Neutron system<a class="headerlink" href="#integrating-with-the-neutron-system" title="Link to this heading">¶</a></h2>
+<section id="configuration-files">
+<h3>Configuration Files<a class="headerlink" href="#configuration-files" title="Link to this heading">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">data_files</span></code> in the <code class="docutils literal notranslate"><span class="pre">[files]</span></code> section of <code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code> of Neutron shall
+not contain any third-party references. These shall be located in the same
+section of the third-party repo’s own <code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code> file.</p>
+<ul class="simple">
+<li><p>Note: Care should be taken when naming sections in configuration files. When
+the Neutron service or an agent starts, oslo.config loads sections from all
+specified config files. This means that if a section [foo] exists in multiple
+config files, duplicate settings will collide. It is therefore recommended to
+prefix section names with a third-party string, e.g. [vendor_foo].</p></li>
+</ul>
+<p>Since Mitaka, configuration files are not maintained in the git repository but
+should be generated as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>``tox -e genconfig``
+</pre></div>
+</div>
+<p>If a ‘tox’ environment is unavailable, then you can run the following script
+instead to generate the configuration files:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">tools</span><span class="o">/</span><span class="n">generate_config_file_samples</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+<p>It is advised that subprojects do not keep their configuration files in their
+respective trees and instead generate them using a similar approach as Neutron
+does.</p>
+<dl class="simple">
+<dt><strong>ToDo: Inclusion in OpenStack documentation?</strong></dt><dd><p>Is there a recommended way to have third-party config options listed in the
+configuration guide in docs.openstack.org?</p>
+</dd>
+</dl>
+</section>
+<section id="database-models-and-migrations">
+<h3>Database Models and Migrations<a class="headerlink" href="#database-models-and-migrations" title="Link to this heading">¶</a></h3>
+<p>A third-party repo may contain database models for its own tables. Although
+these tables are in the Neutron database, they are independently managed
+entirely within the third-party code. Third-party code shall <strong>never</strong> modify
+neutron core tables in any way.</p>
+<p>Each repo has its own <em>expand</em> and <em>contract</em> <a class="reference external" href="alembic_migrations.html#migration-branches">alembic migration branches</a>. A third-party repo’s alembic
+migration branches may operate only on tables that are owned by the repo.</p>
+<ul class="simple">
+<li><p>Note: Care should be taken when adding new tables. To prevent collision of
+table names it is <strong>required</strong> to prefix them with a vendor/plugin string.</p></li>
+<li><p>Note: A third-party maintainer may opt to use a separate database for their
+tables. This may complicate cases where there are foreign key constraints
+across schemas for DBMS that do not support this well. Third-party maintainer
+discretion advised.</p></li>
+</ul>
+<p>The database tables owned by a third-party repo can have references to fields
+in neutron core tables. However, the alembic branch for a plugin/driver repo
+shall never update any part of a table that it does not own.</p>
+<p><strong>Note: What happens when a referenced item changes?</strong></p>
+<ul class="simple">
+<li><p><strong>Q:</strong> If a driver’s table has a reference (for example a foreign key) to a
+neutron core table, and the referenced item is changed in neutron, what
+should you do?</p></li>
+<li><p><strong>A:</strong> Fortunately, this should be an extremely rare occurrence. Neutron core
+reviewers will not allow such a change unless there is a very carefully
+thought-out design decision behind it. That design will include how to
+address any third-party code affected. (This is another good reason why you
+should stay actively involved with the Neutron developer community.)</p></li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">neutron-db-manage</span></code> alembic wrapper script for neutron detects alembic
+branches for installed third-party repos, and the upgrade command automatically
+applies to all of them. A third-party repo must register its alembic migrations
+at installation time. This is done by providing an entrypoint in setup.cfg as
+follows:</p>
+<p>For a third-party repo named <code class="docutils literal notranslate"><span class="pre">networking-foo</span></code>, add the alembic_migrations
+directory as an entrypoint in the <code class="docutils literal notranslate"><span class="pre">neutron.db.alembic_migrations</span></code> group:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">entry_points</span><span class="p">]</span>
+<span class="n">neutron</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">alembic_migrations</span> <span class="o">=</span>
+    <span class="n">networking</span><span class="o">-</span><span class="n">foo</span> <span class="o">=</span> <span class="n">networking_foo</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">migration</span><span class="p">:</span><span class="n">alembic_migrations</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>ToDo: neutron-db-manage autogenerate</strong></dt><dd><p>The alembic autogenerate command needs to support branches in external
+repos. Bug #1471333 has been filed for this.</p>
+</dd>
+</dl>
+</section>
+<section id="db-model-migration-testing">
+<h3>DB Model/Migration Testing<a class="headerlink" href="#db-model-migration-testing" title="Link to this heading">¶</a></h3>
+<p>Here is a <a class="reference internal" href="testing/template_model_sync_test.html"><span class="doc">template functional test</span></a>
+third-party maintainers can use to develop tests for model-vs-migration sync in
+their repos. It is recommended that each third-party CI sets up such a test,
+and runs it regularly against Neutron master.</p>
+</section>
+<section id="entry-points">
+<h3>Entry Points<a class="headerlink" href="#entry-points" title="Link to this heading">¶</a></h3>
+<p>The <a class="reference external" href="https://pythonhosted.org/setuptools">Python setuptools</a> installs all
+entry points for packages in one global namespace for an environment. Thus each
+third-party repo can define its package’s own <code class="docutils literal notranslate"><span class="pre">[entry_points]</span></code> in its own
+<code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code> file.</p>
+<p>For example, for the <code class="docutils literal notranslate"><span class="pre">networking-foo</span></code> repo:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">entry_points</span><span class="p">]</span>
+<span class="n">console_scripts</span> <span class="o">=</span>
+    <span class="n">neutron</span><span class="o">-</span><span class="n">foo</span><span class="o">-</span><span class="n">agent</span> <span class="o">=</span> <span class="n">networking_foo</span><span class="o">.</span><span class="n">cmd</span><span class="o">.</span><span class="n">eventlet</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">foo</span><span class="p">:</span><span class="n">main</span>
+<span class="n">neutron</span><span class="o">.</span><span class="n">core_plugins</span> <span class="o">=</span>
+    <span class="n">foo_monolithic</span> <span class="o">=</span> <span class="n">networking_foo</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">monolithic</span><span class="o">.</span><span class="n">plugin</span><span class="p">:</span><span class="n">FooPluginV2</span>
+<span class="n">neutron</span><span class="o">.</span><span class="n">service_plugins</span> <span class="o">=</span>
+    <span class="n">foo_l3</span> <span class="o">=</span> <span class="n">networking_foo</span><span class="o">.</span><span class="n">services</span><span class="o">.</span><span class="n">l3_router</span><span class="o">.</span><span class="n">l3_foo</span><span class="p">:</span><span class="n">FooL3ServicePlugin</span>
+<span class="n">neutron</span><span class="o">.</span><span class="n">ml2</span><span class="o">.</span><span class="n">type_drivers</span> <span class="o">=</span>
+    <span class="n">foo_type</span> <span class="o">=</span> <span class="n">networking_foo</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">ml2</span><span class="o">.</span><span class="n">drivers</span><span class="o">.</span><span class="n">foo</span><span class="p">:</span><span class="n">FooType</span>
+<span class="n">neutron</span><span class="o">.</span><span class="n">ml2</span><span class="o">.</span><span class="n">mechanism_drivers</span> <span class="o">=</span>
+    <span class="n">foo_ml2</span> <span class="o">=</span> <span class="n">networking_foo</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">ml2</span><span class="o">.</span><span class="n">drivers</span><span class="o">.</span><span class="n">foo</span><span class="p">:</span><span class="n">FooDriver</span>
+<span class="n">neutron</span><span class="o">.</span><span class="n">ml2</span><span class="o">.</span><span class="n">extension_drivers</span> <span class="o">=</span>
+    <span class="n">foo_ext</span> <span class="o">=</span> <span class="n">networking_foo</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">ml2</span><span class="o">.</span><span class="n">drivers</span><span class="o">.</span><span class="n">foo</span><span class="p">:</span><span class="n">FooExtensionDriver</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Note: It is advisable to include <code class="docutils literal notranslate"><span class="pre">foo</span></code> in the names of these entry points
+to avoid conflicts with other third-party packages that may get installed in
+the same environment.</p></li>
+</ul>
+</section>
+<section id="api-extensions">
+<h3>API Extensions<a class="headerlink" href="#api-extensions" title="Link to this heading">¶</a></h3>
+<p>Extensions can be loaded in two ways:</p>
+<ol class="arabic simple">
+<li><p>Use the <code class="docutils literal notranslate"><span class="pre">append_api_extensions_path()</span></code> library API. This method is defined
+in <code class="docutils literal notranslate"><span class="pre">neutron/api/extensions.py</span></code> in the neutron tree.</p></li>
+<li><p>Leverage the <code class="docutils literal notranslate"><span class="pre">api_extensions_path</span></code> config variable when deploying. See the
+example config file <code class="docutils literal notranslate"><span class="pre">etc/neutron.conf</span></code> in the neutron tree where this
+variable is commented.</p></li>
+</ol>
+</section>
+<section id="service-providers">
+<h3>Service Providers<a class="headerlink" href="#service-providers" title="Link to this heading">¶</a></h3>
+<p>If your project uses service provider(s) the same way VPNAAS does, you
+specify your service provider in your <code class="docutils literal notranslate"><span class="pre">project_name.conf</span></code> file like so:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">service_providers</span><span class="p">]</span>
+<span class="c1"># Must be in form:</span>
+<span class="c1"># service_provider=&lt;service_type&gt;:&lt;name&gt;:&lt;driver&gt;[:default][,...]</span>
+</pre></div>
+</div>
+<p>In order for Neutron to load this correctly, make sure you do the following in
+your code:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">neutron.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">servicetype_db</span>
+<span class="n">service_type_manager</span> <span class="o">=</span> <span class="n">servicetype_db</span><span class="o">.</span><span class="n">ServiceTypeManager</span><span class="o">.</span><span class="n">get_instance</span><span class="p">()</span>
+<span class="n">service_type_manager</span><span class="o">.</span><span class="n">add_provider_configuration</span><span class="p">(</span>
+    <span class="n">YOUR_SERVICE_TYPE</span><span class="p">,</span>
+    <span class="n">pconf</span><span class="o">.</span><span class="n">ProviderConfiguration</span><span class="p">(</span><span class="n">YOUR_SERVICE_MODULE</span><span class="p">,</span> <span class="n">YOUR_SERVICE_TYPE</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>This is typically required when you instantiate your service plugin class.</p>
+</section>
+<section id="interface-drivers">
+<h3>Interface Drivers<a class="headerlink" href="#interface-drivers" title="Link to this heading">¶</a></h3>
+<p>Interface (VIF) drivers for the reference implementations are defined in
+<code class="docutils literal notranslate"><span class="pre">neutron/agent/linux/interface.py</span></code>. Third-party interface drivers shall be
+defined in a similar location within their own repo.</p>
+<p>The entry point for the interface driver is a Neutron config option. It is up
+to the installer to configure this item in the <code class="docutils literal notranslate"><span class="pre">[DEFAULT]</span></code> section.
+For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">DEFAULT</span><span class="p">]</span>
+<span class="n">interface_driver</span> <span class="o">=</span> <span class="n">networking_foo</span><span class="o">.</span><span class="n">agent</span><span class="o">.</span><span class="n">linux</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">FooInterfaceDriver</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">openvswitch</span></code> interface driver is used by default in case the option is
+not explicitly set.</p>
+<dl class="simple">
+<dt><strong>ToDo: Interface Driver port bindings.</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">VIF_TYPE_*</span></code> constants in <code class="docutils literal notranslate"><span class="pre">neutron_lib/api/definitions/portbindings.py</span></code> should be
+moved from neutron core to the repositories where their drivers are
+implemented. We need to provide some config or hook mechanism for VIF types
+to be registered by external interface drivers. For Nova, selecting the VIF
+driver can be done outside of
+Neutron (using the new <a class="reference external" href="https://review.opendev.org/193668">os-vif python library</a>?). Armando and Akihiro to discuss.</p>
+</dd>
+</dl>
+</section>
+<section id="rootwrap-filters">
+<h3>Rootwrap Filters<a class="headerlink" href="#rootwrap-filters" title="Link to this heading">¶</a></h3>
+<p>If a third-party repo needs a rootwrap filter for a command that is not used by
+Neutron core, then the filter shall be defined in the third-party repo.</p>
+<p>For example, to add a rootwrap filters for commands in repo <code class="docutils literal notranslate"><span class="pre">networking-foo</span></code>:</p>
+<ul>
+<li><p>In the repo, create the file:
+<code class="docutils literal notranslate"><span class="pre">etc/neutron/rootwrap.d/foo.filters</span></code></p></li>
+<li><p>In the repo’s <code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code> add the filters to data_files:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">files</span><span class="p">]</span>
+<span class="n">data_files</span> <span class="o">=</span>
+    <span class="n">etc</span><span class="o">/</span><span class="n">neutron</span><span class="o">/</span><span class="n">rootwrap</span><span class="o">.</span><span class="n">d</span> <span class="o">=</span>
+        <span class="n">etc</span><span class="o">/</span><span class="n">neutron</span><span class="o">/</span><span class="n">rootwrap</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">foo</span><span class="o">.</span><span class="n">filters</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="extending-python-neutronclient">
+<h3>Extending python-neutronclient<a class="headerlink" href="#extending-python-neutronclient" title="Link to this heading">¶</a></h3>
+<p>The maintainer of a third-party component may wish to add extensions to the
+Neutron CLI client. Thanks to <a class="reference external" href="https://review.opendev.org/148318">https://review.opendev.org/148318</a> this can now
+be accomplished. See <a class="reference external" href="client_command_extensions.html">Client Command Extensions</a>.</p>
+</section>
+<section id="other-repo-split-items">
+<h3>Other repo-split items<a class="headerlink" href="#other-repo-split-items" title="Link to this heading">¶</a></h3>
+<p>(These are still TBD.)</p>
+<ul class="simple">
+<li><p>Splitting policy.yaml? <strong>ToDo</strong> Armando will investigate.</p></li>
+<li><p>Generic instructions (or a template) for installing an out-of-tree plugin or
+driver for Neutron. Possibly something for the networking guide, and/or a
+template that plugin/driver maintainers can modify and include with their
+package.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="ovn_vagrant/sparse-architecture.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Sparse architecture"></i></a>
+          
+          
+            <a href="neutron_api.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Neutron public API"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2025-02-19 09:42:53</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Contributor Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index.html#basic-information">Basic Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#neutron-policies">Neutron Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#gerrit-rechecks">Gerrit Rechecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#neutron-stadium">Neutron Stadium</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#neutron-internals">Neutron Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#ovn-driver">OVN Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#dashboards">Dashboards</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Contributing new extensions to Neutron</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#contribution-process">Contribution Process</a></li>
+<li><a class="reference internal" href="#design-and-development">Design and Development</a></li>
+<li><a class="reference internal" href="#testing-and-continuous-integration">Testing and Continuous Integration</a></li>
+<li><a class="reference internal" href="#defect-management">Defect Management</a><ul>
+<li><a class="reference internal" href="#security-issues">Security Issues</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#backport-management-strategies">Backport Management Strategies</a></li>
+<li><a class="reference internal" href="#devstack-integration-strategies">DevStack Integration Strategies</a></li>
+<li><a class="reference internal" href="#documentation">Documentation</a></li>
+<li><a class="reference internal" href="#project-initial-setup">Project Initial Setup</a></li>
+<li><a class="reference internal" href="#internationalization-support">Internationalization support</a><ul>
+<li><a class="reference internal" href="#oslo-i18n">oslo.i18n</a></li>
+<li><a class="reference internal" href="#enable-translation">Enable Translation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#integrating-with-the-neutron-system">Integrating with the Neutron system</a><ul>
+<li><a class="reference internal" href="#configuration-files">Configuration Files</a></li>
+<li><a class="reference internal" href="#database-models-and-migrations">Database Models and Migrations</a></li>
+<li><a class="reference internal" href="#db-model-migration-testing">DB Model/Migration Testing</a></li>
+<li><a class="reference internal" href="#entry-points">Entry Points</a></li>
+<li><a class="reference internal" href="#api-extensions">API Extensions</a></li>
+<li><a class="reference internal" href="#service-providers">Service Providers</a></li>
+<li><a class="reference internal" href="#interface-drivers">Interface Drivers</a></li>
+<li><a class="reference internal" href="#rootwrap-filters">Rootwrap Filters</a></li>
+<li><a class="reference internal" href="#extending-python-neutronclient">Extending python-neutronclient</a></li>
+<li><a class="reference internal" href="#other-repo-split-items">Other repo-split items</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "contributor/contribute" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Contributing new extensions to Neutron in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2025-02-19 09:42:53";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "contributor/contribute";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

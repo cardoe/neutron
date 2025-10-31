@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Policy Enforcement and Authorization &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Provisioning Blocks in relation to Composite Object Status" href="provisioning_blocks.html" />
+    <link rel="prev" title="Neutron Plugin Architecture" href="plugin-api.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/contributor/internals/policy.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Policy Enforcement and Authorization</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="plugin-api.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Neutron Plugin Architecture"></i></a>
+    
+    
+    <a href="provisioning_blocks.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Provisioning Blocks in relation to Composite Object Status"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="policy-enforcement-and-authorization">
+<h1>Policy Enforcement and Authorization<a class="headerlink" href="#policy-enforcement-and-authorization" title="Link to this heading">¶</a></h1>
+<p>As most OpenStack projects, Neutron leverages oslo_policy <a class="footnote-reference brackets" href="#id12" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. However, since
+Neutron loves to be special and complicate every developer’s life, it also
+“augments” oslo_policy capabilities by:</p>
+<ul class="simple">
+<li><p>A wrapper module with its own API: neutron.policy;</p></li>
+<li><p>The ability of adding fine-grained checks on attributes for resources in
+request bodies;</p></li>
+<li><p>The ability of using the policy engine to filter out attributes in responses;</p></li>
+<li><p>Adding some custom rule checks beyond those defined in oslo_policy;</p></li>
+</ul>
+<p>This document discusses Neutron-specific aspects of policy enforcement, and in
+particular how the enforcement logic is wired into API processing.
+For any other information please refer to the developer documentation for
+oslo_policy <a class="footnote-reference brackets" href="#id13" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
+<section id="authorization-workflow">
+<h2>Authorization workflow<a class="headerlink" href="#authorization-workflow" title="Link to this heading">¶</a></h2>
+<p>The Neutron API controllers perform policy checks in two phases during the
+processing of an API request:</p>
+<ul class="simple">
+<li><p>Request authorization, immediately before dispatching the request to the
+plugin layer for <code class="docutils literal notranslate"><span class="pre">POST</span></code>, <code class="docutils literal notranslate"><span class="pre">PUT</span></code>, and <code class="docutils literal notranslate"><span class="pre">DELETE</span></code>, and immediately after
+returning from the plugin layer for <code class="docutils literal notranslate"><span class="pre">GET</span></code> requests;</p></li>
+<li><p>Response filtering, when building the response to be returned to the API
+consumer.</p></li>
+</ul>
+<section id="request-authorization">
+<h3>Request authorization<a class="headerlink" href="#request-authorization" title="Link to this heading">¶</a></h3>
+<p>The aim of this step is to authorize processing for a request or reject it
+with an error status code.
+This step uses the <code class="docutils literal notranslate"><span class="pre">neutron.policy.enforce</span></code> routine. This routine raises
+<code class="docutils literal notranslate"><span class="pre">oslo_policy.PolicyNotAuthorized</span></code> when policy enforcement fails. The Neutron
+REST API controllers catch this exception and return:</p>
+<ul class="simple">
+<li><p>A 403 response code on a <code class="docutils literal notranslate"><span class="pre">POST</span></code> request or an <code class="docutils literal notranslate"><span class="pre">PUT</span></code> request for an
+object owned by the project submitting the request;</p></li>
+<li><p>A 403 response for failures while authorizing API actions such as
+<code class="docutils literal notranslate"><span class="pre">add_router_interface</span></code>;</p></li>
+<li><p>A 404 response for <code class="docutils literal notranslate"><span class="pre">DELETE</span></code>, <code class="docutils literal notranslate"><span class="pre">GET</span></code> and all other <code class="docutils literal notranslate"><span class="pre">PUT</span></code> requests.</p></li>
+</ul>
+<p>For <code class="docutils literal notranslate"><span class="pre">DELETE</span></code> operations the resource must first be fetched. This is done
+invoking the same <code class="docutils literal notranslate"><span class="pre">_item</span></code> <a class="footnote-reference brackets" href="#id14" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a> method used for processing <code class="docutils literal notranslate"><span class="pre">GET</span></code> requests.
+This is also true for <code class="docutils literal notranslate"><span class="pre">PUT</span></code> operations, since the Neutron API implements
+<code class="docutils literal notranslate"><span class="pre">PATCH</span></code> semantics for <code class="docutils literal notranslate"><span class="pre">PUTs</span></code>.
+The criteria to evaluate are built in the <code class="docutils literal notranslate"><span class="pre">_build_match_rule</span></code> <a class="footnote-reference brackets" href="#id15" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a> routine.
+This routine takes in input the following parameters:</p>
+<ul class="simple">
+<li><p>The action to be performed, in the <code class="docutils literal notranslate"><span class="pre">&lt;operation&gt;_&lt;resource&gt;</span></code> form,
+<code class="docutils literal notranslate"><span class="pre">e.g.:</span> <span class="pre">create_network</span></code></p></li>
+<li><p>The data to use for performing checks. For <code class="docutils literal notranslate"><span class="pre">POST</span></code> operations this could
+be a partial specification of the object, whereas it is always a full
+specification for <code class="docutils literal notranslate"><span class="pre">GET</span></code>, <code class="docutils literal notranslate"><span class="pre">PUT</span></code>, and <code class="docutils literal notranslate"><span class="pre">DELETE</span></code> requests, as resource
+data are retrieved before dispatching the call to the plugin layer.</p></li>
+<li><p>The collection name for the resource specified in the previous parameter;
+for instance, for a network it would be the “networks”.</p></li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">_build_match_rule</span></code> routine returns a <code class="docutils literal notranslate"><span class="pre">oslo_policy.RuleCheck</span></code> instance
+built in the following way:</p>
+<ul class="simple">
+<li><p>Always add a check for the action being performed. This will match
+a policy like create_network in <code class="docutils literal notranslate"><span class="pre">policy.yaml</span></code>;</p></li>
+<li><p>Return for <code class="docutils literal notranslate"><span class="pre">GET</span></code> operations; more detailed checks will be performed anyway
+when building the response;</p></li>
+<li><p>For each attribute which has been explicitly specified in the request
+create a rule matching policy names in the form
+<code class="docutils literal notranslate"><span class="pre">&lt;operation&gt;_&lt;resource&gt;:&lt;attribute&gt;</span></code> rule, and link it with the
+previous rule with an ‘And’ relationship (using <code class="docutils literal notranslate"><span class="pre">oslo_policy.AndCheck</span></code>);
+this step will be performed only if the <code class="docutils literal notranslate"><span class="pre">enforce_policy</span></code> flag is set to
+<code class="docutils literal notranslate"><span class="pre">True</span></code> in the resource attribute descriptor (usually found in a data
+structure called <code class="docutils literal notranslate"><span class="pre">RESOURCE_ATTRIBUTE_MAP</span></code>);</p></li>
+<li><p>If the attribute is a composite one then further rules will be created;
+These will match policy names in the form
+<code class="docutils literal notranslate"><span class="pre">&lt;operation&gt;_&lt;resource&gt;:&lt;attribute&gt;:&lt;sub_attribute&gt;</span></code>.
+An ‘And’ relationship will be used in this case too.</p></li>
+</ul>
+<p>As all the rules to verify are linked by ‘And’ relationships, all the policy
+checks should succeed in order for a request to be authorized. Rule
+verification is performed by <code class="docutils literal notranslate"><span class="pre">oslo_policy</span></code> with no “customization” from the
+Neutron side.</p>
+</section>
+<section id="response-filtering">
+<span id="id5"></span><h3>Response Filtering<a class="headerlink" href="#response-filtering" title="Link to this heading">¶</a></h3>
+<p>Some Neutron extensions, like the provider networks one, add some attribute
+to resources which are however not meant to be consumed by all clients. This
+might be because these attributes contain implementation details, or are
+meant only to be used when exchanging information between services, such
+as Nova and Neutron;</p>
+<p>For this reason the policy engine is invoked again when building API
+responses. This is achieved by the <code class="docutils literal notranslate"><span class="pre">_exclude_attributes_by_policy</span></code> <a class="footnote-reference brackets" href="#id16" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>
+method in <code class="docutils literal notranslate"><span class="pre">neutron.api.v2.base.Controller</span></code>;</p>
+<p>This method, for each attribute in the response returned by the plugin layer,
+first checks if the <code class="docutils literal notranslate"><span class="pre">is_visible</span></code> flag is True. In that case it proceeds to
+checking policies for the attribute; if the policy check fails the attribute
+is added to a list of attributes that should be removed from the response
+before returning it to the API client.</p>
+</section>
+</section>
+<section id="the-neutron-policy-api">
+<h2>The neutron.policy API<a class="headerlink" href="#the-neutron-policy-api" title="Link to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">neutron.policy</span></code> module exposes a simple API whose main goal if to allow
+the REST API controllers to implement the authorization workflow discussed inu
+this document. It is a bad practice to call the policy engine from within the
+plugin layer, as this would make request authorization dependent on configured
+plugins, and therefore make API behaviour dependent on the plugin itself, which
+defies Neutron tenet of being backend agnostic.</p>
+<p>The neutron.policy API exposes the following routines:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">init</span></code>
+Initializes the policy engine loading rules from the json policy (files).
+This method can safely be called several times.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reset</span></code>
+Clears all the rules currently configured in the policy engine. It is
+called in unit tests and at the end of the initialization of core API
+router <a class="footnote-reference brackets" href="#id17" id="id7" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a> in order to ensure rules are loaded after all the extensions
+are loaded.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">refresh</span></code>
+Combines init and reset. Called when a SIGHUP signal is sent to an API
+worker.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">set_rules</span></code>
+Explicitly set policy engine’s rules. Used only in unit tests.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">check</span></code>
+Perform a check using the policy engine. Builds match rules as described
+in this document, and then evaluates the resulting rule using oslo_policy’s
+policy engine. Returns True if the checks succeeds, false otherwise.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">enforce</span></code>
+Operates like the check routine but raises if the check in oslo_policy
+fails.</p></li>
+</ul>
+</section>
+<section id="neutron-specific-policy-rules">
+<h2>Neutron specific policy rules<a class="headerlink" href="#neutron-specific-policy-rules" title="Link to this heading">¶</a></h2>
+<p>Neutron provides two additional policy rule classes in order to support the
+“augmented” authorization capabilities it provides. They both extend
+<code class="docutils literal notranslate"><span class="pre">oslo_policy.RuleCheck</span></code> and are registered using the
+<code class="docutils literal notranslate"><span class="pre">oslo_policy.register</span></code> decorator.</p>
+<section id="ownercheck-extended-checks-for-resource-ownership">
+<h3>OwnerCheck: Extended Checks for Resource Ownership<a class="headerlink" href="#ownercheck-extended-checks-for-resource-ownership" title="Link to this heading">¶</a></h3>
+<p>This class is registered for rules matching the <code class="docutils literal notranslate"><span class="pre">tenant_id</span></code> keyword and
+overrides the generic check performed by oslo_policy in this case.
+It uses for those cases where neutron needs to check whether the project
+submitting a request for a new resource owns the parent resource of the one
+being created. Current usages of <code class="docutils literal notranslate"><span class="pre">OwnerCheck</span></code> include, for instance,
+creating and updating a subnet. This class supports the extension parent
+resources owner check which the parent resource introduced by
+service plugins. Such as router and floatingip owner check for <code class="docutils literal notranslate"><span class="pre">router</span></code>
+service plugin. Developers can register the extension resource name and service
+plugin name which were registered in neutron-lib into
+<code class="docutils literal notranslate"><span class="pre">EXT_PARENT_RESOURCE_MAPPING</span></code> which is located in
+<code class="docutils literal notranslate"><span class="pre">neutron_lib.services.constants</span></code>.</p>
+<p>The check, performed in the <code class="docutils literal notranslate"><span class="pre">__call__</span></code> method, works as follows:</p>
+<ul class="simple">
+<li><p>verify if the target field is already in the target data. If yes, then
+simply verify whether the value for the target field in target data
+is equal to value for the same field in credentials, just like
+<code class="docutils literal notranslate"><span class="pre">oslo_policy.GenericCheck</span></code> would do. This is also the most frequent case
+as the target field is usually <code class="docutils literal notranslate"><span class="pre">tenant_id</span></code>;</p></li>
+<li><p>if the previous check failed, extract a parent resource type and a
+parent field name from the target field. For instance
+<code class="docutils literal notranslate"><span class="pre">networks:tenant_id</span></code> identifies the <code class="docutils literal notranslate"><span class="pre">tenant_id</span></code> attribute of the
+<code class="docutils literal notranslate"><span class="pre">network</span></code> resource. For extension parent resource case,
+<code class="docutils literal notranslate"><span class="pre">ext_parent:tenant_id</span></code> identifies the <code class="docutils literal notranslate"><span class="pre">tenant_id</span></code> attribute of the
+registered extension resource in <code class="docutils literal notranslate"><span class="pre">EXT_PARENT_RESOURCE_MAPPING</span></code>;</p></li>
+<li><p>if no parent resource or target field could be identified raise a
+<code class="docutils literal notranslate"><span class="pre">PolicyCheckError</span></code> exception;</p></li>
+<li><p>Retrieve a ‘parent foreign key’ from the <code class="docutils literal notranslate"><span class="pre">_RESOURCE_FOREIGN_KEYS</span></code> data
+structure in <code class="docutils literal notranslate"><span class="pre">neutron.policy</span></code>. This foreign key is simply the
+attribute acting as a primary key in the parent resource. A
+<code class="docutils literal notranslate"><span class="pre">PolicyCheckError</span></code> exception will be raised if such ‘parent foreign key’
+cannot be retrieved;</p></li>
+<li><p>Using the core plugin, retrieve an instance of the resource having
+‘parent foreign key’ as an identifier;</p></li>
+<li><p>Finally, verify whether the target field in this resource matches the
+one in the initial request data. For instance, for a port create request,
+verify whether the <code class="docutils literal notranslate"><span class="pre">tenant_id</span></code> of the port data structure matches the
+<code class="docutils literal notranslate"><span class="pre">tenant_id</span></code> of the network where this port is being created.</p></li>
+</ul>
+</section>
+<section id="fieldcheck-verify-resource-attributes">
+<h3>FieldCheck: Verify Resource Attributes<a class="headerlink" href="#fieldcheck-verify-resource-attributes" title="Link to this heading">¶</a></h3>
+<p>This class is registered with the policy engine for rules matching the ‘field’
+keyword, and provides a way to perform fine grained checks on resource
+attributes. For instance, using this class of rules it is possible to specify
+a rule for granting every project read access to shared resources.</p>
+<p>In policy.yaml, a FieldCheck rules is specified in the following way:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">field</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">resource</span><span class="o">&gt;</span><span class="p">:</span><span class="o">&lt;</span><span class="n">field</span><span class="o">&gt;=&lt;</span><span class="n">value</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>This will result in the initialization of a FieldCheck that will check for
+<code class="docutils literal notranslate"><span class="pre">&lt;field&gt;</span></code> in the target resource data, and return <code class="docutils literal notranslate"><span class="pre">True</span></code> if it is equal
+to <code class="docutils literal notranslate"><span class="pre">&lt;value&gt;</span></code> or return <code class="docutils literal notranslate"><span class="pre">False</span></code> is the <code class="docutils literal notranslate"><span class="pre">&lt;field&gt;</span></code> either is not equal to
+<code class="docutils literal notranslate"><span class="pre">&lt;value&gt;</span></code> or does not exist at all.</p>
+</section>
+</section>
+<section id="guidance-for-neutron-api-developers">
+<h2>Guidance for Neutron API developers<a class="headerlink" href="#guidance-for-neutron-api-developers" title="Link to this heading">¶</a></h2>
+<p>When developing REST APIs for Neutron it is important to be aware of how the
+policy engine will authorize these requests. This is true both for APIs
+served by Neutron “core” and for the APIs served by the various Neutron
+“stadium” services.</p>
+<ul class="simple">
+<li><p>If an attribute of a resource might be subject to authorization checks
+then the <code class="docutils literal notranslate"><span class="pre">enforce_policy</span></code> attribute should be set to <code class="docutils literal notranslate"><span class="pre">True</span></code>. While
+setting this flag to <code class="docutils literal notranslate"><span class="pre">True</span></code> for each attribute is a viable strategy,
+it is worth noting that this will require a call to the policy engine
+for each attribute, thus consistently increasing the time required to
+complete policy checks for a resource. This could result in a scalability
+issue, especially in the case of list operations retrieving a large
+number of resources;</p></li>
+<li><p>Some resource attributes, even if not directly used in policy checks
+might still be required by the policy engine. This is for instance the
+case of the <code class="docutils literal notranslate"><span class="pre">tenant_id</span></code> attribute. For these attributes the
+<code class="docutils literal notranslate"><span class="pre">required_by_policy</span></code> attribute should always set to <code class="docutils literal notranslate"><span class="pre">True</span></code>. This will
+ensure that the attribute is included in the resource data sent to the
+policy engine for evaluation;</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">tenant_id</span></code> attribute is a fundamental one in Neutron API request
+authorization. The default policy, <code class="docutils literal notranslate"><span class="pre">admin_or_owner</span></code>, uses it to validate
+if a project owns the resource it is trying to operate on. To this aim,
+if a resource without a tenant_id is created, it is important to ensure
+that ad-hoc authZ policies are specified for this resource.</p></li>
+<li><p>There is still only one check which is hardcoded in Neutron’s API layer:
+the check to verify that a project owns the network on which it is creating
+a port. This check is hardcoded and is always executed when creating a
+port, unless the network is shared. Unfortunately a solution for performing
+this check in an efficient way through the policy engine has not yet been
+found. Due to its nature, there is no way to override this check using the
+policy engine.</p></li>
+<li><p>It is strongly advised to not perform policy checks in the plugin or in
+the database management classes. This might lead to divergent API
+behaviours across plugins. Also, it might leave the Neutron DB in an
+inconsistent state if a request is not authorized after it has already
+been dispatched to the backend.</p></li>
+</ul>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>No authorization checks are performed for requests coming from the RPC over
+AMQP channel. For all these requests a neutron admin context is built, and
+the plugins will process them as such.</p></li>
+<li><p>For <code class="docutils literal notranslate"><span class="pre">PUT</span></code> and <code class="docutils literal notranslate"><span class="pre">DELETE</span></code> requests a 404 error is returned on request
+authorization failures rather than a 403, unless the project submitting the
+request own the resource to update or delete. This is to avoid conditions
+in which an API client might try and find out other projects’ resource
+identifiers by sending out <code class="docutils literal notranslate"><span class="pre">PUT</span></code> and <code class="docutils literal notranslate"><span class="pre">DELETE</span></code> requests for random
+resource identifiers.</p></li>
+<li><p>There is no way at the moment to specify an <code class="docutils literal notranslate"><span class="pre">OR</span></code> relationship between two
+attributes of a given resource (eg.: <code class="docutils literal notranslate"><span class="pre">port.name</span> <span class="pre">==</span> <span class="pre">'meh'</span> <span class="pre">or</span>
+<span class="pre">port.status</span> <span class="pre">==</span> <span class="pre">'DOWN'</span></code>), unless the rule with the or condition is explicitly
+added to the policy.yaml file.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OwnerCheck</span></code> performs a plugin access; this will likely require a database
+access, but since the behaviour is implementation specific it might also
+imply a round-trip to the backend. This class of checks, when involving
+retrieving attributes for ‘parent’ resources should be used very sparingly.</p></li>
+<li><p>In order for <code class="docutils literal notranslate"><span class="pre">OwnerCheck</span></code> rules to work, parent resources should have an
+entry in <code class="docutils literal notranslate"><span class="pre">neutron.policy._RESOURCE_FOREIGN_KEYS</span></code>; moreover the
+resource must be managed by the ‘core’ plugin (ie: the one defined in the
+core_plugin configuration variable)</p></li>
+</ul>
+</section>
+</section>
+<section id="policy-in-code-support">
+<h2>Policy-in-Code support<a class="headerlink" href="#policy-in-code-support" title="Link to this heading">¶</a></h2>
+<section id="guideline-on-defining-in-code-policies">
+<h3>Guideline on defining in-code policies<a class="headerlink" href="#guideline-on-defining-in-code-policies" title="Link to this heading">¶</a></h3>
+<p>The following is the guideline of policy definitions.</p>
+<p>Ideally we should define all available policies, but in the neutron policy
+enforcement it is not practical to define all policies because we check
+all attributes of a target resource in the <a class="reference internal" href="#response-filtering"><span class="std std-ref">Response Filtering</span></a>.
+Considering this, we have the special guidelines for “get” operation.</p>
+<ul class="simple">
+<li><p>All policies of <code class="docutils literal notranslate"><span class="pre">&lt;action&gt;_&lt;resource&gt;</span></code> must be defined
+for all types of operations.
+Valid actions are <code class="docutils literal notranslate"><span class="pre">create</span></code>, <code class="docutils literal notranslate"><span class="pre">update</span></code>, <code class="docutils literal notranslate"><span class="pre">delete</span></code> and <code class="docutils literal notranslate"><span class="pre">get</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_&lt;resourceS&gt;</span></code> (get plural) is unnecessary.
+The neutron API layer use a single form policy <code class="docutils literal notranslate"><span class="pre">get_&lt;resource&gt;</span></code>
+when listing resources <a class="footnote-reference brackets" href="#id18" id="id8" role="doc-noteref"><span class="fn-bracket">[</span>7<span class="fn-bracket">]</span></a> <a class="footnote-reference brackets" href="#id19" id="id9" role="doc-noteref"><span class="fn-bracket">[</span>8<span class="fn-bracket">]</span></a>.</p></li>
+<li><p>Member actions for individual resources must be defined.
+For example, <code class="docutils literal notranslate"><span class="pre">add_router_interface</span></code> of <code class="docutils literal notranslate"><span class="pre">router</span></code> resource.</p></li>
+<li><p>All policies with attributes on “create”, “update” and “delete” actions must
+be defined. <code class="docutils literal notranslate"><span class="pre">&lt;action&gt;_&lt;resource&gt;:&lt;attribute&gt;(:&lt;sub_attribute&gt;)</span></code> policy is
+required for attributes with <code class="docutils literal notranslate"><span class="pre">enforce_policy</span></code> in the API definitions.
+Note that it is recommended to define even if a rule is same as for
+<code class="docutils literal notranslate"><span class="pre">&lt;action&gt;_&lt;resource&gt;</span></code> from the documentation perspective.</p></li>
+<li><p>For a policy with attributes of “get” actions like
+<code class="docutils literal notranslate"><span class="pre">get_&lt;resource&gt;:&lt;attribute&gt;(:&lt;sub_attribute&gt;)</span></code>,
+the following guideline is applied:</p>
+<ul>
+<li><p>A policy with an attribute must be defined if the policy is different from
+the policy for <code class="docutils literal notranslate"><span class="pre">get_&lt;resource&gt;</span></code> (without attributes).</p></li>
+<li><p>If a policy with an attribute is same as for <code class="docutils literal notranslate"><span class="pre">get_&lt;resource&gt;</span></code>, there is
+no need to define it explicitly.
+This is for simplicity. We check all attributes of a target resource
+in the process of <a class="reference internal" href="#response-filtering"><span class="std std-ref">Response Filtering</span></a> so it leads to a long long
+policy definitions for “get” actions in our documentation.
+It is not happy for operators either.</p></li>
+<li><p>If an attribute is marked as <code class="docutils literal notranslate"><span class="pre">enforce_policy</span></code>, it is recommended to
+define the corresponding policy with the attribute.
+This is for clarification. If an attribute is marked as <code class="docutils literal notranslate"><span class="pre">enforce_policy</span></code>
+in the API definitions, for example, the neutron API limits to set such
+attribute only to admin users but allows to retrieve a value for regular
+users. If policies for the attribute are different across the types of
+operations, it is better to define all of them explicitly.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="registering-policies-in-neutron-related-projects">
+<h3>Registering policies in neutron related projects<a class="headerlink" href="#registering-policies-in-neutron-related-projects" title="Link to this heading">¶</a></h3>
+<p>Policy-in-code support in neutron is a bit different from other projects
+because the neutron server needs to load policies in code from multiple
+projects. Each neutron related project should register the following two entry
+points <code class="docutils literal notranslate"><span class="pre">oslo.policy.policies</span></code> and <code class="docutils literal notranslate"><span class="pre">neutron.policies</span></code> in <code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code> like
+below:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">oslo.policy.policies</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="na">neutron</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">neutron.conf.policies:list_rules</span>
+<span class="na">neutron.policies</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="na">neutron</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">neutron.conf.policies:list_rules</span>
+</pre></div>
+</div>
+<p>The above two entries are same, but they have different purposes.</p>
+<ul class="simple">
+<li><p>The first entry point is a normal entry point defined by oslo.policy and it
+is used to generate a sample policy file <a class="footnote-reference brackets" href="#id20" id="id10" role="doc-noteref"><span class="fn-bracket">[</span>9<span class="fn-bracket">]</span></a> <a class="footnote-reference brackets" href="#id21" id="id11" role="doc-noteref"><span class="fn-bracket">[</span>10<span class="fn-bracket">]</span></a>.</p></li>
+<li><p>The second one is specific to neutron. It is used by <code class="docutils literal notranslate"><span class="pre">neutron.policy</span></code>
+module to load policies of neutron related projects.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">oslo.policy.policies</span></code> entry point is used by all projects which adopt
+oslo.policy, so we cannot determine which projects are neutron related
+projects, so the second entry point is required.</p>
+<p>The recommended entry point name is a repository name: For example,
+‘neutron-fwaas’ for FWaaS and ‘networking-sfc’ for SFC:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">oslo.policy.policies</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="na">neutron-fwaas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">neutron_fwaas.policies:list_rules</span>
+<span class="na">neutron.policies</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="na">neutron-fwaas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">neutron_fwaas.policies:list_rules</span>
+</pre></div>
+</div>
+<p>Except registering the <code class="docutils literal notranslate"><span class="pre">neutron.policies</span></code> entry point, other steps to be done
+in each neutron related project for policy-in-code support are same for all
+OpenStack projects.</p>
+</section>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id12" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="http://opendev.org/openstack/oslo.policy/">Oslo policy module</a></p>
+</aside>
+<aside class="footnote brackets" id="id13" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://docs.openstack.org/oslo.policy/latest/">Oslo policy developer</a></p>
+</aside>
+<aside class="footnote brackets" id="id14" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p>API controller <a class="reference external" href="http://opendev.org/openstack/neutron/src/tag/2015.1.1/neutron/api/v2/base.py#L282">item</a> method</p>
+</aside>
+</aside>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id15" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
+<p>Policy engine’s <a class="reference external" href="http://opendev.org/openstack/neutron/src/tag/2015.1.1/neutron/policy.py#L187">build_match_rule</a> method</p>
+</aside>
+</aside>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id16" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id6">5</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="http://opendev.org/openstack/neutron/src/tag/2015.1.1/neutron/api/v2/base.py#L132">exclude_attributes_by_policy</a> method</p>
+</aside>
+</aside>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id17" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id7">6</a><span class="fn-bracket">]</span></span>
+<p>Policy <a class="reference external" href="http://opendev.org/openstack/neutron/src/tag/2015.1.1/neutron/api/v2/router.py#L122">reset</a> in neutron.api.v2.router</p>
+</aside>
+</aside>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id18" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">7</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://github.com/openstack/neutron/blob/051b6b40f3921b9db4f152a54f402c402cbf138c/neutron/pecan_wsgi/hooks/policy_enforcement.py#L173">https://github.com/openstack/neutron/blob/051b6b40f3921b9db4f152a54f402c402cbf138c/neutron/pecan_wsgi/hooks/policy_enforcement.py#L173</a></p>
+</aside>
+<aside class="footnote brackets" id="id19" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id9">8</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://github.com/openstack/neutron/blob/051b6b40f3921b9db4f152a54f402c402cbf138c/neutron/pecan_wsgi/hooks/policy_enforcement.py#L143">https://github.com/openstack/neutron/blob/051b6b40f3921b9db4f152a54f402c402cbf138c/neutron/pecan_wsgi/hooks/policy_enforcement.py#L143</a></p>
+</aside>
+<aside class="footnote brackets" id="id20" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id10">9</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://docs.openstack.org/oslo.policy/latest/user/usage.html#sample-file-generation">https://docs.openstack.org/oslo.policy/latest/user/usage.html#sample-file-generation</a></p>
+</aside>
+<aside class="footnote brackets" id="id21" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id11">10</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://docs.openstack.org/oslo.policy/latest/cli/index.html#oslopolicy-sample-generator">https://docs.openstack.org/oslo.policy/latest/cli/index.html#oslopolicy-sample-generator</a></p>
+</aside>
+</aside>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="plugin-api.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Neutron Plugin Architecture"></i></a>
+          
+          
+            <a href="provisioning_blocks.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Provisioning Blocks in relation to Composite Object Status"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2024-10-06 01:30:00</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Contributor Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#basic-information">Basic Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-policies">Neutron Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#gerrit-rechecks">Gerrit Rechecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-stadium">Neutron Stadium</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#neutron-internals">Neutron Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#ovn-driver">OVN Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#dashboards">Dashboards</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Policy Enforcement and Authorization</a><ul>
+<li><a class="reference internal" href="#authorization-workflow">Authorization workflow</a><ul>
+<li><a class="reference internal" href="#request-authorization">Request authorization</a></li>
+<li><a class="reference internal" href="#response-filtering">Response Filtering</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-neutron-policy-api">The neutron.policy API</a></li>
+<li><a class="reference internal" href="#neutron-specific-policy-rules">Neutron specific policy rules</a><ul>
+<li><a class="reference internal" href="#ownercheck-extended-checks-for-resource-ownership">OwnerCheck: Extended Checks for Resource Ownership</a></li>
+<li><a class="reference internal" href="#fieldcheck-verify-resource-attributes">FieldCheck: Verify Resource Attributes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#guidance-for-neutron-api-developers">Guidance for Neutron API developers</a><ul>
+<li><a class="reference internal" href="#notes">Notes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#policy-in-code-support">Policy-in-Code support</a><ul>
+<li><a class="reference internal" href="#guideline-on-defining-in-code-policies">Guideline on defining in-code policies</a></li>
+<li><a class="reference internal" href="#registering-policies-in-neutron-related-projects">Registering policies in neutron related projects</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "contributor/internals/policy" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Policy Enforcement and Authorization in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2024-10-06 01:30:00";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "contributor/internals/policy";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

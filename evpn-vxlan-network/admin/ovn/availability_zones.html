@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Availability Zones guide for OVN &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Routed Provider Networks for OVN" href="routed_provider_networks.html" />
+    <link rel="prev" title="SR-IOV guide for OVN" href="sriov.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/admin/ovn/availability_zones.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Availability Zones guide for OVN</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="sriov.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: SR-IOV guide for OVN"></i></a>
+    
+    
+    <a href="routed_provider_networks.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Routed Provider Networks for OVN"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="availability-zones-guide-for-ovn">
+<span id="ovn-availability-zones"></span><h1>Availability Zones guide for OVN<a class="headerlink" href="#availability-zones-guide-for-ovn" title="Link to this heading">¶</a></h1>
+<p>The purpose of this page is to describe how the availability zones works
+with OVN. Prior to reading this document, it is recommended to first
+read <a class="reference internal" href="../config-az.html#config-az"><span class="std std-ref">ML2/OVS driver Availability Zones guide</span></a>.</p>
+<p>There are two types of availability zones available in Neutron: Router
+and Network. For ML2/OVS, this is related to the scheduling of the L3
+agent and DHCP agent respectively. For ML2/OVN, it’s about the scheduling
+of logical router ports and “external” ports respectively.</p>
+<p>More details about each type of availability zones can be found later
+in this document but first let’s go over the common parts between them:</p>
+<section id="how-to-configure-it">
+<h2>How to configure it<a class="headerlink" href="#how-to-configure-it" title="Link to this heading">¶</a></h2>
+<p>Different from the ML2/OVS driver for Neutron the availability zones for
+the OVN driver is not configured via a configuration file. Since ML2/OVN
+does not rely on an external agent such as the L3 agent, certain nodes
+(e.g gateway/networker node) won’t have any Neutron configuration file
+present. For this reason, OVN uses the local OVSDB for configuring the
+availability zones that instance of <code class="docutils literal notranslate"><span class="pre">ovn-controller</span></code> running on that
+hypervisor belongs to.</p>
+<p>The configuration is done via the <code class="docutils literal notranslate"><span class="pre">ovn-cms-options</span></code> entry in
+<em>external_ids</em> column of the local <em>Open_vSwitch</em> table:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>ovs-vsctl<span class="w"> </span><span class="nb">set</span><span class="w"> </span>Open_vSwitch<span class="w"> </span>.<span class="w"> </span>external-ids:ovn-cms-options<span class="o">=</span><span class="s2">&quot;enable-chassis-as-gw,availability-zones=az-0:az-1:az-2&quot;</span>
+</pre></div>
+</div>
+<p>The above command is adding two configurations to the <code class="docutils literal notranslate"><span class="pre">ovn-cms-options</span></code>
+option, the <code class="docutils literal notranslate"><span class="pre">enable-chassis-as-gw</span></code> option which tells the OVN driver
+that this is a gateway/networker node and the <code class="docutils literal notranslate"><span class="pre">availability-zones</span></code>
+option specifying three availability zones: <strong>az-0</strong>, <strong>az-1</strong> and
+<strong>az-2</strong>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Specifying the “enable-chassis-as-gw” option is not required for the
+Availability Zones <strong>however</strong> ML2/OVN will only consider nodes that
+are gateway (the ones with the “enable-chassis-as-gw” option) when
+scheduling both <code class="docutils literal notranslate"><span class="pre">router</span></code> and <code class="docutils literal notranslate"><span class="pre">external</span></code> ports. So, even tho the
+“availability-zones” option can be set own their own, the ML2/OVN
+driver does not have a use case for it at the moment.</p>
+</div>
+<p>Note that, the syntax used to specify the availability zones is the
+<code class="docutils literal notranslate"><span class="pre">availability-zones</span></code> word, followed by an equal sign (=) and a
+<strong>colon</strong> separated list of the availability zones that this local
+<code class="docutils literal notranslate"><span class="pre">ovn-controller</span></code> instance belongs to.</p>
+<p>To confirm the specific <code class="docutils literal notranslate"><span class="pre">ovn-controller</span></code> availability zones, check the
+<strong>Availability Zone</strong> column in the output of the command below:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>openstack<span class="w"> </span>network<span class="w"> </span>agent<span class="w"> </span>list
++--------------------------------------+------------------------------+----------------+-------------------+-------+-------+----------------+
+<span class="p">|</span><span class="w"> </span>ID<span class="w">                                   </span><span class="p">|</span><span class="w"> </span>Agent<span class="w"> </span>Type<span class="w">                   </span><span class="p">|</span><span class="w"> </span>Host<span class="w">           </span><span class="p">|</span><span class="w"> </span>Availability<span class="w"> </span>Zone<span class="w"> </span><span class="p">|</span><span class="w"> </span>Alive<span class="w"> </span><span class="p">|</span><span class="w"> </span>State<span class="w"> </span><span class="p">|</span><span class="w"> </span>Binary<span class="w">         </span><span class="p">|</span>
++--------------------------------------+------------------------------+----------------+-------------------+-------+-------+----------------+
+<span class="p">|</span><span class="w"> </span>2d1924b2-99a4-4c6c-a4f2-0be64c0cec8c<span class="w"> </span><span class="p">|</span><span class="w"> </span>OVN<span class="w"> </span>Controller<span class="w"> </span>Gateway<span class="w"> </span>agent<span class="w"> </span><span class="p">|</span><span class="w"> </span>gateway-host-0<span class="w"> </span><span class="p">|</span><span class="w"> </span>az0,<span class="w"> </span>az1,<span class="w"> </span>az2<span class="w">     </span><span class="p">|</span><span class="w"> </span>:-<span class="o">)</span><span class="w">   </span><span class="p">|</span><span class="w"> </span>UP<span class="w">    </span><span class="p">|</span><span class="w"> </span>ovn-controller<span class="w"> </span><span class="p">|</span>
++--------------------------------------+------------------------------+----------------+-------------------+-------+-------+----------------+
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you know the UUID of the agent the “<strong>openstack network agent show
+&lt;UUID&gt;</strong>” command can also be used.</p>
+</div>
+<p>To confirm the availability zones defined in the system as a whole:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>openstack<span class="w"> </span>availability<span class="w"> </span>zone<span class="w"> </span>list<span class="w"> </span>--network
++-----------+-------------+
+<span class="p">|</span><span class="w"> </span>Zone<span class="w"> </span>Name<span class="w"> </span><span class="p">|</span><span class="w"> </span>Zone<span class="w"> </span>Status<span class="w"> </span><span class="p">|</span>
++-----------+-------------+
+<span class="p">|</span><span class="w"> </span>az0<span class="w">       </span><span class="p">|</span><span class="w"> </span>available<span class="w">   </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>az1<span class="w">       </span><span class="p">|</span><span class="w"> </span>available<span class="w">   </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>az2<span class="w">       </span><span class="p">|</span><span class="w"> </span>available<span class="w">   </span><span class="p">|</span>
++-----------+-------------+
+</pre></div>
+</div>
+</section>
+<section id="router-availability-zones">
+<h2>Router Availability Zones<a class="headerlink" href="#router-availability-zones" title="Link to this heading">¶</a></h2>
+<p>In order to create a router with availability zones the
+<code class="docutils literal notranslate"><span class="pre">--availability-zone-hint</span></code> should be passed to the create command,
+note that this parameter can be specified multiple times in case the
+router belongs to more than one availability zone. For example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>openstack<span class="w"> </span>router<span class="w"> </span>create<span class="w"> </span>--availability-zone-hint<span class="w"> </span>az-0<span class="w"> </span>--availability-zone-hint<span class="w"> </span>az-1<span class="w"> </span>router-0
++-------------------------+--------------------------------------+
+<span class="p">|</span><span class="w"> </span>Field<span class="w">                   </span><span class="p">|</span><span class="w"> </span>Value<span class="w">                                </span><span class="p">|</span>
++-------------------------+--------------------------------------+
+<span class="p">|</span><span class="w"> </span>admin_state_up<span class="w">          </span><span class="p">|</span><span class="w"> </span>UP<span class="w">                                   </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>availability_zone_hints<span class="w"> </span><span class="p">|</span><span class="w"> </span>az-0,<span class="w"> </span>az-1<span class="w">                           </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>availability_zones<span class="w">      </span><span class="p">|</span><span class="w">                                      </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>created_at<span class="w">              </span><span class="p">|</span><span class="w"> </span><span class="m">2020</span>-06-04T08:29:33Z<span class="w">                 </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>description<span class="w">             </span><span class="p">|</span><span class="w">                                      </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>external_gateway_info<span class="w">   </span><span class="p">|</span><span class="w"> </span>null<span class="w">                                 </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>flavor_id<span class="w">               </span><span class="p">|</span><span class="w"> </span>None<span class="w">                                 </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>id<span class="w">                      </span><span class="p">|</span><span class="w"> </span>8fd6d01a-57ad-4e91-a788-ebe48742d000<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>name<span class="w">                    </span><span class="p">|</span><span class="w"> </span>router-0<span class="w">                             </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>project_id<span class="w">              </span><span class="p">|</span><span class="w"> </span>2a364ced6c084888be0919450629de1c<span class="w">     </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>revision_number<span class="w">         </span><span class="p">|</span><span class="w"> </span><span class="m">1</span><span class="w">                                    </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>routes<span class="w">                  </span><span class="p">|</span><span class="w">                                      </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>status<span class="w">                  </span><span class="p">|</span><span class="w"> </span>ACTIVE<span class="w">                               </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>tags<span class="w">                    </span><span class="p">|</span><span class="w">                                      </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>updated_at<span class="w">              </span><span class="p">|</span><span class="w"> </span><span class="m">2020</span>-06-04T08:29:33Z<span class="w">                 </span><span class="p">|</span>
++-------------------------+--------------------------------------+
+</pre></div>
+</div>
+<p>It’s also possible to set the default availability zones via the
+<em>/etc/neutron/neutron.conf</em> configuration file:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[DEFAULT]</span>
+<span class="na">default_availability_zones</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">az-0,az-2</span>
+<span class="na">...</span>
+</pre></div>
+</div>
+<p>When scheduling the gateway ports of a router, the OVN driver will take
+into consideration the router availability zones and make sure that the
+ports are scheduled on the nodes belonging to those availability zones.</p>
+<p>Note that in the router object we have two attributes
+related to availability zones: <code class="docutils literal notranslate"><span class="pre">availability_zones</span></code> and
+<code class="docutils literal notranslate"><span class="pre">availability_zone_hints</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="p">|</span><span class="w"> </span>availability_zone_hints<span class="w"> </span><span class="p">|</span><span class="w"> </span>az-0,<span class="w"> </span>az-1<span class="w">                           </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>availability_zones<span class="w">      </span><span class="p">|</span><span class="w">                                      </span><span class="p">|</span>
+</pre></div>
+</div>
+<p>This distinction makes more sense in the <strong>ML2/OVS</strong> driver which
+relies on the L3 agent for its router placement (see the <a class="reference internal" href="../config-az.html#config-az"><span class="std std-ref">ML2/OVS
+driver Availability Zones guide</span></a> for more information). In
+<strong>ML2/OVN</strong> the <code class="docutils literal notranslate"><span class="pre">ovn-controller</span></code> service will be running on all nodes
+of the cluster so the <code class="docutils literal notranslate"><span class="pre">availability_zone_hints</span></code> will always match the
+<code class="docutils literal notranslate"><span class="pre">availability_zones</span></code> attribute, as below:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="p">|</span><span class="w"> </span>availability_zone_hints<span class="w"> </span><span class="p">|</span><span class="w"> </span>az-0,<span class="w"> </span>az-1<span class="w">                           </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>availability_zones<span class="w">      </span><span class="p">|</span><span class="w"> </span>az-0,<span class="w"> </span>az-1<span class="w">                           </span><span class="p">|</span>
+</pre></div>
+</div>
+<section id="ovn-database-information">
+<h3>OVN Database information<a class="headerlink" href="#ovn-database-information" title="Link to this heading">¶</a></h3>
+<p>In order to check the availability zones of a router
+via the OVN Northbound database, one can look for the
+<code class="docutils literal notranslate"><span class="pre">neutron:availability_zone_hints</span></code> key in the <code class="docutils literal notranslate"><span class="pre">external_ids</span></code>
+column for its entry in the <code class="docutils literal notranslate"><span class="pre">Logical_Router</span></code> table:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>ovn-nbctl<span class="w"> </span>list<span class="w"> </span>Logical_Router
+_uuid<span class="w">               </span>:<span class="w"> </span>4df68f1e-17dd-4b9a-848d-b6152ae19203
+external_ids<span class="w">        </span>:<span class="w"> </span><span class="o">{</span><span class="s2">&quot;neutron:availability_zone_hints&quot;</span><span class="o">=</span><span class="s2">&quot;az-0,az-1&quot;</span>,<span class="w"> </span><span class="s2">&quot;neutron:gw_port_id&quot;</span><span class="o">=</span><span class="s2">&quot;&quot;</span>,<span class="w"> </span><span class="s2">&quot;neutron:revision_number&quot;</span><span class="o">=</span><span class="s2">&quot;1&quot;</span>,<span class="w"> </span><span class="s2">&quot;neutron:router_name&quot;</span><span class="o">=</span>router-0<span class="o">}</span>
+name<span class="w">                </span>:<span class="w"> </span>neutron-8fd6d01a-57ad-4e91-a788-ebe48742d000
+...
+</pre></div>
+</div>
+<p>To check the availability zones of the Chassis, look at the
+<code class="docutils literal notranslate"><span class="pre">ovn-cms-options</span></code> key in the <code class="docutils literal notranslate"><span class="pre">other_config</span></code> column (or
+<code class="docutils literal notranslate"><span class="pre">external_ids</span></code> for an older version of OVN) of the <code class="docutils literal notranslate"><span class="pre">Chassis</span></code> table
+in the OVN Southbound database:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>ovn-sbctl<span class="w"> </span>list<span class="w"> </span>Chassis
+_uuid<span class="w">               </span>:<span class="w"> </span>abaa9f07-9988-40c0-bd1a-8d8326af08b0
+name<span class="w">                </span>:<span class="w"> </span><span class="s2">&quot;2d1924b2-99a4-4c6c-a4f2-0be64c0cec8c&quot;</span>
+other_config<span class="w">        </span>:<span class="w"> </span><span class="o">{</span>...,<span class="w"> </span>ovn-cms-options<span class="o">=</span><span class="s2">&quot;enable-chassis-as-gw,availability-zones=az-0:az-1:az-2&quot;</span><span class="o">}</span>
+...
+</pre></div>
+</div>
+<p>As mentioned in the <a class="reference internal" href="#router-availability-zones">Router availability zones</a> section, the
+scheduling of the gateway router ports will take into consideration
+the availability zones that the router belongs to. We can confirm
+this behavior by looking in the <code class="docutils literal notranslate"><span class="pre">Gateway_Chassis</span></code> table from the OVN
+Northbound database:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>ovn-nbctl<span class="w"> </span>list<span class="w"> </span>Gateway_Chassis
+_uuid<span class="w">               </span>:<span class="w"> </span>ac61b70f-ff51-43d9-830b-f9bc6d74090a
+chassis_name<span class="w">        </span>:<span class="w"> </span><span class="s2">&quot;2d1924b2-99a4-4c6c-a4f2-0be64c0cec8c&quot;</span>
+external_ids<span class="w">        </span>:<span class="w"> </span><span class="o">{}</span>
+name<span class="w">                </span>:<span class="w"> </span>lrp-5a40eeca-5233-4029-a470-9018aa8b3de9_2d1924b2-99a4-4c6c-a4f2-0be64c0cec8c
+options<span class="w">             </span>:<span class="w"> </span><span class="o">{}</span>
+priority<span class="w">            </span>:<span class="w"> </span><span class="m">2</span>
+
+_uuid<span class="w">               </span>:<span class="w"> </span>c1b7763b-1784-4e5a-a948-853662faeddc
+chassis_name<span class="w">        </span>:<span class="w"> </span><span class="s2">&quot;1cde2542-69f9-4598-b20b-d4f68304deb0&quot;</span>
+external_ids<span class="w">        </span>:<span class="w"> </span><span class="o">{}</span>
+name<span class="w">                </span>:<span class="w"> </span>lrp-5a40eeca-5233-4029-a470-9018aa8b3de9_1cde2542-69f9-4598-b20b-d4f68304deb0
+options<span class="w">             </span>:<span class="w"> </span><span class="o">{}</span>
+priority<span class="w">            </span>:<span class="w"> </span><span class="m">1</span>
+</pre></div>
+</div>
+<p>Each entry on this table represents an instance of the gateway port
+(L3 HA, for more information see <a class="reference internal" href="routing.html#ovn-routing"><span class="std std-ref">Routing in OVN</span></a>),
+the <code class="docutils literal notranslate"><span class="pre">chassis_name</span></code> column indicates which Chassis that port instance
+is scheduled onto. If we co-relate each entry and their <code class="docutils literal notranslate"><span class="pre">chassis_name</span></code>
+we will see that this port has been only scheduled to Chassis matching
+with the router’s availability zones and with priority to distribute
+over each zones.</p>
+</section>
+</section>
+<section id="network-availability-zones">
+<h2>Network Availability Zones<a class="headerlink" href="#network-availability-zones" title="Link to this heading">¶</a></h2>
+<p>Since OVN has a distributed DHCP server model (see the
+<a class="reference external" href="http://www.openvswitch.org/support/dist-docs-2.5/ovn-architecture.7.html">ovn-architecture</a>
+document for more information), one may think that there’s no need
+for Ml2/OVN to support Network Availability Zones as there’s no need
+to co-locate a DHCP agent within the same zones to serve the VMs but,
+in ML2/OVN there’s a special case which are the <code class="docutils literal notranslate"><span class="pre">external</span></code> ports and
+those need to be aware of the Availability Zones for its scheduling.</p>
+<p>These <code class="docutils literal notranslate"><span class="pre">external</span></code> ports are ports that are located on a different
+node than the one that the VM is running. At the moment, ML2/OVN only
+supports one case that makes use of these ports which is the <a class="reference internal" href="sriov.html#ovn-sriov"><span class="std std-ref">SR-IOV
+support</span></a>.</p>
+<p>In order to create a network with availability zones the
+<code class="docutils literal notranslate"><span class="pre">--availability-zone-hint</span></code> should be passed to the create command,
+note that this parameter can be specified multiple times in case the
+network belongs to more than one availability zone. For example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>openstack<span class="w"> </span>network<span class="w"> </span>create<span class="w"> </span>--availability-zone-hint<span class="w"> </span>az-0<span class="w"> </span>--availability-zone-hint<span class="w"> </span>az-1<span class="w"> </span>network-0
++---------------------------+--------------------------------------+
+<span class="p">|</span><span class="w"> </span>Field<span class="w">                     </span><span class="p">|</span><span class="w"> </span>Value<span class="w">                                </span><span class="p">|</span>
++---------------------------+--------------------------------------+
+<span class="p">|</span><span class="w"> </span>admin_state_up<span class="w">            </span><span class="p">|</span><span class="w"> </span>UP<span class="w">                                   </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>availability_zone_hints<span class="w">   </span><span class="p">|</span><span class="w"> </span>az-0,<span class="w"> </span>az-1<span class="w">                           </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>availability_zones<span class="w">        </span><span class="p">|</span><span class="w">                                      </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>created_at<span class="w">                </span><span class="p">|</span><span class="w"> </span><span class="m">2021</span>-04-26T14:04:51Z<span class="w">                 </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>description<span class="w">               </span><span class="p">|</span><span class="w">                                      </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>dns_domain<span class="w">                </span><span class="p">|</span><span class="w">                                      </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>id<span class="w">                        </span><span class="p">|</span><span class="w"> </span>ba584cdb-b866-4744-85d3-6e38718055cc<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>ipv4_address_scope<span class="w">        </span><span class="p">|</span><span class="w"> </span>None<span class="w">                                 </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>ipv6_address_scope<span class="w">        </span><span class="p">|</span><span class="w"> </span>None<span class="w">                                 </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>is_default<span class="w">                </span><span class="p">|</span><span class="w"> </span>False<span class="w">                                </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>is_vlan_transparent<span class="w">       </span><span class="p">|</span><span class="w"> </span>None<span class="w">                                 </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>mtu<span class="w">                       </span><span class="p">|</span><span class="w"> </span><span class="m">1442</span><span class="w">                                 </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>name<span class="w">                      </span><span class="p">|</span><span class="w"> </span>network-0<span class="w">                            </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>port_security_enabled<span class="w">     </span><span class="p">|</span><span class="w"> </span>True<span class="w">                                 </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>project_id<span class="w">                </span><span class="p">|</span><span class="w"> </span>ffd9e4a60af34b0599f1d50aed20dde0<span class="w">     </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>provider:network_type<span class="w">     </span><span class="p">|</span><span class="w"> </span>None<span class="w">                                 </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>provider:physical_network<span class="w"> </span><span class="p">|</span><span class="w"> </span>None<span class="w">                                 </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>provider:segmentation_id<span class="w">  </span><span class="p">|</span><span class="w"> </span>None<span class="w">                                 </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>qos_policy_id<span class="w">             </span><span class="p">|</span><span class="w"> </span>None<span class="w">                                 </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>revision_number<span class="w">           </span><span class="p">|</span><span class="w"> </span><span class="m">1</span><span class="w">                                    </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>router:external<span class="w">           </span><span class="p">|</span><span class="w"> </span>Internal<span class="w">                             </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>segments<span class="w">                  </span><span class="p">|</span><span class="w"> </span>None<span class="w">                                 </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>shared<span class="w">                    </span><span class="p">|</span><span class="w"> </span>False<span class="w">                                </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>status<span class="w">                    </span><span class="p">|</span><span class="w"> </span>ACTIVE<span class="w">                               </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>subnets<span class="w">                   </span><span class="p">|</span><span class="w">                                      </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>tags<span class="w">                      </span><span class="p">|</span><span class="w">                                      </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>updated_at<span class="w">                </span><span class="p">|</span><span class="w"> </span><span class="m">2021</span>-04-26T14:04:52Z<span class="w">                 </span><span class="p">|</span>
++---------------------------+--------------------------------------+
+</pre></div>
+</div>
+<section id="id1">
+<h3>OVN Database information<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<p>Upon creating the first <code class="docutils literal notranslate"><span class="pre">external</span></code> port to a network with Availability
+Zones set a HA Chassis Group correspondent to that network will also be
+created in the OVN Northbound Database:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>openstack<span class="w"> </span>port<span class="w"> </span>create<span class="w"> </span>--network<span class="w"> </span>network-0<span class="w"> </span>--vnic-type<span class="w"> </span>direct<span class="w"> </span>port-0
++-------------------------+--------------------------------------+
+<span class="p">|</span><span class="w"> </span>Field<span class="w">                   </span><span class="p">|</span><span class="w"> </span>Value<span class="w">                                </span><span class="p">|</span>
++-------------------------+--------------------------------------+
+<span class="p">|</span><span class="w"> </span>id<span class="w">                      </span><span class="p">|</span><span class="w"> </span>2523d7f5-c7ca-40b8-83c5-ac37e5b126ea<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>name<span class="w">                    </span><span class="p">|</span><span class="w"> </span>port-0<span class="w">                               </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>network_id<span class="w">              </span><span class="p">|</span><span class="w"> </span>ba584cdb-b866-4744-85d3-6e38718055cc<span class="w"> </span><span class="p">|</span>
+...
++-------------------------+--------------------------------------+
+</pre></div>
+</div>
+<p>To find the corresponding HA Chassis Group we need to look for a group
+named as <em>neutron-&lt;Neutron Network UUID&gt;</em>, for example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>ovn-nbctl<span class="w"> </span>list<span class="w"> </span>HA_Chassis_Group<span class="w"> </span>neutron-ba584cdb-b866-4744-85d3-6e38718055cc
+_uuid<span class="w">               </span>:<span class="w"> </span>f6a49abb-dc97-4e2a-955a-6f8e8be4865e
+external_ids<span class="w">        </span>:<span class="w"> </span><span class="o">{</span><span class="s2">&quot;neutron:availability_zone_hints&quot;</span><span class="o">=</span><span class="s2">&quot;az-0,az-1&quot;</span><span class="o">}</span>
+ha_chassis<span class="w">          </span>:<span class="w"> </span><span class="o">[</span><span class="m">46850075</span>-7383-4da9-b0b2-5ded2858f681,<span class="w"> </span>ce1da6a5-77d3-4945-b218-c0ae35403b80<span class="o">]</span>
+name<span class="w">                </span>:<span class="w"> </span>neutron-ba584cdb-b866-4744-85d3-6e38718055cc
+</pre></div>
+</div>
+<p>In the output above is possible to see that the HA Chassis Group for
+the Neutron network <code class="docutils literal notranslate"><span class="pre">ba584cdb-b866-4744-85d3-6e38718055cc</span></code> includes
+two Chassis (the <code class="docutils literal notranslate"><span class="pre">ha_chassis</span></code> column) that are part of the Availability
+Zones that this network is also part of.</p>
+<p>We can inspect these members to see which one has the <strong>highest</strong>
+priority, which means that when the <code class="docutils literal notranslate"><span class="pre">external</span></code> port is bound it
+will first bound to the HA Chassis with the <strong>highest</strong> priority in
+the Group. In case that Chassis goes down the port will move on to the
+next Chassis with the <strong>highest</strong> priority and so on. To check these HA
+Chassis do:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>ovn-nbctl<span class="w"> </span>list<span class="w"> </span>HA_Chassis<span class="w"> </span><span class="m">46850075</span>-7383-4da9-b0b2-5ded2858f681
+_uuid<span class="w">               </span>:<span class="w"> </span><span class="m">46850075</span>-7383-4da9-b0b2-5ded2858f681
+chassis_name<span class="w">        </span>:<span class="w"> </span><span class="s2">&quot;2c5c4479-0e2b-4742-a1d7-df10be020143&quot;</span>
+external_ids<span class="w">        </span>:<span class="w"> </span><span class="o">{}</span>
+priority<span class="w">            </span>:<span class="w"> </span><span class="m">32766</span>
+
+$<span class="w"> </span>ovn-nbctl<span class="w"> </span>list<span class="w"> </span>HA_Chassis<span class="w"> </span>ce1da6a5-77d3-4945-b218-c0ae35403b8
+_uuid<span class="w">               </span>:<span class="w"> </span>ce1da6a5-77d3-4945-b218-c0ae35403b80
+chassis_name<span class="w">        </span>:<span class="w"> </span><span class="s2">&quot;159970f0-71f7-4d3d-9a9e-92e37c5f03c5&quot;</span>
+external_ids<span class="w">        </span>:<span class="w"> </span><span class="o">{}</span>
+priority<span class="w">            </span>:<span class="w"> </span><span class="m">32767</span>
+</pre></div>
+</div>
+<p>In this case, the <strong>active</strong> Chassis is the
+<code class="docutils literal notranslate"><span class="pre">159970f0-71f7-4d3d-9a9e-92e37c5f03c5</span></code>.</p>
+<p>And lastly, to find which HA Chassis Group an external
+port belongs to by looking into the OVN Northbound Database do:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>sudo<span class="w"> </span>ovn-nbctl<span class="w"> </span>list<span class="w"> </span>Logical_Switch_Port<span class="w"> </span>2523d7f5-c7ca-40b8-83c5-ac37e5b126ea
+_uuid<span class="w">               </span>:<span class="w"> </span>382d8cd8-575f-4a3f-93ba-a01cb9c2c265
+ha_chassis_group<span class="w">    </span>:<span class="w"> </span>f6a49abb-dc97-4e2a-955a-6f8e8be4865e
+name<span class="w">                </span>:<span class="w"> </span><span class="s2">&quot;2523d7f5-c7ca-40b8-83c5-ac37e5b126ea&quot;</span>
+<span class="nb">type</span><span class="w">                </span>:<span class="w"> </span>external
+...
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">ha_chassis_group</span></code> column will point to the UUID (in the OVN
+database) of the HA Chassis Group it belongs to.</p>
+</section>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="sriov.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: SR-IOV guide for OVN"></i></a>
+          
+          
+            <a href="routed_provider_networks.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Routed Provider Networks for OVN"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2023-08-24 15:56:48</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">OpenStack Networking Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../intro.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../deploy.html">Deployment examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ops.html">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../migration.html">Migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../misc.html">Miscellaneous</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">OVN Driver Administration Guide</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributor/index.html">Contributor Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Availability Zones guide for OVN</a><ul>
+<li><a class="reference internal" href="#how-to-configure-it">How to configure it</a></li>
+<li><a class="reference internal" href="#router-availability-zones">Router Availability Zones</a><ul>
+<li><a class="reference internal" href="#ovn-database-information">OVN Database information</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#network-availability-zones">Network Availability Zones</a><ul>
+<li><a class="reference internal" href="#id1">OVN Database information</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "admin/ovn/availability_zones" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Availability Zones guide for OVN in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2023-08-24 15:56:48";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "admin/ovn/availability_zones";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

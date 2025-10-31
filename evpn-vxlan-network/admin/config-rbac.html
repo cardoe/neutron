@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Role-Based Access Control (RBAC) &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/support-matrix.css?v=ac26a930" />
+    <script src="../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Routed provider networks" href="config-routed-networks.html" />
+    <link rel="prev" title="Quality of Service (QoS): Guaranteed Minimum Packet Rate" href="config-qos-min-pps.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/admin/config-rbac.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Role-Based Access Control (RBAC)</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="config-qos-min-pps.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Quality of Service (QoS): Guaranteed Minimum Packet Rate"></i></a>
+    
+    
+    <a href="config-routed-networks.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Routed provider networks"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="role-based-access-control-rbac">
+<span id="config-rbac"></span><h1>Role-Based Access Control (RBAC)<a class="headerlink" href="#role-based-access-control-rbac" title="Link to this heading">¶</a></h1>
+<p>The Role-Based Access Control (RBAC) policy framework enables both operators
+and users to grant access to resources for specific projects.</p>
+<section id="supported-objects-for-sharing-with-specific-projects">
+<h2>Supported objects for sharing with specific projects<a class="headerlink" href="#supported-objects-for-sharing-with-specific-projects" title="Link to this heading">¶</a></h2>
+<p>Currently, the access that can be granted using this feature
+is supported by:</p>
+<ul class="simple">
+<li><p>Regular port creation permissions on networks (since Liberty).</p></li>
+<li><p>Binding QoS policies permissions to networks or ports (since Mitaka).</p></li>
+<li><p>Attaching router gateways to networks (since Mitaka).</p></li>
+<li><p>Binding security groups to ports (since Stein).</p></li>
+<li><p>Assigning address scopes to subnet pools (since Ussuri).</p></li>
+<li><p>Assigning subnet pools to subnets (since Ussuri).</p></li>
+<li><p>Assigning address groups to security group rules (since Wallaby).</p></li>
+</ul>
+</section>
+<section id="sharing-an-object-with-specific-projects">
+<h2>Sharing an object with specific projects<a class="headerlink" href="#sharing-an-object-with-specific-projects" title="Link to this heading">¶</a></h2>
+<p>Sharing an object with a specific project is accomplished by creating
+a policy entry that permits the target project the <code class="docutils literal notranslate"><span class="pre">access_as_shared</span></code>
+action on that object.</p>
+</section>
+<section id="sharing-a-network-with-specific-projects">
+<h2>Sharing a network with specific projects<a class="headerlink" href="#sharing-a-network-with-specific-projects" title="Link to this heading">¶</a></h2>
+<p>Create a network to share:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>create<span class="w"> </span>secret_network
+<span class="go">+---------------------------+--------------------------------------+</span>
+<span class="go">| Field                     | Value                                |</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+<span class="go">| admin_state_up            | UP                                   |</span>
+<span class="go">| availability_zone_hints   |                                      |</span>
+<span class="go">| availability_zones        |                                      |</span>
+<span class="go">| created_at                | 2017-01-25T20:16:40Z                 |</span>
+<span class="go">| description               |                                      |</span>
+<span class="go">| dns_domain                | None                                 |</span>
+<span class="go">| id                        | f55961b9-3eb8-42eb-ac96-b97038b568de |</span>
+<span class="go">| ipv4_address_scope        | None                                 |</span>
+<span class="go">| ipv6_address_scope        | None                                 |</span>
+<span class="go">| is_default                | None                                 |</span>
+<span class="go">| mtu                       | 1450                                 |</span>
+<span class="go">| name                      | secret_network                       |</span>
+<span class="go">| port_security_enabled     | True                                 |</span>
+<span class="go">| project_id                | 61b7eba037fd41f29cfba757c010faff     |</span>
+<span class="go">| provider:network_type     | vxlan                                |</span>
+<span class="go">| provider:physical_network | None                                 |</span>
+<span class="go">| provider:segmentation_id  | 9                                    |</span>
+<span class="go">| qos_policy_id             | None                                 |</span>
+<span class="go">| revision_number           | 3                                    |</span>
+<span class="go">| router:external           | Internal                             |</span>
+<span class="go">| segments                  | None                                 |</span>
+<span class="go">| shared                    | False                                |</span>
+<span class="go">| status                    | ACTIVE                               |</span>
+<span class="go">| subnets                   |                                      |</span>
+<span class="go">| tags                      | []                                   |</span>
+<span class="go">| updated_at                | 2017-01-25T20:16:40Z                 |</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>Create the policy entry using the <strong class="command">openstack network rbac create</strong>
+command (in this example, the ID of the project we want to share with is
+<code class="docutils literal notranslate"><span class="pre">b87b2fc13e0248a4a031d38e06dc191d</span></code>):</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>rbac<span class="w"> </span>create<span class="w"> </span>--target-project<span class="w"> </span><span class="se">\</span>
+b87b2fc13e0248a4a031d38e06dc191d<span class="w"> </span>--action<span class="w"> </span>access_as_shared<span class="w"> </span><span class="se">\</span>
+--type<span class="w"> </span>network<span class="w"> </span>f55961b9-3eb8-42eb-ac96-b97038b568de
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| Field             | Value                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| action            | access_as_shared                     |</span>
+<span class="go">| id                | f93efdbf-f1e0-41d2-b093-8328959d469e |</span>
+<span class="go">| name              | None                                 |</span>
+<span class="go">| object_id         | f55961b9-3eb8-42eb-ac96-b97038b568de |</span>
+<span class="go">| object_type       | network                              |</span>
+<span class="go">| project_id        | 61b7eba037fd41f29cfba757c010faff     |</span>
+<span class="go">| target_project_id | b87b2fc13e0248a4a031d38e06dc191d     |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">target-project</span></code> parameter specifies the project that requires
+access to the network. The <code class="docutils literal notranslate"><span class="pre">action</span></code> parameter specifies what
+the project is allowed to do. The <code class="docutils literal notranslate"><span class="pre">type</span></code> parameter says
+that the target object is a network. The final parameter is the ID of
+the network we are granting access to.</p>
+<p>Project <code class="docutils literal notranslate"><span class="pre">b87b2fc13e0248a4a031d38e06dc191d</span></code> will now be able to see
+the network when running <strong class="command">openstack network list</strong> and
+<strong class="command">openstack network show</strong> and will also be able to create ports
+on that network. No other users (other than admins and the owner)
+will be able to see the network.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Subnets inherit the RBAC policy entries of their network.</p>
+</div>
+<p>To remove access for that project, delete the policy that allows
+it using the <strong class="command">openstack network rbac delete</strong> command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>rbac<span class="w"> </span>delete<span class="w"> </span>f93efdbf-f1e0-41d2-b093-8328959d469e
+</pre></div>
+</div>
+<p>If that project has ports on the network, the server will prevent the
+policy from being deleted until the ports have been deleted:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>rbac<span class="w"> </span>delete<span class="w"> </span>f93efdbf-f1e0-41d2-b093-8328959d469e
+<span class="go">RBAC policy on object f93efdbf-f1e0-41d2-b093-8328959d469e</span>
+<span class="go">cannot be removed because other objects depend on it.</span>
+</pre></div>
+</div>
+<p>This process can be repeated any number of times to share a network
+with an arbitrary number of projects.</p>
+</section>
+<section id="sharing-a-qos-policy-with-specific-projects">
+<h2>Sharing a QoS policy with specific projects<a class="headerlink" href="#sharing-a-qos-policy-with-specific-projects" title="Link to this heading">¶</a></h2>
+<p>Create a QoS policy to share:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>qos<span class="w"> </span>policy<span class="w"> </span>create<span class="w"> </span>secret_policy
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| Field             | Value                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| description       |                                      |</span>
+<span class="go">| id                | 1f730d69-1c45-4ade-a8f2-89070ac4f046 |</span>
+<span class="go">| name              | secret_policy                        |</span>
+<span class="go">| project_id        | 61b7eba037fd41f29cfba757c010faff     |</span>
+<span class="go">| revision_number   | 1                                    |</span>
+<span class="go">| rules             | []                                   |</span>
+<span class="go">| shared            | False                                |</span>
+<span class="go">| tags              | []                                   |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>Create the RBAC policy entry using the <strong class="command">openstack network rbac create</strong>
+command (in this example, the ID of the project we want to share with is
+<code class="docutils literal notranslate"><span class="pre">be98b82f8fdf46b696e9e01cebc33fd9</span></code>):</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>rbac<span class="w"> </span>create<span class="w"> </span>--target-project<span class="w"> </span><span class="se">\</span>
+be98b82f8fdf46b696e9e01cebc33fd9<span class="w"> </span>--action<span class="w"> </span>access_as_shared<span class="w"> </span><span class="se">\</span>
+--type<span class="w"> </span>qos_policy<span class="w"> </span>1f730d69-1c45-4ade-a8f2-89070ac4f046
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| Field             | Value                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| action            | access_as_shared                     |</span>
+<span class="go">| id                | 8828e38d-a0df-4c78-963b-e5f215d3d550 |</span>
+<span class="go">| name              | None                                 |</span>
+<span class="go">| object_id         | 1f730d69-1c45-4ade-a8f2-89070ac4f046 |</span>
+<span class="go">| object_type       | qos_policy                           |</span>
+<span class="go">| project_id        | 61b7eba037fd41f29cfba757c010faff     |</span>
+<span class="go">| target_project_id | be98b82f8fdf46b696e9e01cebc33fd9     |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">target-project</span></code> parameter specifies the project that requires
+access to the QoS policy. The <code class="docutils literal notranslate"><span class="pre">action</span></code> parameter specifies what
+the project is allowed to do. The <code class="docutils literal notranslate"><span class="pre">type</span></code> parameter says
+that the target object is a QoS policy. The final parameter is the ID of
+the QoS policy we are granting access to.</p>
+<p>Project <code class="docutils literal notranslate"><span class="pre">be98b82f8fdf46b696e9e01cebc33fd9</span></code> will now be able to see
+the QoS policy when running <strong class="command">openstack network qos policy list</strong> and
+<strong class="command">openstack network qos policy show</strong> and will also be able to bind
+it to its ports or networks. No other users (other than admins and the owner)
+will be able to see the QoS policy.</p>
+<p>To remove access for that project, delete the RBAC policy that allows
+it using the <strong class="command">openstack network rbac delete</strong> command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>rbac<span class="w"> </span>delete<span class="w"> </span>8828e38d-a0df-4c78-963b-e5f215d3d550
+</pre></div>
+</div>
+<p>If that project has ports or networks with the QoS policy applied to them,
+the server will not delete the RBAC policy until
+the QoS policy is no longer in use:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>rbac<span class="w"> </span>delete<span class="w"> </span>8828e38d-a0df-4c78-963b-e5f215d3d550
+<span class="go">RBAC policy on object 8828e38d-a0df-4c78-963b-e5f215d3d550</span>
+<span class="go">cannot be removed because other objects depend on it.</span>
+</pre></div>
+</div>
+<p>This process can be repeated any number of times to share a qos-policy
+with an arbitrary number of projects.</p>
+</section>
+<section id="sharing-a-security-group-with-specific-projects">
+<h2>Sharing a security group with specific projects<a class="headerlink" href="#sharing-a-security-group-with-specific-projects" title="Link to this heading">¶</a></h2>
+<p>Create a security group to share:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>security<span class="w"> </span>group<span class="w"> </span>create<span class="w"> </span>my_security_group
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| Field             | Value                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| created_at        | 2019-02-07T06:09:59Z                 |</span>
+<span class="go">| description       | my_security_group                    |</span>
+<span class="go">| id                | 5ba835b7-22b0-4be6-bdbe-e0722d1b5f24 |</span>
+<span class="go">| location          | None                                 |</span>
+<span class="go">| name              | my_security_group                    |</span>
+<span class="go">| project_id        | 077e8f39d3db4c9e998d842b0503283a     |</span>
+<span class="go">| revision_number   | 1                                    |</span>
+<span class="go">| rules             | ...                                  |</span>
+<span class="go">| tags              | []                                   |</span>
+<span class="go">| updated_at        | 2019-02-07T06:09:59Z                 |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>Create the RBAC policy entry using the <strong class="command">openstack network rbac create</strong>
+command (in this example, the ID of the project we want to share with is
+<code class="docutils literal notranslate"><span class="pre">32016615de5d43bb88de99e7f2e26a1e</span></code>):</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>rbac<span class="w"> </span>create<span class="w"> </span>--target-project<span class="w"> </span><span class="se">\</span>
+32016615de5d43bb88de99e7f2e26a1e<span class="w"> </span>--action<span class="w"> </span>access_as_shared<span class="w"> </span><span class="se">\</span>
+--type<span class="w"> </span>security_group<span class="w"> </span>5ba835b7-22b0-4be6-bdbe-e0722d1b5f24
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| Field             | Value                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| action            | access_as_shared                     |</span>
+<span class="go">| id                | 8828e38d-a0df-4c78-963b-e5f215d3d550 |</span>
+<span class="go">| name              | None                                 |</span>
+<span class="go">| object_id         | 5ba835b7-22b0-4be6-bdbe-e0722d1b5f24 |</span>
+<span class="go">| object_type       | security_group                       |</span>
+<span class="go">| project_id        | 077e8f39d3db4c9e998d842b0503283a     |</span>
+<span class="go">| target_project_id | 32016615de5d43bb88de99e7f2e26a1e     |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">target-project</span></code> parameter specifies the project that requires
+access to the security group. The <code class="docutils literal notranslate"><span class="pre">action</span></code> parameter specifies what
+the project is allowed to do. The <code class="docutils literal notranslate"><span class="pre">type</span></code> parameter says
+that the target object is a security group. The final parameter is the ID of
+the security group we are granting access to.</p>
+<p>Project <code class="docutils literal notranslate"><span class="pre">32016615de5d43bb88de99e7f2e26a1e</span></code> will now be able to see
+the security group when running <strong class="command">openstack security group list</strong> and
+<strong class="command">openstack security group show</strong> and will also be able to bind
+it to its ports. No other users (other than admins and the owner)
+will be able to see the security group.</p>
+<p>To remove access for that project, delete the RBAC policy that allows
+it using the <strong class="command">openstack network rbac delete</strong> command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>rbac<span class="w"> </span>delete<span class="w"> </span>8828e38d-a0df-4c78-963b-e5f215d3d550
+</pre></div>
+</div>
+<p>If that project has ports with the security group applied to them,
+the server will not delete the RBAC policy until
+the security group is no longer in use:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>rbac<span class="w"> </span>delete<span class="w"> </span>8828e38d-a0df-4c78-963b-e5f215d3d550
+<span class="go">RBAC policy on object 8828e38d-a0df-4c78-963b-e5f215d3d550</span>
+<span class="go">cannot be removed because other objects depend on it.</span>
+</pre></div>
+</div>
+<p>This process can be repeated any number of times to share a security-group
+with an arbitrary number of projects.</p>
+<p>Creating an instance which uses a security group shared through RBAC, but only
+specifying the network ID when calling Nova will not work currently. In such
+cases Nova will check if the given security group exists in Neutron before it
+creates a port in the given network. The problem with that is that Nova asks
+only for the security groups filtered by the project_id thus it will not get
+the shared security group back from the Neutron API. See <a class="reference external" href="https://bugs.launchpad.net/neutron/+bug/1942615">bug 1942615</a> for details.
+To workaround the issue, the user needs to create a port in Neutron first, and
+then pass that port to Nova:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>port<span class="w"> </span>create<span class="w"> </span>--network<span class="w"> </span>net1<span class="w"> </span>--security-group
+<span class="go">5ba835b7-22b0-4be6-bdbe-e0722d1b5f24 shared-sg-port</span>
+
+<span class="gp">$ </span>openstack<span class="w"> </span>server<span class="w"> </span>create<span class="w"> </span>--image<span class="w"> </span>cirros-0.5.1-x86_64-disk<span class="w"> </span>--flavor<span class="w"> </span>m1.tiny
+<span class="go">--port shared-sg-port vm-with-shared-sg</span>
+</pre></div>
+</div>
+</section>
+<section id="sharing-an-address-scope-with-specific-projects">
+<h2>Sharing an address scope with specific projects<a class="headerlink" href="#sharing-an-address-scope-with-specific-projects" title="Link to this heading">¶</a></h2>
+<p>Create an address scope to share:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>address<span class="w"> </span>scope<span class="w"> </span>create<span class="w"> </span>my_address_scope
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| Field             | Value                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| id                | c19cb654-3489-4160-9c82-8a3015483643 |</span>
+<span class="go">| ip_version        | 4                                    |</span>
+<span class="go">| location          | ...                                  |</span>
+<span class="go">| name              | my_address_scope                     |</span>
+<span class="go">| project_id        | 34304bc4f233470fa4a2448d153b6324     |</span>
+<span class="go">| shared            | False                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>Create the RBAC policy entry using the <strong class="command">openstack network rbac create</strong>
+command (in this example, the ID of the project we want to share with is
+<code class="docutils literal notranslate"><span class="pre">32016615de5d43bb88de99e7f2e26a1e</span></code>):</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>rbac<span class="w"> </span>create<span class="w"> </span>--target-project<span class="w"> </span><span class="se">\</span>
+32016615de5d43bb88de99e7f2e26a1e<span class="w"> </span>--action<span class="w"> </span>access_as_shared<span class="w"> </span><span class="se">\</span>
+--type<span class="w"> </span>address_scope<span class="w"> </span>c19cb654-3489-4160-9c82-8a3015483643
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| Field             | Value                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| action            | access_as_shared                     |</span>
+<span class="go">| id                | d54b1482-98c4-44aa-9115-ede80387ffe0 |</span>
+<span class="go">| location          | ...                                  |</span>
+<span class="go">| name              | None                                 |</span>
+<span class="go">| object_id         | c19cb654-3489-4160-9c82-8a3015483643 |</span>
+<span class="go">| object_type       | address_scope                        |</span>
+<span class="go">| project_id        | 34304bc4f233470fa4a2448d153b6324     |</span>
+<span class="go">| target_project_id | 32016615de5d43bb88de99e7f2e26a1e     |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">target-project</span></code> parameter specifies the project that requires
+access to the address scope. The <code class="docutils literal notranslate"><span class="pre">action</span></code> parameter specifies what
+the project is allowed to do. The <code class="docutils literal notranslate"><span class="pre">type</span></code> parameter says
+that the target object is an address scope. The final parameter is the ID of
+the address scope we are granting access to.</p>
+<p>Project <code class="docutils literal notranslate"><span class="pre">32016615de5d43bb88de99e7f2e26a1e</span></code> will now be able to see
+the address scope when running <strong class="command">openstack address scope list</strong> and
+<strong class="command">openstack address scope show</strong> and will also be able to assign
+it to its subnet pools. No other users (other than admins and the owner)
+will be able to see the address scope.</p>
+<p>To remove access for that project, delete the RBAC policy that allows
+it using the <strong class="command">openstack network rbac delete</strong> command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>rbac<span class="w"> </span>delete<span class="w"> </span>d54b1482-98c4-44aa-9115-ede80387ffe0
+</pre></div>
+</div>
+<p>If that project has subnet pools with the address scope applied to them,
+the server will not delete the RBAC policy until
+the address scope is no longer in use:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>rbac<span class="w"> </span>delete<span class="w"> </span>d54b1482-98c4-44aa-9115-ede80387ffe0
+<span class="go">RBAC policy on object c19cb654-3489-4160-9c82-8a3015483643</span>
+<span class="go">cannot be removed because other objects depend on it.</span>
+</pre></div>
+</div>
+<p>This process can be repeated any number of times to share an address scope
+with an arbitrary number of projects.</p>
+</section>
+<section id="sharing-a-subnet-pool-with-specific-projects">
+<h2>Sharing a subnet pool with specific projects<a class="headerlink" href="#sharing-a-subnet-pool-with-specific-projects" title="Link to this heading">¶</a></h2>
+<p>Create a subnet pool to share:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>pool<span class="w"> </span>create<span class="w"> </span>my_subnetpool<span class="w"> </span>--pool-prefix<span class="w"> </span><span class="m">203</span>.0.113.0/24
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| Field             | Value                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| address_scope_id  | None                                 |</span>
+<span class="go">| created_at        | 2020-03-16T14:23:01Z                 |</span>
+<span class="go">| default_prefixlen | 8                                    |</span>
+<span class="go">| default_quota     | None                                 |</span>
+<span class="go">| description       |                                      |</span>
+<span class="go">| id                | 11f79287-bc17-46b2-bfd0-2562471eb631 |</span>
+<span class="go">| ip_version        | 4                                    |</span>
+<span class="go">| is_default        | False                                |</span>
+<span class="go">| location          | ...                                  |</span>
+<span class="go">| max_prefixlen     | 32                                   |</span>
+<span class="go">| min_prefixlen     | 8                                    |</span>
+<span class="go">| name              | my_subnetpool                        |</span>
+<span class="go">| project_id        | 290ccedbcf594ecc8e76eff06f964f7e     |</span>
+<span class="go">| revision_number   | 0                                    |</span>
+<span class="go">| shared            | False                                |</span>
+<span class="go">| tags              |                                      |</span>
+<span class="go">| updated_at        | 2020-03-16T14:23:01Z                 |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>Create the RBAC policy entry using the <strong class="command">openstack network rbac create</strong>
+command (in this example, the ID of the project we want to share with is
+<code class="docutils literal notranslate"><span class="pre">32016615de5d43bb88de99e7f2e26a1e</span></code>):</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>rbac<span class="w"> </span>create<span class="w"> </span>--target-project<span class="w"> </span><span class="se">\</span>
+32016615de5d43bb88de99e7f2e26a1e<span class="w"> </span>--action<span class="w"> </span>access_as_shared<span class="w"> </span><span class="se">\</span>
+--type<span class="w"> </span>subnetpool<span class="w"> </span>11f79287-bc17-46b2-bfd0-2562471eb631
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| Field             | Value                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| action            | access_as_shared                     |</span>
+<span class="go">| id                | d54b1482-98c4-44aa-9115-ede80387ffe0 |</span>
+<span class="go">| location          | ...                                  |</span>
+<span class="go">| name              | None                                 |</span>
+<span class="go">| object_id         | 11f79287-bc17-46b2-bfd0-2562471eb631 |</span>
+<span class="go">| object_type       | subnetpool                           |</span>
+<span class="go">| project_id        | 290ccedbcf594ecc8e76eff06f964f7e     |</span>
+<span class="go">| target_project_id | 32016615de5d43bb88de99e7f2e26a1e     |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">target-project</span></code> parameter specifies the project that requires
+access to the subnet pool. The <code class="docutils literal notranslate"><span class="pre">action</span></code> parameter specifies what
+the project is allowed to do. The <code class="docutils literal notranslate"><span class="pre">type</span></code> parameter says
+that the target object is a subnet pool. The final parameter is the ID of
+the subnet pool we are granting access to.</p>
+<p>Project <code class="docutils literal notranslate"><span class="pre">32016615de5d43bb88de99e7f2e26a1e</span></code> will now be able to see
+the subnet pool when running <strong class="command">openstack subnet pool list</strong> and
+<strong class="command">openstack subnet pool show</strong> and will also be able to assign
+it to its subnets. No other users (other than admins and the owner)
+will be able to see the subnet pool.</p>
+<p>To remove access for that project, delete the RBAC policy that allows
+it using the <strong class="command">openstack network rbac delete</strong> command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>rbac<span class="w"> </span>delete<span class="w"> </span>d54b1482-98c4-44aa-9115-ede80387ffe0
+</pre></div>
+</div>
+<p>If that project has subnets with the subnet pool applied to them,
+the server will not delete the RBAC policy until
+the subnet pool is no longer in use:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>rbac<span class="w"> </span>delete<span class="w"> </span>d54b1482-98c4-44aa-9115-ede80387ffe0
+<span class="go">RBAC policy on object 11f79287-bc17-46b2-bfd0-2562471eb631</span>
+<span class="go">cannot be removed because other objects depend on it.</span>
+</pre></div>
+</div>
+<p>This process can be repeated any number of times to share a subnet pool
+with an arbitrary number of projects.</p>
+</section>
+<section id="sharing-an-address-group-with-specific-projects">
+<h2>Sharing an address group with specific projects<a class="headerlink" href="#sharing-an-address-group-with-specific-projects" title="Link to this heading">¶</a></h2>
+<p>Create an address group to share:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>address<span class="w"> </span>group<span class="w"> </span>create<span class="w"> </span>test-ag<span class="w"> </span>--address<span class="w"> </span><span class="m">10</span>.1.1.1
+<span class="go">+-------------+--------------------------------------+</span>
+<span class="go">| Field       | Value                                |</span>
+<span class="go">+-------------+--------------------------------------+</span>
+<span class="go">| addresses   | [&#39;10.1.1.1/32&#39;]                      |</span>
+<span class="go">| description |                                      |</span>
+<span class="go">| id          | cdb6eb3e-f9a0-4d52-8478-358eaa2c4737 |</span>
+<span class="go">| name        | test-ag                              |</span>
+<span class="go">| project_id  | 66c77cf262454777a8f455cce48c12c0     |</span>
+<span class="go">+-------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>Create the RBAC policy entry using the <strong class="command">openstack network rbac create</strong>
+command (in this example, the ID of the project we want to share with is
+<code class="docutils literal notranslate"><span class="pre">bbd82892525d4372911390b984ed3265</span></code>):</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>rbac<span class="w"> </span>create<span class="w"> </span>--target-project<span class="w"> </span><span class="se">\</span>
+bbd82892525d4372911390b984ed3265<span class="w"> </span>--action<span class="w"> </span>access_as_shared<span class="w"> </span><span class="se">\</span>
+--type<span class="w"> </span>address_group<span class="w"> </span>cdb6eb3e-f9a0-4d52-8478-358eaa2c4737
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| Field             | Value                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| action            | access_as_shared                     |</span>
+<span class="go">| id                | c7414ac2-9a6b-420b-84c5-4158a6cca4f9 |</span>
+<span class="go">| name              | None                                 |</span>
+<span class="go">| object_id         | cdb6eb3e-f9a0-4d52-8478-358eaa2c4737 |</span>
+<span class="go">| object_type       | address_group                        |</span>
+<span class="go">| project_id        | 66c77cf262454777a8f455cce48c12c0     |</span>
+<span class="go">| target_project_id | bbd82892525d4372911390b984ed3265     |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">target-project</span></code> parameter specifies the project that requires
+access to the address group. The <code class="docutils literal notranslate"><span class="pre">action</span></code> parameter specifies what
+the project is allowed to do. The <code class="docutils literal notranslate"><span class="pre">type</span></code> parameter says
+that the target object is an address group. The final parameter is the ID of
+the address group we are granting access to.</p>
+<p>Project <code class="docutils literal notranslate"><span class="pre">bbd82892525d4372911390b984ed3265</span></code> will now be able to see
+the address group when running <strong class="command">openstack address group list</strong> and
+<strong class="command">openstack address group show</strong> and will also be able to assign
+it to its security group rules. No other users (other than admins and the
+owner) will be able to see the address group.</p>
+<p>To remove access for that project, delete the RBAC policy that allows
+it using the <strong class="command">openstack network rbac delete</strong> command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>rbac<span class="w"> </span>delete<span class="w"> </span>c7414ac2-9a6b-420b-84c5-4158a6cca4f9
+</pre></div>
+</div>
+<p>If that project has security group rules with the address group applied to
+them, the server will not delete the RBAC policy until the address group is no
+longer in use:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>rbac<span class="w"> </span>delete<span class="w"> </span>c7414ac2-9a6b-420b-84c5-4158a6cca4f9
+<span class="go">RBAC policy on object cdb6eb3e-f9a0-4d52-8478-358eaa2c4737</span>
+<span class="go">cannot be removed because other objects depend on it</span>
+</pre></div>
+</div>
+<p>This process can be repeated any number of times to share an address group
+with an arbitrary number of projects.</p>
+</section>
+<section id="how-the-shared-flag-relates-to-these-entries">
+<h2>How the ‘shared’ flag relates to these entries<a class="headerlink" href="#how-the-shared-flag-relates-to-these-entries" title="Link to this heading">¶</a></h2>
+<p>As introduced in other guide entries, neutron provides a means of
+making an object (<code class="docutils literal notranslate"><span class="pre">address-scope</span></code>, <code class="docutils literal notranslate"><span class="pre">network</span></code>, <code class="docutils literal notranslate"><span class="pre">qos-policy</span></code>,
+<code class="docutils literal notranslate"><span class="pre">security-group</span></code>, <code class="docutils literal notranslate"><span class="pre">subnetpool</span></code>) available to every project.
+This is accomplished using the <code class="docutils literal notranslate"><span class="pre">shared</span></code> flag on the supported object:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>create<span class="w"> </span>global_network<span class="w"> </span>--share
+<span class="go">+---------------------------+--------------------------------------+</span>
+<span class="go">| Field                     | Value                                |</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+<span class="go">| admin_state_up            | UP                                   |</span>
+<span class="go">| availability_zone_hints   |                                      |</span>
+<span class="go">| availability_zones        |                                      |</span>
+<span class="go">| created_at                | 2017-01-25T20:32:06Z                 |</span>
+<span class="go">| description               |                                      |</span>
+<span class="go">| dns_domain                | None                                 |</span>
+<span class="go">| id                        | 84a7e627-573b-49da-af66-c9a65244f3ce |</span>
+<span class="go">| ipv4_address_scope        | None                                 |</span>
+<span class="go">| ipv6_address_scope        | None                                 |</span>
+<span class="go">| is_default                | None                                 |</span>
+<span class="go">| mtu                       | 1450                                 |</span>
+<span class="go">| name                      | global_network                       |</span>
+<span class="go">| port_security_enabled     | True                                 |</span>
+<span class="go">| project_id                | 61b7eba037fd41f29cfba757c010faff     |</span>
+<span class="go">| provider:network_type     | vxlan                                |</span>
+<span class="go">| provider:physical_network | None                                 |</span>
+<span class="go">| provider:segmentation_id  | 7                                    |</span>
+<span class="go">| qos_policy_id             | None                                 |</span>
+<span class="go">| revision_number           | 3                                    |</span>
+<span class="go">| router:external           | Internal                             |</span>
+<span class="go">| segments                  | None                                 |</span>
+<span class="go">| shared                    | True                                 |</span>
+<span class="go">| status                    | ACTIVE                               |</span>
+<span class="go">| subnets                   |                                      |</span>
+<span class="go">| tags                      | []                                   |</span>
+<span class="go">| updated_at                | 2017-01-25T20:32:07Z                 |</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>This is the equivalent of creating a policy on the network that permits
+every project to perform the action <code class="docutils literal notranslate"><span class="pre">access_as_shared</span></code> on that network.
+Neutron treats them as the same thing, so the policy entry for that
+network should be visible using the <strong class="command">openstack network rbac list</strong>
+command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>rbac<span class="w"> </span>list
+<span class="go">+-------------------------------+-------------+--------------------------------+</span>
+<span class="go">| ID                            | Object Type | Object ID                      |</span>
+<span class="go">+-------------------------------+-------------+--------------------------------+</span>
+<span class="go">| 58a5ee31-2ad6-467d-           | qos_policy  | 1f730d69-1c45-4ade-            |</span>
+<span class="go">| 8bb8-8c2ae3dd1382             |             | a8f2-89070ac4f046              |</span>
+<span class="go">| 27efbd79-f384-4d89-9dfc-      | network     | 84a7e627-573b-49da-            |</span>
+<span class="go">| 6c4a606ceec6                  |             | af66-c9a65244f3ce              |</span>
+<span class="go">+-------------------------------+-------------+--------------------------------+</span>
+</pre></div>
+</div>
+<p>Use the <strong class="command">openstack network rbac show</strong> command to see the details:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>rbac<span class="w"> </span>show<span class="w"> </span>27efbd79-f384-4d89-9dfc-6c4a606ceec6
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| Field             | Value                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| action            | access_as_shared                     |</span>
+<span class="go">| id                | 27efbd79-f384-4d89-9dfc-6c4a606ceec6 |</span>
+<span class="go">| name              | None                                 |</span>
+<span class="go">| object_id         | 84a7e627-573b-49da-af66-c9a65244f3ce |</span>
+<span class="go">| object_type       | network                              |</span>
+<span class="go">| project_id        | 61b7eba037fd41f29cfba757c010faff     |</span>
+<span class="go">| target_project_id | *                                    |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>The output shows that the entry allows the action <code class="docutils literal notranslate"><span class="pre">access_as_shared</span></code>
+on object <code class="docutils literal notranslate"><span class="pre">84a7e627-573b-49da-af66-c9a65244f3ce</span></code> of type <code class="docutils literal notranslate"><span class="pre">network</span></code>
+to target_project <code class="docutils literal notranslate"><span class="pre">*</span></code>, which is a wildcard that represents all projects.</p>
+<p>Currently, the <code class="docutils literal notranslate"><span class="pre">shared</span></code> flag is just a mapping to the underlying
+RBAC policies for a network. Setting the flag to <code class="docutils literal notranslate"><span class="pre">True</span></code> on a network
+creates a wildcard RBAC entry. Setting it to <code class="docutils literal notranslate"><span class="pre">False</span></code> removes the
+wildcard entry.</p>
+<p>When you run <strong class="command">openstack network list</strong> or
+<strong class="command">openstack network show</strong>, the <code class="docutils literal notranslate"><span class="pre">shared</span></code> flag is calculated by the
+server based on the calling project and the RBAC entries for each network.
+For QoS objects use <strong class="command">openstack network qos policy list</strong> or
+<strong class="command">openstack network qos policy show</strong> respectively.
+If there is a wildcard entry, the <code class="docutils literal notranslate"><span class="pre">shared</span></code> flag is always set to <code class="docutils literal notranslate"><span class="pre">True</span></code>.
+If there are only entries that share with specific projects, only
+the projects the object is shared to will see the flag as <code class="docutils literal notranslate"><span class="pre">True</span></code>
+and the rest will see the flag as <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+</section>
+<section id="allowing-a-network-to-be-used-as-an-external-network">
+<h2>Allowing a network to be used as an external network<a class="headerlink" href="#allowing-a-network-to-be-used-as-an-external-network" title="Link to this heading">¶</a></h2>
+<p>To make a network available as an external network for specific projects
+rather than all projects, use the <code class="docutils literal notranslate"><span class="pre">access_as_external</span></code> action.</p>
+<ol class="arabic">
+<li><p>Create a network that you want to be available as an external network:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>create<span class="w"> </span>secret_external_network
+<span class="go">+---------------------------+--------------------------------------+</span>
+<span class="go">| Field                     | Value                                |</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+<span class="go">| admin_state_up            | UP                                   |</span>
+<span class="go">| availability_zone_hints   |                                      |</span>
+<span class="go">| availability_zones        |                                      |</span>
+<span class="go">| created_at                | 2017-01-25T20:36:59Z                 |</span>
+<span class="go">| description               |                                      |</span>
+<span class="go">| dns_domain                | None                                 |</span>
+<span class="go">| id                        | 802d4e9e-4649-43e6-9ee2-8d052a880cfb |</span>
+<span class="go">| ipv4_address_scope        | None                                 |</span>
+<span class="go">| ipv6_address_scope        | None                                 |</span>
+<span class="go">| is_default                | None                                 |</span>
+<span class="go">| mtu                       | 1450                                 |</span>
+<span class="go">| name                      | secret_external_network              |</span>
+<span class="go">| port_security_enabled     | True                                 |</span>
+<span class="go">| project_id                | 61b7eba037fd41f29cfba757c010faff     |</span>
+<span class="go">| proider:network_type      | vxlan                                |</span>
+<span class="go">| provider:physical_network | None                                 |</span>
+<span class="go">| provider:segmentation_id  | 21                                   |</span>
+<span class="go">| qos_policy_id             | None                                 |</span>
+<span class="go">| revision_number           | 3                                    |</span>
+<span class="go">| router:external           | Internal                             |</span>
+<span class="go">| segments                  | None                                 |</span>
+<span class="go">| shared                    | False                                |</span>
+<span class="go">| status                    | ACTIVE                               |</span>
+<span class="go">| subnets                   |                                      |</span>
+<span class="go">| tags                      | []                                   |</span>
+<span class="go">| updated_at                | 2017-01-25T20:36:59Z                 |</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create a policy entry using the <strong class="command">openstack network rbac create</strong>
+command (in this example, the ID of the project we want to share with is
+<code class="docutils literal notranslate"><span class="pre">838030a7bf3c4d04b4b054c0f0b2b17c</span></code>):</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>rbac<span class="w"> </span>create<span class="w"> </span>--target-project<span class="w"> </span><span class="se">\</span>
+838030a7bf3c4d04b4b054c0f0b2b17c<span class="w"> </span>--action<span class="w"> </span>access_as_external<span class="w"> </span><span class="se">\</span>
+--type<span class="w"> </span>network<span class="w"> </span>802d4e9e-4649-43e6-9ee2-8d052a880cfb
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| Field             | Value                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| action            | access_as_external                   |</span>
+<span class="go">| id                | afdd5b8d-b6f5-4a15-9817-5231434057be |</span>
+<span class="go">| name              | None                                 |</span>
+<span class="go">| object_id         | 802d4e9e-4649-43e6-9ee2-8d052a880cfb |</span>
+<span class="go">| object_type       | network                              |</span>
+<span class="go">| project_id        | 61b7eba037fd41f29cfba757c010faff     |</span>
+<span class="go">| target_project_id | 838030a7bf3c4d04b4b054c0f0b2b17c     |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>The <code class="docutils literal notranslate"><span class="pre">target-project</span></code> parameter specifies the project that requires
+access to the network. The <code class="docutils literal notranslate"><span class="pre">action</span></code> parameter specifies what
+the project is allowed to do. The <code class="docutils literal notranslate"><span class="pre">type</span></code> parameter indicates
+that the target object is a network. The final parameter is the ID of
+the network we are granting external access to.</p>
+<p>Now project <code class="docutils literal notranslate"><span class="pre">838030a7bf3c4d04b4b054c0f0b2b17c</span></code> is able to see
+the network when running <strong class="command">openstack network list</strong>
+and <strong class="command">openstack network show</strong> and can attach router gateway
+ports to that network. No other users (other than admins
+and the owner) are able to see the network.</p>
+<p>To remove access for that project, delete the policy that allows
+it using the <strong class="command">openstack network rbac delete</strong> command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>rbac<span class="w"> </span>delete<span class="w"> </span>afdd5b8d-b6f5-4a15-9817-5231434057be
+</pre></div>
+</div>
+<p>If that project has router gateway ports attached to that network,
+the server prevents the policy from being deleted until the
+ports have been deleted:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>rbac<span class="w"> </span>delete<span class="w"> </span>afdd5b8d-b6f5-4a15-9817-5231434057be
+<span class="go">RBAC policy on object afdd5b8d-b6f5-4a15-9817-5231434057be</span>
+<span class="go">cannot be removed because other objects depend on it.</span>
+</pre></div>
+</div>
+<p>This process can be repeated any number of times to make a network
+available as external to an arbitrary number of projects.</p>
+<p>If a network is marked as external during creation, it now implicitly
+creates a wildcard RBAC policy granting everyone access to preserve
+previous behavior before this feature was added.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>create<span class="w"> </span>global_external_network<span class="w"> </span>--external
+<span class="go">+---------------------------+--------------------------------------+</span>
+<span class="go">| Field                     | Value                                |</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+<span class="go">| admin_state_up            | UP                                   |</span>
+<span class="go">| availability_zone_hints   |                                      |</span>
+<span class="go">| availability_zones        |                                      |</span>
+<span class="go">| created_at                | 2017-01-25T20:41:44Z                 |</span>
+<span class="go">| description               |                                      |</span>
+<span class="go">| dns_domain                | None                                 |</span>
+<span class="go">| id                        | 72a257a2-a56e-4ac7-880f-94a4233abec6 |</span>
+<span class="go">| ipv4_address_scope        | None                                 |</span>
+<span class="go">| ipv6_address_scope        | None                                 |</span>
+<span class="go">| is_default                | None                                 |</span>
+<span class="go">| mtu                       | 1450                                 |</span>
+<span class="go">| name                      | global_external_network              |</span>
+<span class="go">| port_security_enabled     | True                                 |</span>
+<span class="go">| project_id                | 61b7eba037fd41f29cfba757c010faff     |</span>
+<span class="go">| provider:network_type     | vxlan                                |</span>
+<span class="go">| provider:physical_network | None                                 |</span>
+<span class="go">| provider:segmentation_id  | 69                                   |</span>
+<span class="go">| qos_policy_id             | None                                 |</span>
+<span class="go">| revision_number           | 4                                    |</span>
+<span class="go">| router:external           | External                             |</span>
+<span class="go">| segments                  | None                                 |</span>
+<span class="go">| shared                    | False                                |</span>
+<span class="go">| status                    | ACTIVE                               |</span>
+<span class="go">| subnets                   |                                      |</span>
+<span class="go">| tags                      | []                                   |</span>
+<span class="go">| updated_at                | 2017-01-25T20:41:44Z                 |</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>In the output above the standard <code class="docutils literal notranslate"><span class="pre">router:external</span></code> attribute is
+<code class="docutils literal notranslate"><span class="pre">External</span></code> as expected. Now a wildcard policy is visible in the
+RBAC policy listings:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>rbac<span class="w"> </span>list<span class="w"> </span>--long<span class="w"> </span>-c<span class="w"> </span>ID<span class="w"> </span>-c<span class="w"> </span>Action
+<span class="go">+--------------------------------------+--------------------+</span>
+<span class="go">| ID                                   | Action             |</span>
+<span class="go">+--------------------------------------+--------------------+</span>
+<span class="go">| b694e541-bdca-480d-94ec-eda59ab7d71a | access_as_external |</span>
+<span class="go">+--------------------------------------+--------------------+</span>
+</pre></div>
+</div>
+<p>You can modify or delete this policy with the same constraints
+as any other RBAC <code class="docutils literal notranslate"><span class="pre">access_as_external</span></code> policy.</p>
+</section>
+<section id="preventing-regular-users-from-sharing-objects-with-each-other">
+<h2>Preventing regular users from sharing objects with each other<a class="headerlink" href="#preventing-regular-users-from-sharing-objects-with-each-other" title="Link to this heading">¶</a></h2>
+<p>The default <code class="docutils literal notranslate"><span class="pre">policy.yaml</span></code> file will not allow regular
+users to share objects with every other project using a wildcard;
+however, it will allow them to share objects with specific project
+IDs.</p>
+<p>If an operator wants to prevent normal users from doing this, the
+<code class="docutils literal notranslate"><span class="pre">&quot;create_rbac_policy&quot;:</span></code> entry in <code class="docutils literal notranslate"><span class="pre">policy.yaml</span></code> can be adjusted
+from <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code> to <code class="docutils literal notranslate"><span class="pre">&quot;rule:admin_only&quot;</span></code>.</p>
+</section>
+<section id="improve-database-rbac-query-operations">
+<h2>Improve database RBAC query operations<a class="headerlink" href="#improve-database-rbac-query-operations" title="Link to this heading">¶</a></h2>
+<p>Since <a class="footnote-reference brackets" href="#id4" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, present in Yoga version, Neutron has indexes for
+“target_tenant” (now “target_project”) and “action” columns in all
+RBAC related tables. That improves the SQL queries involving the
+RBAC tables <a class="footnote-reference brackets" href="#id5" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>. Any system before Yoga won’t have these indexes
+but the system administrator can manually add them to the Neutron
+database following the next steps:</p>
+<ul class="simple">
+<li><p>Find the RBAC tables:</p></li>
+</ul>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nv">tables</span><span class="o">=</span><span class="sb">`</span>mysql<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;use ovs_neutron; show tables;&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>rbac<span class="sb">`</span>
+</pre></div>
+</div>
+<ul>
+<li><p>Insert the indexes for the “target_tenant” and “action” columns:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>$ for table in $tables do; mysql -e </dt><dd><dl class="simple">
+<dt>“alter table $table add key (action); </dt><dd><p>alter table $table add key (target_tenant);”; done</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+</li>
+</ul>
+<p>In order to prevent errors during a system upgrade, <a class="footnote-reference brackets" href="#id6" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a> was
+implemented and backported up to Yoga. This patch checks if any index
+is already present in the Neutron tables and avoids executing the
+index creation command again.</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id4" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://review.opendev.org/c/openstack/neutron/+/810072">https://review.opendev.org/c/openstack/neutron/+/810072</a></p>
+</aside>
+<aside class="footnote brackets" id="id5" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://github.com/openstack/neutron-lib/blob/890d62a3df3f35bb18bf1a11e79a9e97e7dd2d2c/neutron_lib/db/model_query.py#L123-L131">https://github.com/openstack/neutron-lib/blob/890d62a3df3f35bb18bf1a11e79a9e97e7dd2d2c/neutron_lib/db/model_query.py#L123-L131</a></p>
+</aside>
+<aside class="footnote brackets" id="id6" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://review.opendev.org/c/openstack/neutron/+/884617">https://review.opendev.org/c/openstack/neutron/+/884617</a></p>
+</aside>
+</aside>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="config-qos-min-pps.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Quality of Service (QoS): Guaranteed Minimum Packet Rate"></i></a>
+          
+          
+            <a href="config-routed-networks.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Routed provider networks"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2024-08-23 12:03:12</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation Guide</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">OpenStack Networking Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deploy.html">Deployment examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ops.html">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">Migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ovn/index.html">OVN Driver Administration Guide</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributor/index.html">Contributor Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Role-Based Access Control (RBAC)</a><ul>
+<li><a class="reference internal" href="#supported-objects-for-sharing-with-specific-projects">Supported objects for sharing with specific projects</a></li>
+<li><a class="reference internal" href="#sharing-an-object-with-specific-projects">Sharing an object with specific projects</a></li>
+<li><a class="reference internal" href="#sharing-a-network-with-specific-projects">Sharing a network with specific projects</a></li>
+<li><a class="reference internal" href="#sharing-a-qos-policy-with-specific-projects">Sharing a QoS policy with specific projects</a></li>
+<li><a class="reference internal" href="#sharing-a-security-group-with-specific-projects">Sharing a security group with specific projects</a></li>
+<li><a class="reference internal" href="#sharing-an-address-scope-with-specific-projects">Sharing an address scope with specific projects</a></li>
+<li><a class="reference internal" href="#sharing-a-subnet-pool-with-specific-projects">Sharing a subnet pool with specific projects</a></li>
+<li><a class="reference internal" href="#sharing-an-address-group-with-specific-projects">Sharing an address group with specific projects</a></li>
+<li><a class="reference internal" href="#how-the-shared-flag-relates-to-these-entries">How the ‘shared’ flag relates to these entries</a></li>
+<li><a class="reference internal" href="#allowing-a-network-to-be-used-as-an-external-network">Allowing a network to be used as an external network</a></li>
+<li><a class="reference internal" href="#preventing-regular-users-from-sharing-objects-with-each-other">Preventing regular users from sharing objects with each other</a></li>
+<li><a class="reference internal" href="#improve-database-rbac-query-operations">Improve database RBAC query operations</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "admin/config-rbac" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Role-Based Access Control (RBAC) in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2024-08-23 12:03:12";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "admin/config-rbac";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

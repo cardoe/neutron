@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Neutron Plugin Architecture &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Policy Enforcement and Authorization" href="policy.html" />
+    <link rel="prev" title="Neutron Open vSwitch vhost-user Support" href="ovs_vhostuser.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/contributor/internals/plugin-api.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Neutron Plugin Architecture</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="ovs_vhostuser.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Neutron Open vSwitch vhost-user Support"></i></a>
+    
+    
+    <a href="policy.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Policy Enforcement and Authorization"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="neutron-plugin-architecture">
+<h1>Neutron Plugin Architecture<a class="headerlink" href="#neutron-plugin-architecture" title="Link to this heading">¶</a></h1>
+<p><a class="reference external" href="http://www.slideshare.net/salv_orlando/how-to-write-a-neutron-plugin-if-you-really-need-to">Salvatore Orlando: How to write a Neutron Plugin (if you really need to)</a></p>
+<section id="module-neutron.neutron_plugin_base_v2">
+<span id="plugin-api"></span><h2>Plugin API<a class="headerlink" href="#module-neutron.neutron_plugin_base_v2" title="Link to this heading">¶</a></h2>
+<p>v2 Neutron Plug-in API specification.</p>
+<p><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2" title="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2"><code class="xref py py-class docutils literal notranslate"><span class="pre">NeutronPluginBaseV2</span></code></a> provides the definition of minimum set of
+methods that needs to be implemented by a v2 Neutron Plug-in.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">neutron.neutron_plugin_base_v2.</span></span><span class="sig-name descname"><span class="pre">NeutronPluginBaseV2</span></span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2" title="Link to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.create_network">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">network</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.create_network" title="Link to this definition">¶</a></dt>
+<dd><p>Create a network.</p>
+<p>Create a network, which represents an L2 network segment which
+can have a set of subnets and ports associated with it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – neutron api request context</p></li>
+<li><p><strong>network</strong> – dictionary describing the network, with keys
+as listed in the  <code class="xref py py-obj docutils literal notranslate"><span class="pre">RESOURCE_ATTRIBUTE_MAP</span></code> object
+in <code class="file docutils literal notranslate"><span class="pre">neutron/api/v2/attributes.py</span></code>.  All keys will
+be populated.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.create_port">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_port</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.create_port" title="Link to this definition">¶</a></dt>
+<dd><p>Create a port.</p>
+<p>Create a port, which is a connection point of a device (e.g., a VM
+NIC) to attach to a L2 neutron network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – neutron api request context</p></li>
+<li><p><strong>port</strong> – dictionary describing the port, with keys as listed in the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">RESOURCE_ATTRIBUTE_MAP</span></code> object in
+<code class="file docutils literal notranslate"><span class="pre">neutron/api/v2/attributes.py</span></code>.  All keys will be
+populated.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.create_subnet">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_subnet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subnet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.create_subnet" title="Link to this definition">¶</a></dt>
+<dd><p>Create a subnet.</p>
+<p>Create a subnet, which represents a range of IP addresses
+that can be allocated to devices</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – neutron api request context</p></li>
+<li><p><strong>subnet</strong> – dictionary describing the subnet, with keys
+as listed in the  <code class="xref py py-obj docutils literal notranslate"><span class="pre">RESOURCE_ATTRIBUTE_MAP</span></code> object
+in <code class="file docutils literal notranslate"><span class="pre">neutron/api/v2/attributes.py</span></code>.  All keys will
+be populated.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.create_subnetpool">
+<span class="sig-name descname"><span class="pre">create_subnetpool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subnetpool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.create_subnetpool" title="Link to this definition">¶</a></dt>
+<dd><p>Create a subnet pool.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – neutron api request context</p></li>
+<li><p><strong>subnetpool</strong> – Dictionary representing the subnetpool to create.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.delete_network">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">delete_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.delete_network" title="Link to this definition">¶</a></dt>
+<dd><p>Delete a network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – neutron api request context</p></li>
+<li><p><strong>id</strong> – UUID representing the network to delete.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.delete_port">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">delete_port</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.delete_port" title="Link to this definition">¶</a></dt>
+<dd><p>Delete a port.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – neutron api request context</p></li>
+<li><p><strong>id</strong> – UUID representing the port to delete.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.delete_subnet">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">delete_subnet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.delete_subnet" title="Link to this definition">¶</a></dt>
+<dd><p>Delete a subnet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – neutron api request context</p></li>
+<li><p><strong>id</strong> – UUID representing the subnet to delete.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.delete_subnetpool">
+<span class="sig-name descname"><span class="pre">delete_subnetpool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.delete_subnetpool" title="Link to this definition">¶</a></dt>
+<dd><p>Delete a subnet pool.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – neutron api request context</p></li>
+<li><p><strong>id</strong> – The UUID of the subnet pool to delete.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_network">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_network" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve a network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – neutron api request context</p></li>
+<li><p><strong>id</strong> – UUID representing the network to fetch.</p></li>
+<li><p><strong>fields</strong> – a list of strings that are valid keys in a
+network dictionary as listed in the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">RESOURCE_ATTRIBUTE_MAP</span></code> object in
+<code class="file docutils literal notranslate"><span class="pre">neutron/api/v2/attributes.py</span></code>. Only these fields
+will be returned.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_networks">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_networks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sorts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">page_reverse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_networks" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve a list of networks.</p>
+<p>The contents of the list depends on
+the identity of the user making the request (as indicated by the
+context) as well as any filters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – neutron api request context</p></li>
+<li><p><strong>filters</strong> – a dictionary with keys that are valid keys for
+a network as listed in the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">RESOURCE_ATTRIBUTE_MAP</span></code> object in
+<code class="file docutils literal notranslate"><span class="pre">neutron/api/v2/attributes.py</span></code>.  Values in this
+dictionary are an iterable containing values that will
+be used for an exact match comparison for that value.
+Each result returned by this function will have matched
+one of the values for each key in filters.</p></li>
+<li><p><strong>fields</strong> – a list of strings that are valid keys in a
+network dictionary as listed in the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">RESOURCE_ATTRIBUTE_MAP</span></code> object in
+<code class="file docutils literal notranslate"><span class="pre">neutron/api/v2/attributes.py</span></code>. Only these fields
+will be returned.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_networks_count">
+<span class="sig-name descname"><span class="pre">get_networks_count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_networks_count" title="Link to this definition">¶</a></dt>
+<dd><p>Return the number of networks.</p>
+<p>The result depends on the identity
+of the user making the request (as indicated by the context) as well
+as any filters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – neutron api request context</p></li>
+<li><p><strong>filters</strong> – a dictionary with keys that are valid keys for
+a network as listed in the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">RESOURCE_ATTRIBUTE_MAP</span></code> object
+in <code class="file docutils literal notranslate"><span class="pre">neutron/api/v2/attributes.py</span></code>. Values in
+this dictionary are an iterable containing values that
+will be used for an exact match comparison for that
+value.  Each result returned by this function will have
+matched one of the values for each key in filters.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>NOTE: this method is optional, as it was not part of the originally</dt><dd><p>defined plugin API.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_port">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_port</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_port" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve a port.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – neutron api request context</p></li>
+<li><p><strong>id</strong> – UUID representing the port to fetch.</p></li>
+<li><p><strong>fields</strong> – a list of strings that are valid keys in a port
+dictionary as listed in the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">RESOURCE_ATTRIBUTE_MAP</span></code> object in
+<code class="file docutils literal notranslate"><span class="pre">neutron/api/v2/attributes.py</span></code>. Only these fields
+will be returned.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_ports">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_ports</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sorts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">page_reverse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_ports" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve a list of ports.</p>
+<p>The contents of the list depends on the identity of the user making
+the request (as indicated by the context) as well as any filters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – neutron api request context</p></li>
+<li><p><strong>filters</strong> – a dictionary with keys that are valid keys for
+a port as listed in the  <code class="xref py py-obj docutils literal notranslate"><span class="pre">RESOURCE_ATTRIBUTE_MAP</span></code>
+object in <code class="file docutils literal notranslate"><span class="pre">neutron/api/v2/attributes.py</span></code>. Values
+in this dictionary are an iterable containing values
+that will be used for an exact match comparison for
+that value.  Each result returned by this function will
+have matched one of the values for each key in filters.</p></li>
+<li><p><strong>fields</strong> – a list of strings that are valid keys in a
+port dictionary as listed in the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">RESOURCE_ATTRIBUTE_MAP</span></code> object in
+<code class="file docutils literal notranslate"><span class="pre">neutron/api/v2/attributes.py</span></code>. Only these fields
+will be returned.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_ports_count">
+<span class="sig-name descname"><span class="pre">get_ports_count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_ports_count" title="Link to this definition">¶</a></dt>
+<dd><p>Return the number of ports.</p>
+<p>The result depends on the identity of the user making the request
+(as indicated by the context) as well as any filters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – neutron api request context</p></li>
+<li><p><strong>filters</strong> – a dictionary with keys that are valid keys for
+a network as listed in the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">RESOURCE_ATTRIBUTE_MAP</span></code> object in
+<code class="file docutils literal notranslate"><span class="pre">neutron/api/v2/attributes.py</span></code>.  Values in this
+dictionary are an iterable containing values that will
+be used for an exact match comparison for that value.
+Each result returned by this function will have matched
+one of the values for each key in filters.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>this method is optional, as it was not part of the originally
+defined plugin API.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_subnet">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_subnet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_subnet" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve a subnet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – neutron api request context</p></li>
+<li><p><strong>id</strong> – UUID representing the subnet to fetch.</p></li>
+<li><p><strong>fields</strong> – a list of strings that are valid keys in a
+subnet dictionary as listed in the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">RESOURCE_ATTRIBUTE_MAP</span></code> object in
+<code class="file docutils literal notranslate"><span class="pre">neutron/api/v2/attributes.py</span></code>. Only these fields
+will be returned.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_subnetpool">
+<span class="sig-name descname"><span class="pre">get_subnetpool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_subnetpool" title="Link to this definition">¶</a></dt>
+<dd><p>Show a subnet pool.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – neutron api request context</p></li>
+<li><p><strong>id</strong> – The UUID of the subnetpool to show.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_subnetpools">
+<span class="sig-name descname"><span class="pre">get_subnetpools</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sorts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">page_reverse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_subnetpools" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve list of subnet pools.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_subnets">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_subnets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sorts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">page_reverse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_subnets" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve a list of subnets.</p>
+<p>The contents of the list depends on
+the identity of the user making the request (as indicated by the
+context) as well as any filters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – neutron api request context</p></li>
+<li><p><strong>filters</strong> – a dictionary with keys that are valid keys for
+a subnet as listed in the <code class="xref py py-obj docutils literal notranslate"><span class="pre">RESOURCE_ATTRIBUTE_MAP</span></code>
+object in <code class="file docutils literal notranslate"><span class="pre">neutron/api/v2/attributes.py</span></code>.
+Values in this dictionary are an iterable containing
+values that will be used for an exact match comparison
+for that value.  Each result returned by this
+function will have matched one of the values for each
+key in filters.</p></li>
+<li><p><strong>fields</strong> – a list of strings that are valid keys in a
+subnet dictionary as listed in the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">RESOURCE_ATTRIBUTE_MAP</span></code> object in
+<code class="file docutils literal notranslate"><span class="pre">neutron/api/v2/attributes.py</span></code>. Only these fields
+will be returned.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_subnets_count">
+<span class="sig-name descname"><span class="pre">get_subnets_count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_subnets_count" title="Link to this definition">¶</a></dt>
+<dd><p>Return the number of subnets.</p>
+<p>The result depends on the identity of
+the user making the request (as indicated by the context) as well as
+any filters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – neutron api request context</p></li>
+<li><p><strong>filters</strong> – a dictionary with keys that are valid keys for
+a network as listed in the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">RESOURCE_ATTRIBUTE_MAP</span></code> object in
+<code class="file docutils literal notranslate"><span class="pre">neutron/api/v2/attributes.py</span></code>.  Values in this
+dictionary are an iterable containing values that
+will be used for an exact match comparison for that
+value.  Each result returned by this function will
+have matched one of the values for each key in filters.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>this method is optional, as it was not part of the originally
+defined plugin API.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.has_native_datastore">
+<span class="sig-name descname"><span class="pre">has_native_datastore</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.has_native_datastore" title="Link to this definition">¶</a></dt>
+<dd><p>Return True if the plugin uses Neutron’s native datastore.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>plugins like ML2 should override this method and return True.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.rpc_state_report_workers_supported">
+<span class="sig-name descname"><span class="pre">rpc_state_report_workers_supported</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.rpc_state_report_workers_supported" title="Link to this definition">¶</a></dt>
+<dd><p>Return whether the plugin supports state report RPC workers.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>this method is optional, as it was not part of the originally
+defined plugin API.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.rpc_workers_supported">
+<span class="sig-name descname"><span class="pre">rpc_workers_supported</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.rpc_workers_supported" title="Link to this definition">¶</a></dt>
+<dd><p>Return whether the plugin supports multiple RPC workers.</p>
+<p>A plugin that supports multiple RPC workers should override the
+start_rpc_listeners method to ensure that this method returns True and
+that start_rpc_listeners is called at the appropriate time.
+Alternately, a plugin can override this method to customize detection
+of support for multiple rpc workers</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>this method is optional, as it was not part of the originally
+defined plugin API.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.start_rpc_listeners">
+<span class="sig-name descname"><span class="pre">start_rpc_listeners</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.start_rpc_listeners" title="Link to this definition">¶</a></dt>
+<dd><p>Start the RPC listeners.</p>
+<p>Most plugins start RPC listeners implicitly on initialization.  In
+order to support multiple process RPC, the plugin needs to expose
+control over when this is started.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>this method is optional, as it was not part of the originally
+defined plugin API.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.start_rpc_state_reports_listener">
+<span class="sig-name descname"><span class="pre">start_rpc_state_reports_listener</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.start_rpc_state_reports_listener" title="Link to this definition">¶</a></dt>
+<dd><p>Start the RPC listeners consuming state reports queue.</p>
+<p>This optional method creates rpc consumer for REPORTS queue only.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>this method is optional, as it was not part of the originally
+defined plugin API.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.update_network">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">network</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.update_network" title="Link to this definition">¶</a></dt>
+<dd><p>Update values of a network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – neutron api request context</p></li>
+<li><p><strong>id</strong> – UUID representing the network to update.</p></li>
+<li><p><strong>network</strong> – dictionary with keys indicating fields to update.
+valid keys are those that have a value of True for
+‘allow_put’ as listed in the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">RESOURCE_ATTRIBUTE_MAP</span></code> object in
+<code class="file docutils literal notranslate"><span class="pre">neutron/api/v2/attributes.py</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.update_port">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_port</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.update_port" title="Link to this definition">¶</a></dt>
+<dd><p>Update values of a port.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – neutron api request context</p></li>
+<li><p><strong>id</strong> – UUID representing the port to update.</p></li>
+<li><p><strong>port</strong> – dictionary with keys indicating fields to update.
+valid keys are those that have a value of True for
+‘allow_put’ as listed in the <code class="xref py py-obj docutils literal notranslate"><span class="pre">RESOURCE_ATTRIBUTE_MAP</span></code>
+object in <code class="file docutils literal notranslate"><span class="pre">neutron/api/v2/attributes.py</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.update_subnet">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_subnet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subnet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.update_subnet" title="Link to this definition">¶</a></dt>
+<dd><p>Update values of a subnet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – neutron api request context</p></li>
+<li><p><strong>id</strong> – UUID representing the subnet to update.</p></li>
+<li><p><strong>subnet</strong> – dictionary with keys indicating fields to update.
+valid keys are those that have a value of True for
+‘allow_put’ as listed in the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">RESOURCE_ATTRIBUTE_MAP</span></code> object in
+<code class="file docutils literal notranslate"><span class="pre">neutron/api/v2/attributes.py</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.update_subnetpool">
+<span class="sig-name descname"><span class="pre">update_subnetpool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subnetpool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.update_subnetpool" title="Link to this definition">¶</a></dt>
+<dd><p>Update a subnet pool.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – neutron api request context</p></li>
+<li><p><strong>subnetpool</strong> – Dictionary representing the subnetpool attributes
+to update.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="ovs_vhostuser.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Neutron Open vSwitch vhost-user Support"></i></a>
+          
+          
+            <a href="policy.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Policy Enforcement and Authorization"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2017-07-06 06:31:21</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Contributor Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#basic-information">Basic Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-policies">Neutron Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#gerrit-rechecks">Gerrit Rechecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-stadium">Neutron Stadium</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#neutron-internals">Neutron Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#ovn-driver">OVN Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#dashboards">Dashboards</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Neutron Plugin Architecture</a><ul>
+<li><a class="reference internal" href="#module-neutron.neutron_plugin_base_v2">Plugin API</a><ul>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2</span></code></a><ul>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.create_network"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.create_network()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.create_port"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.create_port()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.create_subnet"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.create_subnet()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.create_subnetpool"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.create_subnetpool()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.delete_network"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.delete_network()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.delete_port"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.delete_port()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.delete_subnet"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.delete_subnet()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.delete_subnetpool"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.delete_subnetpool()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_network"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.get_network()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_networks"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.get_networks()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_networks_count"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.get_networks_count()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_port"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.get_port()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_ports"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.get_ports()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_ports_count"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.get_ports_count()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_subnet"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.get_subnet()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_subnetpool"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.get_subnetpool()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_subnetpools"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.get_subnetpools()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_subnets"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.get_subnets()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.get_subnets_count"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.get_subnets_count()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.has_native_datastore"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.has_native_datastore()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.rpc_state_report_workers_supported"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.rpc_state_report_workers_supported()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.rpc_workers_supported"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.rpc_workers_supported()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.start_rpc_listeners"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.start_rpc_listeners()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.start_rpc_state_reports_listener"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.start_rpc_state_reports_listener()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.update_network"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.update_network()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.update_port"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.update_port()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.update_subnet"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.update_subnet()</span></code></a></li>
+<li><a class="reference internal" href="#neutron.neutron_plugin_base_v2.NeutronPluginBaseV2.update_subnetpool"><code class="docutils literal notranslate"><span class="pre">NeutronPluginBaseV2.update_subnetpool()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "contributor/internals/plugin-api" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Neutron Plugin Architecture in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2017-07-06 06:31:21";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "contributor/internals/plugin-api";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

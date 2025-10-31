@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Routed provider networks &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/support-matrix.css?v=ac26a930" />
+    <script src="../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Router flavors with the L3 OVN service plugin" href="config-router-flavor-ovn.html" />
+    <link rel="prev" title="Role-Based Access Control (RBAC)" href="config-rbac.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/admin/config-routed-networks.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Routed provider networks</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="config-rbac.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Role-Based Access Control (RBAC)"></i></a>
+    
+    
+    <a href="config-router-flavor-ovn.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Router flavors with the L3 OVN service plugin"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="routed-provider-networks">
+<span id="config-routed-provider-networks"></span><h1>Routed provider networks<a class="headerlink" href="#routed-provider-networks" title="Link to this heading">¶</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Use of this feature requires the OpenStack client
+version 3.3 or newer.</p>
+</div>
+<p>Before routed provider networks, the Networking service could not present a
+multi-segment layer-3 network as a single entity. Thus, each operator typically
+chose one of the following architectures:</p>
+<ul class="simple">
+<li><p>Single large layer-2 network</p></li>
+<li><p>Multiple smaller layer-2 networks</p></li>
+</ul>
+<p>Single large layer-2 networks become complex at scale and involve significant
+failure domains.</p>
+<p>Multiple smaller layer-2 networks scale better and shrink failure domains, but
+leave network selection to the user. Without additional information, users
+cannot easily differentiate these networks.</p>
+<p>A routed provider network enables a single provider network to represent
+multiple layer-2 networks (broadcast domains) or segments and enables the
+operator to present one network to users. However, the particular IP
+addresses available to an instance depend on the segment of the network
+available on the particular compute node. Neutron port could be associated
+with only one network segment, but there is an exception for OVN distributed
+services like OVN Metadata.</p>
+<p>Similar to conventional networking, layer-2 (switching) handles transit of
+traffic between ports on the same segment and layer-3 (routing) handles
+transit of traffic between segments.</p>
+<p>Each segment requires at least one subnet that explicitly belongs to that
+segment. The association between a segment and a subnet distinguishes a
+routed provider network from other types of networks. The Networking service
+enforces that either zero or all subnets on a particular network associate
+with a segment. For example, attempting to create a subnet without a segment
+on a network containing subnets with segments generates an error.</p>
+<p>The Networking service does not provide layer-3 services between segments.
+Instead, it relies on physical network infrastructure to route subnets.
+Thus, both the Networking service and physical network infrastructure must
+contain configuration for routed provider networks, similar to conventional
+provider networks. In the future, implementation of dynamic routing protocols
+may ease configuration of routed networks.</p>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">¶</a></h2>
+<p>Routed provider networks require additional prerequisites over conventional
+provider networks. We recommend using the following procedure:</p>
+<ol class="arabic">
+<li><p>Begin with segments. The Networking service defines a segment using the
+following components:</p>
+<ul class="simple">
+<li><p>Unique physical network name</p></li>
+<li><p>Segmentation type</p></li>
+<li><p>Segmentation ID</p></li>
+</ul>
+<p>For example, <code class="docutils literal notranslate"><span class="pre">provider1</span></code>, <code class="docutils literal notranslate"><span class="pre">VLAN</span></code>, and <code class="docutils literal notranslate"><span class="pre">2016</span></code>. See the
+<a class="reference external" href="https://docs.openstack.org/api-ref/network/v2/#segments">API reference</a>
+for more information.</p>
+<p>Within a network, use a unique physical network name for each segment which
+enables reuse of the same segmentation details between subnets. For
+example, using the same VLAN ID across all segments of a particular
+provider network. Similar to conventional provider networks, the operator
+must provision the layer-2 physical network infrastructure accordingly.</p>
+</li>
+<li><p>Implement routing between segments.</p>
+<p>The Networking service does not provision routing among segments. The
+operator must implement routing among segments of a provider network.
+Each subnet on a segment must contain the gateway address of the
+router interface on that particular subnet. For example:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Segment</p></th>
+<th class="head"><p>Version</p></th>
+<th class="head"><p>Addresses</p></th>
+<th class="head"><p>Gateway</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>segment1</p></td>
+<td><p>4</p></td>
+<td><p>203.0.113.0/24</p></td>
+<td><p>203.0.113.1</p></td>
+</tr>
+<tr class="row-odd"><td><p>segment1</p></td>
+<td><p>6</p></td>
+<td><p>fd00:203:0:113::/64</p></td>
+<td><p>fd00:203:0:113::1</p></td>
+</tr>
+<tr class="row-even"><td><p>segment2</p></td>
+<td><p>4</p></td>
+<td><p>198.51.100.0/24</p></td>
+<td><p>198.51.100.1</p></td>
+</tr>
+<tr class="row-odd"><td><p>segment2</p></td>
+<td><p>6</p></td>
+<td><p>fd00:198:51:100::/64</p></td>
+<td><p>fd00:198:51:100::1</p></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p>Map segments to compute nodes.</p>
+<p>Routed provider networks imply that compute nodes reside on different
+segments. The operator must ensure that every compute host that is supposed
+to participate in a router provider network has direct connectivity to one
+of its segments.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Host</p></th>
+<th class="head"><p>Rack</p></th>
+<th class="head"><p>Physical Network</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>compute0001</p></td>
+<td><p>rack 1</p></td>
+<td><p>segment 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>compute0002</p></td>
+<td><p>rack 1</p></td>
+<td><p>segment 1</p></td>
+</tr>
+<tr class="row-even"><td><p>…</p></td>
+<td><p>…</p></td>
+<td><p>…</p></td>
+</tr>
+<tr class="row-odd"><td><p>compute0101</p></td>
+<td><p>rack 2</p></td>
+<td><p>segment 2</p></td>
+</tr>
+<tr class="row-even"><td><p>compute0102</p></td>
+<td><p>rack 2</p></td>
+<td><p>segment 2</p></td>
+</tr>
+<tr class="row-odd"><td><p>compute0102</p></td>
+<td><p>rack 2</p></td>
+<td><p>segment 2</p></td>
+</tr>
+<tr class="row-even"><td><p>…</p></td>
+<td><p>…</p></td>
+<td><p>…</p></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p>Deploy DHCP agents.</p>
+<p>Unlike conventional provider networks, a DHCP agent cannot support more
+than one segment within a network. The operator must deploy at least one
+DHCP agent per segment. Consider deploying DHCP agents on compute nodes
+containing the segments rather than one or more network nodes to reduce
+node count.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Host</p></th>
+<th class="head"><p>Rack</p></th>
+<th class="head"><p>Physical Network</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>network0001</p></td>
+<td><p>rack 1</p></td>
+<td><p>segment 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>network0002</p></td>
+<td><p>rack 2</p></td>
+<td><p>segment 2</p></td>
+</tr>
+<tr class="row-even"><td><p>…</p></td>
+<td><p>…</p></td>
+<td><p>…</p></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p>Configure communication of the Networking service with the Compute
+scheduler.</p>
+<p>An instance with an interface with an IPv4 address in a routed provider
+network must be placed by the Compute scheduler in a host that has access to
+a segment with available IPv4 addresses. To make this possible, the
+Networking service communicates to the Compute scheduler the inventory of
+IPv4 addresses associated with each segment of a routed provider network.
+The operator must configure the authentication credentials that the
+Networking service will use to communicate with the Compute scheduler’s
+placement API. Please see below an example configuration.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Coordination between the Networking service and the Compute scheduler is
+not necessary for IPv6 subnets as a consequence of their large address
+spaces.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The coordination between the Networking service and the Compute scheduler
+requires the following minimum API micro-versions.</p>
+<ul class="simple">
+<li><p>Compute service API: 2.41</p></li>
+<li><p>Placement API: 1.1</p></li>
+</ul>
+</div>
+</li>
+</ol>
+</section>
+<section id="example-configuration">
+<h2>Example configuration<a class="headerlink" href="#example-configuration" title="Link to this heading">¶</a></h2>
+<section id="controller-node">
+<h3>Controller node<a class="headerlink" href="#controller-node" title="Link to this heading">¶</a></h3>
+<ol class="arabic">
+<li><p>Enable the segments service plug-in by appending <code class="docutils literal notranslate"><span class="pre">segments</span></code> to the list
+of <code class="docutils literal notranslate"><span class="pre">service_plugins</span></code> in the <code class="docutils literal notranslate"><span class="pre">neutron.conf</span></code> file on all nodes running the
+<code class="docutils literal notranslate"><span class="pre">neutron-server</span></code> service:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[DEFAULT]</span>
+<span class="c1"># ...</span>
+<span class="na">service_plugins</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">...,segments</span>
+</pre></div>
+</div>
+</li>
+<li><p>Add a <code class="docutils literal notranslate"><span class="pre">placement</span></code> section to the <code class="docutils literal notranslate"><span class="pre">neutron.conf</span></code> file with authentication
+credentials for the Compute service placement API:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[placement]</span>
+<span class="na">www_authenticate_uri</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">http://192.0.2.72/identity</span>
+<span class="na">project_domain_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Default</span>
+<span class="na">project_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">service</span>
+<span class="na">user_domain_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Default</span>
+<span class="na">password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">apassword</span>
+<span class="na">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">nova</span>
+<span class="na">auth_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">http://192.0.2.72/identity_admin</span>
+<span class="na">auth_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">password</span>
+<span class="na">region_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">RegionOne</span>
+</pre></div>
+</div>
+</li>
+<li><p>Restart the <code class="docutils literal notranslate"><span class="pre">neutron-server</span></code> service.</p></li>
+<li><p>(Optional) Configure the Nova scheduler to filter based upon routed network
+host aggregates. Without this option set, once ports are attached to
+instances and have IP addresses assigned, Nova may schedule instances to
+hosts which do not have access to the required segment. See the <a class="reference external" href="https://docs.openstack.org/nova/latest/configuration/config.html#scheduler.query_placement_for_routed_network_aggregates">Nova
+configuration reference</a>
+for more information.</p></li>
+</ol>
+</section>
+<section id="network-or-compute-nodes">
+<h3>Network or compute nodes<a class="headerlink" href="#network-or-compute-nodes" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Configure the layer-2 agent on each node to map one or more segments to
+the appropriate physical network bridge or interface and restart the
+agent.</p></li>
+</ul>
+</section>
+</section>
+<section id="create-a-routed-provider-network">
+<h2>Create a routed provider network<a class="headerlink" href="#create-a-routed-provider-network" title="Link to this heading">¶</a></h2>
+<p>The following steps create a routed provider network with two segments. Each
+segment contains one IPv4 subnet and one IPv6 subnet.</p>
+<ol class="arabic">
+<li><p>Source the administrative project credentials.</p></li>
+<li><p>Create a VLAN provider network which includes a default segment. In this
+example, the network uses the <code class="docutils literal notranslate"><span class="pre">provider1</span></code> physical network with VLAN ID
+2016.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>create<span class="w"> </span>--share<span class="w"> </span>--provider-physical-network<span class="w"> </span>provider1<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--provider-network-type<span class="w"> </span>vlan<span class="w"> </span>--provider-segment<span class="w"> </span><span class="m">2016</span><span class="w"> </span>multisegment1
+<span class="go">+---------------------------+--------------------------------------+</span>
+<span class="go">| Field                     | Value                                |</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+<span class="go">| admin_state_up            | UP                                   |</span>
+<span class="go">| id                        | 6ab19caa-dda9-4b3d-abc4-5b8f435b98d9 |</span>
+<span class="go">| ipv4_address_scope        | None                                 |</span>
+<span class="go">| ipv6_address_scope        | None                                 |</span>
+<span class="go">| l2_adjacency              | True                                 |</span>
+<span class="go">| mtu                       | 1500                                 |</span>
+<span class="go">| name                      | multisegment1                        |</span>
+<span class="go">| port_security_enabled     | True                                 |</span>
+<span class="go">| provider:network_type     | vlan                                 |</span>
+<span class="go">| provider:physical_network | provider1                            |</span>
+<span class="go">| provider:segmentation_id  | 2016                                 |</span>
+<span class="go">| revision_number           | 1                                    |</span>
+<span class="go">| router:external           | Internal                             |</span>
+<span class="go">| shared                    | True                                 |</span>
+<span class="go">| status                    | ACTIVE                               |</span>
+<span class="go">| subnets                   |                                      |</span>
+<span class="go">| tags                      | []                                   |</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>Rename the default segment to <code class="docutils literal notranslate"><span class="pre">segment1</span></code>.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>segment<span class="w"> </span>list<span class="w"> </span>--network<span class="w"> </span>multisegment1
+<span class="go">+--------------------------------------+----------+--------------------------------------+--------------+---------+</span>
+<span class="go">| ID                                   | Name     | Network                              | Network Type | Segment |</span>
+<span class="go">+--------------------------------------+----------+--------------------------------------+--------------+---------+</span>
+<span class="go">| 43e16869-ad31-48e4-87ce-acf756709e18 | None     | 6ab19caa-dda9-4b3d-abc4-5b8f435b98d9 | vlan         |    2016 |</span>
+<span class="go">+--------------------------------------+----------+--------------------------------------+--------------+---------+</span>
+</pre></div>
+</div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>segment<span class="w"> </span><span class="nb">set</span><span class="w"> </span>--name<span class="w"> </span>segment1<span class="w"> </span>43e16869-ad31-48e4-87ce-acf756709e18
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command provides no output.</p>
+</div>
+</li>
+<li><p>Create a second segment on the provider network. In this example, the
+segment uses the <code class="docutils literal notranslate"><span class="pre">provider2</span></code> physical network with VLAN ID 2017.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>segment<span class="w"> </span>create<span class="w"> </span>--physical-network<span class="w"> </span>provider2<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--network-type<span class="w"> </span>vlan<span class="w"> </span>--segment<span class="w"> </span><span class="m">2017</span><span class="w"> </span>--network<span class="w"> </span>multisegment1<span class="w"> </span>segment2
+<span class="go">+------------------+--------------------------------------+</span>
+<span class="go">| Field            | Value                                |</span>
+<span class="go">+------------------+--------------------------------------+</span>
+<span class="go">| description      | None                                 |</span>
+<span class="go">| headers          |                                      |</span>
+<span class="go">| id               | 053b7925-9a89-4489-9992-e164c8cc8763 |</span>
+<span class="go">| name             | segment2                             |</span>
+<span class="go">| network_id       | 6ab19caa-dda9-4b3d-abc4-5b8f435b98d9 |</span>
+<span class="go">| network_type     | vlan                                 |</span>
+<span class="go">| physical_network | provider2                            |</span>
+<span class="go">| revision_number  | 1                                    |</span>
+<span class="go">| segmentation_id  | 2017                                 |</span>
+<span class="go">| tags             | []                                   |</span>
+<span class="go">+------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>Verify that the network contains the <code class="docutils literal notranslate"><span class="pre">segment1</span></code> and <code class="docutils literal notranslate"><span class="pre">segment2</span></code> segments.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>segment<span class="w"> </span>list<span class="w"> </span>--network<span class="w"> </span>multisegment1
+<span class="go">+--------------------------------------+----------+--------------------------------------+--------------+---------+</span>
+<span class="go">| ID                                   | Name     | Network                              | Network Type | Segment |</span>
+<span class="go">+--------------------------------------+----------+--------------------------------------+--------------+---------+</span>
+<span class="go">| 053b7925-9a89-4489-9992-e164c8cc8763 | segment2 | 6ab19caa-dda9-4b3d-abc4-5b8f435b98d9 | vlan         |    2017 |</span>
+<span class="go">| 43e16869-ad31-48e4-87ce-acf756709e18 | segment1 | 6ab19caa-dda9-4b3d-abc4-5b8f435b98d9 | vlan         |    2016 |</span>
+<span class="go">+--------------------------------------+----------+--------------------------------------+--------------+---------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create subnets on the <code class="docutils literal notranslate"><span class="pre">segment1</span></code> segment. In this example, the IPv4
+subnet uses 203.0.113.0/24 and the IPv6 subnet uses fd00:203:0:113::/64.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--network<span class="w"> </span>multisegment1<span class="w"> </span>--network-segment<span class="w"> </span>segment1<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--ip-version<span class="w"> </span><span class="m">4</span><span class="w"> </span>--subnet-range<span class="w"> </span><span class="m">203</span>.0.113.0/24<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>multisegment1-segment1-v4
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| Field             | Value                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| allocation_pools  | 203.0.113.2-203.0.113.254            |</span>
+<span class="go">| cidr              | 203.0.113.0/24                       |</span>
+<span class="go">| enable_dhcp       | True                                 |</span>
+<span class="go">| gateway_ip        | 203.0.113.1                          |</span>
+<span class="go">| id                | c428797a-6f8e-4cb1-b394-c404318a2762 |</span>
+<span class="go">| ip_version        | 4                                    |</span>
+<span class="go">| name              | multisegment1-segment1-v4            |</span>
+<span class="go">| network_id        | 6ab19caa-dda9-4b3d-abc4-5b8f435b98d9 |</span>
+<span class="go">| revision_number   | 1                                    |</span>
+<span class="go">| segment_id        | 43e16869-ad31-48e4-87ce-acf756709e18 |</span>
+<span class="go">| tags              | []                                   |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+
+<span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--network<span class="w"> </span>multisegment1<span class="w"> </span>--network-segment<span class="w"> </span>segment1<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--ip-version<span class="w"> </span><span class="m">6</span><span class="w"> </span>--subnet-range<span class="w"> </span>fd00:203:0:113::/64<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--ipv6-address-mode<span class="w"> </span>slaac<span class="w"> </span>multisegment1-segment1-v6
+<span class="go">+-------------------+------------------------------------------------------+</span>
+<span class="go">| Field             | Value                                                |</span>
+<span class="go">+-------------------+------------------------------------------------------+</span>
+<span class="go">| allocation_pools  | fd00:203:0:113::2-fd00:203:0:113:ffff:ffff:ffff:ffff |</span>
+<span class="go">| cidr              | fd00:203:0:113::/64                                  |</span>
+<span class="go">| enable_dhcp       | True                                                 |</span>
+<span class="go">| gateway_ip        | fd00:203:0:113::1                                    |</span>
+<span class="go">| id                | e41cb069-9902-4c01-9e1c-268c8252256a                 |</span>
+<span class="go">| ip_version        | 6                                                    |</span>
+<span class="go">| ipv6_address_mode | slaac                                                |</span>
+<span class="go">| ipv6_ra_mode      | None                                                 |</span>
+<span class="go">| name              | multisegment1-segment1-v6                            |</span>
+<span class="go">| network_id        | 6ab19caa-dda9-4b3d-abc4-5b8f435b98d9                 |</span>
+<span class="go">| revision_number   | 1                                    |</span>
+<span class="go">| segment_id        | 43e16869-ad31-48e4-87ce-acf756709e18                 |</span>
+<span class="go">| tags              | []                                                   |</span>
+<span class="go">+-------------------+------------------------------------------------------+</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>By default, IPv6 subnets on provider networks rely on physical network
+infrastructure for stateless address autoconfiguration (SLAAC) and
+router advertisement.</p>
+</div>
+</li>
+<li><p>Create subnets on the <code class="docutils literal notranslate"><span class="pre">segment2</span></code> segment. In this example, the IPv4
+subnet uses 198.51.100.0/24 and the IPv6 subnet uses fd00:198:51:100::/64.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--network<span class="w"> </span>multisegment1<span class="w"> </span>--network-segment<span class="w"> </span>segment2<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--ip-version<span class="w"> </span><span class="m">4</span><span class="w"> </span>--subnet-range<span class="w"> </span><span class="m">198</span>.51.100.0/24<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>multisegment1-segment2-v4
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| Field             | Value                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| allocation_pools  | 198.51.100.2-198.51.100.254          |</span>
+<span class="go">| cidr              | 198.51.100.0/24                      |</span>
+<span class="go">| enable_dhcp       | True                                 |</span>
+<span class="go">| gateway_ip        | 198.51.100.1                         |</span>
+<span class="go">| id                | 242755c2-f5fd-4e7d-bd7a-342ca95e50b2 |</span>
+<span class="go">| ip_version        | 4                                    |</span>
+<span class="go">| name              | multisegment1-segment2-v4            |</span>
+<span class="go">| network_id        | 6ab19caa-dda9-4b3d-abc4-5b8f435b98d9 |</span>
+<span class="go">| revision_number   | 1                                    |</span>
+<span class="go">| segment_id        | 053b7925-9a89-4489-9992-e164c8cc8763 |</span>
+<span class="go">| tags              | []                                   |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+
+<span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--network<span class="w"> </span>multisegment1<span class="w"> </span>--network-segment<span class="w"> </span>segment2<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--ip-version<span class="w"> </span><span class="m">6</span><span class="w"> </span>--subnet-range<span class="w"> </span>fd00:198:51:100::/64<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--ipv6-address-mode<span class="w"> </span>slaac<span class="w"> </span>multisegment1-segment2-v6
+<span class="go">+-------------------+--------------------------------------------------------+</span>
+<span class="go">| Field             | Value                                                  |</span>
+<span class="go">+-------------------+--------------------------------------------------------+</span>
+<span class="go">| allocation_pools  | fd00:198:51:100::2-fd00:198:51:100:ffff:ffff:ffff:ffff |</span>
+<span class="go">| cidr              | fd00:198:51:100::/64                                   |</span>
+<span class="go">| enable_dhcp       | True                                                   |</span>
+<span class="go">| gateway_ip        | fd00:198:51:100::1                                     |</span>
+<span class="go">| id                | b884c40e-9cfe-4d1b-a085-0a15488e9441                   |</span>
+<span class="go">| ip_version        | 6                                                      |</span>
+<span class="go">| ipv6_address_mode | slaac                                                  |</span>
+<span class="go">| ipv6_ra_mode      | None                                                   |</span>
+<span class="go">| name              | multisegment1-segment2-v6                              |</span>
+<span class="go">| network_id        | 6ab19caa-dda9-4b3d-abc4-5b8f435b98d9                   |</span>
+<span class="go">| revision_number   | 1                                                      |</span>
+<span class="go">| segment_id        | 053b7925-9a89-4489-9992-e164c8cc8763                   |</span>
+<span class="go">| tags              | []                                                     |</span>
+<span class="go">+-------------------+--------------------------------------------------------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>Verify that each IPv4 subnet associates with at least one DHCP agent.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>agent<span class="w"> </span>list<span class="w"> </span>--agent-type<span class="w"> </span>dhcp<span class="w"> </span>--network<span class="w"> </span>multisegment1
+<span class="go">+--------------------------------------+------------+-------------+-------------------+-------+-------+--------------------+</span>
+<span class="go">| ID                                   | Agent Type | Host        | Availability Zone | Alive | State | Binary             |</span>
+<span class="go">+--------------------------------------+------------+-------------+-------------------+-------+-------+--------------------+</span>
+<span class="go">| c904ed10-922c-4c1a-84fd-d928abaf8f55 | DHCP agent | compute0001 | nova              | :-)   | UP    | neutron-dhcp-agent |</span>
+<span class="go">| e0b22cc0-d2a6-4f1c-b17c-27558e20b454 | DHCP agent | compute0101 | nova              | :-)   | UP    | neutron-dhcp-agent |</span>
+<span class="go">+--------------------------------------+------------+-------------+-------------------+-------+-------+--------------------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>Verify that inventories were created for each segment IPv4 subnet in the
+Compute service placement API (for the sake of brevity, only one of the
+segments is shown in this example).</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nv">SEGMENT_ID</span><span class="o">=</span>053b7925-9a89-4489-9992-e164c8cc8763
+<span class="gp">$ </span>openstack<span class="w"> </span>resource<span class="w"> </span>provider<span class="w"> </span>inventory<span class="w"> </span>list<span class="w"> </span><span class="nv">$SEGMENT_ID</span>
+<span class="go">+----------------+------------------+----------+----------+-----------+----------+-------+</span>
+<span class="go">| resource_class | allocation_ratio | max_unit | reserved | step_size | min_unit | total |</span>
+<span class="go">+----------------+------------------+----------+----------+-----------+----------+-------+</span>
+<span class="go">| IPV4_ADDRESS   |              1.0 |        1 |        2 |         1 |        1 |    30 |</span>
+<span class="go">+----------------+------------------+----------+----------+-----------+----------+-------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>Verify that host aggregates were created for each segment in the Compute
+service (for the sake of brevity, only one of the segments is shown in this
+example).</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>aggregate<span class="w"> </span>list
+<span class="go">+----+---------------------------------------------------------+-------------------+</span>
+<span class="go">| Id | Name                                                    | Availability Zone |</span>
+<span class="go">+----+---------------------------------------------------------+-------------------+</span>
+<span class="go">| 10 | Neutron segment id 053b7925-9a89-4489-9992-e164c8cc8763 | None              |</span>
+<span class="go">+----+---------------------------------------------------------+-------------------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>Launch one or more instances. Each instance obtains IP addresses according
+to the segment it uses on the particular compute node.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If a fixed IP is specified by the user in the port create request, that
+particular IP is allocated immediately to the port. However, creating a
+port and passing it to an instance yields a different behavior than
+conventional networks. If the fixed IP is not specified on the port
+create request, the Networking service defers assignment of IP
+addresses to the port until the particular compute node becomes
+apparent. For example:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>port<span class="w"> </span>create<span class="w"> </span>--network<span class="w"> </span>multisegment1<span class="w"> </span>port1
+<span class="go">+-----------------------+--------------------------------------+</span>
+<span class="go">| Field                 | Value                                |</span>
+<span class="go">+-----------------------+--------------------------------------+</span>
+<span class="go">| admin_state_up        | UP                                   |</span>
+<span class="go">| binding_vnic_type     | normal                               |</span>
+<span class="go">| id                    | 6181fb47-7a74-4add-9b6b-f9837c1c90c4 |</span>
+<span class="go">| ip_allocation         | deferred                             |</span>
+<span class="go">| mac_address           | fa:16:3e:34:de:9b                    |</span>
+<span class="go">| name                  | port1                                |</span>
+<span class="go">| network_id            | 6ab19caa-dda9-4b3d-abc4-5b8f435b98d9 |</span>
+<span class="go">| port_security_enabled | True                                 |</span>
+<span class="go">| revision_number       | 1                                    |</span>
+<span class="go">| security_groups       | e4fcef0d-e2c5-40c3-a385-9c33ac9289c5 |</span>
+<span class="go">| status                | DOWN                                 |</span>
+<span class="go">| tags                  | []                                   |</span>
+<span class="go">+-----------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+</div>
+</li>
+</ol>
+</section>
+<section id="migrating-non-routed-networks-to-routed">
+<h2>Migrating non-routed networks to routed<a class="headerlink" href="#migrating-non-routed-networks-to-routed" title="Link to this heading">¶</a></h2>
+<p>Migration of existing non-routed networks is only possible if there is only one
+segment and one subnet on the network. To migrate a candidate network, update
+the subnet and set <code class="docutils literal notranslate"><span class="pre">id</span></code> of the existing network segment as <code class="docutils literal notranslate"><span class="pre">segment_id</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the case where there are multiple subnets or segments it is not
+possible to safely migrate. The reason for this is that in non-routed
+networks addresses from the subnet’s allocation pools are assigned to
+ports without considering to which network segment the port is bound.</p>
+</div>
+<section id="example">
+<h3>Example<a class="headerlink" href="#example" title="Link to this heading">¶</a></h3>
+<p>The following steps migrate an existing non-routed network with one subnet and
+one segment to a routed one.</p>
+<ol class="arabic">
+<li><p>Source the administrative project credentials.</p></li>
+<li><p>Get the <code class="docutils literal notranslate"><span class="pre">id</span></code> of the current network segment on the network that is being
+migrated.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>segment<span class="w"> </span>list<span class="w"> </span>--network<span class="w"> </span>my_network
+<span class="go">+--------------------------------------+------+--------------------------------------+--------------+---------+</span>
+<span class="go">| ID                                   | Name | Network                              | Network Type | Segment |</span>
+<span class="go">+--------------------------------------+------+--------------------------------------+--------------+---------+</span>
+<span class="go">| 81e5453d-4c9f-43a5-8ddf-feaf3937e8c7 | None | 45e84575-2918-471c-95c0-018b961a2984 | flat         | None    |</span>
+<span class="go">+--------------------------------------+------+--------------------------------------+--------------+---------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>Get the <code class="docutils literal notranslate"><span class="pre">id</span></code> or <code class="docutils literal notranslate"><span class="pre">name</span></code> of the current subnet on the network.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>list<span class="w"> </span>--network<span class="w"> </span>my_network
+<span class="go">+--------------------------------------+-----------+--------------------------------------+---------------+</span>
+<span class="go">| ID                                   | Name      | Network                              | Subnet        |</span>
+<span class="go">+--------------------------------------+-----------+--------------------------------------+---------------+</span>
+<span class="go">| 71d931d2-0328-46ae-93bc-126caf794307 | my_subnet | 45e84575-2918-471c-95c0-018b961a2984 | 172.24.4.0/24 |</span>
+<span class="go">+--------------------------------------+-----------+--------------------------------------+---------------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>Verify the current <code class="docutils literal notranslate"><span class="pre">segment_id</span></code> of the subnet is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>show<span class="w"> </span>my_subnet<span class="w"> </span>--c<span class="w"> </span>segment_id
+<span class="go">+------------+-------+</span>
+<span class="go">| Field      | Value |</span>
+<span class="go">+------------+-------+</span>
+<span class="go">| segment_id | None  |</span>
+<span class="go">+------------+-------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>Update the <code class="docutils literal notranslate"><span class="pre">segment_id</span></code> of the subnet.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span><span class="nb">set</span><span class="w"> </span>--network-segment<span class="w"> </span>81e5453d-4c9f-43a5-8ddf-feaf3937e8c7<span class="w"> </span>my_subnet
+</pre></div>
+</div>
+</li>
+<li><p>Verify that the subnet is now associated with the desired network segment.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>show<span class="w"> </span>my_subnet<span class="w"> </span>--c<span class="w"> </span>segment_id
+<span class="go">+------------+--------------------------------------+</span>
+<span class="go">| Field      | Value                                |</span>
+<span class="go">+------------+--------------------------------------+</span>
+<span class="go">| segment_id | 81e5453d-4c9f-43a5-8ddf-feaf3937e8c7 |</span>
+<span class="go">+------------+--------------------------------------+</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+</section>
+<section id="routed-provider-networks-as-external-networks-for-tenant-routed-networks">
+<h2>Routed provider networks as external networks for tenant routed networks<a class="headerlink" href="#routed-provider-networks-as-external-networks-for-tenant-routed-networks" title="Link to this heading">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This section applies only to legacy routers, not DVR nor HA routers. A
+legacy router has a single instance that is hosted in one single host.</p>
+</div>
+<p>One of the consequences of this feature is the externalization of any routing
+operation. The communication (routing) between segments is done using the
+underlying network infrastructure, not managed by Neutron.</p>
+<p>Could be the case that the user needs to split the communication between
+several hosts. It is possible to create tenant networks and connect them using
+a router. To access to the routed provider network, it should be connected
+as router gateway.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Tenant<span class="w"> </span>net1<span class="w">  </span>┌─────────────────────┐
+─────────────┤<span class="w">                     </span>│
+<span class="w">             </span>│<span class="w">                     </span>│<span class="w"> </span>Routed<span class="w"> </span>provided<span class="w"> </span>network
+<span class="w">             </span>│<span class="w">             </span>GW<span class="w"> </span>port<span class="w"> </span>├────────────────────────
+Tenant<span class="w"> </span>net2<span class="w">  </span>│<span class="w">                     </span>│
+─────────────┤<span class="w">                     </span>│
+<span class="w">             </span>└─────────────────────┘
+</pre></div>
+</div>
+<p>The routed provider network, acting as router gateway, contains all subnets
+associated to the segments. In a deployment without routed provided networks,
+the gateway port has L2 connectivity to all subnet CIDRs. In this case, the
+gateway port has only connectivity to the attached segment subnets and its
+L2 broadcast domains.</p>
+<p>The L3 agent will create, inside the router namespace, a default route in the
+gateway port fixed IP CIDR. For each other subnet not belonging to the port’s
+fixed IP address, an onlink route is created. These routes use the gateway port
+as routing device and allow to route any packet with destination on these
+CIDRs through this port.</p>
+<p>The problem in the case of connecting the gatewat port to a routed provider
+network is that it will have broadcast connectivity only to those subnets
+that belong to the host segment:</p>
+<ul class="simple">
+<li><p>One of those subnets will provide the port IP address. The gateway IP address
+of this subnet will be the default route, through the gateway port.</p></li>
+<li><p>Any other subnet belonging to this segment will create a onlink route, using
+the gateway port as route device.</p></li>
+</ul>
+<p>For example, let’s consider the following configuration:</p>
+<ul class="simple">
+<li><p>Two tenant networks with CIDRs 10.1.0.0/24 and 10.2.0.0/24.</p></li>
+<li><p>A RPN with two segments; each segment with two subnets: segment 1 with
+10.51.0.0/24 and 10.52.0.0/24, segment 2 with 10.53.0.0/24 and 10.54.0.0/24.</p></li>
+<li><p>The router is connected to the first segment and the gateway port has an IP
+address in the range of 10.51.0.0/24. This is why the default route uses
+an IP address in this range.</p></li>
+</ul>
+<p>Without considering that the gateway network is a router provided network, this
+is the routing table set in the router namespace:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>ip<span class="w"> </span>netns<span class="w"> </span><span class="nb">exec</span><span class="w"> </span><span class="nv">$r</span><span class="w"> </span>ip<span class="w"> </span>r
+default<span class="w"> </span>via<span class="w"> </span><span class="m">10</span>.51.0.1<span class="w"> </span>dev<span class="w"> </span>qg-gwport<span class="w"> </span>proto<span class="w"> </span>static
+<span class="m">10</span>.1.0.0/24<span class="w"> </span>dev<span class="w"> </span>qr-tenant1<span class="w"> </span>proto<span class="w"> </span>kernel<span class="w"> </span>scope<span class="w"> </span>link<span class="w"> </span>src<span class="w"> </span><span class="m">10</span>.1.0.1
+<span class="m">10</span>.2.0.0/24<span class="w"> </span>dev<span class="w"> </span>qr-tenant2<span class="w"> </span>proto<span class="w"> </span>kernel<span class="w"> </span>scope<span class="w"> </span>link<span class="w"> </span>src<span class="w"> </span><span class="m">10</span>.2.0.1
+<span class="m">10</span>.51.0.0/24<span class="w"> </span>dev<span class="w"> </span>qg-gwport<span class="w"> </span>proto<span class="w"> </span>kernel<span class="w"> </span>scope<span class="w"> </span>link<span class="w"> </span>src<span class="w"> </span><span class="m">10</span>.100.0.15
+<span class="m">10</span>.52.0.0/24<span class="w"> </span>dev<span class="w"> </span>qg-gwport<span class="w"> </span>proto<span class="w"> </span>static<span class="w"> </span>scope<span class="w"> </span>link
+<span class="m">10</span>.53.0.0/24<span class="w"> </span>dev<span class="w"> </span>qg-gwport<span class="w"> </span>proto<span class="w"> </span>static<span class="w"> </span>scope<span class="w"> </span>link<span class="w">  </span>&lt;--<span class="w"> </span>should<span class="w"> </span>be<span class="w"> </span>removed,<span class="w"> </span>belongs<span class="w"> </span>to<span class="w"> </span>segment<span class="w"> </span><span class="m">2</span>
+<span class="m">10</span>.54.0.0/24<span class="w"> </span>dev<span class="w"> </span>qg-gwport<span class="w"> </span>proto<span class="w"> </span>static<span class="w"> </span>scope<span class="w"> </span>link<span class="w">  </span>&lt;--<span class="w"> </span>should<span class="w"> </span>be<span class="w"> </span>removed,<span class="w"> </span>belongs<span class="w"> </span>to<span class="w"> </span>segment<span class="w"> </span><span class="m">2</span>
+</pre></div>
+</div>
+<p>Those packets sent to 10.53.0.0/24 and 10.54.0.0/24 (the second RPN subnet
+CIDRs), don’t have L2 connectivity and the ARP packets won’t be replied. In the
+case of having a RPN as gateway network, all packets exiting the router through
+the gateway, must be sent to the gateway IP address, in this case 10.51.0.1.
+This is why the L3 plugin does not send the information of other segments
+subnets L3 agent when:</p>
+<ul class="simple">
+<li><p>The network is the router gateway.</p></li>
+<li><p>The “segments” plugin is enabled; this plugin is needed for routed provided
+networks.</p></li>
+<li><p>The network is connected to a segment.</p></li>
+</ul>
+</section>
+<section id="multiple-routed-provider-segments-per-host">
+<h2>Multiple routed provider segments per host<a class="headerlink" href="#multiple-routed-provider-segments-per-host" title="Link to this heading">¶</a></h2>
+<p>Starting with 2023.1 (Antelope), the support of routed provider networks has
+been enhanced to handle multiple segments per host. The main
+consequence will be for an operator to extend the IP pool without
+creating multiple networks and/or increasing broadcast domain.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The present support is only available for OVS agent at this point.</p>
+</div>
+<ol class="arabic">
+<li><p>On a given provider network, create a second segment. In this
+example, the second segment uses the <code class="docutils literal notranslate"><span class="pre">provider1</span></code> physical network
+with VLAN ID 2020.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>segment<span class="w"> </span>create<span class="w"> </span>--physical-network<span class="w"> </span>provider1<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--network-type<span class="w"> </span>vlan<span class="w"> </span>--segment<span class="w"> </span><span class="m">2020</span><span class="w"> </span>--network<span class="w"> </span>multisegment1<span class="w"> </span>segment1-2
+<span class="go">+------------------+--------------------------------------+</span>
+<span class="go">| Field            | Value                                |</span>
+<span class="go">+------------------+--------------------------------------+</span>
+<span class="go">| description      | None                                 |</span>
+<span class="go">| headers          |                                      |</span>
+<span class="go">| id               | 333b7925-9a89-4489-9992-e164c8cc8764 |</span>
+<span class="go">| name             | segment1-2                           |</span>
+<span class="go">| network_id       | 6ab19caa-dda9-4b3d-abc4-5b8f435b98d9 |</span>
+<span class="go">| network_type     | vlan                                 |</span>
+<span class="go">| physical_network | provider1                            |</span>
+<span class="go">| revision_number  | 1                                    |</span>
+<span class="go">| segmentation_id  | 2020                                 |</span>
+<span class="go">| tags             | []                                   |</span>
+<span class="go">+------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create subnets on the <code class="docutils literal notranslate"><span class="pre">segment1-2</span></code> segment. In this example, the IPv4
+subnet uses 203.0.114.0/24.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"> $ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--network<span class="w"> </span>multisegment1<span class="w"> </span>--network-segment<span class="w"> </span>segment1-2<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--ip-version<span class="w"> </span><span class="m">4</span><span class="w"> </span>--subnet-range<span class="w"> </span><span class="m">203</span>.0.114.0/24<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>multisegment1-segment1-2
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| Field             | Value                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| allocation_pools  | 203.0.114.2-203.0.114.254            |</span>
+<span class="go">| cidr              | 203.0.114.0/24                       |</span>
+<span class="go">| enable_dhcp       | True                                 |</span>
+<span class="go">| gateway_ip        | 203.0.114.1                          |</span>
+<span class="go">| id                | c428797a-6f8e-4cb1-b394-c404318a2762 |</span>
+<span class="go">| ip_version        | 4                                    |</span>
+<span class="go">| name              | multisegment1-segment1-2             |</span>
+<span class="go">| network_id        | 6ab19caa-dda9-4b3d-abc4-5b8f435b98d9 |</span>
+<span class="go">| revision_number   | 1                                    |</span>
+<span class="go">| segment_id        | 333b7925-9a89-4489-9992-e164c8cc8764 |</span>
+<span class="go">| tags              | []                                   |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>Considering that, for a subnet of the given provider network
+<code class="docutils literal notranslate"><span class="pre">provider1</span></code> running out of available IP, Neutron will automatically
+switch to the subnet <code class="docutils literal notranslate"><span class="pre">multisegment1-segment1-2</span></code>.</p>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="config-rbac.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Role-Based Access Control (RBAC)"></i></a>
+          
+          
+            <a href="config-router-flavor-ovn.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Router flavors with the L3 OVN service plugin"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2023-05-09 15:57:21</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation Guide</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">OpenStack Networking Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deploy.html">Deployment examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ops.html">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">Migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ovn/index.html">OVN Driver Administration Guide</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributor/index.html">Contributor Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Routed provider networks</a><ul>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#example-configuration">Example configuration</a><ul>
+<li><a class="reference internal" href="#controller-node">Controller node</a></li>
+<li><a class="reference internal" href="#network-or-compute-nodes">Network or compute nodes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#create-a-routed-provider-network">Create a routed provider network</a></li>
+<li><a class="reference internal" href="#migrating-non-routed-networks-to-routed">Migrating non-routed networks to routed</a><ul>
+<li><a class="reference internal" href="#example">Example</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#routed-provider-networks-as-external-networks-for-tenant-routed-networks">Routed provider networks as external networks for tenant routed networks</a></li>
+<li><a class="reference internal" href="#multiple-routed-provider-segments-per-host">Multiple routed provider segments per host</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "admin/config-routed-networks" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Routed provider networks in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2023-05-09 15:57:21";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "admin/config-routed-networks";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

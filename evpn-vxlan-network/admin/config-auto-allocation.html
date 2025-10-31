@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Automatic allocation of network topologies &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/support-matrix.css?v=ac26a930" />
+    <script src="../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Availability Zones" href="config-az.html" />
+    <link rel="prev" title="Address Scopes" href="config-address-scopes.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/admin/config-auto-allocation.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Automatic allocation of network topologies</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="config-address-scopes.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Address Scopes"></i></a>
+    
+    
+    <a href="config-az.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Availability Zones"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="automatic-allocation-of-network-topologies">
+<span id="config-auto-allocation"></span><h1>Automatic allocation of network topologies<a class="headerlink" href="#automatic-allocation-of-network-topologies" title="Link to this heading">¶</a></h1>
+<p>The auto-allocation feature introduced in Mitaka simplifies the procedure of
+setting up an external connectivity for end-users, and is also known as <strong>Get
+Me A Network</strong>.</p>
+<p>Previously, a user had to configure a range of networking resources to boot
+a server and get access to the Internet. For example, the following steps
+are required:</p>
+<ul class="simple">
+<li><p>Create a network</p></li>
+<li><p>Create a subnet</p></li>
+<li><p>Create a router</p></li>
+<li><p>Uplink the router on an external network</p></li>
+<li><p>Downlink the router on the previously created subnet</p></li>
+</ul>
+<p>These steps need to be performed on each logical segment that a VM needs to
+be connected to, and may require networking knowledge the user might not
+have.</p>
+<p>This feature is designed to automate the basic networking provisioning for
+projects. The steps to provision a basic network are run during instance
+boot, making the networking setup hands-free.</p>
+<p>To make this possible, provide a default external network and default
+subnetpools (one for IPv4, or one for IPv6, or one of each) so that the
+Networking service can choose what to do in lieu of input. Once these are in
+place, users can boot their VMs without specifying any networking details.
+The Compute service will then use this feature automatically to wire user
+VMs.</p>
+<section id="enabling-the-deployment-for-auto-allocation">
+<h2>Enabling the deployment for auto-allocation<a class="headerlink" href="#enabling-the-deployment-for-auto-allocation" title="Link to this heading">¶</a></h2>
+<p>To use this feature, the neutron service must have the following extensions
+enabled:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">auto-allocated-topology</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">subnet_allocation</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">external-net</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">router</span></code></p></li>
+</ul>
+<p>Before the end-user can use the auto-allocation feature, the operator must
+create the resources that will be used for the auto-allocated network
+topology creation. To perform this task, proceed with the following steps:</p>
+<ol class="arabic">
+<li><p>Set up a default external network</p>
+<p>Assuming the external network to be used for the auto-allocation feature
+is named <code class="docutils literal notranslate"><span class="pre">public</span></code>, make it the <code class="docutils literal notranslate"><span class="pre">default</span></code> external network
+with the following command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span><span class="nb">set</span><span class="w"> </span>public<span class="w"> </span>--default
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The flag <code class="docutils literal notranslate"><span class="pre">--default</span></code> (and <code class="docutils literal notranslate"><span class="pre">--no-default</span></code> flag) is only effective
+with external networks and has no effects on regular (or internal)
+networks.</p>
+</div>
+</li>
+<li><p>Create default subnetpools</p>
+<p>The auto-allocation feature requires at least one default
+subnetpool. One for IPv4, or one for IPv6, or one of each.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>pool<span class="w"> </span>create<span class="w"> </span>--share<span class="w"> </span>--default<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--pool-prefix<span class="w"> </span><span class="m">192</span>.0.2.0/24<span class="w"> </span>--default-prefix-length<span class="w"> </span><span class="m">26</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>shared-default
+
+<span class="go">  +-------------------+--------------------------------------+</span>
+<span class="go">  | Field             | Value                                |</span>
+<span class="go">  +-------------------+--------------------------------------+</span>
+<span class="go">  | address_scope_id  | None                                 |</span>
+<span class="go">  | created_at        | 2017-01-12T15:10:34Z                 |</span>
+<span class="go">  | default_prefixlen | 26                                   |</span>
+<span class="go">  | default_quota     | None                                 |</span>
+<span class="go">  | description       |                                      |</span>
+<span class="go">  | headers           |                                      |</span>
+<span class="go">  | id                | b41b7b9c-de57-4c19-b1c5-731985bceb7f |</span>
+<span class="go">  | ip_version        | 4                                    |</span>
+<span class="go">  | is_default        | True                                 |</span>
+<span class="go">  | max_prefixlen     | 32                                   |</span>
+<span class="go">  | min_prefixlen     | 8                                    |</span>
+<span class="go">  | name              | shared-default                       |</span>
+<span class="go">  | prefixes          | 192.0.2.0/24                         |</span>
+<span class="go">  | project_id        | 86acdbd1d72745fd8e8320edd7543400     |</span>
+<span class="go">  | revision_number   | 1                                    |</span>
+<span class="go">  | shared            | True                                 |</span>
+<span class="go">  | tags              | []                                   |</span>
+<span class="go">  | updated_at        | 2017-01-12T15:10:34Z                 |</span>
+<span class="go">  +-------------------+--------------------------------------+</span>
+
+<span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>pool<span class="w"> </span>create<span class="w"> </span>--share<span class="w"> </span>--default<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--pool-prefix<span class="w"> </span><span class="m">2001</span>:db8:8000::/48<span class="w"> </span>--default-prefix-length<span class="w"> </span><span class="m">64</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>default-v6
+
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| Field             | Value                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| address_scope_id  | None                                 |</span>
+<span class="go">| created_at        | 2017-01-12T15:14:35Z                 |</span>
+<span class="go">| default_prefixlen | 64                                   |</span>
+<span class="go">| default_quota     | None                                 |</span>
+<span class="go">| description       |                                      |</span>
+<span class="go">| headers           |                                      |</span>
+<span class="go">| id                | 6f387016-17f0-4564-96ad-e34775b6ea14 |</span>
+<span class="go">| ip_version        | 6                                    |</span>
+<span class="go">| is_default        | True                                 |</span>
+<span class="go">| max_prefixlen     | 128                                  |</span>
+<span class="go">| min_prefixlen     | 64                                   |</span>
+<span class="go">| name              | default-v6                           |</span>
+<span class="go">| prefixes          | 2001:db8:8000::/48                   |</span>
+<span class="go">| project_id        | 86acdbd1d72745fd8e8320edd7543400     |</span>
+<span class="go">| revision_number   | 1                                    |</span>
+<span class="go">| shared            | True                                 |</span>
+<span class="go">| tags              | []                                   |</span>
+<span class="go">| updated_at        | 2017-01-12T15:14:35Z                 |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="get-me-a-network">
+<h2>Get Me A Network<a class="headerlink" href="#get-me-a-network" title="Link to this heading">¶</a></h2>
+<p>In a deployment where the operator has set up the resources as described above,
+they can get or create their auto-allocated network topology as follows:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>auto<span class="w"> </span>allocated<span class="w"> </span>topology<span class="w"> </span>create<span class="w"> </span>--or-show
+<span class="go">+------------+--------------------------------------+</span>
+<span class="go">| Field      | Value                                |</span>
+<span class="go">+------------+--------------------------------------+</span>
+<span class="go">| id         | a380c780-d6cd-4510-a4c0-1a6ec9b85a29 |</span>
+<span class="go">| project_id | cfd1889ac7d64ad891d4f20aef9f8d7c     |</span>
+<span class="go">+------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When the <code class="docutils literal notranslate"><span class="pre">--or-show</span></code> option is used the command returns the topology
+information if it already exists, or creates it if it does not.</p>
+</div>
+<p>Operators (and users with admin role) can get or create the auto-allocated
+topology for a project by specifying the project ID:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>auto<span class="w"> </span>allocated<span class="w"> </span>topology<span class="w"> </span>create<span class="w"> </span>--project<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>cfd1889ac7d64ad891d4f20aef9f8d7c<span class="w"> </span>--or-show
+<span class="go">+------------+--------------------------------------+</span>
+<span class="go">| Field      | Value                                |</span>
+<span class="go">+------------+--------------------------------------+</span>
+<span class="go">| id         | a380c780-d6cd-4510-a4c0-1a6ec9b85a29 |</span>
+<span class="go">| project_id | cfd1889ac7d64ad891d4f20aef9f8d7c     |</span>
+<span class="go">+------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>The ID returned by this command is a network which can be used for booting
+a VM.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>server<span class="w"> </span>create<span class="w"> </span>--flavor<span class="w"> </span>m1.small<span class="w"> </span>--image<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>cirros-0.3.5-x86_64-uec<span class="w"> </span>--nic<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>net-id<span class="o">=</span>8b835bfb-cae2-4acc-b53f-c16bb5f9a7d0<span class="w"> </span>vm1
+</pre></div>
+</div>
+<p>The auto-allocated topology for a user never changes. In practice, when a user
+boots a server omitting the <code class="docutils literal notranslate"><span class="pre">--nic</span></code> option, and there is more than one
+network available, the Compute service will invoke the API behind
+<code class="docutils literal notranslate"><span class="pre">auto</span> <span class="pre">allocated</span> <span class="pre">topology</span> <span class="pre">create</span></code>, fetch the network UUID, and pass it on
+during the boot process.</p>
+<p>Alternately one can delete their auto-allocated network topology as follows:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>auto<span class="w"> </span>allocated<span class="w"> </span>topology<span class="w"> </span>delete
+</pre></div>
+</div>
+</section>
+<section id="validating-the-requirements-for-auto-allocation">
+<h2>Validating the requirements for auto-allocation<a class="headerlink" href="#validating-the-requirements-for-auto-allocation" title="Link to this heading">¶</a></h2>
+<p>To validate that the required resources are correctly set up for
+auto-allocation, without actually provisioning anything, use
+the <code class="docutils literal notranslate"><span class="pre">--check-resources</span></code> option:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>auto<span class="w"> </span>allocated<span class="w"> </span>topology<span class="w"> </span>create<span class="w"> </span>--check-resources
+<span class="go">Deployment error: No default router:external network.</span>
+
+<span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span><span class="nb">set</span><span class="w"> </span>public<span class="w"> </span>--default
+
+<span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>auto<span class="w"> </span>allocated<span class="w"> </span>topology<span class="w"> </span>create<span class="w"> </span>--check-resources
+<span class="go">Deployment error: No default subnetpools defined.</span>
+
+<span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>pool<span class="w"> </span><span class="nb">set</span><span class="w"> </span>shared-default<span class="w"> </span>--default
+
+<span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>auto<span class="w"> </span>allocated<span class="w"> </span>topology<span class="w"> </span>create<span class="w"> </span>--check-resources
+<span class="go">+---------+-------+</span>
+<span class="go">| Field   | Value |</span>
+<span class="go">+---------+-------+</span>
+<span class="go">| dry-run | pass  |</span>
+<span class="go">+---------+-------+</span>
+</pre></div>
+</div>
+<p>The validation option behaves identically for all users. However, it
+is considered primarily an admin or service utility since it is the
+operator who must set up the requirements.</p>
+</section>
+<section id="project-resources-created-by-auto-allocation">
+<h2>Project resources created by auto-allocation<a class="headerlink" href="#project-resources-created-by-auto-allocation" title="Link to this heading">¶</a></h2>
+<p>The auto-allocation feature creates one network topology in every project
+where it is used. The auto-allocated network topology for a project contains
+the following resources:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Resource</p></th>
+<th class="head"><p>Name</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>network</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">auto_allocated_network</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>subnet (IPv4)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">auto_allocated_subnet_v4</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>subnet (IPv6)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">auto_allocated_subnet_v6</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>router</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">auto_allocated_router</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="compatibility-notes">
+<h2>Compatibility notes<a class="headerlink" href="#compatibility-notes" title="Link to this heading">¶</a></h2>
+<p>Nova uses the <code class="docutils literal notranslate"><span class="pre">auto</span> <span class="pre">allocated</span> <span class="pre">topology</span></code> feature with API micro
+version 2.37 or later. This is because, unlike the neutron feature
+which was implemented in the Mitaka release, the integration for
+nova was completed during the Newton release cycle. Note that
+the CLI option <code class="docutils literal notranslate"><span class="pre">--nic</span></code> can be omitted regardless of the microversion
+used as long as there is no more than one network available to the
+project, in which case nova fails with a 400 error because it
+does not know which network to use. Furthermore, nova does not start
+using the feature, regardless of whether or not a user requests
+micro version 2.37 or later, unless all of the <code class="docutils literal notranslate"><span class="pre">nova-compute</span></code>
+services are running Newton-level code.</p>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="config-address-scopes.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Address Scopes"></i></a>
+          
+          
+            <a href="config-az.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Availability Zones"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2024-11-06 18:59:15</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation Guide</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">OpenStack Networking Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deploy.html">Deployment examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ops.html">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">Migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ovn/index.html">OVN Driver Administration Guide</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributor/index.html">Contributor Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Automatic allocation of network topologies</a><ul>
+<li><a class="reference internal" href="#enabling-the-deployment-for-auto-allocation">Enabling the deployment for auto-allocation</a></li>
+<li><a class="reference internal" href="#get-me-a-network">Get Me A Network</a></li>
+<li><a class="reference internal" href="#validating-the-requirements-for-auto-allocation">Validating the requirements for auto-allocation</a></li>
+<li><a class="reference internal" href="#project-resources-created-by-auto-allocation">Project resources created by auto-allocation</a></li>
+<li><a class="reference internal" href="#compatibility-notes">Compatibility notes</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "admin/config-auto-allocation" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Automatic allocation of network topologies in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2024-11-06 18:59:15";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "admin/config-auto-allocation";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

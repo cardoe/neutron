@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Open vSwitch L2 Agent &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="SR-IOV Networking L2 Agent" href="sriov_nic_agent.html" />
+    <link rel="prev" title="L2 Agent Networking" href="l2_agents.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/contributor/internals/openvswitch_agent.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Open vSwitch L2 Agent</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="l2_agents.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: L2 Agent Networking"></i></a>
+    
+    
+    <a href="sriov_nic_agent.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: SR-IOV Networking L2 Agent"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="open-vswitch-l2-agent">
+<h1>Open vSwitch L2 Agent<a class="headerlink" href="#open-vswitch-l2-agent" title="Link to this heading">¶</a></h1>
+<p>This Agent uses the <a class="reference external" href="http://openvswitch.org">Open vSwitch</a> virtual switch to create L2
+connectivity for instances, along with bridges created in conjunction
+with OpenStack Nova for filtering.</p>
+<p>ovs-neutron-agent can be configured to use different networking technologies
+to create project isolation.
+These technologies are implemented as ML2 type drivers which are used in
+conjunction with the Open vSwitch mechanism driver.</p>
+<section id="vlan-tags">
+<h2>VLAN Tags<a class="headerlink" href="#vlan-tags" title="Link to this heading">¶</a></h2>
+<img alt="../../_images/under-the-hood-scenario-1-ovs-compute.png" src="../../_images/under-the-hood-scenario-1-ovs-compute.png" />
+</section>
+<section id="gre-tunnels">
+<h2>GRE Tunnels<a class="headerlink" href="#gre-tunnels" title="Link to this heading">¶</a></h2>
+<p>GRE Tunneling is documented in depth in the <a class="reference external" href="http://openstack.redhat.com/networking/networking-in-too-much-detail/">Networking in too much detail</a>
+by RedHat.</p>
+</section>
+<section id="vxlan-tunnels">
+<h2>VXLAN Tunnels<a class="headerlink" href="#vxlan-tunnels" title="Link to this heading">¶</a></h2>
+<p>VXLAN is an overlay technology which encapsulates MAC frames
+at layer 2 into a UDP header.
+More information can be found in <a class="reference external" href="http://en.wikipedia.org/wiki/Virtual_Extensible_LAN">The VXLAN wiki page.</a></p>
+</section>
+<section id="geneve-tunnels">
+<h2>Geneve Tunnels<a class="headerlink" href="#geneve-tunnels" title="Link to this heading">¶</a></h2>
+<p>Geneve uses UDP as its transport protocol and is dynamic
+in size using extensible option headers.
+It is important to note that currently it is only supported in
+newer kernels. (kernel &gt;= 3.18, OVS version &gt;=2.4)
+More information can be found in the <a class="reference external" href="https://tools.ietf.org/html/draft-ietf-nvo3-geneve-00">Geneve RFC document.</a></p>
+</section>
+<section id="bridge-management">
+<h2>Bridge Management<a class="headerlink" href="#bridge-management" title="Link to this heading">¶</a></h2>
+<p>In order to make the agent capable of handling more than one tunneling
+technology, to decouple the requirements of segmentation technology
+from project isolation, and to preserve backward compatibility for OVS
+agents working without tunneling, the agent relies on a tunneling bridge,
+or br-tun, and the well known integration bridge, or br-int.</p>
+<p>All VM VIFs are plugged into the integration bridge. VM VIFs on a given
+virtual network share a common “local” VLAN (i.e. not propagated
+externally). The VLAN id of this local VLAN is mapped to the physical
+networking details realizing that virtual network.</p>
+<p>For virtual networks realized as VXLAN/GRE tunnels, a Logical Switch
+(LS) identifier is used to differentiate project traffic on inter-HV
+tunnels. A mesh of tunnels is created to other Hypervisors in the
+cloud. These tunnels originate and terminate on the tunneling bridge
+of each hypervisor, leaving br-int unaffected. Port patching is done
+to connect local VLANs on the integration bridge to inter-hypervisor
+tunnels on the tunnel bridge.</p>
+<p>For each virtual network realized as a VLAN or flat network, a veth
+or a pair of patch ports is used to connect the local VLAN on
+the integration bridge with the physical network bridge, with flow
+rules adding, modifying, or stripping VLAN tags as necessary, thus
+preserving backward compatibility with the way the OVS agent used
+to work prior to the tunneling capability (for more details, please
+look at <a class="reference external" href="https://review.opendev.org/#/c/4367">https://review.opendev.org/#/c/4367</a>).</p>
+<p>Bear in mind, that this design decision may be overhauled in the
+future to support existing VLAN-tagged traffic (coming from NFV VMs
+for instance) and/or to deal with potential QinQ support natively
+available in the Open vSwitch.</p>
+</section>
+<section id="ovs-filtering-tables">
+<h2>OVS Filtering Tables<a class="headerlink" href="#ovs-filtering-tables" title="Link to this heading">¶</a></h2>
+<p>ovs-neutron-agent and other L2 agent extensions use OVS filtering tables.</p>
+<p>For the list of tables and the short name for them used in Neutron see
+<a class="reference external" href="https://opendev.org/openstack/neutron-lib/src/branch/master/neutron_lib/constants.py">ovs-neutron-agent constants</a></p>
+<p>For a detailed discussion of Open vSwitch firewall driver and how the
+filtering tables are used for security-groups see <a class="reference internal" href="openvswitch_firewall.html"><span class="doc">Open vSwitch Firewall Driver</span></a>.</p>
+</section>
+<section id="tackling-the-network-trunking-use-case">
+<h2>Tackling the Network Trunking use case<a class="headerlink" href="#tackling-the-network-trunking-use-case" title="Link to this heading">¶</a></h2>
+<section id="rationale">
+<h3>Rationale<a class="headerlink" href="#rationale" title="Link to this heading">¶</a></h3>
+<p>At the time the first design for the OVS agent came up, trunking
+in OpenStack was merely a pipe dream. Since then, lots has happened
+in the OpenStack platform, and many deployments have gone into
+production since early 2012.</p>
+<p>In order to address the <a class="reference external" href="http://specs.openstack.org/openstack/neutron-specs/specs/newton/vlan-aware-vms.html">vlan-aware-vms</a>
+use case on top of Open vSwitch, the following aspects must be
+taken into account:</p>
+<ul class="simple">
+<li><p>Design complexity: starting afresh is always an option, but a
+complete rearchitecture is only desirable under some
+circumstances. After all, customers want solutions…yesterday.
+It is noteworthy that the OVS agent design is already relatively
+complex, as it accommodates a number of deployment options,
+especially in relation to security rules and/or acceleration.</p></li>
+<li><p>Upgrade complexity: being able to retrofit the existing
+design means that an existing deployment does not need to go
+through a forklift upgrade in order to expose new functionality;
+alternatively, the desire of avoiding a migration requires a
+more complex solution that is able to support multiple modes of
+operations;</p></li>
+<li><p>Design reusability: ideally, a proposed design can easily apply
+to the various technology backends that the Neutron L2 agent
+supports: Open vSwitch and Linux Bridge.</p></li>
+<li><p>Performance penalty: no solution is appealing enough if
+it is unable to satisfy the stringent requirement of high
+packet throughput, at least in the long term.</p></li>
+<li><p>Feature compatibility: VLAN <a class="reference external" href="http://specs.openstack.org/openstack/neutron-specs/specs/kilo/nfv-vlan-trunks.html">transparency</a>
+is for better or for worse intertwined with vlan awareness.
+The former is about making the platform not interfere with the
+tag associated to the packets sent by the VM, and let the
+underlay figure out where the packet needs to be sent out; the
+latter is about making the platform use the vlan tag associated
+to packet to determine where the packet needs to go. Ideally,
+a design choice to satisfy the awareness use case will not have
+a negative impact for solving the transparency use case. Having
+said that, the two features are still meant to be mutually
+exclusive in their application, and plugging subports into
+networks whose vlan-transparency flag is set to True might have
+unexpected results.  In fact, it would be impossible from the
+platform’s point of view discerning which tagged packets are meant
+to be treated ‘transparently’ and which ones are meant to be used
+for demultiplexing (in order to reach the right destination).
+The outcome might only be predictable if two layers of vlan tags
+are stacked up together, making guest support even more crucial
+for the combined use case.</p></li>
+</ul>
+<p>It is clear by now that an acceptable solution must be assessed
+with these issues in mind. The potential solutions worth enumerating
+are:</p>
+<ul class="simple">
+<li><p>VLAN interfaces: in layman’s terms, these interfaces allow to
+demux the traffic before it hits the integration bridge where
+the traffic will get isolated and sent off to the right
+destination. This solution is <a class="reference external" href="https://etherpad.openstack.org/p/vlan&#64;tap_experiment">proven</a>
+to work for both iptables-based and native ovs security rules
+(credit to Rawlin Peters). This solution has the following design
+implications:</p>
+<ul>
+<li><p>Design complexity: this requires relative small changes
+to the existing OVS design, and it can work with both
+iptables and native ovs security rules.</p></li>
+<li><p>Upgrade complexity: in order to employ this solution
+no major upgrade is necessary and thus no potential dataplane
+disruption is involved.</p></li>
+<li><p>Design reusability: VLAN interfaces can easily be employed
+for both Open vSwitch and Linux Bridge.</p></li>
+<li><p>Performance penalty: using VLAN interfaces means that the
+kernel must be involved. For Open vSwitch, being able to use
+a fast path like DPDK would be an unresolved issue (<a class="reference external" href="http://dpdk.org/doc/guides/prog_guide/kernel_nic_interface.html">Kernel NIC interfaces</a>
+are not on the roadmap for distros and OVS, and most likely
+will never be). Even in the absence of an extra bridge, i.e. when
+using native ovs firewall, and with the advent of userspace
+connection tracking that would allow the <a class="reference external" href="https://bugs.launchpad.net/neutron/+bug/1461000">stateful firewall driver</a>
+to work with DPDK, the performance gap between a pure
+userspace DPDK capable solution and a kernel based solution
+will be substantial, at least under certain traffic conditions.</p></li>
+<li><p>Feature compatibility: in order to keep the design simple once
+VLAN interfaces are adopted, and yet enable VLAN transparency,
+Open vSwitch needs to support QinQ, which is currently lacking
+as of 2.5 and with no ongoing plan for integration.</p></li>
+</ul>
+</li>
+<li><p>Going full openflow: in layman’s terms, this means programming the
+dataplane using OpenFlow in order to provide tenant isolation, and
+packet processing. This solution has the following design implications:</p>
+<ul>
+<li><p>Design complexity: this requires a big rearchitecture of the
+current Neutron L2 agent solution.</p></li>
+<li><p>Upgrade complexity: existing deployments will be unable to
+work correctly unless one of the actions take place: a) the
+agent can handle both the ‘old’ and ‘new’ way of wiring the
+data path; b) a dataplane migration is forced during a release
+upgrade and thus it may cause (potentially unrecoverable) dataplane
+disruption.</p></li>
+<li><p>Design reusability: a solution for Linux Bridge will still
+be required to avoid widening the gap between Open vSwitch
+(e.g. OVS has DVR but LB does not).</p></li>
+<li><p>Performance penalty: using Open Flow will allow to leverage
+the user space and fast processing given by DPDK, but at
+a considerable engineering cost nonetheless. Security rules
+will have to be provided by a <a class="reference external" href="https://github.com/openstack/networking-ovs-dpdk">learn based firewall</a>
+to fully exploit the capabilities of DPDK, at least until
+<a class="reference external" href="https://patchwork.ozlabs.org/patch/611282/">user space</a>
+connection tracking becomes available in OVS.</p></li>
+<li><p>Feature compatibility: with the adoption of Open Flow, tenant
+isolation will no longer be provided by means of local vlan
+provisioning, thus making the requirement of QinQ support
+no longer strictly necessary for Open vSwitch.</p></li>
+</ul>
+</li>
+<li><p>Per trunk port OVS bridge: in layman’s terms, this is similar to
+the first option, in that an extra layer of mux/demux is introduced
+between the VM and the integration bridge (br-int) but instead of
+using vlan interfaces, a combination of a new per port OVS bridge
+and patch ports to wire this new bridge with br-int will be used.
+This solution has the following design implications:</p>
+<ul>
+<li><p>Design complexity: the complexity of this solution can be
+considered in between the above mentioned options in that
+some work is already available since <a class="reference external" href="https://blueprints.launchpad.net/nova/+spec/neutron-ovs-bridge-name">Mitaka</a>
+and the data path wiring logic can be partially reused.</p></li>
+<li><p>Upgrade complexity: if two separate code paths are assumed
+to be maintained in the OVS agent to handle regular ports
+and ports participating a trunk with no ability to convert
+from one to the other (and vice versa), no migration is
+required. This is done at a cost of some loss of flexibility
+and maintenance complexity.</p></li>
+<li><p>Design reusability: a solution to support vlan trunking for
+the Linux Bridge mech driver will still be required to avoid
+widening the gap with Open vSwitch (e.g. OVS has DVR but
+LB does not).</p></li>
+<li><p>Performance penalty: from a performance standpoint, the adoption
+of a trunk bridge relieves the agent from employing kernel
+interfaces, thus unlocking the full potential of fast packet
+processing. That said, this is only doable in combination with
+a native ovs firewall. At the time of writing the only DPDK
+enabled firewall driver is the learn based one available in
+the <a class="reference external" href="https://github.com/openstack/networking-ovs-dpdk">networking-ovs-dpdk repo</a>;</p></li>
+<li><p>Feature compatibility: the existing local provisioning logic
+will not be affected by the introduction of a trunk bridge,
+therefore use cases where VMs are connected to a vlan transparent
+network via a regular port will still require QinQ support
+from OVS.</p></li>
+</ul>
+</li>
+</ul>
+<p>To summarize:</p>
+<ul class="simple">
+<li><p>VLAN interfaces (A) are compelling because will lead to a relatively
+contained engineering cost at the expense of performance. The Open
+vSwitch community will need to be involved in order to deliver vlan
+transparency. Irrespective of whether this strategy is chosen for
+Open vSwitch or not, this is still the only viable approach for Linux
+Bridge and thus pursued to address Linux Bridge support for VLAN
+trunking. To some extent, this option can also be considered a fallback
+strategy for OVS deployments that are unable to adopt DPDK.</p></li>
+<li><p>Open Flow (B) is compelling because it will allow Neutron to unlock
+the full potential of Open vSwitch, at the expense of development
+and operations effort. The development is confined within the
+boundaries of the Neutron community in order to address vlan awareness
+and transparency (as two distinct use cases, ie. to be adopted
+separately).
+Stateful firewall (based on ovs conntrack) limits the adoption for
+DPDK at the time of writing, but a learn-based firewall can be a
+suitable alternative. Obviously this solution is not compliant with
+iptables firewall.</p></li>
+<li><p>Trunk Bridges (C) tries to bring the best of option A and B together
+as far as OVS development and performance are concerned, but it
+comes at the expense of maintenance complexity and loss of flexibility.
+A Linux Bridge solution would still be required and, QinQ support will
+still be needed to address vlan transparency.</p></li>
+</ul>
+<p>All things considered, as far as OVS is concerned, option (C) is the most
+promising in the medium term. Management of trunks and ports within trunks
+will have to be managed differently and, to start with, it is sensible to
+restrict the ability to update ports (i.e. convert) once they are bound to
+a particular bridge (integration vs trunk). Security rules via iptables
+rules is obviously not supported, and never will be.</p>
+<p>Option (A) for OVS could be pursued in conjunction with Linux Bridge support,
+if the effort is seen particularly low hanging fruit.
+However, a working solution based on this option positions the OVS agent as
+a sub-optminal platform for performance sensitive applications in comparison
+to other accelerated or SDN-controller based solutions. Since further data
+plane performance improvement is hindered by the extra use of kernel resources,
+this option is not at all appealing in the long term.</p>
+<p>Embracing option (B) in the long run may be complicated by the adoption of
+option (C). The development and maintenance complexity involved in Option
+(C) and (B) respectively poses the existential question as to whether
+investing in the agent-based architecture is an effective strategy,
+especially if the end result would look a lot like other maturing
+alternatives.</p>
+</section>
+<section id="implementation-vlan-interfaces-option-a">
+<h3>Implementation VLAN Interfaces (Option A)<a class="headerlink" href="#implementation-vlan-interfaces-option-a" title="Link to this heading">¶</a></h3>
+<p>This implementation doesn’t require any modification of the vif-drivers since
+Nova will plug the vif of the VM the same way as it does for traditional ports.</p>
+<section id="trunk-port-creation">
+<h4>Trunk port creation<a class="headerlink" href="#trunk-port-creation" title="Link to this heading">¶</a></h4>
+<p>A VM is spawned passing to Nova the port-id of a parent port associated with
+a trunk. Nova/libvirt will create the tap interface and will plug it into
+br-int or into the firewall bridge if using iptables firewall. In the
+external-ids of the port Nova will store the port ID of the parent port.
+The OVS agent detects that a new vif has been plugged. It gets
+the details of the new port and wires it.
+The agent configures it in the same way as a traditional port: packets coming
+out from the VM will be tagged using the internal VLAN ID associated to the
+network, packets going to the VM will be stripped of the VLAN ID.
+After wiring it successfully the OVS agent will send a message notifying
+Neutron server that the parent port is up. Neutron will send back to Nova an
+event to signal that the wiring was successful.
+If the parent port is associated with one or more subports the agent will
+process them as described in the next paragraph.</p>
+</section>
+<section id="subport-creation">
+<h4>Subport creation<a class="headerlink" href="#subport-creation" title="Link to this heading">¶</a></h4>
+<p>If a subport is added to a parent port but no VM was booted using that parent
+port yet, no L2 agent will process it (because at that point the parent port is
+not bound to any host).
+When a subport is created for a parent port and a VM that uses that parent port
+is already running, the OVS agent will create a VLAN interface on the VM tap
+using the VLAN ID specified in the subport segmentation id. There’s a small
+possibility that a race might occur: the firewall bridge might be created and
+plugged while the vif is not there yet. The OVS agent needs to check if the
+vif exists before trying to create a subinterface.
+Let’s see how the models differ when using the iptables firewall or the OVS
+native firewall.</p>
+<section id="iptables-firewall">
+<h5>Iptables Firewall<a class="headerlink" href="#iptables-firewall" title="Link to this heading">¶</a></h5>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+----------------------------+</span>
+<span class="o">|</span>             <span class="n">VM</span>             <span class="o">|</span>
+<span class="o">|</span>   <span class="n">eth0</span>            <span class="n">eth0</span><span class="mf">.100</span> <span class="o">|</span>
+<span class="o">+-----+-----------------+----+</span>
+      <span class="o">|</span>
+      <span class="o">|</span>
+  <span class="o">+---+---+</span>       <span class="o">+-----+-----+</span>
+  <span class="o">|</span> <span class="n">tap1</span>  <span class="o">|-------|</span>  <span class="n">tap1</span><span class="mf">.100</span> <span class="o">|</span>
+  <span class="o">+---+---+</span>       <span class="o">+-----+-----+</span>
+      <span class="o">|</span>                 <span class="o">|</span>
+      <span class="o">|</span>                 <span class="o">|</span>
+  <span class="o">+---+---+</span>         <span class="o">+---+---+</span>
+  <span class="o">|</span> <span class="n">qbr1</span>  <span class="o">|</span>         <span class="o">|</span> <span class="n">qbr2</span>  <span class="o">|</span>
+  <span class="o">+---+---+</span>         <span class="o">+---+---+</span>
+      <span class="o">|</span>                 <span class="o">|</span>
+      <span class="o">|</span>                 <span class="o">|</span>
+<span class="o">+-----+-----------------+----+</span>
+<span class="o">|</span>    <span class="n">port</span> <span class="mi">1</span>          <span class="n">port</span> <span class="mi">2</span>  <span class="o">|</span>
+<span class="o">|</span>   <span class="p">(</span><span class="n">tag</span> <span class="mi">3</span><span class="p">)</span>         <span class="p">(</span><span class="n">tag</span> <span class="mi">5</span><span class="p">)</span>  <span class="o">|</span>
+<span class="o">|</span>           <span class="n">br</span><span class="o">-</span><span class="nb">int</span>           <span class="o">|</span>
+<span class="o">+----------------------------+</span>
+</pre></div>
+</div>
+<p>Let’s assume the subport is on network2 and uses segmentation ID 100.
+In the case of hybrid plugging the OVS agent will have to create the firewall
+bridge (qbr2), create tap1.100 and plug it into qbr2. It will connect qbr2 to
+br-int and set the subport ID in the external-ids of port 2.</p>
+<p><em>Inbound traffic from the VM point of view</em></p>
+<p>The untagged traffic will flow from port 1 to eth0 through qbr1.
+For the traffic coming out of port 2, the internal VLAN ID of network2 will be
+stripped. The packet will then go untagged through qbr2 where
+iptables rules will filter the traffic. The tag 100 will be pushed by tap1.100
+and the packet will finally get to eth0.100.</p>
+<p><em>Outbound traffic from the VM point of view</em></p>
+<p>The untagged traffic will flow from eth0 to port1 going through qbr1 where
+firewall rules will be applied. Traffic tagged with VLAN 100 will leave
+eth0.100, go through tap1.100 where the VLAN 100 is stripped. It will reach
+qbr2 where iptables rules will be applied and go to port 2. The internal VLAN
+of network2 will be pushed by br-int when the packet enters port2 because it’s
+a tagged port.</p>
+</section>
+<section id="ovs-firewall-case">
+<h5>OVS Firewall case<a class="headerlink" href="#ovs-firewall-case" title="Link to this heading">¶</a></h5>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+----------------------------+</span>
+<span class="o">|</span>             <span class="n">VM</span>             <span class="o">|</span>
+<span class="o">|</span>   <span class="n">eth0</span>            <span class="n">eth0</span><span class="mf">.100</span> <span class="o">|</span>
+<span class="o">+-----+-----------------+----+</span>
+      <span class="o">|</span>
+      <span class="o">|</span>
+  <span class="o">+---+---+</span>       <span class="o">+-----+-----+</span>
+  <span class="o">|</span> <span class="n">tap1</span>  <span class="o">|-------|</span>  <span class="n">tap1</span><span class="mf">.100</span> <span class="o">|</span>
+  <span class="o">+---+---+</span>       <span class="o">+-----+-----+</span>
+      <span class="o">|</span>                 <span class="o">|</span>
+      <span class="o">|</span>                 <span class="o">|</span>
+      <span class="o">|</span>                 <span class="o">|</span>
+<span class="o">+-----+-----------------+----+</span>
+<span class="o">|</span>    <span class="n">port</span> <span class="mi">1</span>          <span class="n">port</span> <span class="mi">2</span>  <span class="o">|</span>
+<span class="o">|</span>   <span class="p">(</span><span class="n">tag</span> <span class="mi">3</span><span class="p">)</span>         <span class="p">(</span><span class="n">tag</span> <span class="mi">5</span><span class="p">)</span>  <span class="o">|</span>
+<span class="o">|</span>           <span class="n">br</span><span class="o">-</span><span class="nb">int</span>           <span class="o">|</span>
+<span class="o">+----------------------------+</span>
+</pre></div>
+</div>
+<p>When a subport is created the OVS agent will create the VLAN interface tap1.100
+and plug it into br-int. Let’s assume the subport is on network2.</p>
+<p><em>Inbound traffic from the VM point of view</em></p>
+<p>The traffic will flow untagged from port 1 to eth0. The traffic going out from
+port 2 will be stripped of the VLAN ID assigned to network2. It will be
+filtered by the rules installed by the firewall and reach tap1.100.
+tap1.100 will tag the traffic using VLAN 100. It will then reach the VM’s
+eth0.100.</p>
+<p><em>Outbound traffic from the VM point of view</em></p>
+<p>The untagged traffic will flow and reach port 1 where it will be tagged using
+the VLAN ID associated to the network. Traffic tagged with VLAN 100 will leave
+eth0.100 and reach tap1.100 where VLAN 100 will be stripped. It will then reach
+port2. It will be filtered by the rules installed by the firewall on port 2.
+Then the packets will be tagged using the internal VLAN associated to network2
+by br-int since port 2 is a tagged port.</p>
+</section>
+</section>
+<section id="parent-port-deletion">
+<h4>Parent port deletion<a class="headerlink" href="#parent-port-deletion" title="Link to this heading">¶</a></h4>
+<p>Deleting a port that is an active parent in a trunk is forbidden. If the parent
+port has no trunk associated (it’s a “normal” port), it can be deleted.
+The OVS agent doesn’t need to perform any action, the deletion will result in
+a removal of the port data from the DB.</p>
+</section>
+<section id="trunk-deletion">
+<h4>Trunk deletion<a class="headerlink" href="#trunk-deletion" title="Link to this heading">¶</a></h4>
+<p>When Nova deletes a VM, it deletes the VM’s corresponding Neutron ports only if
+they were created by Nova when booting the VM. In the vlan-aware-vm case the
+parent port is passed to Nova, so the port data will remain in the DB after the
+VM deletion. Nova will delete the VIF of the VM (in the example tap1) as part
+of the VM termination. The OVS agent will detect that deletion and notify the
+Neutron server that the parent port is down. The OVS agent will clean up the
+corresponding subports as explained in the next paragraph.</p>
+<p>The deletion of a trunk that is used by a VM is not allowed.
+The trunk can be deleted (leaving the parent port intact) when the parent port
+is not used by any VM. After the trunk is deleted, the parent port can also be
+deleted.</p>
+</section>
+<section id="subport-deletion">
+<h4>Subport deletion<a class="headerlink" href="#subport-deletion" title="Link to this heading">¶</a></h4>
+<p>Removing a subport that is associated with a parent port that was not used to
+boot any VM is a no op from the OVS agent perspective.
+When a subport associated with a parent port that was used to boot a VM is
+deleted, the OVS agent will take care of removing the firewall bridge if using
+the iptables firewall, and the port on br-int.</p>
+</section>
+</section>
+<section id="implementation-trunk-bridge-option-c">
+<h3>Implementation Trunk Bridge (Option C)<a class="headerlink" href="#implementation-trunk-bridge-option-c" title="Link to this heading">¶</a></h3>
+<p>This implementation is based on this <a class="reference external" href="https://etherpad.openstack.org/p/trunk-bridge-tagged-patch-experiment">etherpad</a>.
+Credits to Bence Romsics.
+The IDs used for bridge and port names are truncated.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+--------------------------------+</span>
+<span class="o">|</span>             <span class="n">VM</span>                 <span class="o">|</span>
+<span class="o">|</span>   <span class="n">eth0</span>               <span class="n">eth0</span><span class="mf">.100</span>  <span class="o">|</span>
+<span class="o">+-----+--------------------+-----+</span>
+      <span class="o">|</span>
+      <span class="o">|</span>
+<span class="o">+-----+--------------------------+</span>
+<span class="o">|</span>    <span class="n">tap1</span>                        <span class="o">|</span>
+<span class="o">|</span>          <span class="n">tbr</span><span class="o">-</span><span class="n">trunk</span><span class="o">-</span><span class="nb">id</span>          <span class="o">|</span>
+<span class="o">|</span>                                <span class="o">|</span>
+<span class="o">|</span> <span class="n">tpt</span><span class="o">-</span><span class="n">parent</span><span class="o">-</span><span class="nb">id</span>   <span class="n">spt</span><span class="o">-</span><span class="n">subport</span><span class="o">-</span><span class="nb">id</span> <span class="o">|</span>
+<span class="o">|</span>  <span class="p">(</span><span class="n">tag</span> <span class="mi">0</span><span class="p">)</span>          <span class="p">(</span><span class="n">tag</span> <span class="mi">100</span><span class="p">)</span>    <span class="o">|</span>
+<span class="o">+-----+-----------------+--------+</span>
+      <span class="o">|</span>                 <span class="o">|</span>
+      <span class="o">|</span>                 <span class="o">|</span>
+      <span class="o">|</span>                 <span class="o">|</span>
+<span class="o">+-----+-----------------+---------+</span>
+<span class="o">|</span> <span class="n">tpi</span><span class="o">-</span><span class="n">parent</span><span class="o">-</span><span class="nb">id</span>    <span class="n">spi</span><span class="o">-</span><span class="n">subport</span><span class="o">-</span><span class="nb">id</span> <span class="o">|</span>
+<span class="o">|</span>  <span class="p">(</span><span class="n">tag</span> <span class="mi">3</span><span class="p">)</span>           <span class="p">(</span><span class="n">tag</span> <span class="mi">5</span><span class="p">)</span>      <span class="o">|</span>
+<span class="o">|</span>                                 <span class="o">|</span>
+<span class="o">|</span>           <span class="n">br</span><span class="o">-</span><span class="nb">int</span>                <span class="o">|</span>
+<span class="o">+---------------------------------+</span>
+</pre></div>
+</div>
+<p>tpt-parent-id: trunk bridge side of the patch port that implements a trunk.
+tpi-parent-id: int bridge side of the patch port that implements a trunk.
+spt-subport-id: trunk bridge side of the patch port that implements a subport.
+spi-subport-id: int bridge side of the patch port that implements a subport.</p>
+<section id="trunk-creation">
+<h4>Trunk creation<a class="headerlink" href="#trunk-creation" title="Link to this heading">¶</a></h4>
+<p>A VM is spawned passing to Nova the port-id of a parent port associated
+with a trunk. Neutron will pass to Nova the bridge where to plug the
+vif as part of the vif details.  The os-vif driver creates the trunk
+bridge tbr-trunk-id if it does not exist in plug().  It will create the
+tap interface tap1 and plug it into tbr-trunk-id setting the parent port
+ID in the external-ids.  The trunk driver will wire the parent port via
+a patch port to connect the trunk bridge to the integration bridge:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ovs</span><span class="o">-</span><span class="n">vsctl</span> <span class="n">add</span><span class="o">-</span><span class="n">port</span> <span class="n">tbr</span><span class="o">-</span><span class="n">trunk</span><span class="o">-</span><span class="nb">id</span> <span class="n">tpt</span><span class="o">-</span><span class="n">parent</span><span class="o">-</span><span class="nb">id</span> <span class="o">--</span> <span class="nb">set</span> <span class="n">Interface</span> <span class="n">tpt</span><span class="o">-</span><span class="n">parent</span><span class="o">-</span><span class="nb">id</span> <span class="nb">type</span><span class="o">=</span><span class="n">patch</span> <span class="n">options</span><span class="p">:</span><span class="n">peer</span><span class="o">=</span><span class="n">tpi</span><span class="o">-</span><span class="n">parent</span><span class="o">-</span><span class="nb">id</span> <span class="o">--</span> <span class="nb">set</span> <span class="n">Port</span> <span class="n">tpt</span><span class="o">-</span><span class="n">parent</span><span class="o">-</span><span class="nb">id</span> <span class="n">vlan_mode</span><span class="o">=</span><span class="n">access</span> <span class="n">tag</span><span class="o">=</span><span class="mi">0</span>
+<span class="n">ovs</span><span class="o">-</span><span class="n">vsctl</span> <span class="n">add</span><span class="o">-</span><span class="n">port</span> <span class="n">br</span><span class="o">-</span><span class="nb">int</span> <span class="n">tpi</span><span class="o">-</span><span class="n">parent</span><span class="o">-</span><span class="nb">id</span> <span class="o">--</span> <span class="nb">set</span> <span class="n">Interface</span> <span class="n">tpi</span><span class="o">-</span><span class="n">parent</span><span class="o">-</span><span class="nb">id</span> <span class="nb">type</span><span class="o">=</span><span class="n">patch</span> <span class="n">options</span><span class="p">:</span><span class="n">peer</span><span class="o">=</span><span class="n">tpt</span><span class="o">-</span><span class="n">parent</span><span class="o">-</span><span class="nb">id</span>
+</pre></div>
+</div>
+<p>tpt-parent-id, the trunk bridge side of the patch will carry untagged
+traffic (vlan_mode=access tag=0).  The OVS agent will be monitoring the
+creation of ports on the integration bridge.  tpi-parent-id, the br-int
+side the patch port is tagged with VLAN 3 by ovs-agent.  We assume that
+the trunk is on network1 that on this host is associated with VLAN 3.
+If the parent port is associated with one or more subports the agent
+will process them as described in the next paragraph.</p>
+</section>
+<section id="id1">
+<h4>Subport creation<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h4>
+<p>If a subport is added to a parent port but no VM was booted using that parent
+port yet, the agent won’t process the subport (because at this point there’s
+no node associated with the parent port).
+When a subport is added to a parent port that is used by a VM the OVS agent
+will create a new patch port:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ovs</span><span class="o">-</span><span class="n">vsctl</span> <span class="n">add</span><span class="o">-</span><span class="n">port</span> <span class="n">tbr</span><span class="o">-</span><span class="n">trunk</span><span class="o">-</span><span class="nb">id</span> <span class="n">spt</span><span class="o">-</span><span class="n">subport</span><span class="o">-</span><span class="nb">id</span> <span class="n">tag</span><span class="o">=</span><span class="mi">100</span> <span class="o">--</span> <span class="nb">set</span> <span class="n">Interface</span> <span class="n">spt</span><span class="o">-</span><span class="n">subport</span><span class="o">-</span><span class="nb">id</span> <span class="nb">type</span><span class="o">=</span><span class="n">patch</span> <span class="n">options</span><span class="p">:</span><span class="n">peer</span><span class="o">=</span><span class="n">spi</span><span class="o">-</span><span class="n">subport</span><span class="o">-</span><span class="nb">id</span>
+<span class="n">ovs</span><span class="o">-</span><span class="n">vsctl</span> <span class="n">add</span><span class="o">-</span><span class="n">port</span> <span class="n">br</span><span class="o">-</span><span class="nb">int</span> <span class="n">spi</span><span class="o">-</span><span class="n">subport</span><span class="o">-</span><span class="nb">id</span> <span class="n">tag</span><span class="o">=</span><span class="mi">5</span> <span class="o">--</span> <span class="nb">set</span> <span class="n">Interface</span> <span class="n">spi</span><span class="o">-</span><span class="n">subport</span><span class="o">-</span><span class="nb">id</span> <span class="nb">type</span><span class="o">=</span><span class="n">patch</span> <span class="n">options</span><span class="p">:</span><span class="n">peer</span><span class="o">=</span><span class="n">spt</span><span class="o">-</span><span class="n">subport</span><span class="o">-</span><span class="nb">id</span>
+</pre></div>
+</div>
+<p>This patch port connects the trunk bridge to the integration bridge.
+spt-subport-id, the trunk bridge side of the patch is tagged using VLAN 100.
+We assume that the segmentation ID of the subport is 100.
+spi-subport-id, the br-int side of the patch port is tagged with VLAN 5. We
+assume that the subport is on network2 that on this host uses VLAN 5.
+The OVS agent will set the subport ID in the external-ids of spt-subport-id
+and spi-subport-id.</p>
+<p><em>Inbound traffic from the VM point of view</em></p>
+<p>The traffic coming out of tpi-parent-id will be stripped by br-int of VLAN 3.
+It will reach tpt-parent-id untagged and from there tap1.
+The traffic coming out of spi-subport-id will be stripped by br-int of VLAN 5.
+It will reach spt-subport-id where it will be tagged with VLAN 100 and it will
+then get to tap1 tagged.</p>
+<p><em>Outbound traffic from the VM point of view</em></p>
+<p>The untagged traffic coming from tap1 will reach tpt-parent-id and from there
+tpi-parent-id where it will be tagged using VLAN 3.
+The traffic tagged with VLAN 100 from tap1 will reach spt-subport-id.
+VLAN 100 will be stripped since spt-subport-id is a tagged port and the packet
+will reach spi-subport-id, where it’s tagged using VLAN 5.</p>
+</section>
+<section id="id2">
+<h4>Parent port deletion<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h4>
+<p>Deleting a port that is an active parent in a trunk is forbidden. If the parent
+port has no trunk associated, it can be deleted. The OVS agent doesn’t need to
+perform any action.</p>
+</section>
+<section id="id3">
+<h4>Trunk deletion<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h4>
+<p>When Nova deletes a VM, it deletes the VM’s corresponding Neutron ports only if
+they were created by Nova when booting the VM. In the vlan-aware-vm case the
+parent port is passed to Nova, so the port data will remain in the DB after the
+VM deletion. Nova will delete the port on the trunk bridge where the VM is
+plugged. The L2 agent will detect that and delete the trunk bridge. It will
+notify the Neutron server that the parent port is down.</p>
+<p>The deletion of a trunk that is used by a VM is not allowed.
+The trunk can be deleted (leaving the parent port intact) when the parent port
+is not used by any VM. After the trunk is deleted, the parent port can also be
+deleted.</p>
+</section>
+<section id="id4">
+<h4>Subport deletion<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h4>
+<p>The OVS agent will delete the patch port pair corresponding to the subport
+deleted.</p>
+</section>
+</section>
+<section id="agent-resync">
+<h3>Agent resync<a class="headerlink" href="#agent-resync" title="Link to this heading">¶</a></h3>
+<p>During resync the agent should check that all the trunk and subports are
+still valid. It will delete the stale trunk and subports using the procedure
+specified in the previous paragraphs according to the implementation.</p>
+</section>
+</section>
+<section id="local-ip">
+<h2>Local IP<a class="headerlink" href="#local-ip" title="Link to this heading">¶</a></h2>
+<p>Local IP is a new feature added in Yoga release. For details on openvswitch
+agent impact please see:
+<a class="reference internal" href="local_ips.html"><span class="doc">Local IPs</span></a>.</p>
+</section>
+<section id="further-reading">
+<h2>Further Reading<a class="headerlink" href="#further-reading" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="http://techbackground.blogspot.com/2013/07/the-open-vswitch-plugin-with-vlans.html">Darragh O’Reilly - The Open vSwitch plugin with VLANs</a></p></li>
+</ul>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="l2_agents.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: L2 Agent Networking"></i></a>
+          
+          
+            <a href="sriov_nic_agent.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: SR-IOV Networking L2 Agent"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2024-08-23 12:03:12</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Contributor Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#basic-information">Basic Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-policies">Neutron Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#gerrit-rechecks">Gerrit Rechecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-stadium">Neutron Stadium</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#neutron-internals">Neutron Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#ovn-driver">OVN Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#dashboards">Dashboards</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Open vSwitch L2 Agent</a><ul>
+<li><a class="reference internal" href="#vlan-tags">VLAN Tags</a></li>
+<li><a class="reference internal" href="#gre-tunnels">GRE Tunnels</a></li>
+<li><a class="reference internal" href="#vxlan-tunnels">VXLAN Tunnels</a></li>
+<li><a class="reference internal" href="#geneve-tunnels">Geneve Tunnels</a></li>
+<li><a class="reference internal" href="#bridge-management">Bridge Management</a></li>
+<li><a class="reference internal" href="#ovs-filtering-tables">OVS Filtering Tables</a></li>
+<li><a class="reference internal" href="#tackling-the-network-trunking-use-case">Tackling the Network Trunking use case</a><ul>
+<li><a class="reference internal" href="#rationale">Rationale</a></li>
+<li><a class="reference internal" href="#implementation-vlan-interfaces-option-a">Implementation VLAN Interfaces (Option A)</a><ul>
+<li><a class="reference internal" href="#trunk-port-creation">Trunk port creation</a></li>
+<li><a class="reference internal" href="#subport-creation">Subport creation</a><ul>
+<li><a class="reference internal" href="#iptables-firewall">Iptables Firewall</a></li>
+<li><a class="reference internal" href="#ovs-firewall-case">OVS Firewall case</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#parent-port-deletion">Parent port deletion</a></li>
+<li><a class="reference internal" href="#trunk-deletion">Trunk deletion</a></li>
+<li><a class="reference internal" href="#subport-deletion">Subport deletion</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementation-trunk-bridge-option-c">Implementation Trunk Bridge (Option C)</a><ul>
+<li><a class="reference internal" href="#trunk-creation">Trunk creation</a></li>
+<li><a class="reference internal" href="#id1">Subport creation</a></li>
+<li><a class="reference internal" href="#id2">Parent port deletion</a></li>
+<li><a class="reference internal" href="#id3">Trunk deletion</a></li>
+<li><a class="reference internal" href="#id4">Subport deletion</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#agent-resync">Agent resync</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#local-ip">Local IP</a></li>
+<li><a class="reference internal" href="#further-reading">Further Reading</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "contributor/internals/openvswitch_agent" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Open vSwitch L2 Agent in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2024-08-23 12:03:12";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "contributor/internals/openvswitch_agent";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>SR-IOV &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/support-matrix.css?v=ac26a930" />
+    <script src="../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Service Function Chaining" href="config-sfc.html" />
+    <link rel="prev" title="Router flavors with the L3 OVN service plugin" href="config-router-flavor-ovn.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/admin/config-sriov.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>SR-IOV</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="config-router-flavor-ovn.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Router flavors with the L3 OVN service plugin"></i></a>
+    
+    
+    <a href="config-sfc.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Service Function Chaining"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="sr-iov">
+<span id="config-sriov"></span><h1>SR-IOV<a class="headerlink" href="#sr-iov" title="Link to this heading">¶</a></h1>
+<p>The purpose of this page is to describe how to enable SR-IOV functionality
+available in OpenStack (using OpenStack Networking). This functionality was
+first introduced in the OpenStack Juno release. This page intends to serve as
+a guide for how to configure OpenStack Networking and OpenStack Compute to
+create SR-IOV ports.</p>
+<section id="the-basics">
+<h2>The basics<a class="headerlink" href="#the-basics" title="Link to this heading">¶</a></h2>
+<p>PCI-SIG Single Root I/O Virtualization and Sharing (SR-IOV) functionality is
+available in OpenStack since the Juno release. The SR-IOV specification
+defines a standardized mechanism to virtualize PCIe devices. This mechanism
+can virtualize a single PCIe Ethernet controller to appear as multiple PCIe
+devices. Each device can be directly assigned to an instance, bypassing the
+hypervisor and virtual switch layer. As a result, users are able to achieve
+low latency and near-line wire speed.</p>
+<p>The following terms are used throughout this document:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 10.0%" />
+<col style="width: 90.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Term</p></th>
+<th class="head"><p>Definition</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>PF</p></td>
+<td><p>Physical Function. The physical Ethernet controller that supports
+SR-IOV.</p></td>
+</tr>
+<tr class="row-odd"><td><p>VF</p></td>
+<td><p>Virtual Function. The virtual PCIe device created from a physical
+Ethernet controller.</p></td>
+</tr>
+</tbody>
+</table>
+<section id="sr-iov-agent">
+<h3>SR-IOV agent<a class="headerlink" href="#sr-iov-agent" title="Link to this heading">¶</a></h3>
+<p>The SR-IOV agent allows you to set the admin state of ports, configure port
+security (enable and disable spoof checking), and configure QoS rate limiting
+and minimum bandwidth. You must include the SR-IOV agent on each compute node
+using SR-IOV ports.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The SR-IOV agent was optional before Mitaka, and was not enabled by default
+before Liberty.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The ability to control port security and QoS rate limit settings was added
+in Liberty.</p>
+</div>
+</section>
+<section id="supported-ethernet-controllers">
+<h3>Supported Ethernet controllers<a class="headerlink" href="#supported-ethernet-controllers" title="Link to this heading">¶</a></h3>
+<p>The following manufacturers are known to work:</p>
+<ul class="simple">
+<li><p>Intel</p></li>
+<li><p>Mellanox</p></li>
+<li><p>QLogic</p></li>
+<li><p>Broadcom</p></li>
+</ul>
+<p>For information on <strong>Mellanox SR-IOV Ethernet ConnectX cards</strong>, see the
+<a class="reference external" href="https://support.mellanox.com/s/article/HowTo-Configure-SR-IOV-for-ConnectX-4-ConnectX-5-ConnectX-6-with-KVM-Ethernet">Mellanox: How To Configure SR-IOV VFs on ConnectX-4 or newer</a>.</p>
+<p>For information on <strong>QLogic SR-IOV Ethernet cards</strong>, see the
+<a class="reference external" href="http://www.qlogic.com/solutions/Documents/UsersGuide_OpenStack_SR-IOV.pdf">User’s Guide OpenStack Deployment with SR-IOV Configuration</a>.</p>
+<p>For information on <strong>Broadcom NetXtreme Series Ethernet cards</strong>, see the
+<a class="reference external" href="https://www.broadcom.com/products/ethernet-connectivity/network-adapters">Broadcom NetXtreme Product Page</a>.</p>
+</section>
+</section>
+<section id="using-sr-iov-interfaces">
+<h2>Using SR-IOV interfaces<a class="headerlink" href="#using-sr-iov-interfaces" title="Link to this heading">¶</a></h2>
+<p>In order to enable SR-IOV, the following steps are required:</p>
+<ol class="arabic simple">
+<li><p>Create Virtual Functions (Compute)</p></li>
+<li><p>Configure allow list for PCI devices in nova-compute (Compute)</p></li>
+<li><p>Configure neutron-server (Controller)</p></li>
+<li><p>Configure nova-scheduler (Controller)</p></li>
+<li><p>Enable neutron sriov-agent (Compute)</p></li>
+</ol>
+<p>We recommend using VLAN provider networks for segregation. This way you can
+combine instances without SR-IOV ports and instances with SR-IOV ports on a
+single network.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Throughout this guide, <code class="docutils literal notranslate"><span class="pre">eth3</span></code> is used as the PF and <code class="docutils literal notranslate"><span class="pre">physnet2</span></code> is used
+as the provider network configured as a VLAN range. These ports may vary in
+different environments.</p>
+</div>
+<section id="create-virtual-functions-compute">
+<h3>Create Virtual Functions (Compute)<a class="headerlink" href="#create-virtual-functions-compute" title="Link to this heading">¶</a></h3>
+<p>Create the VFs for the network interface that will be used for SR-IOV. We use
+<code class="docutils literal notranslate"><span class="pre">eth3</span></code> as PF, which is also used as the interface for the VLAN provider
+network and has access to the private networks of all machines.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The steps detail how to create VFs using Mellanox ConnectX-4 and newer/Intel
+SR-IOV Ethernet cards on an Intel system. Steps may differ for different
+hardware configurations.</p>
+</div>
+<ol class="arabic">
+<li><p>Ensure SR-IOV and VT-d are enabled in BIOS.</p></li>
+<li><p>Enable IOMMU in Linux by adding <code class="docutils literal notranslate"><span class="pre">intel_iommu=on</span></code> to the kernel parameters,
+for example, using GRUB.</p></li>
+<li><p>On each compute node, create the VFs via the PCI SYS interface:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;8&#39;</span><span class="w"> </span>&gt;<span class="w"> </span>/sys/class/net/eth3/device/sriov_numvfs
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>On some PCI devices, observe that when changing the amount of VFs you
+receive the error <code class="docutils literal notranslate"><span class="pre">Device</span> <span class="pre">or</span> <span class="pre">resource</span> <span class="pre">busy</span></code>. In this case, you must
+first set <code class="docutils literal notranslate"><span class="pre">sriov_numvfs</span></code> to <code class="docutils literal notranslate"><span class="pre">0</span></code>, then set it to your new value.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A network interface could be used both for PCI passthrough, using the PF,
+and SR-IOV, using the VFs. If the PF is used, the VF number stored in
+the <code class="docutils literal notranslate"><span class="pre">sriov_numvfs</span></code> file is lost. If the PF is attached again to the
+operating system, the number of VFs assigned to this interface will be
+zero. To keep the number of VFs always assigned to this interface,
+modify the interfaces configuration file adding an <code class="docutils literal notranslate"><span class="pre">ifup</span></code> script
+command.</p>
+<p>On Ubuntu, modify the <code class="docutils literal notranslate"><span class="pre">/etc/network/interfaces</span></code> file:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">auto eth3</span>
+<span class="na">iface eth3 inet dhcp</span>
+<span class="na">pre-up echo &#39;4&#39; &gt; /sys/class/net/eth3/device/sriov_numvfs</span>
+</pre></div>
+</div>
+<p>On RHEL and derivatives, modify the <code class="docutils literal notranslate"><span class="pre">/sbin/ifup-local</span></code> file:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/sh</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;eth3&quot;</span><span class="w"> </span><span class="o">]]</span>
+<span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;4&#39;</span><span class="w"> </span>&gt;<span class="w"> </span>/sys/class/net/eth3/device/sriov_numvfs
+<span class="k">fi</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Alternatively, you can create VFs by passing the <code class="docutils literal notranslate"><span class="pre">max_vfs</span></code> to the
+kernel module of your network interface. However, the <code class="docutils literal notranslate"><span class="pre">max_vfs</span></code>
+parameter has been deprecated, so the PCI SYS interface is the preferred
+method.</p>
+</div>
+<p>You can determine the maximum number of VFs a PF can support:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span>cat<span class="w"> </span>/sys/class/net/eth3/device/sriov_totalvfs
+<span class="go">63</span>
+</pre></div>
+</div>
+</li>
+<li><p>Verify that the VFs have been created and are in <code class="docutils literal notranslate"><span class="pre">up</span></code> state. For example:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span>lspci<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>Ethernet
+<span class="go">82:00.0 Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ Network Connection (rev 01)</span>
+<span class="go">82:00.1 Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ Network Connection (rev 01)</span>
+<span class="go">82:10.0 Ethernet controller: Intel Corporation 82599 Ethernet Controller Virtual Function (rev 01)</span>
+<span class="go">82:10.2 Ethernet controller: Intel Corporation 82599 Ethernet Controller Virtual Function (rev 01)</span>
+<span class="go">82:10.4 Ethernet controller: Intel Corporation 82599 Ethernet Controller Virtual Function (rev 01)</span>
+<span class="go">82:10.6 Ethernet controller: Intel Corporation 82599 Ethernet Controller Virtual Function (rev 01)</span>
+<span class="go">82:11.0 Ethernet controller: Intel Corporation 82599 Ethernet Controller Virtual Function (rev 01)</span>
+<span class="go">82:11.2 Ethernet controller: Intel Corporation 82599 Ethernet Controller Virtual Function (rev 01)</span>
+<span class="go">82:11.4 Ethernet controller: Intel Corporation 82599 Ethernet Controller Virtual Function (rev 01)</span>
+<span class="go">82:11.6 Ethernet controller: Intel Corporation 82599 Ethernet Controller Virtual Function (rev 01)</span>
+</pre></div>
+</div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span>ip<span class="w"> </span>link<span class="w"> </span>show<span class="w"> </span>eth3
+<span class="go">8: eth3: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc mq state UP mode DEFAULT qlen 1000</span>
+<span class="go">   link/ether a0:36:9f:8f:3f:b8 brd ff:ff:ff:ff:ff:ff</span>
+<span class="go">   vf 0 MAC 00:00:00:00:00:00, spoof checking on, link-state auto</span>
+<span class="go">   vf 1 MAC 00:00:00:00:00:00, spoof checking on, link-state auto</span>
+<span class="go">   vf 2 MAC 00:00:00:00:00:00, spoof checking on, link-state auto</span>
+<span class="go">   vf 3 MAC 00:00:00:00:00:00, spoof checking on, link-state auto</span>
+<span class="go">   vf 4 MAC 00:00:00:00:00:00, spoof checking on, link-state auto</span>
+<span class="go">   vf 5 MAC 00:00:00:00:00:00, spoof checking on, link-state auto</span>
+<span class="go">   vf 6 MAC 00:00:00:00:00:00, spoof checking on, link-state auto</span>
+<span class="go">   vf 7 MAC 00:00:00:00:00:00, spoof checking on, link-state auto</span>
+</pre></div>
+</div>
+<p>If the interfaces are down, set them to <code class="docutils literal notranslate"><span class="pre">up</span></code> before launching a guest,
+otherwise the instance will fail to spawn:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span>ip<span class="w"> </span>link<span class="w"> </span><span class="nb">set</span><span class="w"> </span>eth3<span class="w"> </span>up
+</pre></div>
+</div>
+</li>
+<li><p>Persist created VFs on reboot:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;echo &#39;7&#39; &gt; /sys/class/net/eth3/device/sriov_numvfs&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>/etc/rc.local
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The suggested way of making PCI SYS settings persistent is through
+the <code class="docutils literal notranslate"><span class="pre">sysfsutils</span></code> tool. However, this is not available by default on
+many major distributions.</p>
+</div>
+</li>
+</ol>
+</section>
+<section id="configuring-allow-list-for-pci-devices-nova-compute-compute">
+<h3>Configuring allow list for PCI devices nova-compute (Compute)<a class="headerlink" href="#configuring-allow-list-for-pci-devices-nova-compute-compute" title="Link to this heading">¶</a></h3>
+<ol class="arabic">
+<li><p>Configure which PCI devices the <code class="docutils literal notranslate"><span class="pre">nova-compute</span></code> service may use. Edit
+the <code class="docutils literal notranslate"><span class="pre">nova.conf</span></code> file:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[pci]</span>
+<span class="na">passthrough_whitelist = { &quot;devname&quot;</span><span class="o">:</span><span class="w"> </span><span class="s">&quot;eth3&quot;</span><span class="na">, &quot;physical_network&quot;</span><span class="o">:</span><span class="w"> </span><span class="s">&quot;physnet2&quot;</span><span class="na">}</span>
+</pre></div>
+</div>
+<p>This tells the Compute service that all VFs belonging to <code class="docutils literal notranslate"><span class="pre">eth3</span></code> are
+allowed to be passed through to instances and belong to the provider network
+<code class="docutils literal notranslate"><span class="pre">physnet2</span></code>.</p>
+<p>Alternatively the <code class="docutils literal notranslate"><span class="pre">[pci]</span> <span class="pre">passthrough_whitelist</span></code> parameter also supports
+allowing devices by:</p>
+<ul>
+<li><p>PCI address: The address uses the same syntax as in <code class="docutils literal notranslate"><span class="pre">lspci</span></code> and an
+asterisk (<code class="docutils literal notranslate"><span class="pre">*</span></code>) can be used to match anything.</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[pci]</span>
+<span class="na">passthrough_whitelist = { &quot;address&quot;</span><span class="o">:</span><span class="w"> </span><span class="s">&quot;[[[[&lt;domain&gt;]:]&lt;bus&gt;]:][&lt;slot&gt;][.[&lt;function&gt;]]&quot;</span><span class="na">, &quot;physical_network&quot;</span><span class="o">:</span><span class="w"> </span><span class="s">&quot;physnet2&quot;</span><span class="w"> </span><span class="na">}</span>
+</pre></div>
+</div>
+<p>For example, to match any domain, bus <code class="docutils literal notranslate"><span class="pre">0a</span></code>, slot <code class="docutils literal notranslate"><span class="pre">00</span></code>, and all
+functions:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[pci]</span>
+<span class="na">passthrough_whitelist = { &quot;address&quot;</span><span class="o">:</span><span class="w"> </span><span class="s">&quot;*:0a:00.*&quot;</span><span class="na">, &quot;physical_network&quot;</span><span class="o">:</span><span class="w"> </span><span class="s">&quot;physnet2&quot;</span><span class="w"> </span><span class="na">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>PCI <code class="docutils literal notranslate"><span class="pre">vendor_id</span></code> and <code class="docutils literal notranslate"><span class="pre">product_id</span></code> as displayed by the Linux utility
+<code class="docutils literal notranslate"><span class="pre">lspci</span></code>.</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[pci]</span>
+<span class="na">passthrough_whitelist = { &quot;vendor_id&quot;</span><span class="o">:</span><span class="w"> </span><span class="s">&quot;&lt;id&gt;&quot;</span><span class="na">, &quot;product_id&quot;</span><span class="o">:</span><span class="w"> </span><span class="s">&quot;&lt;id&gt;&quot;</span><span class="na">, &quot;physical_network&quot;</span><span class="o">:</span><span class="w"> </span><span class="s">&quot;physnet2&quot;</span><span class="w"> </span><span class="na">}</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>If the device defined by the PCI address or <code class="docutils literal notranslate"><span class="pre">devname</span></code> corresponds to an
+SR-IOV PF, all VFs under the PF will match the entry. Multiple
+<code class="docutils literal notranslate"><span class="pre">[pci]</span> <span class="pre">passthrough_whitelist</span></code> entries per host are supported.</p>
+<p>In order to enable SR-IOV to request “trusted mode”, the
+<code class="docutils literal notranslate"><span class="pre">[pci]</span> <span class="pre">passthrough_whitelist</span></code> parameter also supports a <code class="docutils literal notranslate"><span class="pre">trusted</span></code>
+tag.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This capability is only supported starting with version 18.0.0
+(Rocky) release of the compute service configured to use the
+libvirt driver.</p>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>There are security implications of enabling trusted ports. The
+trusted VFs can be set into VF promiscuous mode which will
+enable it to receive unmatched and multicast traffic sent to the
+physical function.</p>
+</div>
+<p>For example, to allow users to request SR-IOV devices with trusted
+capabilities on device <code class="docutils literal notranslate"><span class="pre">eth3</span></code>:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[pci]</span>
+<span class="na">passthrough_whitelist = { &quot;devname&quot;</span><span class="o">:</span><span class="w"> </span><span class="s">&quot;eth3&quot;</span><span class="na">, &quot;physical_network&quot;</span><span class="o">:</span><span class="w"> </span><span class="s">&quot;physnet2&quot;</span><span class="na">, &quot;trusted&quot;</span><span class="o">:</span><span class="s">&quot;true&quot;</span><span class="w"> </span><span class="na">}</span>
+</pre></div>
+</div>
+<p>The ports will have to be created with a binding profile to match the
+<code class="docutils literal notranslate"><span class="pre">trusted</span></code> tag, see <a class="reference internal" href="#launching-instances-with-sr-iov-ports">Launching instances with SR-IOV ports</a>.</p>
+</li>
+<li><p>Restart the <code class="docutils literal notranslate"><span class="pre">nova-compute</span></code> service for the changes to go into effect.</p></li>
+</ol>
+</section>
+<section id="configure-neutron-server-controller">
+<span id="configure-sriov-neutron-server"></span><h3>Configure neutron-server (Controller)<a class="headerlink" href="#configure-neutron-server-controller" title="Link to this heading">¶</a></h3>
+<blockquote>
+<div><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This section does not apply to remote-managed ports of SmartNIC DPU
+devices which also use SR-IOV at the host side but do not rely on the
+<code class="docutils literal notranslate"><span class="pre">sriovnicswitch</span></code> mechanism driver.</p>
+</div>
+</div></blockquote>
+<ol class="arabic">
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">sriovnicswitch</span></code> as mechanism driver. Edit the <code class="docutils literal notranslate"><span class="pre">ml2_conf.ini</span></code> file
+on each controller:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[ml2]</span>
+<span class="na">mechanism_drivers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">openvswitch,sriovnicswitch</span>
+</pre></div>
+</div>
+</li>
+<li><p>Ensure your physnet is configured for the chosen network type. Edit the
+<code class="docutils literal notranslate"><span class="pre">ml2_conf.ini</span></code> file on each controller:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[ml2_type_vlan]</span>
+<span class="na">network_vlan_ranges</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">physnet2</span>
+</pre></div>
+</div>
+</li>
+<li><p>Add the <code class="docutils literal notranslate"><span class="pre">plugin.ini</span></code> file as a parameter to the <code class="docutils literal notranslate"><span class="pre">neutron-server</span></code>
+service. Edit the appropriate initialization script to configure the
+<code class="docutils literal notranslate"><span class="pre">neutron-server</span></code> service to load the plugin configuration file:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>--config-file<span class="w"> </span>/etc/neutron/neutron.conf
+--config-file<span class="w"> </span>/etc/neutron/plugin.ini
+</pre></div>
+</div>
+</li>
+<li><p>Restart the <code class="docutils literal notranslate"><span class="pre">neutron-server</span></code> service.</p></li>
+</ol>
+</section>
+<section id="configure-nova-scheduler-controller">
+<h3>Configure nova-scheduler (Controller)<a class="headerlink" href="#configure-nova-scheduler-controller" title="Link to this heading">¶</a></h3>
+<ol class="arabic">
+<li><p>On every controller node running the <code class="docutils literal notranslate"><span class="pre">nova-scheduler</span></code> service, add
+<code class="docutils literal notranslate"><span class="pre">PciPassthroughFilter</span></code> to <code class="docutils literal notranslate"><span class="pre">[filter_scheduler]</span> <span class="pre">enabled_filters</span></code> to enable
+this filter. Ensure <code class="docutils literal notranslate"><span class="pre">[filter_scheduler]</span> <span class="pre">available_filters</span></code> is set to the
+default of <code class="docutils literal notranslate"><span class="pre">nova.scheduler.filters.all_filters</span></code>:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[filter_scheduler]</span>
+<span class="na">enabled_filters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">ComputeFilter, ComputeCapabilitiesFilter, ImagePropertiesFilter, ServerGroupAntiAffinityFilter, ServerGroupAffinityFilter, PciPassthroughFilter</span>
+<span class="na">available_filters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">nova.scheduler.filters.all_filters</span>
+</pre></div>
+</div>
+</li>
+<li><p>Restart the <code class="docutils literal notranslate"><span class="pre">nova-scheduler</span></code> service.</p></li>
+</ol>
+</section>
+<section id="enable-neutron-sriov-nic-agent-compute">
+<h3>Enable neutron-sriov-nic-agent (Compute)<a class="headerlink" href="#enable-neutron-sriov-nic-agent-compute" title="Link to this heading">¶</a></h3>
+<ol class="arabic">
+<li><p>Install the SR-IOV agent, if necessary.</p></li>
+<li><p>Edit the <code class="docutils literal notranslate"><span class="pre">sriov_agent.ini</span></code> file on each compute node. For example:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[sriov_nic]</span>
+<span class="na">physical_device_mappings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">physnet2:eth3</span>
+<span class="na">exclude_devices</span><span class="w"> </span><span class="o">=</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">physical_device_mappings</span></code> parameter is not limited to be a 1-1
+mapping between physical networks and NICs. This enables you to map the
+same physical network to more than one NIC. For example, if <code class="docutils literal notranslate"><span class="pre">physnet2</span></code>
+is connected to <code class="docutils literal notranslate"><span class="pre">eth3</span></code> and <code class="docutils literal notranslate"><span class="pre">eth4</span></code>, then
+<code class="docutils literal notranslate"><span class="pre">physnet2:eth3,physnet2:eth4</span></code> is a valid option.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The SR-IOV agent does not implement any kind of firewall driver.</p>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">exclude_devices</span></code> parameter is empty, therefore, all the VFs
+associated with eth3 may be configured by the agent. To exclude specific
+VFs, add them to the <code class="docutils literal notranslate"><span class="pre">exclude_devices</span></code> parameter as follows:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">exclude_devices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">eth1:0000:07:00.2</span><span class="c1">;0000:07:00.3,eth2:0000:05:00.1;0000:05:00.2</span>
+</pre></div>
+</div>
+</li>
+<li><p>Ensure the SR-IOV agent runs successfully:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span>neutron-sriov-nic-agent<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--config-file<span class="w"> </span>/etc/neutron/neutron.conf<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--config-file<span class="w"> </span>/etc/neutron/plugins/ml2/sriov_agent.ini
+</pre></div>
+</div>
+</li>
+<li><p>Enable the neutron SR-IOV agent service.</p>
+<p>If installing from source, you must configure a daemon file for the init
+system manually.</p>
+</li>
+</ol>
+<section id="optional-fdb-l2-agent-extension">
+<h4>(Optional) FDB L2 agent extension<a class="headerlink" href="#optional-fdb-l2-agent-extension" title="Link to this heading">¶</a></h4>
+<p>Forwarding DataBase (FDB) population is an L2 agent extension to OVS agent. Its
+objective is to update the FDB table for existing instance
+using normal port. This enables communication between SR-IOV instances and
+normal instances. The use cases of the FDB population extension are:</p>
+<ul class="simple">
+<li><p>Direct port and normal port instances reside on the same compute node.</p></li>
+<li><p>Direct port instance that uses floating IP address and network node
+are located on the same host.</p></li>
+</ul>
+<p>For additional information describing the problem, refer to:
+<a class="reference external" href="https://events.static.linuxfound.org/sites/events/files/slides/LinuxConJapan2014_makita_0.pdf">Virtual switching technologies and Linux bridge.</a></p>
+<ol class="arabic">
+<li><p>Edit the <code class="docutils literal notranslate"><span class="pre">ovs_agent.ini</span></code> file on each compute node. For example:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">[agent]</span>
+<span class="go">extensions = fdb</span>
+</pre></div>
+</div>
+</li>
+<li><p>Add the FDB section and the <code class="docutils literal notranslate"><span class="pre">shared_physical_device_mappings</span></code> parameter.
+This parameter maps each physical port to its physical network name. Each
+physical network can be mapped to several ports:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">[FDB]</span>
+<span class="go">shared_physical_device_mappings = physnet1:p1p1, physnet1:p1p2</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+</section>
+<section id="launching-instances-with-sr-iov-ports">
+<h3>Launching instances with SR-IOV ports<a class="headerlink" href="#launching-instances-with-sr-iov-ports" title="Link to this heading">¶</a></h3>
+<p>Once configuration is complete, you can launch instances with SR-IOV ports.</p>
+<ol class="arabic">
+<li><p>If it does not already exist, create a network and subnet for the chosen
+physnet. This is the network to which SR-IOV ports will be attached. For
+example:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>create<span class="w"> </span>--provider-physical-network<span class="w"> </span>physnet2<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--provider-network-type<span class="w"> </span>vlan<span class="w"> </span>--provider-segment<span class="w"> </span><span class="m">1000</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>sriov-net
+
+<span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>create<span class="w"> </span>--network<span class="w"> </span>sriov-net<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--subnet-pool<span class="w"> </span>shared-default-subnetpool-v4<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>sriov-subnet
+</pre></div>
+</div>
+</li>
+<li><p>Get the <code class="docutils literal notranslate"><span class="pre">id</span></code> of the network where you want the SR-IOV port to be created:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nv">net_id</span><span class="o">=</span><span class="k">$(</span>openstack<span class="w"> </span>network<span class="w"> </span>show<span class="w"> </span>sriov-net<span class="w"> </span>-c<span class="w"> </span>id<span class="w"> </span>-f<span class="w"> </span>value<span class="k">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create the SR-IOV port. <code class="docutils literal notranslate"><span class="pre">vnic-type=direct</span></code> is used here, but other options
+include <code class="docutils literal notranslate"><span class="pre">normal</span></code>, <code class="docutils literal notranslate"><span class="pre">direct-physical</span></code>, and <code class="docutils literal notranslate"><span class="pre">macvtap</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>port<span class="w"> </span>create<span class="w"> </span>--network<span class="w"> </span><span class="nv">$net_id</span><span class="w"> </span>--vnic-type<span class="w"> </span>direct<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>sriov-port
+</pre></div>
+</div>
+<p>Alternatively, to request that the SR-IOV port accept trusted capabilities,
+the binding profile should be enhanced with the <code class="docutils literal notranslate"><span class="pre">trusted</span></code> tag.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>port<span class="w"> </span>create<span class="w"> </span>--network<span class="w"> </span><span class="nv">$net_id</span><span class="w"> </span>--vnic-type<span class="w"> </span>direct<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--binding-profile<span class="w"> </span><span class="nv">trusted</span><span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>sriov-port
+</pre></div>
+</div>
+</li>
+<li><p>Get the <code class="docutils literal notranslate"><span class="pre">id</span></code> of the created port:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nv">port_id</span><span class="o">=</span><span class="k">$(</span>openstack<span class="w"> </span>port<span class="w"> </span>show<span class="w"> </span>sriov-port<span class="w"> </span>-c<span class="w"> </span>id<span class="w"> </span>-f<span class="w"> </span>value<span class="k">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create the instance. Specify the SR-IOV port created in step two for the
+NIC:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>server<span class="w"> </span>create<span class="w"> </span>--flavor<span class="w"> </span>m1.large<span class="w"> </span>--image<span class="w"> </span>ubuntu_18.04<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--nic<span class="w"> </span>port-id<span class="o">=</span><span class="nv">$port_id</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>test-sriov
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>There are two ways to attach VFs to an instance. You can create an SR-IOV
+port or use the <code class="docutils literal notranslate"><span class="pre">pci_alias</span></code> in the Compute service. For more
+information about using <code class="docutils literal notranslate"><span class="pre">pci_alias</span></code>, refer to <a class="reference external" href="https://docs.openstack.org/nova/latest/admin/pci-passthrough.html#configure-nova-api-controller">nova-api
+configuration</a>.</p>
+</div>
+</li>
+</ol>
+</section>
+</section>
+<section id="sr-iov-with-connectx-3-connectx-3-pro-dual-port-ethernet">
+<h2>SR-IOV with ConnectX-3/ConnectX-3 Pro Dual Port Ethernet<a class="headerlink" href="#sr-iov-with-connectx-3-connectx-3-pro-dual-port-ethernet" title="Link to this heading">¶</a></h2>
+<p>In contrast to Mellanox newer generation NICs, ConnectX-3 family network
+adapters expose a single PCI device (PF) in the system regardless of the number
+of physical ports. When the device is <strong>dual port</strong> and SR-IOV is enabled and
+configured we can observe some inconsistencies in linux networking subsystem.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the example below <code class="docutils literal notranslate"><span class="pre">enp4s0</span></code> represents PF net device associated with physical port 1 and
+<code class="docutils literal notranslate"><span class="pre">enp4s0d1</span></code> represents PF net device associated with physical port 2.</p>
+</div>
+<p><strong>Example:</strong> A system with ConnectX-3 dual port device and a total of four VFs
+configured, two VFs assigned to port one and two VFs assigned to port two.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>lspci<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>Mellanox
+<span class="go">04:00.0 Network controller: Mellanox Technologies MT27520 Family [ConnectX-3 Pro]</span>
+<span class="go">04:00.1 Network controller: Mellanox Technologies MT27500/MT27520 Family [ConnectX-3/ConnectX-3 Pro Virtual Function]</span>
+<span class="go">04:00.2 Network controller: Mellanox Technologies MT27500/MT27520 Family [ConnectX-3/ConnectX-3 Pro Virtual Function]</span>
+<span class="go">04:00.3 Network controller: Mellanox Technologies MT27500/MT27520 Family [ConnectX-3/ConnectX-3 Pro Virtual Function]</span>
+<span class="go">04:00.4 Network controller: Mellanox Technologies MT27500/MT27520 Family [ConnectX-3/ConnectX-3 Pro Virtual Function]</span>
+</pre></div>
+</div>
+<p>Four VFs are available in the system, however,</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ip<span class="w"> </span>link<span class="w"> </span>show
+<span class="go">31: enp4s0: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc noop master ovs-system state DOWN mode DEFAULT group default qlen 1000</span>
+<span class="go">    link/ether f4:52:14:01:d9:e1 brd ff:ff:ff:ff:ff:ff</span>
+<span class="go">    vf 0 MAC 00:00:00:00:00:00, vlan 4095, spoof checking off, link-state auto</span>
+<span class="go">    vf 1 MAC 00:00:00:00:00:00, vlan 4095, spoof checking off, link-state auto</span>
+<span class="go">    vf 2 MAC 00:00:00:00:00:00, vlan 4095, spoof checking off, link-state auto</span>
+<span class="go">    vf 3 MAC 00:00:00:00:00:00, vlan 4095, spoof checking off, link-state auto</span>
+<span class="go">32: enp4s0d1: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000</span>
+<span class="go">    link/ether f4:52:14:01:d9:e2 brd ff:ff:ff:ff:ff:ff</span>
+<span class="go">    vf 0 MAC 00:00:00:00:00:00, vlan 4095, spoof checking off, link-state auto</span>
+<span class="go">    vf 1 MAC 00:00:00:00:00:00, vlan 4095, spoof checking off, link-state auto</span>
+<span class="go">    vf 2 MAC 00:00:00:00:00:00, vlan 4095, spoof checking off, link-state auto</span>
+<span class="go">    vf 3 MAC 00:00:00:00:00:00, vlan 4095, spoof checking off, link-state auto</span>
+</pre></div>
+</div>
+<p><strong>ip</strong> command identifies each PF associated net device as having four VFs
+<em>each</em>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Mellanox <code class="docutils literal notranslate"><span class="pre">mlx4</span></code> driver allows <em>ip</em> commands to perform configuration of <em>all</em>
+VFs from either PF associated network devices.</p>
+</div>
+<p>To allow neutron SR-IOV agent to properly identify the VFs that belong to the
+correct PF network device (thus to the correct network port) Admin is required
+to provide the <code class="docutils literal notranslate"><span class="pre">exclude_devices</span></code> configuration option in <code class="docutils literal notranslate"><span class="pre">sriov_agent.ini</span></code></p>
+<p><strong>Step 1</strong>: derive the VF to Port mapping from mlx4 driver configuration file:
+<code class="docutils literal notranslate"><span class="pre">/etc/modprobe.d/mlnx.conf</span></code>  or <code class="docutils literal notranslate"><span class="pre">/etc/modprobe.d/mlx4.conf</span></code></p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>cat<span class="w"> </span>/etc/modprobe.d/mlnx.conf<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">&quot;options mlx4_core&quot;</span>
+<span class="go">options mlx4_core port_type_array=2,2 num_vfs=2,2,0 probe_vf=2,2,0 log_num_mgm_entry_size=-1</span>
+</pre></div>
+</div>
+<p>Where:</p>
+<p><code class="docutils literal notranslate"><span class="pre">num_vfs=n1,n2,n3</span></code> - The driver will enable <code class="docutils literal notranslate"><span class="pre">n1</span></code> VFs on physical port 1,
+<code class="docutils literal notranslate"><span class="pre">n2</span></code> VFs on physical port 2 and
+<code class="docutils literal notranslate"><span class="pre">n3</span></code> dual port VFs (applies only to dual port HCA when all ports are
+Ethernet ports).</p>
+<p><code class="docutils literal notranslate"><span class="pre">probe_vfs=m1,m2,m3</span></code> - the driver probes <code class="docutils literal notranslate"><span class="pre">m1</span></code> single port VFs on
+physical port 1,
+<code class="docutils literal notranslate"><span class="pre">m2</span></code> single port VFs on physical port 2 (applies only if such a port exist)
+<code class="docutils literal notranslate"><span class="pre">m3</span></code> dual port VFs. Those VFs are attached to the hypervisor. (applies only
+if all ports are configured as Ethernet).</p>
+<p>The VFs will be enumerated in the following order:</p>
+<ol class="arabic simple">
+<li><p>port 1 VFs</p></li>
+<li><p>port 2 VFs</p></li>
+<li><p>dual port VFs</p></li>
+</ol>
+<p>In our example:</p>
+<div class="line-block">
+<div class="line">04:00.0 : PF associated to <strong>both</strong> ports.</div>
+<div class="line">04:00.1 : VF associated to port <strong>1</strong></div>
+<div class="line">04:00.2 : VF associated to port <strong>1</strong></div>
+<div class="line">04:00.3 : VF associated to port <strong>2</strong></div>
+<div class="line">04:00.4 : VF associated to port <strong>2</strong></div>
+</div>
+<p><strong>Step 2:</strong> Update <code class="docutils literal notranslate"><span class="pre">exclude_devices</span></code> configuration option in
+<code class="docutils literal notranslate"><span class="pre">sriov_agent.ini</span></code> with the correct mapping</p>
+<p>Each PF associated net device shall exclude the <strong>other</strong> port’s VFs</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[sriov_nic]</span>
+<span class="na">physical_device_mappings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">physnet1:enp4s0,physnet2:enp4s0d1</span>
+<span class="na">exclude_devices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">enp4s0:0000:04:00.3</span><span class="c1">;0000:04:00.4,enp4s0d1:0000:04:00.1;0000:04:00.2</span>
+</pre></div>
+</div>
+</section>
+<section id="sr-iov-with-infiniband">
+<h2>SR-IOV with InfiniBand<a class="headerlink" href="#sr-iov-with-infiniband" title="Link to this heading">¶</a></h2>
+<p>The support for SR-IOV with InfiniBand allows a Virtual PCI device (VF) to
+be directly mapped to the guest, allowing higher performance and advanced
+features such as RDMA (remote direct memory access). To use this feature,
+you must:</p>
+<ol class="arabic">
+<li><p>Use InfiniBand enabled network adapters.</p></li>
+<li><p>Run InfiniBand subnet managers to enable InfiniBand fabric.</p>
+<p>All InfiniBand networks must have a subnet manager running for the network
+to function. This is true even when doing a simple network of two
+machines with no switch and the cards are plugged in back-to-back. A
+subnet manager is required for the link on the cards to come up.
+It is possible to have more than one subnet manager. In this case, one
+of them will act as the primary, and any other will act as a backup that
+will take over when the primary subnet manager fails.</p>
+</li>
+<li><p>Install the <code class="docutils literal notranslate"><span class="pre">ebrctl</span></code> utility on the compute nodes.</p>
+<p>Check that <code class="docutils literal notranslate"><span class="pre">ebrctl</span></code> is listed somewhere in <code class="docutils literal notranslate"><span class="pre">/etc/nova/rootwrap.d/*</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>grep<span class="w"> </span><span class="s1">&#39;ebrctl&#39;</span><span class="w"> </span>/etc/nova/rootwrap.d/*
+</pre></div>
+</div>
+<p>If <code class="docutils literal notranslate"><span class="pre">ebrctl</span></code> does not appear in any of the rootwrap files, add this to the
+<code class="docutils literal notranslate"><span class="pre">/etc/nova/rootwrap.d/compute.filters</span></code> file in the <code class="docutils literal notranslate"><span class="pre">[Filters]</span></code> section.</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[Filters]</span>
+<span class="na">ebrctl</span><span class="o">:</span><span class="w"> </span><span class="s">CommandFilter, ebrctl, root</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="known-limitations">
+<h2>Known limitations<a class="headerlink" href="#known-limitations" title="Link to this heading">¶</a></h2>
+<ul>
+<li><p>When using Quality of Service (QoS), <code class="docutils literal notranslate"><span class="pre">max_burst_kbps</span></code> (burst over
+<code class="docutils literal notranslate"><span class="pre">max_kbps</span></code>) is not supported. In addition, <code class="docutils literal notranslate"><span class="pre">max_kbps</span></code> is rounded to
+Mbps.</p></li>
+<li><p>Security groups are not supported when using SR-IOV.</p></li>
+<li><p>SR-IOV is not integrated into the OpenStack Dashboard (horizon). Users must
+use the CLI or API to configure SR-IOV interfaces.</p></li>
+<li><p>Live migration support has been added to the Libvirt Nova virt-driver in the
+Train release for instances with neutron SR-IOV ports. Indirect mode SR-IOV
+interfaces (vnic-type: macvtap or virtio-forwarder) can now be migrated
+transparently to the guest. Direct mode SR-IOV interfaces (vnic-type: direct
+or direct-physical) are detached before the migration and reattached after
+the migration so this is not transparent to the guest. To avoid loss of
+network connectivy when live migrating with direct mode sriov the user should
+create a failover bond in the guest with a transparently live migration port
+type e.g. vnic-type normal or indirect mode SR-IOV.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>SR-IOV features may require a specific NIC driver version, depending on the vendor.
+Intel NICs, for example, require ixgbe version 4.4.6 or greater, and ixgbevf version
+3.2.2 or greater.</p>
+</div>
+</li>
+<li><p>Attaching SR-IOV ports to existing servers is supported starting with the
+Victoria release.</p></li>
+</ul>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="config-router-flavor-ovn.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Router flavors with the L3 OVN service plugin"></i></a>
+          
+          
+            <a href="config-sfc.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Service Function Chaining"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2025-08-29 13:18:20</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation Guide</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">OpenStack Networking Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deploy.html">Deployment examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ops.html">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">Migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ovn/index.html">OVN Driver Administration Guide</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributor/index.html">Contributor Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">SR-IOV</a><ul>
+<li><a class="reference internal" href="#the-basics">The basics</a><ul>
+<li><a class="reference internal" href="#sr-iov-agent">SR-IOV agent</a></li>
+<li><a class="reference internal" href="#supported-ethernet-controllers">Supported Ethernet controllers</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-sr-iov-interfaces">Using SR-IOV interfaces</a><ul>
+<li><a class="reference internal" href="#create-virtual-functions-compute">Create Virtual Functions (Compute)</a></li>
+<li><a class="reference internal" href="#configuring-allow-list-for-pci-devices-nova-compute-compute">Configuring allow list for PCI devices nova-compute (Compute)</a></li>
+<li><a class="reference internal" href="#configure-neutron-server-controller">Configure neutron-server (Controller)</a></li>
+<li><a class="reference internal" href="#configure-nova-scheduler-controller">Configure nova-scheduler (Controller)</a></li>
+<li><a class="reference internal" href="#enable-neutron-sriov-nic-agent-compute">Enable neutron-sriov-nic-agent (Compute)</a><ul>
+<li><a class="reference internal" href="#optional-fdb-l2-agent-extension">(Optional) FDB L2 agent extension</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#launching-instances-with-sr-iov-ports">Launching instances with SR-IOV ports</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sr-iov-with-connectx-3-connectx-3-pro-dual-port-ethernet">SR-IOV with ConnectX-3/ConnectX-3 Pro Dual Port Ethernet</a></li>
+<li><a class="reference internal" href="#sr-iov-with-infiniband">SR-IOV with InfiniBand</a></li>
+<li><a class="reference internal" href="#known-limitations">Known limitations</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "admin/config-sriov" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "SR-IOV in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2025-08-29 13:18:20";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "admin/config-sriov";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

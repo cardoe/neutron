@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Quality of Service &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Quota Management and Enforcement" href="quota.html" />
+    <link rel="prev" title="Provisioning Blocks in relation to Composite Object Status" href="provisioning_blocks.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/contributor/internals/quality_of_service.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Quality of Service</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="provisioning_blocks.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Provisioning Blocks in relation to Composite Object Status"></i></a>
+    
+    
+    <a href="quota.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Quota Management and Enforcement"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="quality-of-service">
+<h1>Quality of Service<a class="headerlink" href="#quality-of-service" title="Link to this heading">¶</a></h1>
+<p>Quality of Service advanced service is designed as a service plugin. The
+service is decoupled from the rest of Neutron code on multiple levels (see
+below).</p>
+<p>QoS extends core resources (ports, networks) without using mixins inherited
+from plugins but through an ml2 extension driver.</p>
+<p>Details about the DB models, API extension, and use cases can be found here: <a class="reference external" href="http://specs.openstack.org/openstack/neutron-specs/specs/liberty/qos-api-extension.html">qos spec</a>
+.</p>
+<section id="service-side-design">
+<h2>Service side design<a class="headerlink" href="#service-side-design" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>neutron.extensions.qos:
+base extension + API controller definition. Note that rules are subattributes
+of policies and hence embedded into their URIs.</p></li>
+<li><p>neutron.extensions.qos_fip:
+base extension + API controller definition. Adds qos_policy_id to floating
+IP, enabling users to set/update the binding QoS policy of a floating IP.</p></li>
+<li><p>neutron.services.qos.qos_plugin:
+QoSPlugin, service plugin that implements ‘qos’ extension, receiving and
+handling API calls to create/modify policies and rules.</p></li>
+<li><p>neutron.services.qos.drivers.manager:
+the manager that passes object actions down to every enabled QoS driver and
+issues RPC calls when any of the drivers require RPC push notifications.</p></li>
+<li><p>neutron.services.qos.drivers.base:
+the interface class for pluggable QoS drivers that are used to update
+backends about new {create, update, delete} events on any rule or policy
+change, including precommit events that some backends could need for
+synchronization reason. The drivers also declare which QoS rules,
+VIF drivers and VNIC types are supported.</p></li>
+<li><p>neutron.core_extensions.base:
+Contains an interface class to implement core resource (port/network)
+extensions. Core resource extensions are then easily integrated into
+interested plugins. We may need to  have a core resource extension manager
+that would utilize those extensions, to avoid plugin modifications for every
+new core resource extension.</p></li>
+<li><p>neutron.core_extensions.qos:
+Contains QoS core resource extension that conforms to the interface described
+above.</p></li>
+<li><p>neutron.plugins.ml2.extensions.qos:
+Contains ml2 extension driver that handles core resource updates by reusing
+the core_extensions.qos module mentioned above. In the future, we would like
+to see a plugin-agnostic core resource extension manager that could be
+integrated into other plugins with ease.</p></li>
+</ul>
+<section id="qos-plugin-implementation-guide">
+<h3>QoS plugin implementation guide<a class="headerlink" href="#qos-plugin-implementation-guide" title="Link to this heading">¶</a></h3>
+<p>The neutron.extensions.qos.QoSPluginBase class uses method proxies for methods
+relating to QoS policy rules. Each of these such methods is generic in the
+sense that it is intended to handle any rule type. For example, QoSPluginBase
+has a create_policy_rule method instead of both
+create_policy_dscp_marking_rule and
+create_policy_bandwidth_limit_rule methods. The logic behind the proxies allows
+a call to a plugin’s create_policy_dscp_marking_rule to be handled by the
+create_policy_rule method, which will receive a QosDscpMarkingRule object as an
+argument in order to execute behavior specific to the DSCP marking rule type.
+This approach allows new rule types to be introduced without requiring a plugin
+to modify code as a result. As would be expected, any subclass of QoSPluginBase
+must override the base class’s abc.abstractmethod methods, even if to raise
+NotImplemented.</p>
+</section>
+<section id="supported-qos-rule-types">
+<h3>Supported QoS rule types<a class="headerlink" href="#supported-qos-rule-types" title="Link to this heading">¶</a></h3>
+<p>Each QoS driver has a member called <code class="docutils literal notranslate"><span class="pre">supported_rules</span></code>, where the driver
+exposes the rules it’s able to handle.</p>
+<p>For a list of all rule types, see:
+neutron.services.qos.qos_consts.VALID_RULE_TYPES.</p>
+<p>The list of supported QoS rule types exposed by neutron is calculated as
+the common subset of rules supported by all active QoS drivers.</p>
+<p>Note: the list of supported rule types reported by core plugin is not enforced
+when accessing QoS rule resources. This is mostly because then we would not be
+able to create rules while at least one of the QoS driver in gate lacks
+support for the rules we’re trying to test.</p>
+</section>
+<section id="database-models">
+<h3>Database models<a class="headerlink" href="#database-models" title="Link to this heading">¶</a></h3>
+<p>QoS design defines the following two conceptual resources to apply QoS rules
+for a port, a network or a floating IP:</p>
+<ul class="simple">
+<li><p>QoS policy</p></li>
+<li><p>QoS rule (type specific)</p></li>
+</ul>
+<p>Each QoS policy contains zero or more QoS rules. A policy is then applied to a
+network or a port, making all rules of the policy applied to the corresponding
+Neutron resource.</p>
+<p>When applied through a network association, policy rules could apply or not
+to neutron internal ports (like router, dhcp, etc..). The QosRule
+base object provides a default should_apply_to_port method which could be
+overridden. In the future we may want to have a flag in QoSNetworkPolicyBinding
+or QosRule to enforce such type of application (for example when limiting all
+the ingress of routers devices on an external network automatically).</p>
+<p>Each project can have at most one default QoS policy, although is not
+mandatory. If a default QoS policy is defined, all new networks created within
+this project will have assigned this policy, as long as no other QoS policy is
+explicitly attached during the creation process. If the default QoS policy is
+unset, no change to existing networks will be made.</p>
+<p>From database point of view, following objects are defined in schema:</p>
+<ul class="simple">
+<li><p>QosPolicy: directly maps to the conceptual policy resource.</p></li>
+<li><p>QosNetworkPolicyBinding, QosPortPolicyBinding, QosFIPPolicyBinding:
+define attachment between a Neutron resource and a QoS policy.</p></li>
+<li><p>QosPolicyDefault: defines a default QoS policy per project.</p></li>
+<li><p>QosBandwidthLimitRule: defines the rule to limit the maximum egress
+bandwidth.</p></li>
+<li><p>QosDscpMarkingRule: defines the rule that marks the Differentiated Service
+bits for egress traffic.</p></li>
+<li><p>QosMinimumBandwidthRule: defines the rule that creates a minimum bandwidth
+constraint.</p></li>
+<li><p>QosMinimumPacketRateRule: defines the rule that creates a minimum packet rate
+constraint.</p></li>
+</ul>
+<p>All database models are defined under:</p>
+<ul class="simple">
+<li><p>neutron.db.qos.models</p></li>
+</ul>
+</section>
+<section id="qos-versioned-objects">
+<h3>QoS versioned objects<a class="headerlink" href="#qos-versioned-objects" title="Link to this heading">¶</a></h3>
+<p>For QoS, the following neutron objects are implemented:</p>
+<ul class="simple">
+<li><p>QosPolicy: directly maps to the conceptual policy resource, as defined above.</p></li>
+<li><p>QosPolicyDefault: defines a default QoS policy per project.</p></li>
+<li><p>QosBandwidthLimitRule: defines the instance bandwidth limit rule type,
+characterized by a max kbps and a max burst kbits. This rule has also a
+direction parameter to set the traffic direction, from the instance’s point
+of view.</p></li>
+<li><p>QosDscpMarkingRule: defines the DSCP rule type, characterized by an even
+integer between 0 and 56. These integers are the result of the bits in the
+DiffServ section of the IP header, and only certain configurations are valid.
+As a result, the list of valid DSCP rule types is:
+0, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32,
+34, 36, 38, 40, 46, 48, and 56.</p></li>
+<li><p>QosMinimumBandwidthRule: defines the minimum assured bandwidth rule type,
+characterized by a min_kbps parameter. This rule has also a direction
+parameter to set the traffic direction, from the instance point of view. The
+only direction now implemented is egress.</p></li>
+<li><p>QosMinimumPacketRateRule: defines the minimum assured packet rate rule type,
+characterized by a min_kpps parameter. This rule has also a direction
+parameter to set the traffic direction, from the instance point of view.</p></li>
+</ul>
+<p>Those are defined in:</p>
+<ul class="simple">
+<li><p>neutron.objects.qos.policy</p></li>
+<li><p>neutron.objects.qos.rule</p></li>
+</ul>
+<p>For QosPolicy neutron object, the following public methods were implemented:</p>
+<ul class="simple">
+<li><p>get_network_policy/get_port_policy/get_fip_policy: returns a policy object
+that is attached to the corresponding Neutron resource.</p></li>
+<li><p>attach_network/attach_port/attach_floatingip: attach a policy to the
+corresponding Neutron resource.</p></li>
+<li><p>detach_network/detach_port/detach_floatingip: detach a policy from the
+corresponding Neutron resource.</p></li>
+</ul>
+<p>In addition to the fields that belong to QoS policy database object itself,
+synthetic fields were added to the object that represent lists of rules that
+belong to the policy. To get a list of all rules for a specific policy, a
+consumer of the object can just access the corresponding attribute via:</p>
+<ul class="simple">
+<li><p>policy.rules</p></li>
+</ul>
+<p>Implementation is done in a way that will allow adding a new rule list field
+with little or no modifications in the policy object itself. This is achieved
+by smart introspection of existing available rule object definitions and
+automatic definition of those fields on the policy class.</p>
+<p>Note that rules are loaded in a non lazy way, meaning they are all fetched from
+the database on policy fetch.</p>
+<p>For Qos&lt;type&gt;Rule objects, an extendable approach was taken to allow easy
+addition of objects for new rule types. To accommodate this, fields common to
+all types are put into a base class called QosRule that is then inherited into
+type-specific rule implementations that, ideally, only define additional fields
+and some other minor things.</p>
+<p>Note that the QosRule base class is not registered with oslo.versionedobjects
+registry, because it’s not expected that ‘generic’ rules should be
+instantiated (and to suggest just that, the base rule class is marked as ABC).</p>
+<p>QoS objects rely on some primitive database API functions that are added in:</p>
+<ul class="simple">
+<li><p>neutron_lib.db.api: those can be reused to fetch other models that do not
+have corresponding versioned objects yet, if needed.</p></li>
+<li><p>neutron.db.qos.api: contains database functions that are specific to QoS
+models.</p></li>
+</ul>
+</section>
+<section id="rpc-communication">
+<h3>RPC communication<a class="headerlink" href="#rpc-communication" title="Link to this heading">¶</a></h3>
+<p>Details on RPC communication implemented in reference backend driver are
+discussed in <a class="reference external" href="rpc_callbacks.html">a separate page</a>.</p>
+<p>The flow of updates is as follows:</p>
+<ul class="simple">
+<li><p>if a port that is bound to the agent is attached to a QoS policy, then ML2
+plugin detects the change by relying on ML2 QoS extension driver, and
+notifies the agent about a port change. The agent proceeds with the
+notification by calling to get_device_details() and getting the new port dict
+that contains a new qos_policy_id. Each device details dict is passed into l2
+agent extension manager that passes it down into every enabled extension,
+including QoS. QoS extension sees that there is a new unknown QoS policy for
+a port, so it uses ResourcesPullRpcApi to fetch the current state of the
+policy (with all the rules included) from the server. After that, the QoS
+extension applies the rules by calling into QoS driver that corresponds to
+the agent.</p></li>
+<li><p>For floating IPs, a <code class="docutils literal notranslate"><span class="pre">fip_qos</span></code> L3 agent extension was implemented. This
+extension receives and processes router updates. For each update, it goes
+over each floating IP associated to the router. If a floating IP has a QoS
+policy associated to it, the extension uses ResourcesPullRpcApi to fetch
+the policy details from the Neutron server. If the policy includes
+<code class="docutils literal notranslate"><span class="pre">bandwidth_limit</span></code> rules, the extension applies them to the appropriate
+router device by directly calling the l3_tc_lib.</p></li>
+<li><p>on existing QoS policy update (it includes any policy or its rules change),
+server pushes the new policy object state through ResourcesPushRpcApi
+interface. The interface fans out the serialized (dehydrated) object to any
+agent that is listening for QoS policy updates. If an agent have seen the
+policy before (it is attached to one of the ports/floating IPs it maintains),
+then it goes with applying the updates to the port/floating IP. Otherwise,
+the agent silently ignores the update.</p></li>
+</ul>
+</section>
+</section>
+<section id="agent-side-design">
+<h2>Agent side design<a class="headerlink" href="#agent-side-design" title="Link to this heading">¶</a></h2>
+<p>Reference agents implement QoS functionality using an <a class="reference external" href="./l2_agent_extensions.html">L2 agent extension</a>.</p>
+<ul class="simple">
+<li><p>neutron.agent.l2.extensions.qos
+defines QoS L2 agent extension. It receives handle_port and delete_port
+events and passes them down into QoS agent backend driver (see below). The
+file also defines the QosAgentDriver interface. Note: each backend implements
+its own driver. The driver handles low level interaction with the underlying
+networking technology, while the QoS extension handles operations that are
+common to all agents.</p></li>
+</ul>
+<p>For L3 agent:</p>
+<ul class="simple">
+<li><p>neutron.agent.l3.extensions.fip_qos
+defines QoS L3 agent extension. It implements the L3 agent side of floating
+IP rate limit. For all routers, if floating IP has QoS <code class="docutils literal notranslate"><span class="pre">bandwidth_limit</span></code>
+rules, the corresponding TC filters will be added to the appropriate router
+device, depending on the router type.</p></li>
+</ul>
+<section id="agent-backends">
+<h3>Agent backends<a class="headerlink" href="#agent-backends" title="Link to this heading">¶</a></h3>
+<p>At the moment, QoS is supported by Open vSwitch, SR-IOV and Linux bridge
+ml2 drivers.</p>
+<p>Each agent backend defines a QoS driver that implements the QosAgentDriver
+interface:</p>
+<ul class="simple">
+<li><p>Open vSwitch (QosOVSAgentDriver);</p></li>
+<li><p>SR-IOV (QosSRIOVAgentDriver);</p></li>
+</ul>
+<p>For the Networking back ends, QoS supported rules, and traffic directions
+(from the VM point of view), please see the table:
+<a class="reference external" href="../../admin/config-qos.html#id1">Networking back ends, supported rules, and traffic direction</a>.</p>
+<section id="open-vswitch">
+<h4>Open vSwitch<a class="headerlink" href="#open-vswitch" title="Link to this heading">¶</a></h4>
+<p>Open vSwitch implementation relies on the new ovs_lib OVSBridge functions:</p>
+<ul class="simple">
+<li><p>get_egress_bw_limit_for_port</p></li>
+<li><p>create_egress_bw_limit_for_port</p></li>
+<li><p>delete_egress_bw_limit_for_port</p></li>
+<li><p>get_ingress_bw_limit_for_port</p></li>
+<li><p>update_ingress_bw_limit_for_port</p></li>
+<li><p>delete_ingress_bw_limit_for_port</p></li>
+</ul>
+<p>An egress bandwidth limit is effectively configured on the port by setting
+the port Interface parameters ingress_policing_rate and
+ingress_policing_burst.</p>
+<p>That approach is less flexible than linux-htb, Queues and OvS QoS profiles,
+which we may explore in the future, but which will need to be used in
+combination with openflow rules.</p>
+<p>An ingress bandwidth limit is effectively configured on the port by setting
+Queue and OvS QoS profile with linux-htb type for port.</p>
+<p>The Open vSwitch DSCP marking implementation relies on the recent addition
+of the ovs_agent_extension_api OVSAgentExtensionAPI to request access to the
+integration bridge functions:</p>
+<ul class="simple">
+<li><p>add_flow</p></li>
+<li><p>mod_flow</p></li>
+<li><p>delete_flows</p></li>
+<li><p>dump_flows_for</p></li>
+</ul>
+<p>The DSCP markings are in fact configured on the port by means of
+openflow rules.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As of Ussuri release, the QoS rules can be applied for direct ports with
+hardware offload capability (switchdev), this requires Open vSwitch
+version 2.11.0 or newer and Linux kernel based on kernel 5.4.0 or newer.</p>
+</div>
+</section>
+<section id="sr-iov">
+<h4>SR-IOV<a class="headerlink" href="#sr-iov" title="Link to this heading">¶</a></h4>
+<p>SR-IOV bandwidth limit and minimum bandwidth implementation relies on the
+new pci_lib function:</p>
+<ul class="simple">
+<li><p>set_vf_rate</p></li>
+</ul>
+<p>As the name of the function suggests, the limit is applied on a Virtual
+Function (VF). This function has a parameter called “rate_type” and
+its value can be set to “rate” or “min_tx_rate”, which is for enforcing
+bandwidth limit or minimum bandwidth respectively.</p>
+<p>ip link interface has the following limitation for bandwidth limit: it uses
+Mbps as units of bandwidth measurement, not kbps, and does not support float
+numbers. So in case the limit is set to something less than 1000 kbps, it’s set
+to 1 Mbps only. If the limit is set to something that does not divide to 1000
+kbps chunks, then the effective limit is rounded to the nearest integer Mbps
+value.</p>
+</section>
+</section>
+<section id="linux-bridge">
+<h3>Linux bridge<a class="headerlink" href="#linux-bridge" title="Link to this heading">¶</a></h3>
+<p>The Linux bridge implementation relies on the new tc_lib functions.</p>
+<p>For egress bandwidth limit rule:</p>
+<ul class="simple">
+<li><p>set_filters_bw_limit</p></li>
+<li><p>update_filters_bw_limit</p></li>
+<li><p>delete_filters_bw_limit</p></li>
+</ul>
+<p>The egress bandwidth limit is configured on the tap port by setting traffic
+policing on tc ingress queueing discipline (qdisc). Details about ingress
+qdisc can be found on <a class="reference external" href="http://lartc.org/howto/lartc.adv-qdisc.ingress.html">lartc how-to</a>.
+The reason why ingress qdisc is used to configure egress bandwidth limit is
+that tc is working on traffic which is visible from “inside bridge”
+perspective. So traffic incoming to bridge via tap interface is in fact
+outgoing from Neutron’s port.
+This implementation is the same as what Open vSwitch is doing when
+ingress_policing_rate and ingress_policing_burst are set for port.</p>
+<p>For ingress bandwidth limit rule:</p>
+<ul class="simple">
+<li><p>set_tbf_bw_limit</p></li>
+<li><p>update_tbf_bw_limit</p></li>
+<li><p>delete_tbf_bw_limit</p></li>
+</ul>
+<p>The ingress bandwidth limit is configured on the tap port by setting a simple
+<a class="reference external" href="http://linux.die.net/man/8/tc-tbf">tc-tbf</a> queueing discipline (qdisc) on
+the port. It requires a value of HZ parameter configured in kernel on the host.
+This value is necessary to calculate the minimal burst value which is set in
+tc. Details about how it is calculated can be found in
+<a class="reference external" href="http://unix.stackexchange.com/a/100797">here</a>.
+This solution is similar to Open vSwitch implementation.</p>
+</section>
+</section>
+<section id="qos-driver-design">
+<h2>QoS driver design<a class="headerlink" href="#qos-driver-design" title="Link to this heading">¶</a></h2>
+<p>QoS framework is flexible enough to support any third-party vendor. To
+integrate a third party driver (that just wants to be aware of the QoS
+create/update/delete API calls), one needs to implement
+‘neutron.services.qos.drivers.base’, and register
+the driver during the core plugin or mechanism driver load, see</p>
+<p>neutron.services.qos.drivers.openvswitch.driver register method for an example.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All the functionality MUST be implemented by the vendor, neutron’s QoS
+framework will just act as an interface to bypass the received QoS API
+request and help with database persistence for the API operations.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>L3 agent <code class="docutils literal notranslate"><span class="pre">fip_qos</span></code> extension does not have a driver implementation,
+it directly uses the <code class="docutils literal notranslate"><span class="pre">l3_tc_lib</span></code> for all types of routers.</p>
+</div>
+</section>
+<section id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Link to this heading">¶</a></h2>
+<p>To enable the service, the following steps should be followed:</p>
+<p>On server side:</p>
+<ul class="simple">
+<li><p>enable qos service in service_plugins;</p></li>
+<li><p>for ml2, add ‘qos’ to extension_drivers in [ml2] section;</p></li>
+<li><p>for L3 floating IP QoS, add ‘qos’ and ‘router’ to service_plugins.</p></li>
+</ul>
+<p>On agent side (OVS):</p>
+<ul class="simple">
+<li><p>add ‘qos’ to extensions in [agent] section.</p></li>
+</ul>
+<p>On L3 agent side:</p>
+<ul class="simple">
+<li><p>For for floating IPs QoS support, add ‘fip_qos’ to extensions in [agent]
+section.</p></li>
+</ul>
+</section>
+<section id="testing-strategy">
+<h2>Testing strategy<a class="headerlink" href="#testing-strategy" title="Link to this heading">¶</a></h2>
+<p>All the code added or extended as part of the effort got reasonable unit test
+coverage.</p>
+<section id="neutron-objects">
+<h3>Neutron objects<a class="headerlink" href="#neutron-objects" title="Link to this heading">¶</a></h3>
+<p>Base unit test classes to validate neutron objects were implemented in a way
+that allows code reuse when introducing a new object type.</p>
+<p>There are two test classes that are utilized for that:</p>
+<ul class="simple">
+<li><p>BaseObjectIfaceTestCase: class to validate basic object operations (mostly
+CRUD) with database layer isolated.</p></li>
+<li><p>BaseDbObjectTestCase: class to validate the same operations with models in
+place and database layer unmocked.</p></li>
+</ul>
+<p>Every new object implemented on top of one of those classes is expected to
+either inherit existing test cases as is, or reimplement it, if it makes sense
+in terms of how those objects are implemented. Specific test classes can
+obviously extend the set of test cases as they see needed (f.e. you need to
+define new test cases for those additional methods that you may add to your
+object implementations on top of base semantics common to all neutron objects).</p>
+</section>
+<section id="functional-tests">
+<h3>Functional tests<a class="headerlink" href="#functional-tests" title="Link to this heading">¶</a></h3>
+<p>Additions to ovs_lib to set bandwidth limits on ports are covered in:</p>
+<ul class="simple">
+<li><p>neutron.tests.functional.agent.test_ovs_lib</p></li>
+</ul>
+<p>New functional tests for tc_lib to set bandwidth limits on ports are in:</p>
+<ul class="simple">
+<li><p>neutron.tests.functional.agent.linux.test_tc_lib</p></li>
+</ul>
+<p>New functional tests for test_l3_tc_lib to set TC filters on router floating
+IP related device are covered in:</p>
+<ul class="simple">
+<li><p>neutron.tests.functional.agent.linux.test_l3_tc_lib</p></li>
+</ul>
+<p>New functional tests for L3 agent floating IP rate limit:</p>
+<ul class="simple">
+<li><p>neutron.tests.functional.agent.l3.extensions.test_fip_qos_extension</p></li>
+</ul>
+</section>
+<section id="api-tests">
+<h3>API tests<a class="headerlink" href="#api-tests" title="Link to this heading">¶</a></h3>
+<p>API tests for basic CRUD operations for ports, networks, policies, and rules
+were added in:</p>
+<ul class="simple">
+<li><p>neutron-tempest-plugin.api.test_qos</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="provisioning_blocks.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Provisioning Blocks in relation to Composite Object Status"></i></a>
+          
+          
+            <a href="quota.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Quota Management and Enforcement"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2024-08-26 17:49:17</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Contributor Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#basic-information">Basic Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-policies">Neutron Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#gerrit-rechecks">Gerrit Rechecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-stadium">Neutron Stadium</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#neutron-internals">Neutron Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#ovn-driver">OVN Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#dashboards">Dashboards</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Quality of Service</a><ul>
+<li><a class="reference internal" href="#service-side-design">Service side design</a><ul>
+<li><a class="reference internal" href="#qos-plugin-implementation-guide">QoS plugin implementation guide</a></li>
+<li><a class="reference internal" href="#supported-qos-rule-types">Supported QoS rule types</a></li>
+<li><a class="reference internal" href="#database-models">Database models</a></li>
+<li><a class="reference internal" href="#qos-versioned-objects">QoS versioned objects</a></li>
+<li><a class="reference internal" href="#rpc-communication">RPC communication</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#agent-side-design">Agent side design</a><ul>
+<li><a class="reference internal" href="#agent-backends">Agent backends</a><ul>
+<li><a class="reference internal" href="#open-vswitch">Open vSwitch</a></li>
+<li><a class="reference internal" href="#sr-iov">SR-IOV</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#linux-bridge">Linux bridge</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#qos-driver-design">QoS driver design</a></li>
+<li><a class="reference internal" href="#configuration">Configuration</a></li>
+<li><a class="reference internal" href="#testing-strategy">Testing strategy</a><ul>
+<li><a class="reference internal" href="#neutron-objects">Neutron objects</a></li>
+<li><a class="reference internal" href="#functional-tests">Functional tests</a></li>
+<li><a class="reference internal" href="#api-tests">API tests</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "contributor/internals/quality_of_service" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Quality of Service in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2024-08-26 17:49:17";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "contributor/internals/quality_of_service";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

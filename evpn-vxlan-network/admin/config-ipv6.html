@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>IPv6 &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/support-matrix.css?v=ac26a930" />
+    <script src="../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Macvtap Mechanism Driver" href="config-macvtap.html" />
+    <link rel="prev" title="IPAM Configuration" href="config-ipam.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/admin/config-ipv6.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>IPv6</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="config-ipam.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: IPAM Configuration"></i></a>
+    
+    
+    <a href="config-macvtap.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Macvtap Mechanism Driver"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="ipv6">
+<span id="config-ipv6"></span><h1>IPv6<a class="headerlink" href="#ipv6" title="Link to this heading">¶</a></h1>
+<p>This section describes the OpenStack Networking reference implementation
+for IPv6, including the following items:</p>
+<ul class="simple">
+<li><p>How to enable dual-stack (IPv4 and IPv6 enabled) instances.</p></li>
+<li><p>How those instances receive an IPv6 address.</p></li>
+<li><p>How those instances communicate across a router to other subnets or
+the internet.</p></li>
+<li><p>How those instances interact with other OpenStack services.</p></li>
+</ul>
+<p>Enabling a dual-stack network in OpenStack Networking simply requires
+creating a subnet with the <code class="docutils literal notranslate"><span class="pre">ip_version</span></code> field set to <code class="docutils literal notranslate"><span class="pre">6</span></code>, then the
+IPv6 attributes (<code class="docutils literal notranslate"><span class="pre">ipv6_ra_mode</span></code> and <code class="docutils literal notranslate"><span class="pre">ipv6_address_mode</span></code>) set.  The
+<code class="docutils literal notranslate"><span class="pre">ipv6_ra_mode</span></code> and <code class="docutils literal notranslate"><span class="pre">ipv6_address_mode</span></code> will be described in detail in
+the next section. Finally, the subnets <code class="docutils literal notranslate"><span class="pre">cidr</span></code> needs to be provided.</p>
+<p>This section does not include the following items:</p>
+<ul class="simple">
+<li><p>Single stack IPv6 project networking</p></li>
+<li><p>OpenStack control communication between servers and services over an IPv6
+network.</p></li>
+<li><p>Connection to the OpenStack APIs via an IPv6 transport network</p></li>
+<li><p>IPv6 multicast</p></li>
+<li><p>IPv6 support in conjunction with any out of tree routers, switches, services
+or agents whether in physical or virtual form factors.</p></li>
+</ul>
+<section id="neutron-subnets-and-the-ipv6-api-attributes">
+<h2>Neutron subnets and the IPv6 API attributes<a class="headerlink" href="#neutron-subnets-and-the-ipv6-api-attributes" title="Link to this heading">¶</a></h2>
+<p>As of Juno, the OpenStack Networking service (neutron) provides two
+new attributes to the subnet object, which allows users of the API to
+configure IPv6 subnets.</p>
+<p>There are two IPv6 attributes:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ipv6_ra_mode</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ipv6_address_mode</span></code></p></li>
+</ul>
+<p>These attributes can be set to the following values:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">slaac</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dhcpv6-stateful</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dhcpv6-stateless</span></code></p></li>
+</ul>
+<p>The attributes can also be left unset.</p>
+<section id="ipv6-addressing">
+<h3>IPv6 addressing<a class="headerlink" href="#ipv6-addressing" title="Link to this heading">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">ipv6_address_mode</span></code> attribute is used to control how addressing is
+handled by OpenStack. There are a number of different ways that guest
+instances can obtain an IPv6 address, and this attribute exposes these
+choices to users of the Networking API.</p>
+</section>
+<section id="router-advertisements">
+<h3>Router advertisements<a class="headerlink" href="#router-advertisements" title="Link to this heading">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">ipv6_ra_mode</span></code> attribute is used to control router
+advertisements for a subnet.</p>
+<p>The IPv6 Protocol uses Internet Control Message Protocol packets
+(ICMPv6) as a way to distribute information about networking. ICMPv6
+packets with the type flag set to 134 are called “Router
+Advertisement” messages, which contain information about the router
+and the route that can be used by guest instances to send network
+traffic.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">ipv6_ra_mode</span></code> is used to specify if the Networking service should
+generate Router Advertisement messages for a subnet.</p>
+</section>
+<section id="ipv6-ra-mode-and-ipv6-address-mode-combinations">
+<h3>ipv6_ra_mode and ipv6_address_mode combinations<a class="headerlink" href="#ipv6-ra-mode-and-ipv6-address-mode-combinations" title="Link to this heading">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 10.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>ipv6 ra mode</p></th>
+<th class="head"><p>ipv6 address mode</p></th>
+<th class="head"><p>neutron-generated advertisements (radvd) A,M,O</p></th>
+<th class="head"><p>External Router A,M,O</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><em>N/S</em></p></td>
+<td><p><em>N/S</em></p></td>
+<td><p>Off</p></td>
+<td><p>Not Defined</p></td>
+<td><p>Backwards compatibility with pre-Juno IPv6 behavior.</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>N/S</em></p></td>
+<td><p>slaac</p></td>
+<td><p>Off</p></td>
+<td><p>1,0,0</p></td>
+<td><p>Guest instance obtains IPv6 address from non-OpenStack router using SLAAC.</p></td>
+</tr>
+<tr class="row-even"><td><p><em>N/S</em></p></td>
+<td><p>dhcpv6-stateful</p></td>
+<td><p>Off</p></td>
+<td><p>0,1,1</p></td>
+<td><p>Not currently implemented in the reference implementation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>N/S</em></p></td>
+<td><p>dhcpv6-stateless</p></td>
+<td><p>Off</p></td>
+<td><p>1,0,1</p></td>
+<td><p>Not currently implemented in the reference implementation.</p></td>
+</tr>
+<tr class="row-even"><td><p>slaac</p></td>
+<td><p><em>N/S</em></p></td>
+<td><p>1,0,0</p></td>
+<td><p>Off</p></td>
+<td><p>Not currently implemented in the reference implementation.</p></td>
+</tr>
+<tr class="row-odd"><td><p>dhcpv6-stateful</p></td>
+<td><p><em>N/S</em></p></td>
+<td><p>0,1,0</p></td>
+<td><p>Off</p></td>
+<td><p>Not currently implemented in the reference implementation.</p></td>
+</tr>
+<tr class="row-even"><td><p>dhcpv6-stateless</p></td>
+<td><p><em>N/S</em></p></td>
+<td><p>1,0,1</p></td>
+<td><p>Off</p></td>
+<td><p>Not currently implemented in the reference implementation.</p></td>
+</tr>
+<tr class="row-odd"><td><p>slaac</p></td>
+<td><p>slaac</p></td>
+<td><p>1,0,0</p></td>
+<td><p>Off</p></td>
+<td><p>Guest instance obtains IPv6 address from OpenStack managed radvd using SLAAC.</p></td>
+</tr>
+<tr class="row-even"><td><p>dhcpv6-stateful</p></td>
+<td><p>dhcpv6-stateful</p></td>
+<td><p>0,1,0</p></td>
+<td><p>Off</p></td>
+<td><p>Guest instance obtains IPv6 address from dnsmasq using DHCPv6
+stateful and optional info from dnsmasq using DHCPv6.</p></td>
+</tr>
+<tr class="row-odd"><td><p>dhcpv6-stateless</p></td>
+<td><p>dhcpv6-stateless</p></td>
+<td><p>1,0,1</p></td>
+<td><p>Off</p></td>
+<td><p>Guest instance obtains IPv6 address from OpenStack managed
+radvd using SLAAC and optional info from dnsmasq using
+DHCPv6.</p></td>
+</tr>
+<tr class="row-even"><td><p>slaac</p></td>
+<td><p>dhcpv6-stateful</p></td>
+<td></td>
+<td></td>
+<td><p><em>Invalid combination.</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>slaac</p></td>
+<td><p>dhcpv6-stateless</p></td>
+<td></td>
+<td></td>
+<td><p><em>Invalid combination.</em></p></td>
+</tr>
+<tr class="row-even"><td><p>dhcpv6-stateful</p></td>
+<td><p>slaac</p></td>
+<td></td>
+<td></td>
+<td><p><em>Invalid combination.</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>dhcpv6-stateful</p></td>
+<td><p>dhcpv6-stateless</p></td>
+<td></td>
+<td></td>
+<td><p><em>Invalid combination.</em></p></td>
+</tr>
+<tr class="row-even"><td><p>dhcpv6-stateless</p></td>
+<td><p>slaac</p></td>
+<td></td>
+<td></td>
+<td><p><em>Invalid combination.</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>dhcpv6-stateless</p></td>
+<td><p>dhcpv6-stateful</p></td>
+<td></td>
+<td></td>
+<td><p><em>Invalid combination.</em></p></td>
+</tr>
+</tbody>
+</table>
+<p><em>A - Autonomous Address Configuration Flag,</em>
+<em>M - Managed Address Configuration Flag,</em>
+<em>O - Other Configuration Flag</em></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the M flag is set to 1, the O flag can be either 1 or 0.
+This is because the O flag can be ignored when the M flag is set to 1,
+as mentioned in <a class="reference external" href="https://www.rfc-editor.org/rfc/rfc4861#section-4.2">RFC 4861</a>
+below:</p>
+<p>“If the M flag is set, the O flag is redundant and
+can be ignored because DHCPv6 will return all
+available configuration information.”</p>
+<p>For this reason, the neutron-generated advertisements will have the M flag
+set to 1 and the O flag set to 0.</p>
+</div>
+</section>
+</section>
+<section id="project-network-considerations">
+<h2>Project network considerations<a class="headerlink" href="#project-network-considerations" title="Link to this heading">¶</a></h2>
+<section id="dataplane">
+<h3>Dataplane<a class="headerlink" href="#dataplane" title="Link to this heading">¶</a></h3>
+<p>All dataplane modules, including OVN and Open vSwitch,
+support forwarding IPv6
+packets amongst the guests and router ports. Similar to IPv4, there is no
+special configuration or setup required to enable the dataplane to properly
+forward packets from the source to the destination using IPv6. Note that these
+dataplanes will forward Link-local Address (LLA) packets between hosts on the
+same network just fine without any participation or setup by OpenStack
+components after the ports are all connected and MAC addresses learned.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The only exception to this is the setting of the MTU value on
+the network an IPv6 subnet is created on. If the MTU is less than
+1280 octets (the minimum link MTU value specified in
+<a class="reference external" href="https://www.rfc-editor.org/rfc/rfc8200">RFC 8200</a>), then it
+could lead to issues configuring both IPv6 and IPv4 addresses on
+the network, leaving the subnets unusable. For that reason, the API
+validates the MTU value when subnets are created to avoid this issue.</p>
+</div>
+</section>
+<section id="addresses-for-subnets">
+<h3>Addresses for subnets<a class="headerlink" href="#addresses-for-subnets" title="Link to this heading">¶</a></h3>
+<p>There are three methods currently implemented for a subnet to get its
+<code class="docutils literal notranslate"><span class="pre">cidr</span></code> in OpenStack:</p>
+<ol class="arabic simple">
+<li><p>Direct assignment during subnet creation via command line or Horizon</p></li>
+<li><p>Referencing a subnet pool during subnet creation</p></li>
+<li><p>Using a Prefix Delegation (PD) client to request a prefix for a
+subnet from a PD server</p></li>
+</ol>
+<p>In the future, additional techniques could be used to allocate subnets
+to projects, for example, use of an external IPAM module.</p>
+</section>
+<section id="address-modes-for-ports">
+<h3>Address modes for ports<a class="headerlink" href="#address-modes-for-ports" title="Link to this heading">¶</a></h3>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>An external DHCPv6 server in theory could override the full
+address OpenStack assigns based on the EUI-64 address, but that
+would not be wise as it would not be consistent through the system.</p>
+</div>
+<p>IPv6 supports three different addressing schemes for address configuration and
+for providing optional network information.</p>
+<dl class="simple">
+<dt>Stateless Address Auto Configuration (SLAAC)</dt><dd><p>Address configuration using Router Advertisements.</p>
+</dd>
+<dt>DHCPv6-stateless</dt><dd><p>Address configuration using Router Advertisements and optional information
+using DHCPv6.</p>
+</dd>
+<dt>DHCPv6-stateful</dt><dd><p>Address configuration and optional information using DHCPv6.</p>
+</dd>
+</dl>
+<p>OpenStack can be setup such that OpenStack Networking directly
+provides Router Advertisements, DHCP
+relay and DHCPv6 address and optional information for their networks
+or this can be delegated to external routers and services based on the
+drivers that are in use. There are two neutron subnet attributes -
+<code class="docutils literal notranslate"><span class="pre">ipv6_ra_mode</span></code> and <code class="docutils literal notranslate"><span class="pre">ipv6_address_mode</span></code> – that determine how IPv6
+addressing and network information is provided to project instances:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ipv6_ra_mode</span></code>: Determines who sends Router Advertisements.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ipv6_address_mode</span></code>: Determines how instances obtain IPv6 address,
+default gateway, or optional information.</p></li>
+</ul>
+<p>For the above two attributes to be effective, <code class="docutils literal notranslate"><span class="pre">enable_dhcp</span></code> of the
+subnet object must be set to True.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>When updating a network which already has bound ports with a subnet
+in which Autonomous Address Configuration is enabled (Stateless Address
+Auto Configuration, DHCPv6-stateless) the ports  will be updated with
+the new address. This will not happen if the subnet is DHCPv6-stateful.
+The same is true for the case when the ports are bound with an IPv6
+subnet (the network has no other IPv4 subnet), and an IPv4 subnet
+is added later, the ports will not be updated.</p>
+<p>For more details see the bug
+<a class="reference external" href="https://bugs.launchpad.net/neutron/+bug/1719806">https://bugs.launchpad.net/neutron/+bug/1719806</a>.</p>
+<p>A workaround is to manually update the port with fixed_ips and add the
+subnet in the request.</p>
+</div>
+</section>
+<section id="using-slaac-for-addressing">
+<h3>Using SLAAC for addressing<a class="headerlink" href="#using-slaac-for-addressing" title="Link to this heading">¶</a></h3>
+<p>When using SLAAC, the currently supported combinations for <code class="docutils literal notranslate"><span class="pre">ipv6_ra_mode</span></code> and
+<code class="docutils literal notranslate"><span class="pre">ipv6_address_mode</span></code> are as follows.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 14.3%" />
+<col style="width: 14.3%" />
+<col style="width: 71.4%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>ipv6_ra_mode</p></th>
+<th class="head"><p>ipv6_address_mode</p></th>
+<th class="head"><p>Result</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Not specified.</p></td>
+<td><p>SLAAC</p></td>
+<td><p>Addresses are assigned using EUI-64, and an external router
+will be used for routing.</p></td>
+</tr>
+<tr class="row-odd"><td><p>SLAAC</p></td>
+<td><p>SLAAC</p></td>
+<td><p>Address are assigned using EUI-64, and OpenStack Networking
+provides routing.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Setting SLAAC for <code class="docutils literal notranslate"><span class="pre">ipv6_ra_mode</span></code> configures the neutron
+router with an radvd agent to send Router Advertisements. The list below
+captures the values set for the address configuration flags in the Router
+Advertisement messages in this scenario.</p>
+<ul class="simple">
+<li><p>Autonomous Address Configuration Flag = 1</p></li>
+<li><p>Managed Address Configuration Flag = 0</p></li>
+<li><p>Other Configuration Flag = 0</p></li>
+</ul>
+<p>New or existing neutron networks that contain a SLAAC enabled IPv6 subnet will
+result in all neutron ports attached to the network receiving IPv6 addresses.
+This is because when Router Advertisement messages are multicast on a
+neutron network, they are received by all IPv6 capable ports on the network,
+and each port will then configure an IPv6 address based on the
+information contained in the Router Advertisement messages. In some cases, an
+IPv6 SLAAC address will be added to a port, in addition to other IPv4 and IPv6
+addresses that the port already has been assigned.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If a router is not created and added to the subnet, SLAAC addressing will
+not succeed for instances since no Router Advertisement messages will
+be generated.</p>
+</div>
+</section>
+<section id="dhcpv6">
+<h3>DHCPv6<a class="headerlink" href="#dhcpv6" title="Link to this heading">¶</a></h3>
+<p>For DHCPv6, the currently supported combinations are as
+follows:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 14.3%" />
+<col style="width: 14.3%" />
+<col style="width: 71.4%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>ipv6_ra_mode</p></th>
+<th class="head"><p>ipv6_address_mode</p></th>
+<th class="head"><p>Result</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DHCPv6-stateless</p></td>
+<td><p>DHCPv6-stateless</p></td>
+<td><p>Addresses are assigned through Router Advertisements (see SLAAC above)
+and optional information is delivered through DHCPv6.</p></td>
+</tr>
+<tr class="row-odd"><td><p>DHCPv6-stateful</p></td>
+<td><p>DHCPv6-stateful</p></td>
+<td><p>Addresses and optional information are assigned using DHCPv6.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Setting DHCPv6-stateless for <code class="docutils literal notranslate"><span class="pre">ipv6_ra_mode</span></code> configures the neutron
+router with an radvd agent to send Router Advertisements. The list below
+captures the values set for the address configuration flags in the Router
+Advertisement messages in this scenario. Similarly, setting DHCPv6-stateless
+for <code class="docutils literal notranslate"><span class="pre">ipv6_address_mode</span></code> configures neutron DHCP implementation to provide
+the additional network information.</p>
+<ul class="simple">
+<li><p>Autonomous Address Configuration Flag = 1</p></li>
+<li><p>Managed Address Configuration Flag = 0</p></li>
+<li><p>Other Configuration Flag = 1</p></li>
+</ul>
+<p>Setting DHCPv6-stateful for <code class="docutils literal notranslate"><span class="pre">ipv6_ra_mode</span></code> configures the neutron
+router with an radvd agent to send Router Advertisements. The list below
+captures the values set for the address configuration flags in the Router
+Advertisements messages in this scenario. Similarly, setting DHCPv6-stateful
+for <code class="docutils literal notranslate"><span class="pre">ipv6_address_mode</span></code> configures neutron DHCP implementation to provide
+addresses and additional network information through DHCPv6.</p>
+<ul class="simple">
+<li><p>Autonomous Address Configuration Flag = 0</p></li>
+<li><p>Managed Address Configuration Flag = 1</p></li>
+<li><p>Other Configuration Flag = 0</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If a router is not created and added to the subnet, DHCPv6 addressing will
+not succeed for instances since no Router Advertisement messages will
+be generated.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the M flag is set to 1, the O flag can be either 1 or 0.
+This is because the O flag can be ignored when the M flag is set to 1,
+as mentioned in <a class="reference external" href="https://www.rfc-editor.org/rfc/rfc4861#section-4.2">RFC 4861</a>
+below:</p>
+<p>“If the M flag is set, the O flag is redundant and
+can be ignored because DHCPv6 will return all
+available configuration information.”</p>
+<p>For this reason, the neutron-generated advertisements will have the M flag
+set to 1 and the O flag set to 0.</p>
+</div>
+</section>
+</section>
+<section id="router-support">
+<h2>Router support<a class="headerlink" href="#router-support" title="Link to this heading">¶</a></h2>
+<p>The behavior of the neutron router for IPv6 is different than for IPv4 in
+a few ways.</p>
+<p>Internal router ports, that act as default gateway ports for a network, will
+share a common port for all IPv6 subnets associated with the network. This
+implies that there will be an IPv6 internal router interface with multiple
+IPv6 addresses from each of the IPv6 subnets associated with the network and a
+separate IPv4 internal router interface for the IPv4 subnet. On the other
+hand, external router ports are allowed to have a dual-stack configuration
+with both an IPv4 and an IPv6 address assigned to them.</p>
+<p>Neutron project networks that are assigned Global Unicast Address (GUA)
+prefixes and addresses don’t require NAT on the neutron router external gateway
+port to access the outside world. As a consequence of the lack of NAT the
+external router port doesn’t require a GUA to send and receive to the external
+networks. This implies a GUA IPv6 subnet prefix is not necessarily needed for
+the neutron external network. By default, a IPv6 LLA associated with the
+external gateway port can be used for routing purposes. To handle this
+scenario, the implementation of router-gateway-set API in neutron has been
+modified so that an IPv6 subnet is not required for the external network that
+is associated with the neutron router. The LLA address of the upstream router
+can be learned in two ways.</p>
+<ol class="arabic simple">
+<li><p>In the absence of an upstream Router Advertisement message, the
+<code class="docutils literal notranslate"><span class="pre">ipv6_gateway</span></code> flag can be set
+with the external router gateway LLA in the neutron L3 agent configuration
+file. This also requires that no subnet is associated with that port.</p></li>
+<li><p>The upstream router can send a Router Advertisement and the neutron router
+will automatically learn the next-hop LLA, provided again that no subnet is
+assigned and the <code class="docutils literal notranslate"><span class="pre">ipv6_gateway</span></code> flag is not set.</p></li>
+</ol>
+<p>Effectively the <code class="docutils literal notranslate"><span class="pre">ipv6_gateway</span></code> flag takes precedence over a Router
+Advertisements that is received from the upstream router. If it is desired to
+use a GUA next hop that is accomplished by allocating a subnet to the external
+router port and assigning the upstream routers GUA address as the
+gateway for the subnet.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It should be possible for projects to communicate with each other
+on an isolated network (a network without a router port) using LLA
+with little to no participation on the part of OpenStack. The authors
+of this section have not proven that to be true for all scenarios.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When using the neutron L3 agent in a configuration where it is
+auto-configuring an IPv6 address via SLAAC, and the agent is
+learning its default IPv6 route from the ICMPv6 Router Advertisement,
+it may be necessary to set the
+<code class="docutils literal notranslate"><span class="pre">net.ipv6.conf.&lt;physical_interface&gt;.accept_ra</span></code> sysctl to the
+value <code class="docutils literal notranslate"><span class="pre">2</span></code> in order for routing to function correctly.
+For a more detailed description, please see the <a class="reference external" href="https://bugs.launchpad.net/neutron/+bug/1616282">bug</a>.</p>
+</div>
+<section id="neutron-s-distributed-router-feature-and-ipv6">
+<h3>Neutron’s Distributed Router feature and IPv6<a class="headerlink" href="#neutron-s-distributed-router-feature-and-ipv6" title="Link to this heading">¶</a></h3>
+<p>IPv6 does work when the Distributed Virtual Router functionality is enabled,
+but all ingress/egress traffic is via the centralized router (hence, not
+distributed). More work is required to fully enable this functionality.</p>
+</section>
+</section>
+<section id="advanced-services">
+<h2>Advanced services<a class="headerlink" href="#advanced-services" title="Link to this heading">¶</a></h2>
+<section id="vpnaas">
+<h3>VPNaaS<a class="headerlink" href="#vpnaas" title="Link to this heading">¶</a></h3>
+<p>VPNaaS supports IPv6, but support in Kilo and prior releases will have
+some bugs that may limit how it can be used. More thorough and
+complete testing and bug fixing is being done as part of the Liberty
+release. IPv6-based VPN-as-a-Service is configured similar to the IPv4
+configuration. Either or both the <code class="docutils literal notranslate"><span class="pre">peer_address</span></code> and the
+<code class="docutils literal notranslate"><span class="pre">peer_cidr</span></code> can specified as an IPv6 address. The choice of
+addressing modes and router modes described above should not impact
+support.</p>
+</section>
+<section id="fwaas">
+<h3>FWaaS<a class="headerlink" href="#fwaas" title="Link to this heading">¶</a></h3>
+<p>FWaaS allows creation of IPv6 based rules.</p>
+</section>
+<section id="nat-floating-ips">
+<h3>NAT &amp; Floating IPs<a class="headerlink" href="#nat-floating-ips" title="Link to this heading">¶</a></h3>
+<p>At the current time OpenStack Networking does not provide any facility
+to support any flavor of NAT with IPv6. Unlike IPv4 there is no
+current embedded support for floating IPs with IPv6. It is assumed
+that the IPv6 addressing amongst the projects is using GUAs with no
+overlap across the projects.</p>
+</section>
+</section>
+<section id="security-considerations">
+<h2>Security considerations<a class="headerlink" href="#security-considerations" title="Link to this heading">¶</a></h2>
+<p>For more information about security considerations, see the <code class="docutils literal notranslate"><span class="pre">Security</span> <span class="pre">groups</span></code>
+section in
+<a class="reference internal" href="intro-os-networking.html"><span class="doc">OpenStack Networking</span></a>.</p>
+<section id="configuring-interfaces-of-the-guest">
+<h3>Configuring interfaces of the guest<a class="headerlink" href="#configuring-interfaces-of-the-guest" title="Link to this heading">¶</a></h3>
+<p>OpenStack currently doesn’t support the Privacy Extensions defined by RFC 4941,
+or the Opaque Identifier generation methods defined in RFC 7217. The interface
+identifier and DUID used must be directly derived from the MAC address
+as described in RFC 2373. The compute instances must not be set up to utilize
+either of these methods when generating their interface identifier, or
+they might not be able to communicate properly on the network. For example,
+in Linux guests, these are controlled via these two <code class="docutils literal notranslate"><span class="pre">sysctl</span></code> variables:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">net.ipv6.conf.*.use_tempaddr</span></code> (Privacy Extensions)</p></li>
+</ul>
+<p>This allows the use of non-changing interface identifiers for IPv6 addresses
+according to RFC3041 semantics. It should be disabled (zero) so that stateless
+addresses are constructed using a stable, EUI64-based value.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">net.ipv6.conf.*.addr_gen_mode</span></code></p></li>
+</ul>
+<p>This defines how link-local and auto-configured IPv6 addresses are
+generated. It should be set to zero (default) so that IPv6
+addresses are generated using an EUI64-based value.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Support for <code class="docutils literal notranslate"><span class="pre">addr_gen_mode</span></code> was added in kernel version 4.11.</p>
+</div>
+<p>Other types of guests might have similar configuration options, please
+consult your distribution documentation for more information.</p>
+<p>Unlike IPv4, the MTU of a given network can be conveyed in both the Router
+Advertisement messages sent by the router, as well as in DHCP messages.</p>
+</section>
+</section>
+<section id="openstack-control-management-network-considerations">
+<h2>OpenStack control &amp; management network considerations<a class="headerlink" href="#openstack-control-management-network-considerations" title="Link to this heading">¶</a></h2>
+<p>As of the Kilo release, considerable effort has gone in to ensuring
+the project network can handle dual stack IPv6 and IPv4 transport
+across the variety of configurations described above. OpenStack control
+network can be run in a dual stack configuration and OpenStack API
+endpoints can be accessed via an IPv6 network. At this time, Open vSwitch
+(OVS) tunnel types - STT, VXLAN, GRE, support both IPv4 and IPv6 endpoints.</p>
+</section>
+<section id="prefix-delegation">
+<span id="id2"></span><h2>Prefix delegation<a class="headerlink" href="#prefix-delegation" title="Link to this heading">¶</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This feature is experimental with low test coverage. There is currently no
+reference implementation that would implement the feature in the tree. A
+third party driver may have to be used to utilize it.</p>
+</div>
+<p>From the Liberty release onwards, OpenStack Networking supports IPv6 prefix
+delegation. This section describes the configuration and workflow steps
+necessary to use IPv6 prefix delegation to provide automatic allocation of
+subnet CIDRs. This allows you as the OpenStack administrator to rely on an
+external (to the OpenStack Networking service) DHCPv6 server to manage your
+project network prefixes.</p>
+<section id="configuring-openstack-networking-for-prefix-delegation">
+<h3>Configuring OpenStack Networking for prefix delegation<a class="headerlink" href="#configuring-openstack-networking-for-prefix-delegation" title="Link to this heading">¶</a></h3>
+<p>To enable prefix delegation, edit the <code class="docutils literal notranslate"><span class="pre">/etc/neutron/neutron.conf</span></code> file.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ipv6_pd_enabled = True</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Drivers may require extra configuration.</p>
+</div>
+<p>This tells OpenStack Networking to use the prefix delegation mechanism for
+subnet allocation when the user does not provide a CIDR or subnet pool id when
+creating a subnet.</p>
+</section>
+<section id="requirements">
+<h3>Requirements<a class="headerlink" href="#requirements" title="Link to this heading">¶</a></h3>
+<p>To use this feature, you need a prefix delegation capable DHCPv6 server that is
+reachable from your OpenStack Networking node(s). This could be software
+running on the OpenStack Networking node(s) or elsewhere, or a physical router.
+For the purposes of this guide we are using the open-source DHCPv6 server,
+Dibbler. Dibbler is available in many Linux package managers, or from source at
+<a class="reference external" href="https://github.com/tomaszmrugalski/dibbler">tomaszmrugalski/dibbler</a>.</p>
+<p>This guide assumes that you are running a Dibbler server on the network node
+where the external network bridge exists. If you already have a prefix
+delegation capable DHCPv6 server in place, then you can skip the following
+section.</p>
+</section>
+<section id="configuring-the-dibbler-server">
+<h3>Configuring the Dibbler server<a class="headerlink" href="#configuring-the-dibbler-server" title="Link to this heading">¶</a></h3>
+<p>After installing Dibbler, edit the <code class="docutils literal notranslate"><span class="pre">/etc/dibbler/server.conf</span></code> file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>script &quot;/var/lib/dibbler/pd-server.sh&quot;
+
+iface &quot;br-ex&quot; {
+    pd-class {
+        pd-pool 2001:db8:2222::/48
+        pd-length 64
+    }
+}
+</pre></div>
+</div>
+<p>The options used in the configuration file above are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">script</span></code>
+Points to a script to be run when a prefix is delegated or
+released. This is only needed if you want instances on your
+subnets to have external network access. More on this below.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">iface</span></code>
+The name of the network interface on which to listen for
+prefix delegation messages.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pd-pool</span></code>
+The larger prefix from which you want your delegated
+prefixes to come. The example given is sufficient if you do
+not need external network access, otherwise a unique
+globally routable prefix is necessary.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pd-length</span></code>
+The length that delegated prefixes will be. This must be
+64 to work with the current OpenStack Networking reference implementation.</p></li>
+</ul>
+<p>To provide external network access to your instances, your Dibbler server also
+needs to create new routes for each delegated prefix. This is done using the
+script file named in the config file above. Edit the
+<code class="docutils literal notranslate"><span class="pre">/var/lib/dibbler/pd-server.sh</span></code> file:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PREFIX1</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;add&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span>sudo<span class="w"> </span>ip<span class="w"> </span>-6<span class="w"> </span>route<span class="w"> </span>add<span class="w"> </span><span class="si">${</span><span class="nv">PREFIX1</span><span class="si">}</span>/64<span class="w"> </span>via<span class="w"> </span><span class="nv">$REMOTE_ADDR</span><span class="w"> </span>dev<span class="w"> </span><span class="nv">$IFACE</span>
+<span class="w">    </span><span class="k">fi</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;delete&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span>sudo<span class="w"> </span>ip<span class="w"> </span>-6<span class="w"> </span>route<span class="w"> </span>del<span class="w"> </span><span class="si">${</span><span class="nv">PREFIX1</span><span class="si">}</span>/64<span class="w"> </span>via<span class="w"> </span><span class="nv">$REMOTE_ADDR</span><span class="w"> </span>dev<span class="w"> </span><span class="nv">$IFACE</span>
+<span class="w">    </span><span class="k">fi</span>
+<span class="k">fi</span>
+</pre></div>
+</div>
+<p>The variables used in the script file above are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">$PREFIX1</span></code>
+The prefix being added/deleted by the Dibbler server.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">$1</span></code>
+The operation being performed.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">$REMOTE_ADDR</span></code>
+The IP address of the requesting Dibbler client.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">$IFACE</span></code>
+The network interface upon which the request was received.</p></li>
+</ul>
+<p>The above is all you need in this scenario, but more information on
+installing, configuring, and running Dibbler is available in the Dibbler user
+guide, at <a class="reference external" href="http://klub.com.pl/dhcpv6/doc/dibbler-user.pdf">Dibbler – a portable DHCPv6</a>.</p>
+<p>To start your Dibbler server, run:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span>dibbler-server<span class="w"> </span>run
+</pre></div>
+</div>
+<p>Or to run in headless mode:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span>dibbler-server<span class="w"> </span>start
+</pre></div>
+</div>
+<p>When using DevStack, it is important to start your server after the
+<code class="docutils literal notranslate"><span class="pre">stack.sh</span></code> script has finished to ensure that the required network
+interfaces have been created.</p>
+</section>
+<section id="user-workflow">
+<h3>User workflow<a class="headerlink" href="#user-workflow" title="Link to this heading">¶</a></h3>
+<p>First, create a network and IPv6 subnet:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>create<span class="w"> </span>ipv6-pd
+<span class="go">+---------------------------+--------------------------------------+</span>
+<span class="go">| Field                     | Value                                |</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+<span class="go">| admin_state_up            | UP                                   |</span>
+<span class="go">| availability_zone_hints   |                                      |</span>
+<span class="go">| availability_zones        |                                      |</span>
+<span class="go">| created_at                | 2017-01-25T19:26:01Z                 |</span>
+<span class="go">| description               |                                      |</span>
+<span class="go">| headers                   |                                      |</span>
+<span class="go">| id                        | 4b782725-6abe-4a2d-b061-763def1bb029 |</span>
+<span class="go">| ipv4_address_scope        | None                                 |</span>
+<span class="go">| ipv6_address_scope        | None                                 |</span>
+<span class="go">| mtu                       | 1450                                 |</span>
+<span class="go">| name                      | ipv6-pd                              |</span>
+<span class="go">| port_security_enabled     | True                                 |</span>
+<span class="go">| project_id                | 61b7eba037fd41f29cfba757c010faff     |</span>
+<span class="go">| provider:network_type     | vxlan                                |</span>
+<span class="go">| provider:physical_network | None                                 |</span>
+<span class="go">| provider:segmentation_id  | 46                                   |</span>
+<span class="go">| revision_number           | 3                                    |</span>
+<span class="go">| router:external           | Internal                             |</span>
+<span class="go">| shared                    | False                                |</span>
+<span class="go">| status                    | ACTIVE                               |</span>
+<span class="go">| subnets                   |                                      |</span>
+<span class="go">| tags                      | []                                   |</span>
+<span class="go">| updated_at                | 2017-01-25T19:26:01Z                 |</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+
+<span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>create<span class="w"> </span>--ip-version<span class="w"> </span><span class="m">6</span><span class="w"> </span>--ipv6-ra-mode<span class="w"> </span>slaac<span class="w"> </span><span class="se">\</span>
+--ipv6-address-mode<span class="w"> </span>slaac<span class="w"> </span>--use-prefix-delegation<span class="w"> </span><span class="se">\</span>
+--network<span class="w"> </span>ipv6-pd<span class="w"> </span>ipv6-pd-1
+<span class="go">+------------------------+--------------------------------------+</span>
+<span class="go">| Field                  | Value                                |</span>
+<span class="go">+------------------------+--------------------------------------+</span>
+<span class="go">| allocation_pools       | ::1-::ffff:ffff:ffff:ffff            |</span>
+<span class="go">| cidr                   | ::/64                                |</span>
+<span class="go">| created_at             | 2017-01-25T19:31:53Z                 |</span>
+<span class="go">| description            |                                      |</span>
+<span class="go">| dns_nameservers        |                                      |</span>
+<span class="go">| dns_publish_fixed_ip   | None                                 |</span>
+<span class="go">| enable_dhcp            | True                                 |</span>
+<span class="go">| gateway_ip             | ::                                   |</span>
+<span class="go">| headers                |                                      |</span>
+<span class="go">| host_routes            |                                      |</span>
+<span class="go">| id                     | 1319510d-c92c-4532-bf5d-8bcf3da761a1 |</span>
+<span class="go">| ip_version             | 6                                    |</span>
+<span class="go">| ipv6_address_mode      | slaac                                |</span>
+<span class="go">| ipv6_ra_mode           | slaac                                |</span>
+<span class="go">| name                   | ipv6-pd-1                            |</span>
+<span class="go">| network_id             | 4b782725-6abe-4a2d-b061-763def1bb029 |</span>
+<span class="go">| project_id             | 61b7eba037fd41f29cfba757c010faff     |</span>
+<span class="go">| revision_number        | 2                                    |</span>
+<span class="go">| service_types          |                                      |</span>
+<span class="go">| subnetpool_id          | prefix_delegation                    |</span>
+<span class="go">| tags                   |                                      |</span>
+<span class="go">| updated_at             | 2017-01-25T19:31:53Z                 |</span>
+<span class="go">+------------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>The subnet is initially created with a temporary CIDR before one can be
+assigned by prefix delegation. Any number of subnets with this temporary CIDR
+can exist without raising an overlap error. The subnetpool_id is automatically
+set to <code class="docutils literal notranslate"><span class="pre">prefix_delegation</span></code>.</p>
+<p>To trigger the prefix delegation process, create a router interface between
+this subnet and a router with an active interface on the external network:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>router<span class="w"> </span>add<span class="w"> </span>subnet<span class="w"> </span>router1<span class="w"> </span>ipv6-pd-1
+</pre></div>
+</div>
+<p>The prefix delegation mechanism then sends a request via the external network
+to your prefix delegation server, which replies with the delegated prefix. The
+subnet is then updated with the new prefix, including issuing new IP addresses
+to all ports:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>subnet<span class="w"> </span>show<span class="w"> </span>ipv6-pd-1
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| Field             | Value                                |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+<span class="go">| allocation_pools  | 2001:db8:2222:6977::2-2001:db8:2222: |</span>
+<span class="go">|                   | 6977:ffff:ffff:ffff:ffff             |</span>
+<span class="go">| cidr              | 2001:db8:2222:6977::/64              |</span>
+<span class="go">| created_at        | 2017-01-25T19:31:53Z                 |</span>
+<span class="go">| description       |                                      |</span>
+<span class="go">| dns_nameservers   |                                      |</span>
+<span class="go">| enable_dhcp       | True                                 |</span>
+<span class="go">| gateway_ip        | 2001:db8:2222:6977::1                |</span>
+<span class="go">| host_routes       |                                      |</span>
+<span class="go">| id                | 1319510d-c92c-4532-bf5d-8bcf3da761a1 |</span>
+<span class="go">| ip_version        | 6                                    |</span>
+<span class="go">| ipv6_address_mode | slaac                                |</span>
+<span class="go">| ipv6_ra_mode      | slaac                                |</span>
+<span class="go">| name              | ipv6-pd-1                            |</span>
+<span class="go">| network_id        | 4b782725-6abe-4a2d-b061-763def1bb029 |</span>
+<span class="go">| project_id        | 61b7eba037fd41f29cfba757c010faff     |</span>
+<span class="go">| revision_number   | 4                                    |</span>
+<span class="go">| service_types     |                                      |</span>
+<span class="go">| subnetpool_id     | prefix_delegation                    |</span>
+<span class="go">| tags              | []                                   |</span>
+<span class="go">| updated_at        | 2017-01-25T19:35:26Z                 |</span>
+<span class="go">+-------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>If the prefix delegation server is configured to delegate globally routable
+prefixes and setup routes, then any instance with a port on this subnet should
+now have external network access.</p>
+<p>Deleting the router interface causes the subnet to be reverted to the temporary
+CIDR, and all ports have their IPs updated. Prefix leases are released and
+renewed automatically as necessary.</p>
+</section>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h3>
+<p>The following presentation from the Barcelona Summit provides a great guide for
+setting up IPv6 with OpenStack: <a class="reference external" href="https://www.youtube.com/watch?v=j5hy11YlSOU">Deploying IPv6 in OpenStack Environments</a>.</p>
+</section>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="config-ipam.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: IPAM Configuration"></i></a>
+          
+          
+            <a href="config-macvtap.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Macvtap Mechanism Driver"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2025-01-08 11:08:01</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation Guide</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">OpenStack Networking Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deploy.html">Deployment examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ops.html">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">Migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ovn/index.html">OVN Driver Administration Guide</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributor/index.html">Contributor Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">IPv6</a><ul>
+<li><a class="reference internal" href="#neutron-subnets-and-the-ipv6-api-attributes">Neutron subnets and the IPv6 API attributes</a><ul>
+<li><a class="reference internal" href="#ipv6-addressing">IPv6 addressing</a></li>
+<li><a class="reference internal" href="#router-advertisements">Router advertisements</a></li>
+<li><a class="reference internal" href="#ipv6-ra-mode-and-ipv6-address-mode-combinations">ipv6_ra_mode and ipv6_address_mode combinations</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#project-network-considerations">Project network considerations</a><ul>
+<li><a class="reference internal" href="#dataplane">Dataplane</a></li>
+<li><a class="reference internal" href="#addresses-for-subnets">Addresses for subnets</a></li>
+<li><a class="reference internal" href="#address-modes-for-ports">Address modes for ports</a></li>
+<li><a class="reference internal" href="#using-slaac-for-addressing">Using SLAAC for addressing</a></li>
+<li><a class="reference internal" href="#dhcpv6">DHCPv6</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#router-support">Router support</a><ul>
+<li><a class="reference internal" href="#neutron-s-distributed-router-feature-and-ipv6">Neutron’s Distributed Router feature and IPv6</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#advanced-services">Advanced services</a><ul>
+<li><a class="reference internal" href="#vpnaas">VPNaaS</a></li>
+<li><a class="reference internal" href="#fwaas">FWaaS</a></li>
+<li><a class="reference internal" href="#nat-floating-ips">NAT &amp; Floating IPs</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#security-considerations">Security considerations</a><ul>
+<li><a class="reference internal" href="#configuring-interfaces-of-the-guest">Configuring interfaces of the guest</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#openstack-control-management-network-considerations">OpenStack control &amp; management network considerations</a></li>
+<li><a class="reference internal" href="#prefix-delegation">Prefix delegation</a><ul>
+<li><a class="reference internal" href="#configuring-openstack-networking-for-prefix-delegation">Configuring OpenStack Networking for prefix delegation</a></li>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#configuring-the-dibbler-server">Configuring the Dibbler server</a></li>
+<li><a class="reference internal" href="#user-workflow">User workflow</a></li>
+<li><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "admin/config-ipv6" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "IPv6 in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2025-01-08 11:08:01";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "admin/config-ipv6";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

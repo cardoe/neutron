@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Address Scopes and Subnet Pools &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/support-matrix.css?v=ac26a930" />
+    <script src="../../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Agent Extensions" href="agent_extensions.html" />
+    <link rel="prev" title="Neutron Internals" href="index.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/contributor/internals/address_scopes.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Address Scopes and Subnet Pools</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="index.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Neutron Internals"></i></a>
+    
+    
+    <a href="agent_extensions.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Agent Extensions"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="address-scopes-and-subnet-pools">
+<h1>Address Scopes and Subnet Pools<a class="headerlink" href="#address-scopes-and-subnet-pools" title="Link to this heading">¶</a></h1>
+<p>This page discusses subnet pools and address scopes</p>
+<section id="subnet-pools">
+<h2>Subnet Pools<a class="headerlink" href="#subnet-pools" title="Link to this heading">¶</a></h2>
+<p>Learn about subnet pools by watching the summit talk given in Vancouver <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="http://www.youtube.com/watch?v=QqP8yBUUXBM&amp;t=6m12s">http://www.youtube.com/watch?v=QqP8yBUUXBM&amp;t=6m12s</a></p>
+</aside>
+</aside>
+<p>Subnet pools were added in Kilo.  They are relatively simple.  A SubnetPool has
+any number of SubnetPoolPrefix objects associated to it.  These prefixes are in
+CIDR format.  Each CIDR is a piece of the address space that is available for
+allocation.</p>
+<p>Subnet Pools support IPv6 just as well as IPv4.</p>
+<p>The Subnet model object now has a subnetpool_id attribute whose default is null
+for backward compatibility.  The subnetpool_id attribute stores the UUID of the
+subnet pool that acted as the source for the address range of a particular
+subnet.</p>
+<p>When creating a subnet, the subnetpool_id can be optionally specified.  If it
+is, the ‘cidr’ field is not required.  If ‘cidr’ is specified, it will be
+allocated from the pool assuming the pool includes it and hasn’t already
+allocated any part of it.  If ‘cidr’ is left out, then the prefixlen attribute
+can be specified.  If it is not, the default prefix length will be taken from
+the subnet pool.  Think of it this way, the allocation logic always needs to
+know the size of the subnet desired.  It can pull it from a specific CIDR,
+prefixlen, or default.  A specific CIDR is optional and the allocation will try
+to honor it if provided.  The request will fail if it can’t honor it.</p>
+<p>Subnet pools do not allow overlap of subnets.</p>
+<section id="subnet-pool-quotas">
+<h3>Subnet Pool Quotas<a class="headerlink" href="#subnet-pool-quotas" title="Link to this heading">¶</a></h3>
+<p>A quota mechanism was provided for subnet pools.  It is different than other
+quota mechanisms in Neutron because it doesn’t count instances of first class
+objects.  Instead it counts how much of the address space is used.</p>
+<p>For IPv4, it made reasonable sense to count quota in terms of individual
+addresses.  So, if you’re allowed exactly one /24, your quota should be set to
+256.  Three /26s would be 192.  This mechanism encourages more efficient use of
+the IPv4 space which will be increasingly important when working with globally
+routable addresses.</p>
+<p>For IPv6, the smallest viable subnet in Neutron is a /64.  There is no reason
+to allocate a subnet of any other size for use on a Neutron network.  It would
+look pretty funny to set a quota of 4611686018427387904 to allow one /64
+subnet.  To avoid this, we count IPv6 quota in terms of /64s.  So, a quota of 3
+allows three /64 subnets.  When we need to allocate something smaller in the
+future, we will need to ensure that the code can handle non-integer quota
+consumption.</p>
+</section>
+<section id="allocation">
+<h3>Allocation<a class="headerlink" href="#allocation" title="Link to this heading">¶</a></h3>
+<p>Allocation is done in a way that aims to minimize fragmentation of the pool.
+The relevant code is here <a class="footnote-reference brackets" href="#id5" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.  First, the available prefixes are computed
+using a set difference:  pool - allocations.  The result is compacted <a class="footnote-reference brackets" href="#id6" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a> and
+then sorted by size.  The subnet is then allocated from the smallest available
+prefix that is large enough to accommodate the request.</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id5" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
+<p>neutron/ipam/subnet_alloc.py (_allocate_any_subnet)</p>
+</aside>
+<aside class="footnote brackets" id="id6" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">3</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="http://pythonhosted.org/netaddr/api.html#netaddr.IPSet.compact">http://pythonhosted.org/netaddr/api.html#netaddr.IPSet.compact</a></p>
+</aside>
+</aside>
+</section>
+</section>
+<section id="address-scopes">
+<h2>Address Scopes<a class="headerlink" href="#address-scopes" title="Link to this heading">¶</a></h2>
+<p>Before subnet pools or address scopes, it was impossible to tell if a network
+address was routable in a certain context because the address was given
+explicitly on subnet create and wasn’t validated against any other addresses.
+Address scopes are meant to solve this by putting control over the address
+space in the hands of an authority:  the address scope owner.  It makes use of
+the already existing SubnetPool concept for allocation.</p>
+<p>Address scopes are “the thing within which address overlap is not allowed” and
+thus provide more flexible control as well as decoupling of address overlap
+from tenancy.</p>
+<p>Prior to the Mitaka release, there was implicitly only a single ‘shared’
+address scope.  Arbitrary address overlap was allowed making it pretty much a
+“free for all”.  To make things seem somewhat sane, normal users are not able
+to use routers to cross-plug networks from different projects and NAT was used
+between internal networks and external networks.  It was almost as if each
+project had a private address scope.</p>
+<p>The problem is that this model cannot support use cases where NAT is not
+desired or supported (e.g. IPv6) or we want to allow different projects to
+cross-plug their networks.</p>
+<p>An AddressScope covers only one address family.  But, they work equally well
+for IPv4 and IPv6.</p>
+<section id="routing">
+<h3>Routing<a class="headerlink" href="#routing" title="Link to this heading">¶</a></h3>
+<p>The reference implementation honors address scopes.  Within an address scope,
+addresses route freely (barring any FW rules or other external restrictions).
+Between scopes, routing is prevented unless address translation is used.</p>
+<p>For now, floating IPs are the only place where traffic crosses scope
+boundaries.  When a floating IP is associated to a fixed IP, the fixed IP is
+allowed to access the address scope of the floating IP by way of a 1:1 NAT
+rule. That means the fixed IP can access not only the external network, but
+also any internal networks that are in the same address scope as the external
+network. This is diagrammed as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+----------------------+</span>      <span class="o">+---------------------------+</span>
+<span class="o">|</span>    <span class="n">address</span> <span class="n">scope</span> <span class="mi">1</span>   <span class="o">|</span>      <span class="o">|</span>      <span class="n">address</span> <span class="n">scope</span> <span class="mi">2</span>      <span class="o">|</span>
+<span class="o">|</span>                      <span class="o">|</span>      <span class="o">|</span>                           <span class="o">|</span>
+<span class="o">|</span> <span class="o">+------------------+</span> <span class="o">|</span>      <span class="o">|</span>   <span class="o">+------------------+</span>    <span class="o">|</span>
+<span class="o">|</span> <span class="o">|</span> <span class="n">internal</span> <span class="n">network</span> <span class="o">|</span> <span class="o">|</span>      <span class="o">|</span>   <span class="o">|</span> <span class="n">external</span> <span class="n">network</span> <span class="o">|</span>    <span class="o">|</span>
+<span class="o">|</span> <span class="o">+-------------+----+</span> <span class="o">|</span>      <span class="o">|</span>   <span class="o">+--------+---------+</span>    <span class="o">|</span>
+<span class="o">|</span>               <span class="o">|</span>      <span class="o">|</span>      <span class="o">|</span>            <span class="o">|</span>              <span class="o">|</span>
+<span class="o">|</span>       <span class="o">+-------+--+</span>   <span class="o">|</span>      <span class="o">|</span>     <span class="o">+------+------+</span>       <span class="o">|</span>
+<span class="o">|</span>       <span class="o">|</span> <span class="n">fixed</span> <span class="n">ip</span> <span class="o">+----------------+</span> <span class="n">floating</span> <span class="n">IP</span> <span class="o">|</span>       <span class="o">|</span>
+<span class="o">|</span>       <span class="o">+----------+</span>   <span class="o">|</span>      <span class="o">|</span>     <span class="o">+--+--------+-+</span>       <span class="o">|</span>
+<span class="o">+----------------------+</span>      <span class="o">|</span>        <span class="o">|</span>        <span class="o">|</span>         <span class="o">|</span>
+                              <span class="o">|</span> <span class="o">+------+---+</span> <span class="o">+--+-------+</span> <span class="o">|</span>
+                              <span class="o">|</span> <span class="o">|</span> <span class="n">internal</span> <span class="o">|</span> <span class="o">|</span> <span class="n">internal</span> <span class="o">|</span> <span class="o">|</span>
+                              <span class="o">|</span> <span class="o">+----------+</span> <span class="o">+----------+</span> <span class="o">|</span>
+                              <span class="o">+---------------------------+</span>
+</pre></div>
+</div>
+<p>Due to the asymmetric route in DVR, and the fact that DVR local routers do not
+know the information of the floating IPs that reside in other hosts,
+there is a limitation in the DVR multiple hosts scenario.  With DVR in
+multiple hosts, when the destination of traffic is an internal fixed IP
+in a different host, the fixed IP with a floating IP associated can’t cross
+the scope boundary to access the internal networks that are in the same
+address scope of the external network.
+See <a class="reference external" href="https://bugs.launchpad.net/neutron/+bug/1682228">https://bugs.launchpad.net/neutron/+bug/1682228</a></p>
+</section>
+<section id="rpc">
+<h3>RPC<a class="headerlink" href="#rpc" title="Link to this heading">¶</a></h3>
+<p>The L3 agent in the reference implementation needs to know the address scope
+for each port on each router in order to map ingress traffic correctly.</p>
+<p>Each subnet from the same address family on a network is required to be from
+the same subnet pool.  Therefore, the address scope will also be the same.  If
+this were not the case, it would be more difficult to match ingress traffic on
+a port with the appropriate scope.  It may be counter-intuitive but L3 address
+scopes need to be anchored to some sort of non-L3 thing (e.g. an L2 interface)
+in the topology in order to determine the scope of ingress traffic.  For now,
+we use ports/networks.  In the future, we may be able to distinguish by
+something else like the remote MAC address or something.</p>
+<p>The address scope id is set on each port in a dict under the ‘address_scopes’
+attribute.  The scope is distinct per address family.  If the attribute does
+not appear, it is assumed to be null for both families.  A value of null means
+that the addresses are in the “implicit” address scope which holds all
+addresses that don’t have an explicit one.  All subnets that existed in Neutron
+before address scopes existed fall here.</p>
+<p>Here is an example of how the json will look in the context of a router port:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;address_scopes&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;4&quot;</span><span class="p">:</span> <span class="s2">&quot;d010a0ea-660e-4df4-86ca-ae2ed96da5c1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;6&quot;</span><span class="p">:</span> <span class="n">null</span>
+<span class="p">},</span>
+</pre></div>
+</div>
+<p>To implement floating IPs crossing scope boundaries, the L3 agent needs to know
+the target scope of the floating ip.  The fixed address is not enough to
+disambiguate because, theoretically, there could be overlapping addresses from
+different scopes.  The scope is computed <a class="footnote-reference brackets" href="#id8" id="id7" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a> from the floating ip fixed port
+and attached to the floating ip dict under the ‘fixed_ip_address_scope’
+attribute.  Here’s what the json looks like (trimmed):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+     <span class="o">...</span>
+     <span class="s2">&quot;floating_ip_address&quot;</span><span class="p">:</span> <span class="s2">&quot;172.24.4.4&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;fixed_ip_address&quot;</span><span class="p">:</span> <span class="s2">&quot;172.16.0.3&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;fixed_ip_address_scope&quot;</span><span class="p">:</span> <span class="s2">&quot;d010a0ea-660e-4df4-86ca-ae2ed96da5c1&quot;</span><span class="p">,</span>
+     <span class="o">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id8" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id7">4</a><span class="fn-bracket">]</span></span>
+<p>neutron/db/l3_db.py (_get_sync_floating_ips)</p>
+</aside>
+</aside>
+</section>
+<section id="model">
+<h3>Model<a class="headerlink" href="#model" title="Link to this heading">¶</a></h3>
+<p>The model for subnet pools and address scopes can be found in
+neutron/db/models_v2.py and neutron/db/address_scope_db.py.  This document
+won’t go over all of the details.  It is worth noting how they relate to
+existing Neutron objects.  The existing Neutron subnet now optionally
+references a single subnet pool:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+----------------+</span>        <span class="o">+------------------+</span>        <span class="o">+--------------+</span>
+<span class="o">|</span> <span class="n">Subnet</span>         <span class="o">|</span>        <span class="o">|</span> <span class="n">SubnetPool</span>       <span class="o">|</span>        <span class="o">|</span> <span class="n">AddressScope</span> <span class="o">|</span>
+<span class="o">+----------------+</span>        <span class="o">+------------------+</span>        <span class="o">+--------------+</span>
+<span class="o">|</span> <span class="n">subnet_pool_id</span> <span class="o">+------&gt;</span> <span class="o">|</span> <span class="n">address_scope_id</span> <span class="o">+------&gt;</span> <span class="o">|</span>              <span class="o">|</span>
+<span class="o">|</span>                <span class="o">|</span>        <span class="o">|</span>                  <span class="o">|</span>        <span class="o">|</span>              <span class="o">|</span>
+<span class="o">|</span>                <span class="o">|</span>        <span class="o">|</span>                  <span class="o">|</span>        <span class="o">|</span>              <span class="o">|</span>
+<span class="o">|</span>                <span class="o">|</span>        <span class="o">|</span>                  <span class="o">|</span>        <span class="o">|</span>              <span class="o">|</span>
+<span class="o">+----------------+</span>        <span class="o">+------------------+</span>        <span class="o">+--------------+</span>
+</pre></div>
+</div>
+</section>
+<section id="l3-agent">
+<h3>L3 Agent<a class="headerlink" href="#l3-agent" title="Link to this heading">¶</a></h3>
+<p>The L3 agent is limited in its support for multiple address scopes.  Within a
+router in the reference implementation, traffic is marked on ingress with the
+address scope corresponding to the network it is coming from.  If that traffic
+would route to an interface in a different address scope, the traffic is
+blocked unless an exception is made.</p>
+<p>One exception is made for floating IP traffic.  When traffic is headed to a
+floating IP, DNAT is applied and the traffic is allowed to route to the private
+IP address potentially crossing the address scope boundary.  When traffic
+flows from an internal port to the external network and a floating IP is
+assigned, that traffic is also allowed.</p>
+<p>Another exception is made for traffic from an internal network to the external
+network when SNAT is enabled.  In this case, SNAT to the router’s fixed IP
+address is applied to the traffic.  However, SNAT is not used if the external
+network has an explicit address scope assigned and it matches the internal
+network’s.  In that case, traffic routes straight through without NAT.  The
+internal network’s addresses are viable on the external network in this case.</p>
+<p>The reference implementation has limitations.  Even with multiple address
+scopes, a router implementation is unable to connect to two networks with
+overlapping IP addresses.  There are two reasons for this.</p>
+<p>First, a single routing table is used inside the namespace.  An implementation
+using multiple routing tables has been in the works but there are some
+unresolved issues with it.</p>
+<p>Second, the default SNAT feature cannot be supported with the current Linux
+conntrack implementation unless a double NAT is used (one NAT to get from the
+address scope to an intermediate address specific to the scope and a second NAT
+to get from that intermediate address to an external address).  Single NAT
+won’t work if there are duplicate addresses across the scopes.</p>
+<p>Due to these complications the router will still refuse to connect to
+overlapping subnets.  We can look in to an implementation that overcomes these
+limitations in the future.</p>
+</section>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="index.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Neutron Internals"></i></a>
+          
+          
+            <a href="agent_extensions.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Agent Extensions"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2023-09-15 18:12:45</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install/index.html">Installation Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../admin/index.html">OpenStack Networking Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Contributor Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#basic-information">Basic Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-policies">Neutron Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#gerrit-rechecks">Gerrit Rechecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#neutron-stadium">Neutron Stadium</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#developer-guide">Developer Guide</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#neutron-internals">Neutron Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#ovn-driver">OVN Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#dashboards">Dashboards</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Address Scopes and Subnet Pools</a><ul>
+<li><a class="reference internal" href="#subnet-pools">Subnet Pools</a><ul>
+<li><a class="reference internal" href="#subnet-pool-quotas">Subnet Pool Quotas</a></li>
+<li><a class="reference internal" href="#allocation">Allocation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#address-scopes">Address Scopes</a><ul>
+<li><a class="reference internal" href="#routing">Routing</a></li>
+<li><a class="reference internal" href="#rpc">RPC</a></li>
+<li><a class="reference internal" href="#model">Model</a></li>
+<li><a class="reference internal" href="#l3-agent">L3 Agent</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "contributor/internals/address_scopes" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Address Scopes and Subnet Pools in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2023-09-15 18:12:45";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "contributor/internals/address_scopes";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

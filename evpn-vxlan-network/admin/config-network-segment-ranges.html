@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Network Segment Ranges &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/support-matrix.css?v=ac26a930" />
+    <script src="../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Open vSwitch with DPDK Datapath" href="config-ovs-dpdk.html" />
+    <link rel="prev" title="NDP Proxy" href="config-ndp-proxy.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/admin/config-network-segment-ranges.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Network Segment Ranges</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="config-ndp-proxy.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: NDP Proxy"></i></a>
+    
+    
+    <a href="config-ovs-dpdk.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Open vSwitch with DPDK Datapath"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="network-segment-ranges">
+<span id="config-network-segment-ranges"></span><h1>Network Segment Ranges<a class="headerlink" href="#network-segment-ranges" title="Link to this heading">¶</a></h1>
+<p>The network segment range service exposes the segment range management to be
+administered via the Neutron API. In addition, it introduces the ability for
+the administrator to control the segment ranges globally or on a per-tenant
+basis.</p>
+<section id="why-you-need-it">
+<h2>Why you need it<a class="headerlink" href="#why-you-need-it" title="Link to this heading">¶</a></h2>
+<p>Before Stein, network segment ranges were configured as an entry in ML2
+config file <code class="docutils literal notranslate"><span class="pre">ml2_conf.ini</span></code> that was statically defined for tenant network
+allocation and therefore had to be managed as part of the host deployment and
+management. When a regular tenant user creates a network, Neutron assigns the
+next free segmentation ID (VLAN ID, VNI etc.) from the configured segment
+ranges. Only an administrator can assign a specific segment ID via the
+provider extension.</p>
+<p>The network segment range management service provides the following
+capabilities that the administrator may be interested in:</p>
+<ol class="arabic simple">
+<li><p>To check out the network segment ranges defined by the operators in the
+ML2 config file so that the admin can use this information to make segment
+range allocation.</p></li>
+<li><p>To dynamically create and assign network segment ranges, which can help
+with the distribution of the underlying network connection mapping for
+privacy or dedicated business connection needs. This includes:</p>
+<ul class="simple">
+<li><p>global shared network segment ranges</p></li>
+<li><p>tenant-specific network segment ranges</p></li>
+</ul>
+</li>
+<li><p>To dynamically update a network segment range to offer the ability to adapt
+to the connection mapping changes.</p></li>
+<li><p>To dynamically manage a network segment range when there are no segment
+ranges defined within the ML2 config file <code class="docutils literal notranslate"><span class="pre">ml2_conf.ini</span></code> and no restart
+of the Neutron server is required in this situation.</p></li>
+<li><p>To check the availability and usage statistics of network segment ranges.</p></li>
+</ol>
+</section>
+<section id="how-it-works">
+<h2>How it works<a class="headerlink" href="#how-it-works" title="Link to this heading">¶</a></h2>
+<p>A network segment range manages a set of segments from which self-service
+networks can be allocated. The network segment range management service is
+admin-only.</p>
+<p>As a regular project in an OpenStack cloud, you can not create a network
+segment range of your own and you just create networks in regular way.</p>
+<p>If you are an admin, you can create a network segment range which can be
+shared (i.e. used by any regular project) or tenant-specific (i.e.
+assignment on a per-tenant basis). Your network segment ranges will not be
+visible to any other regular projects. Other CRUD operations are also
+supported.</p>
+<p>When a tenant allocates a segment, it will first be allocated from an available
+segment range assigned to the tenant, and then a shared range if no tenant
+specific allocation is possible.</p>
+</section>
+<section id="default-network-segment-ranges">
+<h2>Default network segment ranges<a class="headerlink" href="#default-network-segment-ranges" title="Link to this heading">¶</a></h2>
+<p>A set of <code class="docutils literal notranslate"><span class="pre">default</span></code> network segment ranges are created out of the values
+defined in the ML2 config file: <code class="docutils literal notranslate"><span class="pre">network_vlan_ranges</span></code> for ml2_type_vlan,
+<code class="docutils literal notranslate"><span class="pre">vni_ranges</span></code> for ml2_type_vxlan, <code class="docutils literal notranslate"><span class="pre">tunnel_id_ranges</span></code> for ml2_type_gre and
+<code class="docutils literal notranslate"><span class="pre">vni_ranges</span></code> for ml2_type_geneve. They will be reloaded when Neutron
+server starts or restarts. The <code class="docutils literal notranslate"><span class="pre">default</span></code> network segment ranges are
+<code class="docutils literal notranslate"><span class="pre">read-only</span></code>, but will be treated as any other <code class="docutils literal notranslate"><span class="pre">shared</span></code> ranges on segment
+allocation.</p>
+<p>The administrator can use the default network segment range information to
+make shared and/or per-tenant range creation and assignment.</p>
+</section>
+<section id="example-configuration">
+<h2>Example configuration<a class="headerlink" href="#example-configuration" title="Link to this heading">¶</a></h2>
+<section id="controller-node">
+<h3>Controller node<a class="headerlink" href="#controller-node" title="Link to this heading">¶</a></h3>
+<ol class="arabic">
+<li><p>Enable the network segment range service plugin by appending
+<code class="docutils literal notranslate"><span class="pre">network_segment_range</span></code> to the list of <code class="docutils literal notranslate"><span class="pre">service_plugins</span></code> in the
+<code class="docutils literal notranslate"><span class="pre">neutron.conf</span></code> file on all nodes running the <code class="docutils literal notranslate"><span class="pre">neutron-server</span></code> service:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[DEFAULT]</span>
+<span class="c1"># ...</span>
+<span class="na">service_plugins</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">...,network_segment_range,...</span>
+</pre></div>
+</div>
+</li>
+<li><p>Restart the <code class="docutils literal notranslate"><span class="pre">neutron-server</span></code> service.</p></li>
+</ol>
+</section>
+<section id="verify-service-operation">
+<h3>Verify service operation<a class="headerlink" href="#verify-service-operation" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple">
+<li><p>Source the administrative project credentials and list the enabled
+extensions.</p></li>
+<li><p>Use the command <strong class="command">openstack extension list --network</strong> to verify
+that the <code class="docutils literal notranslate"><span class="pre">Neutron</span> <span class="pre">Network</span> <span class="pre">Segment</span> <span class="pre">Range</span></code> extension with Alias
+<code class="docutils literal notranslate"><span class="pre">network-segment-range</span></code> is enabled.</p></li>
+</ol>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>extension<span class="w"> </span>list<span class="w"> </span>--network
+<span class="go">+-------------------------------+-----------------------+-----------------------------------------------------------+</span>
+<span class="go">| Name                          | Alias                 | Description                                               |</span>
+<span class="go">+-------------------------------+-----------------------+-----------------------------------------------------------+</span>
+<span class="go">| ......                        | ......                | ......                                                    |</span>
+<span class="go">+-------------------------------+-----------------------+-----------------------------------------------------------+</span>
+<span class="go">| Neutron Network Segment Range | network-segment-range | Provides support for the network segment range management |</span>
+<span class="go">+-------------------------------+-----------------------+-----------------------------------------------------------+</span>
+<span class="go">| ......                        | ......                | ......                                                    |</span>
+<span class="go">+-------------------------------+-----------------------+-----------------------------------------------------------+</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="workflow">
+<h2>Workflow<a class="headerlink" href="#workflow" title="Link to this heading">¶</a></h2>
+<p>At a high level, the basic workflow for a network segment range creation is
+the following:</p>
+<ol class="arabic simple">
+<li><p>The Cloud administrator:</p>
+<ul class="simple">
+<li><p>Lists the existing network segment ranges.</p></li>
+<li><p>Creates a shared or a tenant-specific network segment range based on the
+requirement.</p></li>
+</ul>
+</li>
+<li><p>A regular tenant creates a network in regular way. The network created
+will automatically allocate a segment from the segment ranges assigned to
+the tenant or shared if no tenant specific range available.</p></li>
+</ol>
+<p>At a high level, the basic workflow for a network segment range update is
+the following:</p>
+<ol class="arabic simple">
+<li><p>The Cloud administrator:</p>
+<ul class="simple">
+<li><p>Lists the existing network segment ranges and identifies the one that
+needs to be updated.</p></li>
+<li><p>Updates the network segment range based on the requirement.</p></li>
+</ul>
+</li>
+<li><p>A regular tenant creates a network in regular way. The network created
+will automatically allocate a segment from the updated network segment
+ranges available.</p></li>
+</ol>
+<section id="list-the-network-segment-ranges-or-show-a-network-segment-range">
+<h3>List the network segment ranges or show a network segment range<a class="headerlink" href="#list-the-network-segment-ranges-or-show-a-network-segment-range" title="Link to this heading">¶</a></h3>
+<p>As admin, list the existing network segment ranges:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>segment<span class="w"> </span>range<span class="w"> </span>list
+<span class="go">+--------------------------------------+-------------------+---------+--------+----------------------------------+--------------+------------------+------------+------------+</span>
+<span class="go">| ID                                   | Name              | Default | Shared | Project ID                       | Network Type | Physical Network | Minimum ID | Maximum ID |</span>
+<span class="go">+--------------------------------------+-------------------+---------+--------+----------------------------------+--------------+------------------+------------+------------+</span>
+<span class="go">| 20ce94e1-4e51-4aa0-a5f1-26bdfb5bd90e |                   | True    | True   | None                             | vxlan        | None             |          1 |        200 |</span>
+<span class="go">| 4b7af684-ec97-422d-ba38-8b9c2919ae67 | test_range_3      | False   | False  | 7011dc7fccac4efda89dc3b7f0d0975a | gre          | None             |        100 |        120 |</span>
+<span class="go">| a021e582-6b0f-49f5-90cb-79a670c61973 |                   | True    | True   | None                             | vlan         | default          |          1 |        100 |</span>
+<span class="go">| a3373630-969b-4ce9-bae7-dff0f8fa2f92 | test_range_2      | False   | True   | None                             | vxlan        | None             |        501 |        505 |</span>
+<span class="go">| a5707a8f-76f0-4f90-9aa7-c42bf54e94b5 |                   | True    | True   | None                             | gre          | None             |          1 |        150 |</span>
+<span class="go">| aad1b55b-43f1-46f9-8c35-85f270863ed6 |                   | True    | True   | None                             | geneve       | None             |          1 |        120 |</span>
+<span class="go">| e3233178-2866-4f40-b794-7c6fecdc8655 | test_range_1      | False   | False  | 7011dc7fccac4efda89dc3b7f0d0975a | vlan         | group0-data0     |         11 |         11 |</span>
+<span class="go">+--------------------------------------+-------------------+---------+--------+----------------------------------+--------------+------------------+------------+------------+</span>
+</pre></div>
+</div>
+<p>The network segment ranges with <code class="docutils literal notranslate"><span class="pre">Default</span></code> as <code class="docutils literal notranslate"><span class="pre">True</span></code> are the ranges
+specified by the operators in the ML2 config file. Besides, there
+are also shared and tenant specific network segment ranges created by the
+admin previously.</p>
+<p>The admin is also able to check/show the detailed information (e.g.
+availability and usage statistics) of a network segment range:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>segment<span class="w"> </span>range<span class="w"> </span>show<span class="w"> </span>test_range_1
+<span class="go">+------------------+-----------------------------------------------+</span>
+<span class="go">| Field            | Value                                         |</span>
+<span class="go">+------------------+-----------------------------------------------+</span>
+<span class="go">| available        | []                                            |</span>
+<span class="go">| default          | False                                         |</span>
+<span class="go">| id               | e3233178-2866-4f40-b794-7c6fecdc8655          |</span>
+<span class="go">| location         | None                                          |</span>
+<span class="go">| maximum          | 11                                            |</span>
+<span class="go">| minimum          | 11                                            |</span>
+<span class="go">| name             | test_range_1                                  |</span>
+<span class="go">| network_type     | vlan                                          |</span>
+<span class="go">| physical_network | group0-data0                                  |</span>
+<span class="go">| project_id       | 7011dc7fccac4efda89dc3b7f0d0975a              |</span>
+<span class="go">| shared           | False                                         |</span>
+<span class="go">| used             | {u&#39;7011dc7fccac4efda89dc3b7f0d0975a&#39;: [&#39;11&#39;]} |</span>
+<span class="go">+------------------+-----------------------------------------------+</span>
+</pre></div>
+</div>
+</section>
+<section id="create-or-update-the-network-segment-range">
+<h3>Create or update the network segment range<a class="headerlink" href="#create-or-update-the-network-segment-range" title="Link to this heading">¶</a></h3>
+<p>As admin, create a network segment range based on your requirement:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>segment<span class="w"> </span>range<span class="w"> </span>create<span class="w"> </span>--private<span class="w"> </span>--project<span class="w"> </span>demo<span class="w"> </span><span class="se">\</span>
+--network-type<span class="w"> </span>vxlan<span class="w"> </span>--minimum<span class="w"> </span><span class="m">120</span><span class="w"> </span>--maximum<span class="w"> </span><span class="m">140</span><span class="w"> </span>test_range_4
+<span class="go">+------------------+--------------------------------------+</span>
+<span class="go">| Field            | Value                                |</span>
+<span class="go">+------------------+--------------------------------------+</span>
+<span class="go">| available        | [&#39;120-140&#39;]                          |</span>
+<span class="go">| default          | False                                |</span>
+<span class="go">| id               | c016dcda-5bc3-4e98-b41f-6773e92fcd2d |</span>
+<span class="go">| location         | None                                 |</span>
+<span class="go">| maximum          | 140                                  |</span>
+<span class="go">| minimum          | 120                                  |</span>
+<span class="go">| name             | test_range_4                         |</span>
+<span class="go">| network_type     | vxlan                                |</span>
+<span class="go">| physical_network | None                                 |</span>
+<span class="go">| project_id       | 7011dc7fccac4efda89dc3b7f0d0975a     |</span>
+<span class="go">| shared           | False                                |</span>
+<span class="go">| used             | {}                                   |</span>
+<span class="go">+------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>Update a network segment range based on your requirement:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>segment<span class="w"> </span>range<span class="w"> </span><span class="nb">set</span><span class="w"> </span>--minimum<span class="w"> </span><span class="m">100</span><span class="w"> </span>--maximum<span class="w"> </span><span class="m">150</span><span class="w"> </span><span class="se">\</span>
+test_range_4
+</pre></div>
+</div>
+</section>
+<section id="create-a-tenant-network">
+<h3>Create a tenant network<a class="headerlink" href="#create-a-tenant-network" title="Link to this heading">¶</a></h3>
+<p>Now, as project <code class="docutils literal notranslate"><span class="pre">demo</span></code> (to source the client environment script
+<code class="docutils literal notranslate"><span class="pre">demo-openrc</span></code> for <code class="docutils literal notranslate"><span class="pre">demo</span></code> project according to
+<a class="reference external" href="https://docs.openstack.org/keystone/latest/install/keystone-openrc-rdo.html">https://docs.openstack.org/keystone/latest/install/keystone-openrc-rdo.html</a>),
+create a network in a regular way.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">source</span><span class="w"> </span>demo-openrc
+<span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>create<span class="w"> </span>test_net
+<span class="go">+---------------------------+--------------------------------------+</span>
+<span class="go">| Field                     | Value                                |</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+<span class="go">| admin_state_up            | UP                                   |</span>
+<span class="go">| availability_zone_hints   |                                      |</span>
+<span class="go">| availability_zones        |                                      |</span>
+<span class="go">| created_at                | 2019-02-25T23:20:36Z                 |</span>
+<span class="go">| description               |                                      |</span>
+<span class="go">| dns_domain                |                                      |</span>
+<span class="go">| id                        | 39e5b95c-ad7a-40b5-9ec1-a4b4a8a43f14 |</span>
+<span class="go">| ipv4_address_scope        | None                                 |</span>
+<span class="go">| ipv6_address_scope        | None                                 |</span>
+<span class="go">| is_default                | False                                |</span>
+<span class="go">| is_vlan_transparent       | None                                 |</span>
+<span class="go">| location                  | None                                 |</span>
+<span class="go">| mtu                       | 1450                                 |</span>
+<span class="go">| name                      | test_net                             |</span>
+<span class="go">| port_security_enabled     | True                                 |</span>
+<span class="go">| project_id                | 7011dc7fccac4efda89dc3b7f0d0975a     |</span>
+<span class="go">| provider:network_type     | vxlan                                |</span>
+<span class="go">| provider:physical_network | None                                 |</span>
+<span class="go">| provider:segmentation_id  | None                                  |</span>
+<span class="go">| qos_policy_id             | None                                 |</span>
+<span class="go">| revision_number           | 2                                    |</span>
+<span class="go">| router:external           | Internal                             |</span>
+<span class="go">| segments                  | None                                 |</span>
+<span class="go">| shared                    | False                                |</span>
+<span class="go">| status                    | ACTIVE                               |</span>
+<span class="go">| subnets                   |                                      |</span>
+<span class="go">| tags                      |                                      |</span>
+<span class="go">| updated_at                | 2019-02-25T23:20:36Z                 |</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>Then, switch back to the admin to check the segmentation ID of the tenant
+network created.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">source</span><span class="w"> </span>admin-openrc
+<span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>show<span class="w"> </span>test_net
+<span class="go">+---------------------------+--------------------------------------+</span>
+<span class="go">| Field                     | Value                                |</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+<span class="go">| admin_state_up            | UP                                   |</span>
+<span class="go">| availability_zone_hints   |                                      |</span>
+<span class="go">| availability_zones        |                                      |</span>
+<span class="go">| created_at                | 2019-02-25T23:20:36Z                 |</span>
+<span class="go">| description               |                                      |</span>
+<span class="go">| dns_domain                |                                      |</span>
+<span class="go">| id                        | 39e5b95c-ad7a-40b5-9ec1-a4b4a8a43f14 |</span>
+<span class="go">| ipv4_address_scope        | None                                 |</span>
+<span class="go">| ipv6_address_scope        | None                                 |</span>
+<span class="go">| is_default                | False                                |</span>
+<span class="go">| is_vlan_transparent       | None                                 |</span>
+<span class="go">| location                  | None                                 |</span>
+<span class="go">| mtu                       | 1450                                 |</span>
+<span class="go">| name                      | test_net                             |</span>
+<span class="go">| port_security_enabled     | True                                 |</span>
+<span class="go">| project_id                | 7011dc7fccac4efda89dc3b7f0d0975a     |</span>
+<span class="go">| provider:network_type     | vxlan                                |</span>
+<span class="go">| provider:physical_network | None                                 |</span>
+<span class="go">| provider:segmentation_id  | 137                                  |</span>
+<span class="go">| qos_policy_id             | None                                 |</span>
+<span class="go">| revision_number           | 2                                    |</span>
+<span class="go">| router:external           | Internal                             |</span>
+<span class="go">| segments                  | None                                 |</span>
+<span class="go">| shared                    | False                                |</span>
+<span class="go">| status                    | ACTIVE                               |</span>
+<span class="go">| subnets                   |                                      |</span>
+<span class="go">| tags                      |                                      |</span>
+<span class="go">| updated_at                | 2019-02-25T23:20:36Z                 |</span>
+<span class="go">+---------------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>The tenant network created automatically allocates a segment with
+segmentation ID <code class="docutils literal notranslate"><span class="pre">137</span></code> from the network segment range with segmentation
+ID range <code class="docutils literal notranslate"><span class="pre">120-140</span></code> that is assigned to the tenant.</p>
+<p>If no more available segment in the network segment range assigned to this
+tenant, then the segment allocation would refer to the <code class="docutils literal notranslate"><span class="pre">shared</span></code> segment
+ranges to check whether there’s one segment available. If still there is no
+segment available, the allocation will fail as follows:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>create<span class="w"> </span>test_net
+<span class="gp">$ </span>Unable<span class="w"> </span>to<span class="w"> </span>create<span class="w"> </span>the<span class="w"> </span>network.<span class="w"> </span>No<span class="w"> </span>tenant<span class="w"> </span>network<span class="w"> </span>is<span class="w"> </span>available<span class="w"> </span><span class="k">for</span>
+<span class="go">  allocation.</span>
+</pre></div>
+</div>
+<p>In this case, the admin is advised to check the availability and usage
+statistics of the related network segment ranges in order to take further
+actions (e.g. enlarging a segment range etc.).</p>
+</section>
+</section>
+<section id="known-limitations">
+<h2>Known limitations<a class="headerlink" href="#known-limitations" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>This service plugin is only compatible with ML2 core plugin for now.
+However, it is possible for other core plugins to support this feature
+with a follow-on effort.</p></li>
+</ul>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="config-ndp-proxy.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: NDP Proxy"></i></a>
+          
+          
+            <a href="config-ovs-dpdk.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Open vSwitch with DPDK Datapath"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2023-09-15 18:12:45</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation Guide</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">OpenStack Networking Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deploy.html">Deployment examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ops.html">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">Migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ovn/index.html">OVN Driver Administration Guide</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributor/index.html">Contributor Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Network Segment Ranges</a><ul>
+<li><a class="reference internal" href="#why-you-need-it">Why you need it</a></li>
+<li><a class="reference internal" href="#how-it-works">How it works</a></li>
+<li><a class="reference internal" href="#default-network-segment-ranges">Default network segment ranges</a></li>
+<li><a class="reference internal" href="#example-configuration">Example configuration</a><ul>
+<li><a class="reference internal" href="#controller-node">Controller node</a></li>
+<li><a class="reference internal" href="#verify-service-operation">Verify service operation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#workflow">Workflow</a><ul>
+<li><a class="reference internal" href="#list-the-network-segment-ranges-or-show-a-network-segment-range">List the network segment ranges or show a network segment range</a></li>
+<li><a class="reference internal" href="#create-or-update-the-network-segment-range">Create or update the network segment range</a></li>
+<li><a class="reference internal" href="#create-a-tenant-network">Create a tenant network</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#known-limitations">Known limitations</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "admin/config-network-segment-ranges" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Network Segment Ranges in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2023-09-15 18:12:45";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "admin/config-network-segment-ranges";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>

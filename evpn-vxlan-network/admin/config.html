@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Configuration &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=5c69cfe2" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/support-matrix.css?v=ac26a930" />
+    <script src="../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Active-active L3 Gateway with Multihoming" href="config-active-active-l3gw.html" />
+    <link rel="prev" title="Firewall-as-a-Service (FWaaS)" href="fwaas.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../_static/pygments.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-17511903-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/neutron/src/doc/source/admin/config.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="http://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="http://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="http://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Configuration</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="fwaas.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Firewall-as-a-Service (FWaaS)"></i></a>
+    
+    
+    <a href="config-active-active-l3gw.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Active-active L3 Gateway with Multihoming"></i></a>
+    
+    <a id="pdfLink1" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="configuration">
+<span id="config"></span><h1>Configuration<a class="headerlink" href="#configuration" title="Link to this heading">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="config-active-active-l3gw.html">Active-active L3 Gateway with Multihoming</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-active-active-l3gw.html#why">Why</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-active-active-l3gw.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-active-active-l3gw.html#how">How</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-active-active-l3gw.html#use-cases">Use cases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-active-active-l3gw.html#example">Example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-address-scopes.html">Address Scopes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-address-scopes.html#accessing-address-scopes">Accessing address scopes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-address-scopes.html#backwards-compatibility">Backwards compatibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-address-scopes.html#create-shared-address-scopes-as-an-administrative-user">Create shared address scopes as an administrative user</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-address-scopes.html#routing-with-address-scopes-for-non-privileged-users">Routing with address scopes for non-privileged users</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-auto-allocation.html">Automatic allocation of network topologies</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-auto-allocation.html#enabling-the-deployment-for-auto-allocation">Enabling the deployment for auto-allocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-auto-allocation.html#get-me-a-network">Get Me A Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-auto-allocation.html#validating-the-requirements-for-auto-allocation">Validating the requirements for auto-allocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-auto-allocation.html#project-resources-created-by-auto-allocation">Project resources created by auto-allocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-auto-allocation.html#compatibility-notes">Compatibility notes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-az.html">Availability Zones</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-az.html#use-case">Use case</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-az.html#required-extensions">Required extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-az.html#network-scheduler">Network scheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-az.html#router-scheduler">Router scheduler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-az.html#l3-high-availability">L3 high availability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-az.html#dhcp-high-availability">DHCP high availability</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-bgp-dynamic-routing.html">BGP Dynamic Routing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-bgp-dynamic-routing.html#example-configuration">Example configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-bgp-dynamic-routing.html#prefix-advertisement">Prefix advertisement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-bgp-dynamic-routing.html#operation-with-distributed-virtual-routers-dvr">Operation with Distributed Virtual Routers (DVR)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-bgp-dynamic-routing.html#ipv6">IPv6</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-bgp-dynamic-routing.html#high-availability">High availability</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-bgp-floating-ip-over-l2-segmented-network.html">BGP Floating IPs over L2 Segmented Networks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-bgp-floating-ip-over-l2-segmented-network.html#configuring-the-neutron-api-side">Configuring the Neutron API side</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-bgp-floating-ip-over-l2-segmented-network.html#the-bgp-agent">The BGP agent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-bgp-floating-ip-over-l2-segmented-network.html#setting-up-bgp-peering-with-the-switches">Setting-up BGP peering with the switches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-bgp-floating-ip-over-l2-segmented-network.html#setting-up-physical-network-names">Setting-up physical network names</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-bgp-floating-ip-over-l2-segmented-network.html#setting-up-the-provider-network">Setting-up the provider network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-bgp-floating-ip-over-l2-segmented-network.html#setting-up-the-2nd-segment">Setting-up the 2nd segment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-bgp-floating-ip-over-l2-segmented-network.html#setting-up-the-provider-subnets-for-the-bgp-next-hop-routing">Setting-up the provider subnets for the BGP next HOP routing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-bgp-floating-ip-over-l2-segmented-network.html#adding-a-subnet-for-vm-floating-ips-and-router-gateways">Adding a subnet for VM floating IPs and router gateways</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-bgp-floating-ip-over-l2-segmented-network.html#setting-up-bgp-advertizing">Setting-up BGP advertizing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-bgp-floating-ip-over-l2-segmented-network.html#per-project-operation">Per project operation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-bgp-floating-ip-over-l2-segmented-network.html#cumulus-switch-configuration">Cumulus switch configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-bgp-floating-ip-over-l2-segmented-network.html#verification">Verification</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-services-agent.html">Agents and Services</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-services-agent.html#configuration-options">Configuration options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-services-agent.html#l2-agents">L2 agents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-services-agent.html#metadata-agent">Metadata agent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-services-agent.html#dhcp-agent">DHCP agent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-services-agent.html#l3-agent">L3 agent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-services-agent.html#external-processes-run-by-agents">External processes run by agents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-dns-int.html">DNS Integration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-dns-int.html#the-networking-service-internal-dns-resolution">The Networking service internal DNS resolution</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-dns-int-ext-serv.html">DNS Integration with an External Service</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-dns-int-ext-serv.html#configuring-openstack-networking-for-integration-with-an-external-dns-service">Configuring OpenStack Networking for integration with an external DNS service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-dns-int-ext-serv.html#use-case-1-floating-ips-are-published-with-associated-port-dns-attributes">Use case 1: Floating IPs are published with associated port DNS attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-dns-int-ext-serv.html#use-case-2-floating-ips-are-published-in-the-external-dns-service">Use case 2: Floating IPs are published in the external DNS service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-dns-int-ext-serv.html#use-case-3-ports-are-published-directly-in-the-external-dns-service">Use case 3: Ports are published directly in the external DNS service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-dns-int-ext-serv.html#performance-considerations">Performance considerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-dns-int-ext-serv.html#configuration-of-the-externally-accessible-network-for-use-cases-3b-and-3c">Configuration of the externally accessible network for use cases 3b and 3c</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-dns-int-ext-serv.html#the-port-s-dns-assignment-attribute-with-use-case-3">The port’s <code class="docutils literal notranslate"><span class="pre">dns_assignment</span></code> attribute with use case 3</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-dns-res.html">DNS Resolution for Instances</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-dns-res.html#case-1-each-virtual-network-uses-unique-dns-resolver-s">Case 1: Each virtual network uses unique DNS resolver(s)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-dns-res.html#case-2-dhcp-agents-forward-dns-queries-from-instances">Case 2: DHCP agents forward DNS queries from instances</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-dvr-ha-snat.html">Distributed Virtual Routing with VRRP</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-dvr-ha-snat.html#configuration-example">Configuration example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-dvr-ha-snat.html#known-limitations">Known limitations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-experimental-framework.html">Experimental Features Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config-fip-port-forwardings.html">Floating IP Port Forwarding</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-fip-port-forwardings.html#configuring-floating-ip-port-forwarding">Configuring floating IP port forwarding</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-ipam.html">IPAM Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-ipam.html#the-basics">The basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-ipam.html#known-limitations">Known limitations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-ipv6.html">IPv6</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-ipv6.html#neutron-subnets-and-the-ipv6-api-attributes">Neutron subnets and the IPv6 API attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-ipv6.html#project-network-considerations">Project network considerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-ipv6.html#router-support">Router support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-ipv6.html#advanced-services">Advanced services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-ipv6.html#security-considerations">Security considerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-ipv6.html#openstack-control-management-network-considerations">OpenStack control &amp; management network considerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-ipv6.html#prefix-delegation">Prefix delegation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-macvtap.html">Macvtap Mechanism Driver</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-macvtap.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-macvtap.html#architecture">Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-macvtap.html#example-configuration">Example configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-macvtap.html#network-traffic-flow">Network traffic flow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-metadata-caching.html">Metadata Service Caching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config-metadata-rate-limiting.html">Metadata Service Query Rate-limiting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config-ml2.html">ML2 Plug-in</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-ml2.html#architecture">Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-ml2.html#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-ml2.html#reference-implementations">Reference implementations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-mtu.html">MTU Considerations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-mtu.html#jumbo-frames">Jumbo frames</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-mtu.html#instance-network-interfaces-vifs">Instance network interfaces (VIFs)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-mtu.html#networks-with-enabled-vlan-transparency">Networks with enabled vlan transparency</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-ndp-proxy.html">NDP Proxy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-ndp-proxy.html#configuration-of-ndp-proxy">Configuration of NDP proxy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-ndp-proxy.html#user-workflow">User workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-ndp-proxy.html#known-limitations">Known limitations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-network-segment-ranges.html">Network Segment Ranges</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-network-segment-ranges.html#why-you-need-it">Why you need it</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-network-segment-ranges.html#how-it-works">How it works</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-network-segment-ranges.html#default-network-segment-ranges">Default network segment ranges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-network-segment-ranges.html#example-configuration">Example configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-network-segment-ranges.html#workflow">Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-network-segment-ranges.html#known-limitations">Known limitations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-ovs-dpdk.html">Open vSwitch with DPDK Datapath</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-ovs-dpdk.html#the-basics">The basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-ovs-dpdk.html#using-vhost-user-interfaces">Using vhost-user interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-ovs-dpdk.html#using-vhost-user-multiqueue">Using vhost-user multiqueue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-ovs-dpdk.html#known-limitations">Known limitations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-ovs-offload.html">Open vSwitch Hardware Offloading</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-ovs-offload.html#the-basics">The basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-ovs-offload.html#using-open-vswitch-hardware-offloading">Using Open vSwitch hardware offloading</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-ovsfwdriver.html">Open vSwitch Native Firewall Driver</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-ovsfwdriver.html#configuring-heterogeneous-firewall-drivers">Configuring heterogeneous firewall drivers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-ovsfwdriver.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-ovsfwdriver.html#enable-the-native-ovs-firewall-driver">Enable the native OVS firewall driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-ovsfwdriver.html#using-gre-tunnels-inside-vms-with-ovs-firewall-driver">Using GRE tunnels inside VMs with OVS firewall driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-ovsfwdriver.html#differences-between-ovs-and-iptables-firewall-drivers">Differences between OVS and iptables firewall drivers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-ovsfwdriver.html#open-flow-rules-processing-considerations">Open Flow rules processing considerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-ovsfwdriver.html#permitted-ethertypes">Permitted ethertypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-ovsfwdriver.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-logging.html">Packet Logging Framework</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-logging.html#ml2-ovn-driver">ML2/OVN Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-logging.html#ml2-ovs-driver">ML2/OVS Driver</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-qos.html">Quality of Service (QoS)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-qos.html#supported-qos-rule-types">Supported QoS rule types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-qos.html#l3-qos-support">L3 QoS support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-qos.html#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-qos.html#user-workflow">User workflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-qos-min-bw.html">Quality of Service (QoS): Guaranteed Minimum Bandwidth</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-qos-min-bw.html#limitations">Limitations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-qos-min-bw.html#placement-pre-requisites">Placement pre-requisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-qos-min-bw.html#nova-pre-requisites">Nova pre-requisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-qos-min-bw.html#neutron-pre-requisites">Neutron pre-requisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-qos-min-bw.html#propagation-of-resource-information">Propagation of resource information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-qos-min-bw.html#sample-usage">Sample usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-qos-min-bw.html#on-healing-of-allocations">On Healing of Allocations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-qos-min-bw.html#debugging">Debugging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-qos-min-bw.html#links">Links</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-qos-min-pps.html">Quality of Service (QoS): Guaranteed Minimum Packet Rate</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-qos-min-pps.html#limitations">Limitations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-qos-min-pps.html#placement-pre-requisites">Placement pre-requisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-qos-min-pps.html#nova-pre-requisites">Nova pre-requisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-qos-min-pps.html#neutron-pre-requisites">Neutron pre-requisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-qos-min-pps.html#propagation-of-resource-information">Propagation of resource information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-qos-min-pps.html#sample-usage">Sample usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-qos-min-pps.html#on-healing-of-allocations">On Healing of Allocations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-qos-min-pps.html#debugging">Debugging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-qos-min-pps.html#links">Links</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-rbac.html">Role-Based Access Control (RBAC)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-rbac.html#supported-objects-for-sharing-with-specific-projects">Supported objects for sharing with specific projects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-rbac.html#sharing-an-object-with-specific-projects">Sharing an object with specific projects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-rbac.html#sharing-a-network-with-specific-projects">Sharing a network with specific projects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-rbac.html#sharing-a-qos-policy-with-specific-projects">Sharing a QoS policy with specific projects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-rbac.html#sharing-a-security-group-with-specific-projects">Sharing a security group with specific projects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-rbac.html#sharing-an-address-scope-with-specific-projects">Sharing an address scope with specific projects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-rbac.html#sharing-a-subnet-pool-with-specific-projects">Sharing a subnet pool with specific projects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-rbac.html#sharing-an-address-group-with-specific-projects">Sharing an address group with specific projects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-rbac.html#how-the-shared-flag-relates-to-these-entries">How the ‘shared’ flag relates to these entries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-rbac.html#allowing-a-network-to-be-used-as-an-external-network">Allowing a network to be used as an external network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-rbac.html#preventing-regular-users-from-sharing-objects-with-each-other">Preventing regular users from sharing objects with each other</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-rbac.html#improve-database-rbac-query-operations">Improve database RBAC query operations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-routed-networks.html">Routed provider networks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-routed-networks.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-routed-networks.html#example-configuration">Example configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-routed-networks.html#create-a-routed-provider-network">Create a routed provider network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-routed-networks.html#migrating-non-routed-networks-to-routed">Migrating non-routed networks to routed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-routed-networks.html#routed-provider-networks-as-external-networks-for-tenant-routed-networks">Routed provider networks as external networks for tenant routed networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-routed-networks.html#multiple-routed-provider-segments-per-host">Multiple routed provider segments per host</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-router-flavor-ovn.html">Router flavors with the L3 OVN service plugin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config-sriov.html">SR-IOV</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-sriov.html#the-basics">The basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-sriov.html#using-sr-iov-interfaces">Using SR-IOV interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-sriov.html#sr-iov-with-connectx-3-connectx-3-pro-dual-port-ethernet">SR-IOV with ConnectX-3/ConnectX-3 Pro Dual Port Ethernet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-sriov.html#sr-iov-with-infiniband">SR-IOV with InfiniBand</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-sriov.html#known-limitations">Known limitations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-sfc.html">Service Function Chaining</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-sfc.html#architecture">Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-sfc.html#resources">Resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-sfc.html#operations">Operations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-service-subnets.html">Service Subnets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-service-subnets.html#operation">Operation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-service-subnets.html#usage">Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-subnet-onboard.html">Subnet Onboarding</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-subnet-onboard.html#how-it-works">How it works</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-subnet-pools.html">Subnet Pools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-subnet-pools.html#why-you-need-them">Why you need them</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-subnet-pools.html#how-they-work">How they work</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-subnet-pools.html#quotas">Quotas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-subnet-pools.html#default-subnet-pools">Default subnet pools</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-trunking.html">Trunking</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-trunking.html#operation">Operation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-trunking.html#example-configuration">Example configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-trunking.html#using-trunks-and-subports-inside-an-instance">Using trunks and subports inside an instance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-trunking.html#trunk-states">Trunk states</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-trunking.html#limitations-and-issues">Limitations and issues</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config-wsgi.html">WSGI Usage with the Neutron API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config-wsgi.html#wsgi-application">WSGI Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-wsgi.html#neutron-api-behind-uwsgi">Neutron API behind uwsgi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-wsgi.html#start-neutron-rpc-server">Start Neutron RPC server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config-wsgi.html#neutron-worker-processes">Neutron Worker Processes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="data-center-networks.html">Data center Networks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="data-center-networks.html#document-scope">Document Scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data-center-networks.html#terminology">Terminology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data-center-networks.html#current-state-of-neutron">Current State of Neutron</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data-center-networks.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data-center-networks.html#how-it-works">How it works</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data-center-networks.html#example-configuration">Example configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data-center-networks.html#considerations">Considerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data-center-networks.html#limitations-and-bugs">Limitations and Bugs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data-center-networks.html#related-documentation">Related documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data-center-networks.html#references">References</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For general configuration, see the <a class="reference external" href="../configuration/">Configuration Reference</a>.</p>
+</div>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="fwaas.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Firewall-as-a-Service (FWaaS)"></i></a>
+          
+          
+            <a href="config-active-active-l3gw.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Active-active L3 Gateway with Multihoming"></i></a>
+          
+          <a id="pdfLink2" href="" target="_blank" title="Download the manuals as PDF"><i class="fa fa-file-pdf-o" data-toggle="tooltip" data-placement="top" title="Download PDF"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2025-10-30 12:30:14</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation Guide</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">OpenStack Networking Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deploy.html">Deployment examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ops.html">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">Migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ovn/index.html">OVN Driver Administration Guide</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/index.html">Configuration Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cli/index.html">Command-Line Interface Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ovn/index.html">OVN Driver</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../feature_classification/index.html">Neutron Feature Classification</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributor/index.html">Contributor Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../eventlet_deprecation/index.html">Eventlet Deprecation Reference</a></li>
+</ul>
+
+    </div>
+
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "admin/config" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var repositoryName = "openstack/neutron";
+    var bugProject = "neutron";
+    var bugTitle = "Configuration in Neutron";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 27.1.0.dev87 on 2025-10-30 12:30:14";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+    var currentSourceFile = "admin/config";
+    var pdfFileName = "doc-neutron.pdf";
+    pdfLink(currentSourceFile, pdfFileName);
+</script>
+
+
+<script>
+    $(document).ready(function(){
+
+          $.ajax({
+            context: this,
+            dataType : "html",
+            url : "https://docs.openstack.org/latest/badge.html",
+            success : function(results) {
+                $('#deprecated-badge-container').html(results);
+            }
+        });
+    });
+</script>
+<div id="deprecated-badge-container"></div>
+
+  </body>
+</html>
