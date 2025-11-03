@@ -541,10 +541,19 @@ This example demonstrates a complete EVPN VXLAN setup with baremetal servers:
    * Configure the ToR switch port for VLAN 100
    * The switch maps VLAN 100 to VXLAN VNI 10000 via EVPN
 
-Physical network name handling
--------------------------------
+Additional Improvements
+~~~~~~~~~~~~~~~~~~~~~~~
 
-The EVPN L2VNI driver supports a special syntax for specifying multiple
+Multiple fabric support
+-----------------------
+
+Today Neutron only supports one fabric / VXLAN overlay per instance of Neutron
+but there exist configurations where multiple fabrics / VXLAN overlays for a
+given deployment of OpenStack. For example a tenant fabric and a provider
+fabric to provide cross connectivity or connectivity to network attached
+storage or two different pools of Ironic nodes connected to separate fabrics.
+
+The EVPN L2VNI driver could support a special syntax for specifying multiple
 physical networks in scenarios where the EVPN network and VLAN segment
 use different physical network names:
 
@@ -554,10 +563,17 @@ use different physical network names:
 
 The driver will:
 
-* Use ``evpn-physnet`` for the VXLAN segment
+* Use ``evpn-physnet`` for the VXLAN fabric
 * Use ``vlan-physnet`` for the dynamically allocated VLAN segment
 
-If a colon is not present, the ``evpn-physnet`` is considered empty.
+If a colon is not present, the ``evpn-physnet`` is considered empty or
+``None``.
+
+Or the Ironic Port / Portgroup ``category`` field could be used for the VXLAN
+fabric.
+
+An additional ``evpn-vxlan`` ML2 type could exist which would allow for
+a ``physical_network`` to be supplied like VLAN today.
 
 Trunk ports and subports
 ------------------------

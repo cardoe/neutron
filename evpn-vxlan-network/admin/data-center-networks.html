@@ -714,9 +714,17 @@ create a baremetal server on the network.</p>
 </li>
 </ol>
 </section>
-<section id="physical-network-name-handling">
-<h3>Physical network name handling<a class="headerlink" href="#physical-network-name-handling" title="Link to this heading">¶</a></h3>
-<p>The EVPN L2VNI driver supports a special syntax for specifying multiple
+</section>
+<section id="additional-improvements">
+<h2>Additional Improvements<a class="headerlink" href="#additional-improvements" title="Link to this heading">¶</a></h2>
+<section id="multiple-fabric-support">
+<h3>Multiple fabric support<a class="headerlink" href="#multiple-fabric-support" title="Link to this heading">¶</a></h3>
+<p>Today Neutron only supports one fabric / VXLAN overlay per instance of Neutron
+but there exist configurations where multiple fabrics / VXLAN overlays for a
+given deployment of OpenStack. For example a tenant fabric and a provider
+fabric to provide cross connectivity or connectivity to network attached
+storage or two different pools of Ironic nodes connected to separate fabrics.</p>
+<p>The EVPN L2VNI driver could support a special syntax for specifying multiple
 physical networks in scenarios where the EVPN network and VLAN segment
 use different physical network names:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>physical_network: &quot;evpn-physnet:vlan-physnet&quot;
@@ -724,10 +732,15 @@ use different physical network names:</p>
 </div>
 <p>The driver will:</p>
 <ul class="simple">
-<li><p>Use <code class="docutils literal notranslate"><span class="pre">evpn-physnet</span></code> for the VXLAN segment</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">evpn-physnet</span></code> for the VXLAN fabric</p></li>
 <li><p>Use <code class="docutils literal notranslate"><span class="pre">vlan-physnet</span></code> for the dynamically allocated VLAN segment</p></li>
 </ul>
-<p>If a colon is not present, the <code class="docutils literal notranslate"><span class="pre">evpn-physnet</span></code> is considered empty.</p>
+<p>If a colon is not present, the <code class="docutils literal notranslate"><span class="pre">evpn-physnet</span></code> is considered empty or
+<code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<p>Or the Ironic Port / Portgroup <code class="docutils literal notranslate"><span class="pre">category</span></code> field could be used for the VXLAN
+fabric.</p>
+<p>An additional <code class="docutils literal notranslate"><span class="pre">evpn-vxlan</span></code> ML2 type could exist which would allow for
+a <code class="docutils literal notranslate"><span class="pre">physical_network</span></code> to be supplied like VLAN today.</p>
 </section>
 <section id="trunk-ports-and-subports">
 <h3>Trunk ports and subports<a class="headerlink" href="#trunk-ports-and-subports" title="Link to this heading">¶</a></h3>
@@ -972,7 +985,10 @@ networks</p></li>
 </li>
 <li><a class="reference internal" href="#example-configuration">Example configuration</a><ul>
 <li><a class="reference internal" href="#complete-example-with-ironic-and-networking-generic-switch">Complete example with Ironic and networking-generic-switch</a></li>
-<li><a class="reference internal" href="#physical-network-name-handling">Physical network name handling</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#additional-improvements">Additional Improvements</a><ul>
+<li><a class="reference internal" href="#multiple-fabric-support">Multiple fabric support</a></li>
 <li><a class="reference internal" href="#trunk-ports-and-subports">Trunk ports and subports</a></li>
 <li><a class="reference internal" href="#layer-3-routing-with-svis">Layer-3 Routing with SVIs</a></li>
 </ul>
@@ -1080,7 +1096,7 @@ networks</p></li>
     gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
 
     /* gitsha, project and bug_tag rely on variables in conf.py */
-    var gitSha = "SHA: 295a62ce2aafb267225cdf23c962e00b3a382a77";
+    var gitSha = "SHA: ec8cf9d0d2f7c70b5d253d59b7ee099ce722fdb9";
     var repositoryName = "openstack/neutron";
     var bugProject = "neutron";
     var bugTitle = "Data Center Networks in Neutron";
