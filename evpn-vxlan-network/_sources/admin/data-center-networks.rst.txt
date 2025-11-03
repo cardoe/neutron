@@ -1,7 +1,7 @@
 .. _data-center-networks:
 
 ====================
-Data center Networks
+Data Center Networks
 ====================
 
 In a typical data center deployment, multiple cabinets contain baremetal
@@ -148,20 +148,21 @@ Physical layout
    │                   (VXLAN Overlay - VNI 10000)                   │
    └────────────────┬──────────────────────┬─────────────────────────┘
                     │                      │
-         ┌──────────┴─────────┐ ┌─────────┴──────────┐
-         │   ToR Switch 1     │ │   ToR Switch 2     │
-         │    (Cabinet 1)     │ │    (Cabinet 2)     │
-         │                    │ │                    │
-         │  VXLAN VNI 10000   │ │  VXLAN VNI 10000   │
-         │        ↕           │ │        ↕           │
-         │   VLAN 100         │ │   VLAN 105         │
-         └─┬────────┬─────────┘ └─┬────────┬─────────┘
-           │        │             │        │
-      ┌────┴──┐ ┌───┴────┐    ┌───┴────┐  ┌┴────────┐
-      │Server1│ │Server2 │    │Server3 │  │Server4  │
-      │ eth0  │ │ eth0   │    │ eth0   │  │ eth0    │
-      └───────┘ └────────┘    └────────┘  └─────────┘
-       VLAN 100   VLAN 100     VLAN 105   VLAN 105
+           Cabinet 1│             Cabinet 2│
+         ┌──────────┴─────────┐  ┌─────────┴──────────┐
+         │   ToR Switch 1     │  │   ToR Switch 2     │
+         │    (physnet1)      │  │    (physnet2)      │
+         │                    │  │                    │
+         │  VXLAN VNI 10000   │  │  VXLAN VNI 10000   │
+         │        ↕           │  │        ↕           │
+         │   VLAN 100         │  │   VLAN 105         │
+         └─┬────────┬─────────┘  └─┬────────┬─────────┘
+           │        │              │        │
+      ┌────┴──┐ ┌───┴────┐     ┌───┴────┐  ┌┴────────┐
+      │Server1│ │Server2 │     │Server3 │  │Server4  │
+      │ eth0  │ │ eth0   │     │ eth0   │  │ eth0    │
+      └───────┘ └────────┘     └────────┘  └─────────┘
+       VLAN 100   VLAN 100      VLAN 105    VLAN 105
 
 In this architecture:
 
@@ -169,8 +170,8 @@ In this architecture:
   virtual network
 * **Spine/Core Network** carries only VXLAN-encapsulated traffic; no VLANs or
   native VLAN tagged traffic exists at this layer
-* **VLAN 100** is the local VLAN ID assigned on Switch 1 (switch-local VLAN)
-* **VLAN 105** is the local VLAN ID assigned on Switch 2 (switch-local VLAN)
+* **VLAN 100** is the local VLAN ID assigned on Switch 1 (``physnet1``)
+* **VLAN 105** is the local VLAN ID assigned on Switch 2 (``physnet2``)
 * Each ToR switch performs VXLAN encapsulation/decapsulation, mapping
   VNI 10000 to VLAN 100 or 105 on the server-facing ports
 * Servers in different cabinets can communicate through the VXLAN overlay
@@ -193,7 +194,9 @@ In this architecture:
    In production deployments, ToR switches are often deployed in VPC (Virtual
    Port Channel) pairs for redundancy. Each MLAG pair acts as a single logical
    VTEP (VXLAN Tunnel Endpoint), providing high availability and load
-   distribution across both switches.
+   distribution across both switches. Both switches in the MLAG pair would
+   need to be identified by the same identifier like ``physnet1`` in the
+   above example.
 
 Binding levels
 --------------
@@ -220,7 +223,7 @@ multiple levels:
         ├─ Level 1: VXLAN Segment (VNI 10000)
         │           Bound by: evpn-l2vni driver
         │
-        └─ Level 2: VLAN Segment (VLAN 100, physnet1)
+        └─ Level 2: VLAN Segment (VLAN 100, ``physnet1``)
                     Bound by: networking-generic-switch or
                               networking-baremetal driver
 
@@ -264,7 +267,7 @@ This two-tier approach allows:
    +--------------------------------------+----------+--------------+---------------+
    | a1b2c3d4-e5f6-4a5b-8c7d-9e8f7a6b5c4d | None     | vxlan        | 10000         |
    | b2c3d4e5-f6a7-5b8c-9d7e-0f8a7b6c5d4e | physnet1 | vlan         | 100           |
-   | c3d4e5f6-a7b8-6c9d-0e8f-1a9b8c7d6e5f | physnet2 | vlan         | 101           |
+   | c3d4e5f6-a7b8-6c9d-0e8f-1a9b8c7d6e5f | physnet2 | vlan         | 105           |
    +--------------------------------------+----------+--------------+---------------+
 
 Prerequisites
@@ -291,11 +294,43 @@ EVPN VXLAN networks for baremetal servers require the following prerequisites:
      participation
    * Connectivity between switches for VXLAN tunneling
 
+#. **Neutron network segment ranges**
+
+   :ref:`Network Segment Ranges <config-network-segment-ranges>`
+   would need to be configured for this to work from end to end. The ``vxlan``
+   segment range is necessary for users to create tenant networks. While the
+   ``vlan`` segment ranges are necessary for each MLAG pair of ToR switches.
+   An example of ranges which would be compatible with the other example in
+   this document would be:
+
+   .. code-block:: console
+
+      $ openstack network segment range list
+      +--------------------------------------+----------+---------+--------+------------+--------------+------------------+------------+------------+
+      | ID                                   | Name     | Default | Shared | Project ID | Network Type | Physical Network | Minimum ID | Maximum ID |
+      +--------------------------------------+----------+---------+--------+------------+--------------+------------------+------------+------------+
+      | 0c267189-bf5b-4b8a-afa3-1b22fac9bdd9 | physnet1 | False   | True   | None       | vlan         | physnet1         |        100 |        200 |
+      | 1f6d7d40-26c9-4bf5-bfd4-ceb48f5035b6 | physnet2 | False   | True   | None       | vlan         | physnet2         |        105 |        200 |
+      | 351ba77c-5b4e-4f65-ab4a-46efd481cf5f | None     | False   | True   | None       | vxlan        | None             |      10000 |      20000 |
+      +--------------------------------------+----------+---------+--------+------------+--------------+------------------+------------+------------+
+
 #. **Ironic baremetal nodes**
 
    Baremetal nodes must be configured with the physical network information
-   in their port's ``local_link_connection`` data, which Ironic passes to
-   Neutron during port binding.
+   in their port's ``physical_network`` data, which `Ironic passes to
+   Neutron during port binding <https://review.opendev.org/c/openstack/ironic/+/964570>`_.
+
+   .. code-block:: console
+
+      $ openstack baremetal  port list --node node1 --long -c Address -c 'Local Link Connection' -c 'Physical Network'
+      +-------------------+------------------------------------------------------------------------------------------------+------------------+
+      | Address           | Local Link Connection                                                                          | Physical Network |
+      +-------------------+------------------------------------------------------------------------------------------------+------------------+
+      | d4:04:e6:4f:71:28 | {'switch_id': 'c4:7e:e0:e4:55:3f', 'port_id': 'Ethernet1/4', 'switch_info': 'physnet1-1.mydc'} | physnet1         |
+      | d4:04:e6:4f:71:29 | {'switch_id': '40:14:82:81:3e:e3', 'port_id': 'Ethernet1/4', 'switch_info': 'physnet1-1.mydc'} | physnet1         |
+      | 14:23:f3:f4:c7:e0 | {'switch_id': 'c4:7e:e0:e4:03:37', 'port_id': 'Ethernet1/4', 'switch_info': 'physnet1-2.mydc'} | physnet1         |
+      | 14:23:f3:f4:c7:e1 | {'switch_id': 'c4:7e:e0:e7:a0:37', 'port_id': 'Ethernet1/4', 'switch_info': 'physnet1-2.mydc'} | physnet1         |
+      +-------------------+------------------------------------------------------------------------------------------------+------------------+
 
 #. **Switch configuration drivers**
 
@@ -304,42 +339,6 @@ EVPN VXLAN networks for baremetal servers require the following prerequisites:
    * networking-generic-switch
    * networking-baremetal
    * vendor-specific ML2 drivers
-
-VLAN translation (advanced topic)
-----------------------------------
-
-In advanced deployments, switches may employ **VLAN translation** on trunk
-ports to provide consistent VLAN numbering for tenants across the entire
-fabric, independent of the switch-local VLAN IDs.
-
-With VLAN translation:
-
-* **Tenant/Network VLAN ID**: The VLAN tag visible to the server and used
-  consistently across all ports in the network (e.g., VLAN 2018)
-* **Switch-local VLAN ID**: The internal VLAN used by the switch to separate
-  traffic, which maps to the VNI (e.g., VLAN 100)
-
-When a server sends traffic:
-
-#. Server sends frame tagged with tenant VLAN (e.g., 2018)
-#. Switch rewrites the tag to switch-local VLAN (e.g., 100)
-#. Switch performs VXLAN encapsulation using the VNI associated with VLAN 100
-#. Traffic travels through the VXLAN overlay to the destination switch
-#. Destination switch decapsulates and maps to its local VLAN (e.g., 101)
-#. Destination switch rewrites to tenant VLAN (e.g., 2018) on egress
-#. Destination server receives frame tagged with tenant VLAN 2018
-
-This allows tenants to use consistent VLAN numbering across their entire
-deployment while allowing the fabric to scale beyond 4094 VLANs through
-VLAN ID reuse across different physical networks.
-
-.. note::
-
-   VLAN translation is a switch-level feature and requires switch support.
-   The Neutron EVPN L2VNI driver is compatible with switches that implement
-   VLAN translation but does not directly configure this feature. Switch
-   configuration is handled by mechanism drivers like networking-generic-switch
-   or vendor-specific drivers.
 
 Packet flow example
 -------------------
@@ -411,7 +410,8 @@ When a baremetal port is bound to the EVPN VXLAN network:
 #. **Dynamic VLAN segment allocation or reuse**
 
    * Checks if a VLAN segment for the physical network already exists
-   * If not, allocates a dynamic VLAN segment on the physical network
+   * If not, allocates a dynamic VLAN segment on the physical network using
+     the network segment range
    * Multiple baremetal ports on the same physical network share the same
      VLAN segment
 
@@ -671,6 +671,8 @@ Limitations and Bugs
 Related documentation
 ~~~~~~~~~~~~~~~~~~~~~
 
+* :ref:`config-network-segment-ranges` - Network Segment Ranges necessary
+  for the dynamic VLAN assignment
 * :ref:`config-routed-provider-networks` - Similar concept for multi-segment
   layer-3 networks
 * Ironic documentation: `Configuring Neutron networking

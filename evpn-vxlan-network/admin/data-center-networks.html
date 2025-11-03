@@ -5,12 +5,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Data center Networks &#8212; Neutron 27.1.0.dev87 documentation</title>
+    <title>Data Center Networks &#8212; Neutron 27.1.0.dev100 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fe63c2af" />
     <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=5c69cfe2" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../_static/support-matrix.css?v=ac26a930" />
-    <script src="../_static/documentation_options.js?v=6e3fc1eb"></script>
+    <script src="../_static/documentation_options.js?v=e00b6fe2"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -182,7 +182,7 @@ ga('send', 'pageview');
         <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
 <div class="row docs-title">
   <div class="col-lg-8">
-      <h1>Data center Networks</h1>
+      <h1>Data Center Networks</h1>
     
   </div>
   <div class="docs-actions">
@@ -203,7 +203,7 @@ ga('send', 'pageview');
               <div class="docs-body" role="main">
 
   <section id="data-center-networks">
-<span id="id1"></span><h1>Data center Networks<a class="headerlink" href="#data-center-networks" title="Link to this heading">¶</a></h1>
+<span id="id1"></span><h1>Data Center Networks<a class="headerlink" href="#data-center-networks" title="Link to this heading">¶</a></h1>
 <p>In a typical data center deployment, multiple cabinets contain baremetal
 servers, with each cabinet having one or more switches that connect to the
 baremetal servers. When utilizing OpenStack these servers can make up your
@@ -334,20 +334,21 @@ networks work with baremetal servers.</p>
 │                   (VXLAN Overlay - VNI 10000)                   │
 └────────────────┬──────────────────────┬─────────────────────────┘
                  │                      │
-      ┌──────────┴─────────┐ ┌─────────┴──────────┐
-      │   ToR Switch 1     │ │   ToR Switch 2     │
-      │    (Cabinet 1)     │ │    (Cabinet 2)     │
-      │                    │ │                    │
-      │  VXLAN VNI 10000   │ │  VXLAN VNI 10000   │
-      │        ↕           │ │        ↕           │
-      │   VLAN 100         │ │   VLAN 105         │
-      └─┬────────┬─────────┘ └─┬────────┬─────────┘
-        │        │             │        │
-   ┌────┴──┐ ┌───┴────┐    ┌───┴────┐  ┌┴────────┐
-   │Server1│ │Server2 │    │Server3 │  │Server4  │
-   │ eth0  │ │ eth0   │    │ eth0   │  │ eth0    │
-   └───────┘ └────────┘    └────────┘  └─────────┘
-    VLAN 100   VLAN 100     VLAN 105   VLAN 105
+        Cabinet 1│             Cabinet 2│
+      ┌──────────┴─────────┐  ┌─────────┴──────────┐
+      │   ToR Switch 1     │  │   ToR Switch 2     │
+      │    (physnet1)      │  │    (physnet2)      │
+      │                    │  │                    │
+      │  VXLAN VNI 10000   │  │  VXLAN VNI 10000   │
+      │        ↕           │  │        ↕           │
+      │   VLAN 100         │  │   VLAN 105         │
+      └─┬────────┬─────────┘  └─┬────────┬─────────┘
+        │        │              │        │
+   ┌────┴──┐ ┌───┴────┐     ┌───┴────┐  ┌┴────────┐
+   │Server1│ │Server2 │     │Server3 │  │Server4  │
+   │ eth0  │ │ eth0   │     │ eth0   │  │ eth0    │
+   └───────┘ └────────┘     └────────┘  └─────────┘
+    VLAN 100   VLAN 100      VLAN 105    VLAN 105
 </pre></div>
 </div>
 <p>In this architecture:</p>
@@ -356,8 +357,8 @@ networks work with baremetal servers.</p>
 virtual network</p></li>
 <li><p><strong>Spine/Core Network</strong> carries only VXLAN-encapsulated traffic; no VLANs or
 native VLAN tagged traffic exists at this layer</p></li>
-<li><p><strong>VLAN 100</strong> is the local VLAN ID assigned on Switch 1 (switch-local VLAN)</p></li>
-<li><p><strong>VLAN 105</strong> is the local VLAN ID assigned on Switch 2 (switch-local VLAN)</p></li>
+<li><p><strong>VLAN 100</strong> is the local VLAN ID assigned on Switch 1 (<code class="docutils literal notranslate"><span class="pre">physnet1</span></code>)</p></li>
+<li><p><strong>VLAN 105</strong> is the local VLAN ID assigned on Switch 2 (<code class="docutils literal notranslate"><span class="pre">physnet2</span></code>)</p></li>
 <li><p>Each ToR switch performs VXLAN encapsulation/decapsulation, mapping
 VNI 10000 to VLAN 100 or 105 on the server-facing ports</p></li>
 <li><p>Servers in different cabinets can communicate through the VXLAN overlay
@@ -377,7 +378,9 @@ and implementation to extend Nova.</p>
 <p>In production deployments, ToR switches are often deployed in VPC (Virtual
 Port Channel) pairs for redundancy. Each MLAG pair acts as a single logical
 VTEP (VXLAN Tunnel Endpoint), providing high availability and load
-distribution across both switches.</p>
+distribution across both switches. Both switches in the MLAG pair would
+need to be identified by the same identifier like <code class="docutils literal notranslate"><span class="pre">physnet1</span></code> in the
+above example.</p>
 </div>
 </section>
 <section id="binding-levels">
@@ -400,7 +403,7 @@ multiple levels:</p>
      ├─ Level 1: VXLAN Segment (VNI 10000)
      │           Bound by: evpn-l2vni driver
      │
-     └─ Level 2: VLAN Segment (VLAN 100, physnet1)
+     └─ Level 2: VLAN Segment (VLAN 100, ``physnet1``)
                  Bound by: networking-generic-switch or
                            networking-baremetal driver
 </pre></div>
@@ -445,7 +448,7 @@ from the network segment range pool.</p></li>
 <span class="go">+--------------------------------------+----------+--------------+---------------+</span>
 <span class="go">| a1b2c3d4-e5f6-4a5b-8c7d-9e8f7a6b5c4d | None     | vxlan        | 10000         |</span>
 <span class="go">| b2c3d4e5-f6a7-5b8c-9d7e-0f8a7b6c5d4e | physnet1 | vlan         | 100           |</span>
-<span class="go">| c3d4e5f6-a7b8-6c9d-0e8f-1a9b8c7d6e5f | physnet2 | vlan         | 101           |</span>
+<span class="go">| c3d4e5f6-a7b8-6c9d-0e8f-1a9b8c7d6e5f | physnet2 | vlan         | 105           |</span>
 <span class="go">+--------------------------------------+----------+--------------+---------------+</span>
 </pre></div>
 </div>
@@ -473,10 +476,39 @@ participation</p></li>
 <li><p>Connectivity between switches for VXLAN tunneling</p></li>
 </ul>
 </li>
+<li><p><strong>Neutron network segment ranges</strong></p>
+<p><a class="reference internal" href="config-network-segment-ranges.html#config-network-segment-ranges"><span class="std std-ref">Network Segment Ranges</span></a>
+would need to be configured for this to work from end to end. The <code class="docutils literal notranslate"><span class="pre">vxlan</span></code>
+segment range is necessary for users to create tenant networks. While the
+<code class="docutils literal notranslate"><span class="pre">vlan</span></code> segment ranges are necessary for each MLAG pair of ToR switches.
+An example of ranges which would be compatible with the other example in
+this document would be:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>network<span class="w"> </span>segment<span class="w"> </span>range<span class="w"> </span>list
+<span class="go">+--------------------------------------+----------+---------+--------+------------+--------------+------------------+------------+------------+</span>
+<span class="go">| ID                                   | Name     | Default | Shared | Project ID | Network Type | Physical Network | Minimum ID | Maximum ID |</span>
+<span class="go">+--------------------------------------+----------+---------+--------+------------+--------------+------------------+------------+------------+</span>
+<span class="go">| 0c267189-bf5b-4b8a-afa3-1b22fac9bdd9 | physnet1 | False   | True   | None       | vlan         | physnet1         |        100 |        200 |</span>
+<span class="go">| 1f6d7d40-26c9-4bf5-bfd4-ceb48f5035b6 | physnet2 | False   | True   | None       | vlan         | physnet2         |        105 |        200 |</span>
+<span class="go">| 351ba77c-5b4e-4f65-ab4a-46efd481cf5f | None     | False   | True   | None       | vxlan        | None             |      10000 |      20000 |</span>
+<span class="go">+--------------------------------------+----------+---------+--------+------------+--------------+------------------+------------+------------+</span>
+</pre></div>
+</div>
+</li>
 <li><p><strong>Ironic baremetal nodes</strong></p>
 <p>Baremetal nodes must be configured with the physical network information
-in their port’s <code class="docutils literal notranslate"><span class="pre">local_link_connection</span></code> data, which Ironic passes to
-Neutron during port binding.</p>
+in their port’s <code class="docutils literal notranslate"><span class="pre">physical_network</span></code> data, which <a class="reference external" href="https://review.opendev.org/c/openstack/ironic/+/964570">Ironic passes to
+Neutron during port binding</a>.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>openstack<span class="w"> </span>baremetal<span class="w">  </span>port<span class="w"> </span>list<span class="w"> </span>--node<span class="w"> </span>node1<span class="w"> </span>--long<span class="w"> </span>-c<span class="w"> </span>Address<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;Local Link Connection&#39;</span><span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;Physical Network&#39;</span>
+<span class="go">+-------------------+------------------------------------------------------------------------------------------------+------------------+</span>
+<span class="go">| Address           | Local Link Connection                                                                          | Physical Network |</span>
+<span class="go">+-------------------+------------------------------------------------------------------------------------------------+------------------+</span>
+<span class="go">| d4:04:e6:4f:71:28 | {&#39;switch_id&#39;: &#39;c4:7e:e0:e4:55:3f&#39;, &#39;port_id&#39;: &#39;Ethernet1/4&#39;, &#39;switch_info&#39;: &#39;physnet1-1.mydc&#39;} | physnet1         |</span>
+<span class="go">| d4:04:e6:4f:71:29 | {&#39;switch_id&#39;: &#39;40:14:82:81:3e:e3&#39;, &#39;port_id&#39;: &#39;Ethernet1/4&#39;, &#39;switch_info&#39;: &#39;physnet1-1.mydc&#39;} | physnet1         |</span>
+<span class="go">| 14:23:f3:f4:c7:e0 | {&#39;switch_id&#39;: &#39;c4:7e:e0:e4:03:37&#39;, &#39;port_id&#39;: &#39;Ethernet1/4&#39;, &#39;switch_info&#39;: &#39;physnet1-2.mydc&#39;} | physnet1         |</span>
+<span class="go">| 14:23:f3:f4:c7:e1 | {&#39;switch_id&#39;: &#39;c4:7e:e0:e7:a0:37&#39;, &#39;port_id&#39;: &#39;Ethernet1/4&#39;, &#39;switch_info&#39;: &#39;physnet1-2.mydc&#39;} | physnet1         |</span>
+<span class="go">+-------------------+------------------------------------------------------------------------------------------------+------------------+</span>
+</pre></div>
+</div>
 </li>
 <li><p><strong>Switch configuration drivers</strong></p>
 <p>A mechanism driver that can configure physical switches, such as:</p>
@@ -487,40 +519,6 @@ Neutron during port binding.</p>
 </ul>
 </li>
 </ol>
-<section id="vlan-translation-advanced-topic">
-<h3>VLAN translation (advanced topic)<a class="headerlink" href="#vlan-translation-advanced-topic" title="Link to this heading">¶</a></h3>
-<p>In advanced deployments, switches may employ <strong>VLAN translation</strong> on trunk
-ports to provide consistent VLAN numbering for tenants across the entire
-fabric, independent of the switch-local VLAN IDs.</p>
-<p>With VLAN translation:</p>
-<ul class="simple">
-<li><p><strong>Tenant/Network VLAN ID</strong>: The VLAN tag visible to the server and used
-consistently across all ports in the network (e.g., VLAN 2018)</p></li>
-<li><p><strong>Switch-local VLAN ID</strong>: The internal VLAN used by the switch to separate
-traffic, which maps to the VNI (e.g., VLAN 100)</p></li>
-</ul>
-<p>When a server sends traffic:</p>
-<ol class="arabic simple">
-<li><p>Server sends frame tagged with tenant VLAN (e.g., 2018)</p></li>
-<li><p>Switch rewrites the tag to switch-local VLAN (e.g., 100)</p></li>
-<li><p>Switch performs VXLAN encapsulation using the VNI associated with VLAN 100</p></li>
-<li><p>Traffic travels through the VXLAN overlay to the destination switch</p></li>
-<li><p>Destination switch decapsulates and maps to its local VLAN (e.g., 101)</p></li>
-<li><p>Destination switch rewrites to tenant VLAN (e.g., 2018) on egress</p></li>
-<li><p>Destination server receives frame tagged with tenant VLAN 2018</p></li>
-</ol>
-<p>This allows tenants to use consistent VLAN numbering across their entire
-deployment while allowing the fabric to scale beyond 4094 VLANs through
-VLAN ID reuse across different physical networks.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>VLAN translation is a switch-level feature and requires switch support.
-The Neutron EVPN L2VNI driver is compatible with switches that implement
-VLAN translation but does not directly configure this feature. Switch
-configuration is handled by mechanism drivers like networking-generic-switch
-or vendor-specific drivers.</p>
-</div>
-</section>
 <section id="packet-flow-example">
 <h3>Packet flow example<a class="headerlink" href="#packet-flow-example" title="Link to this heading">¶</a></h3>
 <p>Here’s a detailed example of traffic flowing from Server A in Cabinet 1 to
@@ -586,7 +584,8 @@ and member credentials will work to create the network as a tenant.</p>
 <li><p><strong>Dynamic VLAN segment allocation or reuse</strong></p>
 <ul class="simple">
 <li><p>Checks if a VLAN segment for the physical network already exists</p></li>
-<li><p>If not, allocates a dynamic VLAN segment on the physical network</p></li>
+<li><p>If not, allocates a dynamic VLAN segment on the physical network using
+the network segment range</p></li>
 <li><p>Multiple baremetal ports on the same physical network share the same
 VLAN segment</p></li>
 </ul>
@@ -827,6 +826,8 @@ and implementation to extend Nova.</p></li>
 <section id="related-documentation">
 <h2>Related documentation<a class="headerlink" href="#related-documentation" title="Link to this heading">¶</a></h2>
 <ul class="simple">
+<li><p><a class="reference internal" href="config-network-segment-ranges.html#config-network-segment-ranges"><span class="std std-ref">Network Segment Ranges</span></a> - Network Segment Ranges necessary
+for the dynamic VLAN assignment</p></li>
 <li><p><a class="reference internal" href="config-routed-networks.html#config-routed-provider-networks"><span class="std std-ref">Routed provider networks</span></a> - Similar concept for multi-segment
 layer-3 networks</p></li>
 <li><p>Ironic documentation: <a class="reference external" href="https://docs.openstack.org/ironic/latest/admin/dhcp-less.html">Configuring Neutron networking</a></p></li>
@@ -910,7 +911,7 @@ networks</p></li>
   </div>
   <div class="docs-sidebar-toc">
     <div class="docs-sidebar-section" id="table-of-contents">
-      <a href="../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev87</h4></a>
+      <a href="../index.html" class="docs-sidebar-section-title"><h4>Neutron 27.1.0.dev100</h4></a>
       <ul>
 <li class="toctree-l1"><a class="reference internal" href="../install/index.html">Installation Guide</a></li>
 </ul>
@@ -951,7 +952,7 @@ networks</p></li>
     <div class="docs-sidebar-section" id="local-table-of-contents">
       <h4 class="docs-sidebar-section-title">Page Contents</h4>
       <ul>
-<li><a class="reference internal" href="#">Data center Networks</a><ul>
+<li><a class="reference internal" href="#">Data Center Networks</a><ul>
 <li><a class="reference internal" href="#document-scope">Document Scope</a></li>
 <li><a class="reference internal" href="#terminology">Terminology</a></li>
 <li><a class="reference internal" href="#current-state-of-neutron">Current State of Neutron</a><ul>
@@ -961,7 +962,6 @@ networks</p></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#prerequisites">Prerequisites</a><ul>
-<li><a class="reference internal" href="#vlan-translation-advanced-topic">VLAN translation (advanced topic)</a></li>
 <li><a class="reference internal" href="#packet-flow-example">Packet flow example</a></li>
 </ul>
 </li>
@@ -1080,17 +1080,17 @@ networks</p></li>
     gitURL = "Source: https://opendev.org/openstack/neutron/src/doc/source" + "/" + sourceFile;
 
     /* gitsha, project and bug_tag rely on variables in conf.py */
-    var gitSha = "SHA: 8a1b9e9075b77c56e817df662984c49106e9ea11";
+    var gitSha = "SHA: 295a62ce2aafb267225cdf23c962e00b3a382a77";
     var repositoryName = "openstack/neutron";
     var bugProject = "neutron";
-    var bugTitle = "Data center Networks in Neutron";
+    var bugTitle = "Data Center Networks in Neutron";
     var fieldTags = "doc";
     var useStoryboard = "";
 
     /* "last_updated" is the build date and time. It relies on the
        conf.py variable "html_last_updated_fmt", which should include
        year/month/day as well as hours and minutes                   */
-    var buildstring = "Release: 27.1.0.dev87 on 2025-10-30 12:30:14";
+    var buildstring = "Release: 27.1.0.dev100 on 2025-10-30 12:30:14";
 
     var fieldComment = encodeURI(buildstring) +
                        lineFeed + encodeURI(gitSha) +

@@ -164,11 +164,11 @@
 
 # IPv4 address of this host. If no address is provided and one cannot be
 # determined, 127.0.0.1 will be used. (string value)
-#my_ip = 172.22.0.123
+#my_ip = 10.202.23.79
 
 # IPv6 address of this host. If no address is provided and one cannot be
 # determined, ::1 will be used. (string value)
-#my_ipv6 = 2600:1700:7b90:52f8:5541:2be5:3ca5:9dd
+#my_ipv6 = 2600:1700:7b90:52f8:44e2:2741:f367:e046
 
 # If False, neutron-server will not listen for signals like SIGINT or SIGTERM.
 # This is useful when running behind a WSGI server like apache/mod_wsgi.
