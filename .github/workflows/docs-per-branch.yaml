@@ -1,0 +1,61 @@
+---
+name: docs-per-branch
+on:
+  workflow_dispatch:
+
+jobs:
+  discover-branches:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      matrix: ${{ steps.make-matrix.outputs.matrix }}
+    steps:
+      - name: Build branch list via GitHub API
+        id: make-matrix
+        env:
+          REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BRANCHES=$(gh api repos/$REPO/branches --paginate --jq '.[].name' | jq -R . | jq -s .)
+          # Exclude gh-pages since its where the pages are hosted
+          FILTERED=$(echo "$BRANCHES" | jq '[ .[] | select(. != "gh-pages") ]')
+          echo "matrix=$(jq -c --argjson arr "$FILTERED" '{branch: $arr}')" >> "$GITHUB_OUTPUT"
+
+  build-per-branch:
+    needs: discover-branches
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.discover-branches.outputs.matrix) }}
+      max-parallel: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ matrix.branch }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - run: pip install tox==4.32.0
+      - uses: actions/cache@v4
+        with:
+          path: .tox
+      - name: Generate docs
+        run: tox -e docs
+      - name: Setup git worktree to publish docs
+        run: |
+          git worktree add --checkout .gh-pages gh-pages || git worktree add .gh-pages -b gh-pages
+          mkdir -p .gh-pages/$(basename ${{ matrix.branch }})
+      - name: Copy docs to gh-pages
+        run: rsync -av --delete doc/build/html/ .gh-pages/$(basename ${{ matrix.branch }})/
+      - name: Push the docs to gh-pages
+        run: |
+          cd .gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -a
+          git push origin gh-pages
+
